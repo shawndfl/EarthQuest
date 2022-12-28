@@ -37,9 +37,3 @@ export class CanvasController {
     return this.canvas;
   }
 }
-
-/**
- * Create the only instance of a canvas controller
- */
-const canvas = new CanvasController();
-document.body.appendChild(canvas.component());

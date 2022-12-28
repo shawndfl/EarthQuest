@@ -10,7 +10,6 @@ module.exports = {
       title: 'Earth Quest',
       template: path.resolve(__dirname, 'src/index.html'),
       chunks: ['main'],
-      inject: true,
     }),
   ],
   output: {

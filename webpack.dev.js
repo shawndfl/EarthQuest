@@ -16,7 +16,6 @@ module.exports = {
       title: 'Development',
       template: path.resolve(__dirname, 'src/index.html'),
       chunks: ['main'],
-      inject: true,
     }),
   ],
   module: {
