@@ -14,6 +14,13 @@
         "h": 24  
     },
     {
+        "id": "ness.backwards.step",
+        "x": 36,
+        "y": 24,
+        "w":16,
+        "h": 24  
+    },
+    {
         "id": "ness.right.stand",
         "x": 53,
         "y": 24,

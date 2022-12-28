@@ -1,6 +1,6 @@
 import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import { ISpriteData } from '../core/ISpriteData';
-import { Sprite } from '../core/Sprite';
+import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
 import { SpriteShader } from '../shaders/SpriteShader';
 
@@ -80,7 +80,7 @@ export class SpritController {
    * Select a sprite
    * @param id the id in the sprite sheet
    */
-  setSprite(id?: string) {
+  setSprite(id?: string, flip: SpriteFlip = SpriteFlip.None) {
     // find the sprite of a given id
     for (let i = 0; i < this._spriteData.length; i++) {
       const sprite = this._spriteData[i];
@@ -92,6 +92,7 @@ export class SpritController {
           pixelYOffset: sprite.y,
           spriteWidth: sprite.w,
           spriteHeight: sprite.h,
+          spriteFlip: flip,
         });
 
         // update the buffer

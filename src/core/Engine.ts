@@ -1,5 +1,6 @@
 import { Scene } from '../components/Scene';
-import { TextManager } from '../systems/TextManager';
+import { InputHandler } from './InputHandler';
+import { UserAction } from './UserAction';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -7,9 +8,11 @@ import { TextManager } from '../systems/TextManager';
  */
 export class Engine {
   readonly scene: Scene;
+  readonly input: InputHandler;
 
   constructor(readonly gl: WebGL2RenderingContext) {
     this.scene = new Scene(this);
+    this.input = new InputHandler(this);
   }
 
   async initialize() {
@@ -33,7 +36,7 @@ export class Engine {
   }
 
   update(dt: number) {
-    this.gamepad();
+    this.handleUserAction(this.input.action);
 
     this.scene.update(dt);
   }

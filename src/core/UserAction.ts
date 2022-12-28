@@ -1,7 +1,7 @@
 /**
  * User input action.
  */
-enum UserAction {
+export enum UserAction {
   None = 0x00,
   Right = 0x01,
   Left = 0x02,

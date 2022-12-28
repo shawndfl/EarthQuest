@@ -1,6 +1,13 @@
 import { IQuadModel } from './GlBuffer';
 import { Texture } from './Texture';
 
+export enum SpriteFlip {
+  None,
+  XFlip,
+  YFlip,
+  Both,
+}
+
 /**
  * This is a utility class that is used to create a IQuadModel that
  * is used to create a GLBuffer.
@@ -69,24 +76,34 @@ export class Sprite {
   /**
    * This function is used to select a sprite from the sprite sheet
    */
-  setSprite(options: {
+  setSprite(opt: {
     pixelXOffset: number;
     pixelYOffset: number;
     spriteWidth: number;
     spriteHeight: number;
+    spriteFlip?: SpriteFlip;
   }) {
-    this._quad.minTex = [
-      options.pixelXOffset / this._spriteSheetSize[0],
-      1.0 - options.pixelYOffset / this._spriteSheetSize[1],
-    ];
-    this._quad.maxTex = [
-      (options.pixelXOffset + options.spriteWidth) / this._spriteSheetSize[0],
-      1.0 -
-        (options.pixelYOffset + options.spriteHeight) /
-          this._spriteSheetSize[1],
-    ];
+    const sheetW = this._spriteSheetSize[0];
+    const sheetH = this._spriteSheetSize[1];
+    const minX = opt.pixelXOffset / sheetW;
+    const minY = 1.0 - opt.pixelYOffset / sheetH;
+    const maxX = (opt.pixelXOffset + opt.spriteWidth) / sheetW;
+    const maxY = 1.0 - (opt.pixelYOffset + opt.spriteHeight) / sheetH;
 
-    this._spriteSize = [options.spriteWidth, options.spriteHeight];
+    if (opt.spriteFlip == SpriteFlip.XFlip) {
+      this._quad.minTex = [maxX, minY];
+      this._quad.maxTex = [minX, maxY];
+    } else if (opt.spriteFlip == SpriteFlip.YFlip) {
+      this._quad.minTex = [minX, maxY];
+      this._quad.maxTex = [maxX, minY];
+    } else if (opt.spriteFlip == SpriteFlip.Both) {
+      this._quad.minTex = [maxX, maxY];
+      this._quad.maxTex = [minX, minY];
+    } else {
+      this._quad.minTex = [minX, minY];
+      this._quad.maxTex = [maxX, maxY];
+    }
+    this._spriteSize = [opt.spriteWidth, opt.spriteHeight];
   }
   /**
    *
@@ -94,19 +111,19 @@ export class Sprite {
    * @param positionY Position in pixels
    * @param scale scale of the sprite default is 1.0
    */
-  setPosition(options: { x: number; y: number; scale?: number }) {
+  setPosition(opt: { x: number; y: number; scale?: number }) {
     if (!this._spriteSize) {
       throw '_tileSize not set call setSprite() first';
     }
-    if (!options.scale) {
-      options.scale = 1.0;
+    if (!opt.scale) {
+      opt.scale = 1.0;
     }
-    this._scale = options.scale;
+    this._scale = opt.scale;
 
     // convert to screen space, min is the top left corner
     this._quad.min = [
-      (options.x / this._screenSize[0]) * 2.0 - 1,
-      (options.y / this._screenSize[1]) * 2.0 - 1,
+      (opt.x / this._screenSize[0]) * 2.0 - 1,
+      (opt.y / this._screenSize[1]) * 2.0 - 1,
     ];
 
     const tileWidth = (this._spriteSize[0] / this._screenSize[0]) * this._scale;
@@ -122,7 +139,7 @@ export class Sprite {
 
   /**
    * Builds a IQuadModel from ITileData. This makes it easier to build sprites
-   * @param options
+   * @param opt
    * @returns
    */
   /*

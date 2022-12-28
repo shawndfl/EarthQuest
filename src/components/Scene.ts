@@ -12,6 +12,7 @@ import { Ground } from '../environment/Ground';
 import { PlayerController } from './PlayerController';
 import { Engine } from '../core/Engine';
 import { Component } from './Component';
+import { UserAction } from '../core/UserAction';
 
 /**
  * Sample scene
