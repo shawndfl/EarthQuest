@@ -6,6 +6,8 @@ import { ISpriteData } from '../core/ISpriteData';
 import { UserAction } from '../core/UserAction';
 import { Texture } from '../core/Texture';
 import { SpritBatchController } from '../environment/SpriteBatchController';
+import { ISpriteController } from '../environment/ISprintController';
+import { SpriteFlip } from '../core/Sprite';
 
 /**
  * Test sprite batch vs normal sprites

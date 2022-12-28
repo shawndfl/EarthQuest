@@ -53,5 +53,5 @@ export interface IAnimationData {
    * The animations. The Id will map to something in the spriteSheet and
    * sec is when the sprite should be switched to this id.
    */
-  clip: { id: string; frame: number; flip: SpriteFlip }[];
+  clip: { id: string; frame: number; flip?: SpriteFlip; rotate?: number }[];
 }

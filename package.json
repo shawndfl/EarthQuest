@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "2D Game",
   "scripts": {
-    "test": "test",
+    "test": "jest",
     "start": "webpack serve --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
@@ -13,11 +13,14 @@
   "author": "shawnd",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^29.2.4",
     "css-loader": "^6.7.2",
     "file-loader": "^6.2.0",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "jest": "^29.3.1",
     "style-loader": "^3.3.1",
+    "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.3",
     "webpack": "^5.75.0",

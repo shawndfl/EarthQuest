@@ -5,13 +5,14 @@ import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
 import { SpriteShader } from '../shaders/SpriteShader';
+import { ISpriteController } from './ISprintController';
 
 /**
  * This class controls a sprite's position and scale
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritController extends Component {
+export class SpritController extends Component implements ISpriteController {
   private _spriteData: ISpriteData[];
   private _sprite: Sprite;
   private _spriteTexture: Texture;
