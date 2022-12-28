@@ -42,8 +42,9 @@ const FontFS = `
  */
 export class TextManager {
   texts: TextController[];
-  fontData: IFontData;
+  fontData: IFontData[];
   fontImage: string;
+  maxHeightOfCharacters: number;
 
   constructor(private gl: WebGL2RenderingContext) {
     this.texts = [];
@@ -55,11 +56,22 @@ export class TextManager {
    * @param {} fontImage
    * @param {FontData} fontData
    */
-  initialize(fontImage: string, fontData: IFontData) {
+  initialize(fontImage: string, fontData: IFontData[]) {
     this.fontImage = fontImage;
     this.fontData = fontData;
 
+    // find the tallest character. This will be used when calculating new lines
+    this.maxHeightOfCharacters = 0;
+    fontData.forEach((value) => {
+      if (value.sizeY > this.maxHeightOfCharacters) {
+        this.maxHeightOfCharacters = value.sizeY;
+      }
+    });
+
+    // reset the text controllers
     this.texts = [];
+
+    console.debug('fontData ', fontData);
   }
 
   /**
@@ -75,7 +87,7 @@ export class TextManager {
   addText(textModel: ITextModel) {
     const text = new TextController(this.gl, this.fontData);
 
-    //text.initialize(textModel.text, textModel.position[0])
+    text.initialize(textModel, this.maxHeightOfCharacters);
     //this.texts.push(new )
     console.warn('Implement fontManager');
   }

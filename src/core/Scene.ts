@@ -5,6 +5,7 @@ import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
 import { Texture } from './Texture';
 import FontImage from '../assets/font.png';
+import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 
@@ -53,10 +54,14 @@ export class Scene {
    */
   constructor(private gl: WebGL2RenderingContext) {
     this.textManager = new TextManager(this.gl);
+    this.textManager.initialize(FontImage, FontData);
     this.textManager.addText({
+      id: 'welcomeText',
       text: 'hello',
       position: new vec2([0, 0]),
       color: new vec4([1, 1, 1, 1]),
+      depth: 0,
+      scale: 1.0,
     });
 
     this.texture = new Texture(this.gl);
