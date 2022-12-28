@@ -9,7 +9,7 @@ export class CanvasController {
   constructor() {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('width', '800px');
-    this.canvas.setAttribute('height', '600px');
+    this.canvas.setAttribute('height', '500px');
     this.canvas.classList.add('canvas');
 
     // Initialize the GL context
