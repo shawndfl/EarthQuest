@@ -9,5 +9,6 @@ import './css/canvas.css';
 const canvas = new CanvasController();
 const scene = new Scene();
 
-scene.init();
+scene.init(canvas.gl);
+scene.update();
 document.body.appendChild(canvas.component());

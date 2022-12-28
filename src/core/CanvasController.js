@@ -2,10 +2,6 @@
  * This controller manages the canvas
  */
 export class CanvasController {
-  /** The canvas */
-  canvas;
-  glContext;
-
   constructor() {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('width', '800px');
@@ -13,10 +9,10 @@ export class CanvasController {
     this.canvas.classList.add('canvas');
 
     // Initialize the GL context
-    this.glContext = this.canvas.getContext('webgl');
+    this.gl = this.canvas.getContext('webgl');
 
     // Only continue if WebGL is available and working
-    if (this.glContext === null) {
+    if (this.gl === null) {
       alert(
         'Unable to initialize WebGL. Your browser or machine may not support it.'
       );
@@ -24,9 +20,9 @@ export class CanvasController {
     }
 
     // Set clear color to black, fully opaque
-    this.glContext.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // Clear the color buffer with specified clear color
-    this.glContext.clear(this.glContext.COLOR_BUFFER_BIT);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
   }
 
   /**
