@@ -2,18 +2,15 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: path.resolve(__dirname, './src/index.js'),
+  entry: { main: path.resolve(__dirname, './src/index.js') },
   mode: 'development',
-  output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, './docs'),
-  },
 
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Earth Quest',
-
       template: path.resolve(__dirname, 'src/index.html'),
+      chunks: ['main'],
+      inject: true,
     }),
   ],
   output: {
@@ -22,9 +19,6 @@ module.exports = {
     clean: true,
   },
 
-  optimization: {
-    runtimeChunk: 'single',
-  },
   module: {
     rules: [
       {
