@@ -39,7 +39,7 @@ export class Curve {
     this._isDone = false;
   }
 
-  start(restart: boolean): Curve {
+  start(restart?: boolean): Curve {
     if (restart) {
       this._time = 0;
       this._position = 0;
@@ -62,7 +62,15 @@ export class Curve {
     return this;
   }
 
-  stop(): Curve {
+  /**
+   * Pause the animation and set a custom position if wanted
+   * @param position
+   * @returns
+   */
+  pause(position?: number): Curve {
+    if (position) {
+      this._position = position;
+    }
     this._running = false;
     return this;
   }
@@ -89,11 +97,6 @@ export class Curve {
     return this;
   }
 
-  time(time: number): Curve {
-    this._time = time;
-    return this;
-  }
-
   reverse(reverse: boolean) {
     this._reverse = reverse;
     return this;
@@ -101,11 +104,6 @@ export class Curve {
 
   pingPong(pingPong: boolean): Curve {
     this._pingPong = pingPong;
-    return this;
-  }
-
-  position(value: number) {
-    this._position = value;
     return this;
   }
 

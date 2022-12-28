@@ -34,6 +34,50 @@ test('curve', () => {
   expect(curve.isDone()).toBe(true);
 });
 
+test('curveStart', () => {
+  const curve = new Curve();
+
+  curve.points([
+    { p: 0, t: 0 },
+    { p: 1, t: 1 },
+    { p: 2, t: 2 },
+  ]);
+  curve.start(true);
+  expect(curve.getValue()).toBe(0);
+
+  curve.reverse(true).start(true);
+  expect(curve.getValue()).toBe(2);
+});
+
+test('curvePause', () => {
+  const curve = new Curve();
+
+  curve.points([
+    { p: 0, t: 0 },
+    { p: 1, t: 1 },
+    { p: 2, t: 2 },
+  ]);
+  // start
+  curve.start(true);
+  expect(curve.getValue()).toBe(0);
+
+  // update // marty music
+  curve.update(1);
+  expect(curve.getValue()).toBe(1);
+
+  // stop
+  curve.pause(10);
+  curve.update(1);
+
+  // no change
+  expect(curve.getValue()).toBe(10);
+
+  // start again
+  curve.start();
+  curve.update(1);
+  expect(curve.getValue()).toBe(2);
+});
+
 test('curve2', () => {
   const curve = new Curve();
 
@@ -43,8 +87,8 @@ test('curve2', () => {
     { p: 2, t: 2 },
   ]);
 
+  // setup ping pong. It will only work if you repeat the action at least once.
   curve.curve(CurveType.discreet).pingPong(true).repeat(1).start(true);
-  expect(curve.isDone()).toBe(false);
 
   expect(curve.getValue()).toBe(0);
 
@@ -52,6 +96,41 @@ test('curve2', () => {
   expect(curve.getValue()).toBe(1);
 
   curve.update(1);
+  // check time
+  expect(curve.getTime()).toBe(2);
+  // check value
+  expect(curve.getValue()).toBe(2);
+
+  curve.update(1);
+  expect(curve.getValue()).toBe(1);
+
+  curve.update(1);
+  expect(curve.getValue()).toBe(0);
+
+  expect(curve.isDone()).toBe(true);
+});
+
+test('curveSetPosition', () => {
+  const curve = new Curve();
+
+  curve.points([
+    { p: 0, t: 0 },
+    { p: 1, t: 1 },
+    { p: 2, t: 2 },
+  ]);
+
+  // setup ping pong. It will only work if you repeat the action at least once.
+  curve.curve(CurveType.discreet).pingPong(true).repeat(1).start(true);
+
+  expect(curve.getValue()).toBe(0);
+
+  curve.update(1);
+  expect(curve.getValue()).toBe(1);
+
+  curve.update(1);
+  // check time
+  expect(curve.getTime()).toBe(2);
+  // check value
   expect(curve.getValue()).toBe(2);
 
   curve.update(1);
