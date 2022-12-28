@@ -9,5 +9,17 @@ export interface ISpriteController {
    * @param id id into the sprite sheet.
    * @param flip if the sprite should be flipped in some way.
    */
-  setSprite(id: string, flip?: SpriteFlip): void;
+  setSprite(id: string): void;
+
+  /**
+   * Flip the sprite
+   * @param flipDirection
+   */
+  flip(flipDirection: SpriteFlip): void;
+
+  /**
+   * Rotate sprite in degrees
+   * @param angle in degrees
+   */
+  rotate(angle: number): void;
 }

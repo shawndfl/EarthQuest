@@ -4,9 +4,21 @@ import { SpriteFlip } from '../src/core/Sprite';
 import { ISpriteController } from '../src/environment/ISprintController';
 
 class MockSpriteController implements ISpriteController {
+  flipValue: SpriteFlip;
+  rotateValue: number;
+  spriteId: string;
+
   constructor(private onSpriteChange: (id: string) => void) {}
 
-  setSprite(id: string, flip: SpriteFlip): void {
+  flip(flipDirection: SpriteFlip): void {
+    this.flipValue = flipDirection;
+  }
+  rotate(angle: number): void {
+    this.rotateValue = angle;
+  }
+
+  setSprite(id: string): void {
+    this.spriteId = id;
     if (this.onSpriteChange) {
       this.onSpriteChange(id);
     }
@@ -78,19 +90,10 @@ test('Animation clip', () => {
   }
   let isDone = false;
   let isStart = false;
-  let callbackCount = 0;
+  let callbackFn = jest.fn((ctl) => {});
 
   const animation = new AnimationController(new MockSpriteController(() => {}));
-  animationData.onCallbackEvent = (ctrl) => {
-    callbackCount++;
-
-    console.debug(
-      'callback event: current frame ' +
-        ctrl.currentFrame.frame +
-        ' animation time ' +
-        ctrl.animationTime
-    );
-  };
+  animationData.onCallbackEvent = callbackFn;
 
   animationData.onStart = (ctrl) => {
     isStart = true;
@@ -106,11 +109,11 @@ test('Animation clip', () => {
   }
 
   expect(isStart).toBe(true);
-  expect(callbackCount).toBe(10);
+  expect(callbackFn).toBeCalledTimes(10);
   expect(isDone).toBe(true);
 });
 
-test('Animation clip2', () => {
+test('Animation sprite change event', () => {
   const frameCount = 10;
 
   const animationData: IAnimationData = {
@@ -126,6 +129,14 @@ test('Animation clip2', () => {
           eventType: AnimationEvent.SpriteChange,
           value: 'sprite.' + i,
         },
+        {
+          eventType: AnimationEvent.Rotate,
+          value: 90,
+        },
+        {
+          eventType: AnimationEvent.Flip,
+          value: SpriteFlip.XFlip,
+        },
       ],
     });
   }
@@ -134,9 +145,8 @@ test('Animation clip2', () => {
     //NOP
   });
 
-  const animation = new AnimationController(
-    new MockSpriteController(setSprite)
-  );
+  const spriteController = new MockSpriteController(setSprite);
+  const animation = new AnimationController(spriteController);
 
   animation.start(animationData);
 
@@ -145,4 +155,8 @@ test('Animation clip2', () => {
   }
 
   expect(setSprite).toBeCalledTimes(10);
+
+  expect(spriteController.flipValue).toBe(SpriteFlip.XFlip);
+  expect(spriteController.rotateValue).toBe(90);
+  expect(spriteController.spriteId).toBe('sprite.9');
 });

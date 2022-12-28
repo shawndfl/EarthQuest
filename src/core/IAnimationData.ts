@@ -9,6 +9,7 @@ export enum AnimationDoneAction {
 
 export enum AnimationEvent {
   SpriteChange,
+  Flip,
   Position,
   Rotate,
   Visible,
@@ -25,7 +26,7 @@ export interface IAnimationFrame {
   frame: number;
 
   // collection of event on the same frame
-  events: { eventType: AnimationEvent; value: string }[];
+  events: { eventType: AnimationEvent; value: any }[];
 }
 
 /**

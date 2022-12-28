@@ -150,6 +150,12 @@ export class AnimationController {
         case AnimationEvent.SpriteChange:
           this._spriteController.setSprite(event.value);
           break;
+        case AnimationEvent.Flip:
+          this._spriteController.flip(event.value);
+          break;
+        case AnimationEvent.Rotate:
+          this._spriteController.rotate(event.value);
+          break;
       }
     });
   }
