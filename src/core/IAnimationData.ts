@@ -7,6 +7,37 @@ export enum AnimationDoneAction {
   PingPong,
 }
 
+export enum AnimationEvent {
+  SpriteChange,
+  Position,
+  Rotate,
+  Visible,
+  Sound,
+  Music,
+  CallbackEvent,
+}
+
+/**
+ * The animations. The Id will map to something in the spriteSheet and
+ * sec is when the sprite should be switched to this id.
+ */
+export interface IAnimationFrame {
+  frame: number;
+
+  // collection of event on the same frame
+  events: { eventType: AnimationEvent; value: string }[];
+}
+
+/**
+ * This supports animations that will
+ * change position,
+ * change rotation,
+ * scale,
+ * change sprite image,
+ * play a sound,
+ * start a new song
+ * Change state in an object
+ */
 export interface IAnimationData {
   /**
    * This event is fired when the animation start before any sprite is
@@ -14,10 +45,10 @@ export interface IAnimationData {
    */
   onStart?: (ctrl: AnimationController) => void;
   /**
-   * This event is fired Every frame of the animation
+   * This event is fired when a call back event is raised
    * changed.
    */
-  onUpdate?: (ctrl: AnimationController) => void;
+  onCallbackEvent?: (ctrl: AnimationController) => void;
   /**
    * This event is fired when the animation is done
    * changed.
@@ -50,8 +81,7 @@ export interface IAnimationData {
   frameRate?: number;
 
   /**
-   * The animations. The Id will map to something in the spriteSheet and
-   * sec is when the sprite should be switched to this id.
+   * Animation clip for this request
    */
-  clip: { id: string; frame: number; flip?: SpriteFlip; rotate?: number }[];
+  clip: IAnimationFrame[];
 }
