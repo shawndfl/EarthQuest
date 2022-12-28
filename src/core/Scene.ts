@@ -1,5 +1,4 @@
 import { GlBuffer, IQuadModel } from './GlBuffer';
-import * as mat4 from '../math/mat4';
 import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
@@ -58,9 +57,9 @@ export class Scene {
     this.textManager.initialize(FontImage, FontData);
     this.textManager.addText({
       id: 'welcomeText',
-      text: 'Hello are you doing ok?\n  Only if this works :)',
-      position: new vec2([-1, 0]),
-      color: new vec4([1, 1, 1, 0]),
+      text: 'Hello how are you doing?\n :)',
+      position: new vec2([-1000, 300]),
+      color: new vec4([1, 0, 0, 0]),
       depth: 0.5,
       scale: 1.0,
     });
@@ -124,6 +123,8 @@ export class Scene {
     this.fps.update(dt);
 
     this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_COLOR, this.gl.ONE_MINUS_SRC_ALPHA);
+
     this.gl.clearColor(0.3, 0.3, 0.6, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing

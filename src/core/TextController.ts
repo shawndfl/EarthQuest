@@ -7,6 +7,7 @@ import { ITextModel } from './ITextModel';
 
 export class TextController {
   buffer: GlBuffer;
+  color: vec4;
 
   constructor(
     private gl: WebGL2RenderingContext,
@@ -36,6 +37,7 @@ export class TextController {
     let xpos2 = offsetX;
     let ypos2 = offsetY;
 
+    this.color = block.color;
     const zpos = block.depth;
     let charCount = 0;
     const text = block.text;

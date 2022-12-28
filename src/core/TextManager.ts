@@ -31,6 +31,7 @@ const FontFS = `
                             
       void main() {
         gl_FragColor = texture2D(uFont, vTex) * uColor;
+        gl_FragColor.a = 0.0;
       }
 `;
 
@@ -104,10 +105,7 @@ export class TextManager {
     this.fontTexture.enable(this.shaderInfo.uniform.uFont);
 
     this.texts.forEach((text) => {
-      this.shader.setVec4(
-        this.shaderInfo.uniform.uColor,
-        new vec4([1, 1, 1, 1])
-      );
+      this.shader.setVec4(this.shaderInfo.uniform.uColor, text.color);
       this.shaderInfo.uniform.uColor;
 
       text.update(dt);
