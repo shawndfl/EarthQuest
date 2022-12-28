@@ -83,6 +83,7 @@ export class Sprite {
     this._spriteFlip = SpriteFlip.None;
     this._scale = 1.0;
     this._spriteRotate = 0;
+    this._depth = 0;
   }
 
   /**
@@ -114,6 +115,7 @@ export class Sprite {
     this._spriteFlip = SpriteFlip.None;
     this._spriteRotate = 0;
     this._scale = 1.0;
+    this._depth = 0;
   }
 
   /**
@@ -161,10 +163,12 @@ export class Sprite {
    * @param y
    * @param depth screen space [-1, 1]. 1 is far -1 is close
    */
-  setPosition(x: number, y: number, depth: number) {
+  setPosition(x: number, y: number, depth?: number) {
     this._position.x = x;
     this._position.y = y;
-    this._depth = depth;
+    if (depth != undefined) {
+      this._depth = depth;
+    }
 
     this.calculateQuad();
   }

@@ -16,6 +16,10 @@ export class Curve {
   private _repeat: number;
   private _isDone: boolean;
 
+  isRunning() {
+    return this._running;
+  }
+
   getValue(): number {
     return this._position;
   }
@@ -68,7 +72,7 @@ export class Curve {
    * @returns
    */
   pause(position?: number): Curve {
-    if (position) {
+    if (position != undefined) {
       this._position = position;
     }
     this._running = false;
@@ -138,6 +142,9 @@ export class Curve {
           // if we are ping ponging
           if (this._pingPong) {
             this._reverse = !this._reverse;
+          } else {
+            // reset time
+            this._time = 0;
           }
 
           if (this._repeat > 0) {

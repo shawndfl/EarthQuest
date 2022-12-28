@@ -103,7 +103,7 @@ export class SpritController extends Component implements ISpriteController {
     depth?: number,
     commitToBuffer?: boolean
   ) {
-    this._sprite.setPosition(x, y, depth ?? 0);
+    this._sprite.setPosition(x, y, depth);
     if (commitToBuffer) {
       this.commitToBuffer();
     }
