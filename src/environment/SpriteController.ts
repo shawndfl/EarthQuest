@@ -1,6 +1,6 @@
 import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import { Texture } from '../core/Texture';
-import { TileBuilder } from './TileBuilder';
+import { TileBuilder } from '../core/Sprite';
 
 export interface ISpriteData {
   textureWidth: string;

@@ -1,17 +1,25 @@
 import { CanvasController } from './core/CanvasController';
-import { Scene } from './core/Scene';
+import { Engine } from './core/Engine';
 import './css/canvas.css';
 
 /**
  * Create the only instance of a canvas controller
  */
 const canvas = new CanvasController(onResize);
-const scene = new Scene(canvas.gl);
+const engine = new Engine(canvas.gl);
 
-scene.init();
+/**
+ * Start the engine
+ */
+engine.initialize();
 
+/**
+ * Handle resize
+ * @param width
+ * @param height
+ */
 function onResize(width: number, height: number) {
-  scene.resize(width, height);
+  engine.resize(width, height);
 }
 
 /** time tracking variables */
@@ -27,7 +35,7 @@ function step(timestamp: number) {
   const elapsed = timestamp - previousTimeStamp;
 
   // update the scene
-  scene.update(elapsed);
+  engine.update(elapsed);
 
   // request a new frame
   previousTimeStamp = timestamp;

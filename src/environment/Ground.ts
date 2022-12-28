@@ -1,8 +1,7 @@
 import { Texture } from '../core/Texture';
 import { GlBuffer, IQuadModel } from '../core/GlBuffer';
-import vec2 from '../math/vec2';
 import { ShaderController } from '../core/ShaderController';
-import { TileBuilder } from './TileBuilder';
+import { TileBuilder } from '../core/Sprite';
 
 const vsSource = `
     attribute vec3 aPos;

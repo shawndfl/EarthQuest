@@ -8,24 +8,35 @@ import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 import { Ground } from '../environment/Ground';
+import { PlayerController } from '../components/PlayerController';
 
 /**
  * Sample scene
  */
 export class Scene {
-  textManager: TextManager;
-
-  fps: FpsController;
-  texture: Texture;
-  ground: Ground;
+  readonly fps: FpsController;
+  readonly texture: Texture;
+  readonly ground: Ground;
+  readonly player: PlayerController;
+  readonly textManager: TextManager;
 
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
-  constructor(private gl: WebGL2RenderingContext) {
-    // test text manager
+  constructor(readonly gl: WebGL2RenderingContext) {
+    this.fps = new FpsController(this.textManager);
+
+    this.texture = new Texture(this.gl);
+    this.ground = new Ground(this.gl);
     this.textManager = new TextManager(this.gl);
+  }
+
+  /**
+   * Sets up the scene
+   */
+  init() {
+    console.log('init scene');
 
     this.textManager.initialize(FontImage, FontData);
     this.textManager.setTextBlock({
@@ -36,18 +47,6 @@ export class Scene {
       depth: 0,
       scale: 0.5,
     });
-
-    this.fps = new FpsController(this.textManager);
-
-    this.texture = new Texture(this.gl);
-    this.ground = new Ground(this.gl);
-  }
-
-  /**
-   * Sets up the scene
-   */
-  init() {
-    console.log('init scene');
 
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
