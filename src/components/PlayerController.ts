@@ -1,10 +1,5 @@
-import { AnimationController } from '../core/AnimationController';
+import { Curve } from '../core/Curve';
 import { Engine } from '../core/Engine';
-import {
-  AnimationDoneAction,
-  AnimationEvent,
-  IAnimationData,
-} from '../core/IAnimationData';
 import { ISpriteData } from '../core/ISpriteData';
 import { SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
@@ -28,8 +23,7 @@ export class PlayerController extends Component {
   protected _direction: SpriteDirection;
   protected _spriteFlip: boolean;
 
-  protected _walkAnimationData: IAnimationData;
-  protected _animationController: AnimationController;
+  protected _walkAnimation: Curve;
 
   constructor(eng: Engine) {
     super(eng);
@@ -37,8 +31,6 @@ export class PlayerController extends Component {
     this._direction = SpriteDirection.Down;
     this._animationState = 0;
     this._animationTimer = 0;
-
-    this._animationController = new AnimationController(this._spriteController);
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
@@ -82,7 +74,7 @@ export class PlayerController extends Component {
 
   update(dt: number) {
     this._spriteController.update(dt);
-    this._animationController.update(dt);
+    this._walkAnimation.update(dt);
 
     this.walkAnimation(dt, this._direction);
   }
