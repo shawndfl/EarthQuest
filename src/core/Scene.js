@@ -1,6 +1,8 @@
 import { GlBuffer } from './GlBuffer';
 import * as mat4 from '../math/mat4';
 import { ShaderController } from './ShaderController';
+import { TextManager } from './TextManager';
+import { FpsController } from './FpsController';
 
 const vsSource = `
   attribute vec4 aPos;
@@ -32,6 +34,8 @@ export class Scene {
         vertexPosition: null,
       },
     };
+    this.textManager = new TextManager();
+    this.fps = new FpsController();
   }
 
   /**
@@ -42,9 +46,14 @@ export class Scene {
     console.log('init');
     this.gl = gl;
 
+    // Create font manager
+    this.textManager.initialize();
+
+    // Debug matrix
     const m = mat4.create();
     console.debug(m);
-    //console.debug(gl);
+
+    // Create a new buffer
     this.buffer = new GlBuffer();
     this.buffer.initBuffers(this.gl);
 
@@ -60,8 +69,12 @@ export class Scene {
     };
   }
 
-  update() {
-    console.log('updating');
+  /**
+   * Called for each frame.
+   * @param {float} dt delta time from the last frame
+   */
+  update(dt) {
+    this.fps.update(dt);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing

@@ -10,5 +10,29 @@ const canvas = new CanvasController();
 const scene = new Scene();
 
 scene.init(canvas.gl);
-scene.update();
+
+/** time tracking variables */
+let previousTimeStamp;
+
+function step(timestamp) {
+  // save the start time
+  if (previousTimeStamp === undefined) {
+    previousTimeStamp = timestamp;
+  }
+
+  // calculate the elapsed
+  const elapsed = timestamp - previousTimeStamp;
+
+  // update the scene
+  scene.update(elapsed);
+
+  // request a new frame
+  previousTimeStamp = timestamp;
+  window.requestAnimationFrame(step);
+}
+
+// request a frame
+window.requestAnimationFrame(step);
+
+// add the canvas to the body
 document.body.appendChild(canvas.component());
