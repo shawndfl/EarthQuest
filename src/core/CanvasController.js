@@ -1,5 +1,3 @@
-import { WebGLDebugUtils } from '../utilities/webgl-debug';
-
 /**
  * This controller manages the canvas
  */
@@ -13,7 +11,11 @@ export class CanvasController {
     this.canvas.classList.add('canvas');
 
     /** @type {WebGL2RenderingContext} render context from this canvas*/
-    this.gl = this.canvas.getContext('webgl2');
+    this.gl = WebGLDebugUtils.makeDebugContext(
+      this.canvas.getContext('webgl2'),
+      undefined,
+      this.logGLCall.bind(this)
+    );
 
     // Only continue if WebGL is available and working
     if (this.gl === null) {
@@ -22,6 +24,16 @@ export class CanvasController {
       );
       return;
     }
+  }
+
+  logGLCall(functionName, args) {
+    console.log(
+      'gl.' +
+        functionName +
+        '(' +
+        WebGLDebugUtils.glFunctionArgsToString(functionName, args) +
+        ')'
+    );
   }
 
   /**

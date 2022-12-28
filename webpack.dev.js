@@ -2,7 +2,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: { main: './src/index.js' },
+  entry: {
+    debug: './src/utilities/webgl-debug.js',
+    main: { import: './src/index.js', dependOn: 'debug' },
+  },
   mode: 'development',
   devtool: 'inline-source-map',
 
@@ -15,7 +18,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Development',
       template: path.resolve(__dirname, 'src/index.html'),
-      chunks: ['main'],
+      chunks: ['debug', 'main'],
     }),
   ],
   module: {

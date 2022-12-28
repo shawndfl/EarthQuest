@@ -32,6 +32,9 @@ export class ShaderController {
     this.gl.attachShader(this.shaderProgram, fragmentShader);
     this.gl.linkProgram(this.shaderProgram);
 
+    // needed for get program parameter
+    this.gl.useProgram(this.shaderProgram);
+
     // If creating the shader program failed, alert
     if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
       console.error(
@@ -48,7 +51,7 @@ export class ShaderController {
    * @return {number} The attribute location
    */
   getAttribute(name) {
-    const loc = this.gl.getAttribLocation(shaderProgram, name);
+    const loc = this.gl.getAttribLocation(this.shaderProgram, name);
     if (loc == -1) {
       log.error(
         'can not find attribute: ' + name + ' in shader ' + this.shaderName
@@ -63,7 +66,7 @@ export class ShaderController {
    * @return {number} The attribute location
    */
   getUniform(name) {
-    const loc = this.gl.getUniformLocation(shaderProgram, name);
+    const loc = this.gl.getUniformLocation(this.shaderProgram, name);
     if (loc == -1) {
       log.error(
         'can not find uniform: ' + name + ' in shader ' + this.shaderName

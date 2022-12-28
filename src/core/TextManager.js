@@ -6,26 +6,26 @@ import { TextController } from './TextController';
  */
 class FontData {
   constructor() {
-    /** The ascii character */
-    this.ch;
+    /** @type {string} The ascii character */
+    this.ch = '';
     /**  The int value of the ascii character */
-    this.value;
+    this.value = undefined;
     /** Size of the character */
-    this.sizeX;
+    this.sizeX = undefined;
     /** Size of the character */
-    this.sizeY;
+    this.sizeY = undefined;
     /** Offset of the character */
-    this.bearingX;
+    this.bearingX = undefined;
     /** Offset of the character */
-    this.bearingY;
+    this.bearingY = undefined;
     /** Where to draw the next character */
-    this.advance;
+    this.advance = undefined;
     /** uv coordinates for the character in the texture */
-    this.u1;
-    this.v1;
+    this.u1 = undefined;
+    this.v1 = undefined;
     /** uv coordinates for the character in the texture */
-    this.u2;
-    this.v2;
+    this.u2 = undefined;
+    this.v2 = undefined;
   }
 }
 
@@ -80,23 +80,23 @@ export class TextManager {
   /**
    * Initialize the font manage. Only one font can be used per manager
    * The font data is a json structure.
-   * @param {png image} fontImage
+   * @param {} fontImage
    * @param {FontData} fontData
    */
   initialize(fontImage, fontData) {
     this.fontImage = fontImage;
     this.fontData = fontData;
 
-    const font = new TextController();
-    font.initialize();
-    this.fonts.push(font);
+    const text = new TextController();
+    //text.initialize();
+    this.texts.push(text);
 
     console.warn('Implement fontManager');
   }
 
   /**
    * Updates all the TextureController
-   * @param {float} dt Delta time in ms
+   * @param {number} dt Delta time in ms
    */
   update(dt) {
     this.texts.forEach((text) => {

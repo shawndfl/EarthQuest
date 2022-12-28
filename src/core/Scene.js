@@ -8,7 +8,7 @@ const vsSource = `
     attribute vec4 aPos;
     attribute vec2 aTex;
 
-    varying vec2 vTextureCoord;
+    varying highp vec2 vTex;
 
     void main() {
         vTex = aTex;
@@ -19,11 +19,11 @@ const vsSource = `
 // Fragment shader program
 
 const fsSource = `
-    varying vec2 vTextureCoord;
+    varying highp vec2 vTex;
     uniform sampler2D uSampler;
 
     void main() {
-        gl_FragColor = texture2D(uSampler, vTextureCoord);
+        gl_FragColor = texture2D(uSampler, vTex);
     }
 `;
 
