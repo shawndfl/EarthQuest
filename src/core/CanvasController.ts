@@ -6,6 +6,7 @@ export class CanvasController {
   gl: WebGL2RenderingContext;
 
   constructor(onResize: (width: number, height: number) => void) {
+    console.debug('starting...');
     this.container = document.createElement('div');
     this.container.classList.add('canvas-container');
 

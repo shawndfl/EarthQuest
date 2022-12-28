@@ -14,6 +14,9 @@ module.exports = {
     static: path.join(__dirname, './docs'),
     compress: true,
     port: 8080,
+    client: {
+      logging: 'log'
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({

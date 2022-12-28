@@ -1,37 +1,31 @@
-{
-    "textureWidth": 1014,
-    "textureHeight": 900,
-    "sprites": 
-    [
-        {
-            "id": "ness.forward.step.left",
-            "x": 2,
-            "y": 24,
-            "w":16,
-            "h": 24  
-        },
-        {
-            "id": "ness.forward.step.right",
-            "x": 19,
-            "y": 24,
-            "w":16,
-            "h": 24  
-        },
-        {
-            "id": "ness.right.stand",
-            "x": 53,
-            "y": 24,
-            "w":16,
-            "h": 24  
-        },
-        {
-            "id": "ness.right.step",
-            "x": 70,
-            "y": 24,
-            "w":16,
-            "h": 24  
-        }
+[
+    {
+        "id": "ness.forward.step.left",
+        "x": 2,
+        "y": 24,
+        "w":16,
+        "h": 24  
+    },
+    {
+        "id": "ness.forward.step.right",
+        "x": 19,
+        "y": 24,
+        "w":16,
+        "h": 24  
+    },
+    {
+        "id": "ness.right.stand",
+        "x": 53,
+        "y": 24,
+        "w":16,
+        "h": 24  
+    },
+    {
+        "id": "ness.right.step",
+        "x": 70,
+        "y": 24,
+        "w":16,
+        "h": 24  
+    }
 
-    ]
- 
-}
+]

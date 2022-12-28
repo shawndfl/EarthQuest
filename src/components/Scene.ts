@@ -74,6 +74,21 @@ export class Scene extends Component {
   }
 
   /**
+   * Handles user input. The logic goes through a chain of commands
+   *    1) Main menu
+   *    2) pause menu
+   *    3) battle menu
+   *    4) dialog menu
+   *    5) player in the environment
+   * @param action the action from keyboard or gamepad
+   * @returns True if the action was handled else false
+   */
+  handleUserAction(action: UserAction): boolean {
+    // handle main menu, pause menu, battles menu, dialog menu, environment
+    return this.player.handleUserAction(action);
+  }
+
+  /**
    * Called for each frame.
    * @param {float} dt delta time from the last frame
    */

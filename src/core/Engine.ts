@@ -16,7 +16,25 @@ export class Engine {
     await this.scene.initialize();
   }
 
+  handleUserAction(action: UserAction) {
+    this.scene.handleUserAction(action);
+  }
+
+  gamepad() {
+    // Always call `navigator.getGamepads()` inside of
+    // the game loop, not outside.
+    const gamepads = navigator.getGamepads();
+    for (const gamepad of gamepads) {
+      // Disregard empty slots.
+      if (!gamepad) {
+        continue;
+      }
+    }
+  }
+
   update(dt: number) {
+    this.gamepad();
+
     this.scene.update(dt);
   }
 

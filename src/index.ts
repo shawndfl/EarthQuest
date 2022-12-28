@@ -46,8 +46,8 @@ engine
     // request the first frame
     window.requestAnimationFrame(step);
   })
-  .catch(() => {
-    console.error('Error initializing');
+  .catch((e) => {
+    console.error('Error initializing ', e);
   });
 
 // add the canvas to the body
