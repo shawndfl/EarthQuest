@@ -57,6 +57,10 @@ export class Sprite {
     return this._position;
   }
 
+  get rotation(): number {
+    return this._spriteRotate;
+  }
+
   get quad() {
     return this._quad;
   }
@@ -171,21 +175,11 @@ export class Sprite {
   calculateQuad() {
     const sheetW = this._spriteSheetSize.width;
     const sheetH = this._spriteSheetSize.height;
-    const minX = this._spriteLoc.x / sheetW;
-    const minY = 1.0 - this._spriteLoc.y / sheetH;
-    const maxX = (this._spriteLoc.x + this._spriteLoc.width) / sheetW;
-    const maxY = 1.0 - (this._spriteLoc.y + this._spriteLoc.height) / sheetH;
+    let minX = this._spriteLoc.x / sheetW;
+    let minY = 1.0 - this._spriteLoc.y / sheetH;
+    let maxX = (this._spriteLoc.x + this._spriteLoc.width) / sheetW;
+    let maxY = 1.0 - (this._spriteLoc.y + this._spriteLoc.height) / sheetH;
 
-    // if we have some rotation then apply it
-    if (!MathConst.equals(this._spriteRotate, 0.0)) {
-      const min = new vec2([minX, minY]);
-      const max = new vec2([maxX, maxY]);
-      const rotation = new mat2();
-      rotation.setIdentity();
-      rotation.rotate(MathConst.toRadian(this._spriteRotate));
-      min.multiplyMat2(rotation);
-      max.multiplyMat2(rotation);
-    }
     if (this._spriteFlip == SpriteFlip.XFlip) {
       this._quad.minTex = [maxX, minY];
       this._quad.maxTex = [minX, maxY];
@@ -219,5 +213,23 @@ export class Sprite {
       this._quad.min[1] + spriteHeight,
     ];
     this._quad.depth = this._depth;
+
+    // if we have some rotation then apply it
+    if (!MathConst.equals(this._spriteRotate, 0.0)) {
+      let minTmp = new vec2([-this._quad.min[0], -this._quad.min[1]]);
+      let maxTmp = new vec2([-this._quad.max[0], -this._quad.max[1]]);
+      const rotation = new mat2();
+      rotation.setIdentity();
+
+      rotation.rotate(MathConst.toRadian(this._spriteRotate));
+
+      minTmp.multiplyMat2(rotation);
+      maxTmp.multiplyMat2(rotation);
+
+      this._quad.min[0] = minTmp.x + this._quad.min[0];
+      this._quad.min[1] = minTmp.y + this._quad.min[1];
+      this._quad.max[0] = maxTmp.x + this._quad.max[0];
+      this._quad.max[1] = maxTmp.y + this._quad.max[1];
+    }
   }
 }

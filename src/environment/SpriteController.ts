@@ -20,6 +20,10 @@ export class SpritController extends Component implements ISpriteController {
   private _selectedSpriteIndex: number;
   private _selectedSpriteId: string;
 
+  get rotation(): number {
+    return this._sprite.rotation;
+  }
+
   protected get buffer() {
     return this._buffer;
   }

@@ -161,35 +161,37 @@ export class AnimationController {
   }
 
   update(dt: number) {
-    this._currentFrame = this._animation.clip[this._frameIndex];
-    const nextFrame = this._animation.clip[this._frameIndex + 1];
+    if (this._animation) {
+      this._currentFrame = this._animation.clip[this._frameIndex];
+      const nextFrame = this._animation.clip[this._frameIndex + 1];
 
-    // if we have a next frame and its not past the
-    // last frame of this animation
-    if (nextFrame && nextFrame.frame <= this._lastFrame) {
-      const nextFrameTime = nextFrame.frame / this._frameRate;
+      // if we have a next frame and its not past the
+      // last frame of this animation
+      if (nextFrame && nextFrame.frame <= this._lastFrame) {
+        const nextFrameTime = nextFrame.frame / this._frameRate;
 
-      // did we pass the time of the next frame.
-      // if so fire the events
-      if (this._animationTime >= nextFrameTime) {
-        // increment the frame index
-        this._frameIndex++;
-        // set the new frame
-        this._currentFrame = this._animation.clip[this._frameIndex];
-        // raise the events for the next frame
-        this.handleEvent(this._currentFrame);
-      }
-    } else {
-      // Flag this as done.
-      if (!this._isDone) {
-        this._isDone = true;
-        if (this._animation.OnDone) {
-          this._animation.OnDone(this);
+        // did we pass the time of the next frame.
+        // if so fire the events
+        if (this._animationTime >= nextFrameTime) {
+          // increment the frame index
+          this._frameIndex++;
+          // set the new frame
+          this._currentFrame = this._animation.clip[this._frameIndex];
+          // raise the events for the next frame
+          this.handleEvent(this._currentFrame);
+        }
+      } else {
+        // Flag this as done.
+        if (!this._isDone) {
+          this._isDone = true;
+          if (this._animation.OnDone) {
+            this._animation.OnDone(this);
+          }
         }
       }
-    }
 
-    // update the animation timer
-    this._animationTime += dt;
+      // update the animation timer
+      this._animationTime += dt;
+    }
   }
 }

@@ -27,7 +27,12 @@ export class SpriteDebugger extends PlayerController {
    * @returns True if the action was handled else false
    */
   handleUserAction(action: UserAction): boolean {
-    if (action == UserAction.LeftPressed) {
+    if ((action & UserAction.ActionPressed) == UserAction.ActionPressed) {
+      this._spriteController.rotate(this._spriteController.rotation + 10);
+      this._spriteController.commitToBuffer();
+    }
+
+    if ((action & UserAction.LeftPressed) == UserAction.LeftPressed) {
       let index = this._spriteController.selectedSpriteIndex - 1;
       if (index < 0) {
         index = this._spriteController.spriteCount - 1;
@@ -37,7 +42,7 @@ export class SpriteDebugger extends PlayerController {
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Left;
-    } else if (action == UserAction.RightPressed) {
+    } else if (action & UserAction.RightPressed) {
       let index = this._spriteController.selectedSpriteIndex + 1;
       if (index >= this._spriteController.spriteCount) {
         index = 0;

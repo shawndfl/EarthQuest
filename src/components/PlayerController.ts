@@ -1,6 +1,10 @@
 import { AnimationController } from '../core/AnimationController';
 import { Engine } from '../core/Engine';
-import { IAnimationData } from '../core/IAnimationData';
+import {
+  AnimationDoneAction,
+  AnimationEvent,
+  IAnimationData,
+} from '../core/IAnimationData';
 import { ISpriteData } from '../core/ISpriteData';
 import { SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
@@ -78,6 +82,8 @@ export class PlayerController extends Component {
 
   update(dt: number) {
     this._spriteController.update(dt);
+    this._animationController.update(dt);
+
     this.walkAnimation(dt, this._direction);
   }
 
