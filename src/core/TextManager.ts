@@ -30,7 +30,6 @@ const FontFS = `
                             
       void main() {
         gl_FragColor = texture2D(uFont, vTex) * uColor;
-        gl_FragColor.a = 0.0;
       }
 `;
 

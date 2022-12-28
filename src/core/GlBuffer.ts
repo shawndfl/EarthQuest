@@ -5,12 +5,20 @@ import vec4 from '../math/vec4';
  * This is the model data that represents a quad
  */
 export interface IQuadModel {
-  min: vec2;
-  max: vec2;
-  depth: number;
-  minTex: vec2;
-  maxTex: vec2;
-  color: vec4;
+  /**min (x,y) corner of the quad in screen space -1 t0 1 */
+  min: [number, number];
+
+  /**min (x,y) corner of the quad in screen space -1 t0 1 */
+  max: [number, number];
+
+  /** depth (z) from -1 t0 1 */
+  depth?: number;
+
+  /** min texture (u,v) in uv space -1 to 1 */
+  minTex: [number, number];
+
+  /** max texture (u,v) in uv space -1 to 1 */
+  maxTex: [number, number];
 }
 
 /**
@@ -53,7 +61,7 @@ export class GlBuffer {
    * @param isStatic Is this buffer static
    * @returns
    */
-  setBuffers(quads: IQuadModel[], isStatic: boolean) {
+  setBuffers(quads: IQuadModel[], isStatic: boolean = true) {
     // Now create an array of positions for the square.
     const verts: number[] = [];
     const index: number[] = [];
@@ -79,17 +87,19 @@ export class GlBuffer {
     //
     let vertCount = 0;
     quads.forEach((quad) => {
-      verts.push(quad.min.x, quad.min.y, quad.depth);
-      verts.push(quad.minTex.x, quad.minTex.y);
+      const depth = quad.depth ?? 0;
 
-      verts.push(quad.max.x, quad.min.y, quad.depth);
-      verts.push(quad.maxTex.x, quad.minTex.y);
+      verts.push(quad.min[0], quad.min[1], depth);
+      verts.push(quad.minTex[0], quad.minTex[1]);
 
-      verts.push(quad.max.x, quad.max.y, quad.depth);
-      verts.push(quad.maxTex.x, quad.maxTex.y);
+      verts.push(quad.max[0], quad.min[1], depth);
+      verts.push(quad.maxTex[0], quad.minTex[1]);
 
-      verts.push(quad.min.x, quad.max.y, quad.depth);
-      verts.push(quad.minTex.x, quad.maxTex.y);
+      verts.push(quad.max[0], quad.max[1], depth);
+      verts.push(quad.maxTex[0], quad.maxTex[1]);
+
+      verts.push(quad.min[0], quad.max[1], depth);
+      verts.push(quad.minTex[0], quad.maxTex[1]);
 
       index.push(vertCount + 0);
       index.push(vertCount + 1);

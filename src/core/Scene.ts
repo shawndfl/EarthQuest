@@ -3,6 +3,7 @@ import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
 import { Texture } from './Texture';
+import grassImage from '../assets/grass.png';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
@@ -68,7 +69,7 @@ export class Scene {
       id: 'welcomeText',
       text: 'Hello how are you doing?\n :)',
       position: new vec2([-800, 600]),
-      color: new vec4([1, 0, 0, 0]),
+      color: new vec4([1, 0, 0, 1.0]),
       depth: 0,
       scale: 1.0,
     });
@@ -89,7 +90,7 @@ export class Scene {
   init() {
     console.log('init scene');
 
-    this.texture.initialize(FontImage);
+    this.texture.initialize(grassImage);
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
     // order — starting from the bottom-left corner. So in order to prevent
@@ -97,19 +98,18 @@ export class Scene {
     // rendered, we need to make the following call, to cause the pixels to
     // be flipped into the bottom-to-top order that WebGL expects.
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
-    //this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
     // Create a new buffer
     this.buffer = new GlBuffer(this.gl);
 
     const quads: IQuadModel[] = [
       {
-        max: new vec2([0.5, 0.5]),
-        min: new vec2([-0.5, -0.5]),
+        max: [1, 0.5],
+        min: [-1, -1],
         depth: 0,
-        minTex: new vec2([0, 0]),
-        maxTex: new vec2([1, 1]),
-        color: new vec4([1, 0, 0, 1]),
+        minTex: [0, 0],
+        maxTex: [1, 1],
       },
     ];
     this.buffer.setBuffers(quads, true);
@@ -132,7 +132,7 @@ export class Scene {
     this.fps.update(dt);
 
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_COLOR, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
 
     this.gl.clearColor(0.3, 0.3, 0.6, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
@@ -159,7 +159,7 @@ export class Scene {
       const vertexCount = this.buffer.indexCount;
       const type = this.gl.UNSIGNED_SHORT;
       const offset = 0;
-      //this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
     }
   }
 

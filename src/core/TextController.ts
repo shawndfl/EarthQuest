@@ -1,5 +1,4 @@
 import vec2 from '../math/vec2';
-import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 import { GlBuffer, IQuadModel } from './GlBuffer';
 import { IFontData } from './IFontData';
@@ -74,17 +73,16 @@ export class TextController {
       offsetX = xpos2;
 
       const tu1 = font.u1;
-      const tv1 = font.v2;
+      const tv1 = 1 - font.v2;
       const tu2 = font.u2;
-      const tv2 = font.v1;
+      const tv2 = 1 - font.v1;
 
       const quad: IQuadModel = {
-        min: new vec2([xpos1 / screenWidth, ypos1 / screenHeight]),
-        max: new vec2([xpos2 / screenWidth, ypos2 / screenHeight]),
-        minTex: new vec2([tu1, tv1]),
-        maxTex: new vec2([tu2, tv2]),
+        min: [xpos1 / screenWidth, ypos1 / screenHeight],
+        max: [xpos2 / screenWidth, ypos2 / screenHeight],
+        minTex: [tu1, tv1],
+        maxTex: [tu2, tv2],
         depth: zpos,
-        color: block.color,
       };
 
       charCount++;
