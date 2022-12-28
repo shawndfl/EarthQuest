@@ -1,3 +1,6 @@
+import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
+
 /**
  * Manages one shader program
  */
@@ -9,8 +12,7 @@ export class ShaderController {
    * @param {WebGL2RenderingContext} gl GL Context
    * @param {string} shaderName The name of the shader. This is just a way to id different shader for debugging
    */
-  constructor(private gl: WebGL2RenderingContext, private shaderName: string) {
-  }
+  constructor(private gl: WebGL2RenderingContext, private shaderName: string) {}
 
   /**
    * Initialize a shader program, so WebGL knows how to draw our data
@@ -26,6 +28,14 @@ export class ShaderController {
     this.shaderProgram = this.gl.createProgram();
     this.gl.attachShader(this.shaderProgram, vertexShader);
     this.gl.attachShader(this.shaderProgram, fragmentShader);
+
+    // set the attribute locations
+    // not these must exist in the shader so that
+    // the buffer maps to the correct locations.
+    this.gl.bindAttribLocation(this.shaderProgram, 0, 'aPos');
+    this.gl.bindAttribLocation(this.shaderProgram, 1, 'aTex');
+
+    // link the program
     this.gl.linkProgram(this.shaderProgram);
 
     // needed for get program parameter
@@ -46,9 +56,11 @@ export class ShaderController {
    * @param {string} name Name of the attribute
    * @return {number} The attribute location
    */
-  getAttribute(name : string) :number {
+  getAttribute(name: string): number {
+    this.gl.useProgram(this.shaderProgram);
+
     const loc = this.gl.getAttribLocation(this.shaderProgram, name);
-    if (loc == -1) {
+    if (loc === null) {
       console.error(
         'can not find attribute: ' + name + ' in shader ' + this.shaderName
       );
@@ -62,13 +74,33 @@ export class ShaderController {
    * @return {number} The attribute location
    */
   getUniform(name: string): number {
+    this.gl.useProgram(this.shaderProgram);
+
     const loc = this.gl.getUniformLocation(this.shaderProgram, name);
-    if (loc == -1) {
+    if (loc === null) {
       console.error(
         'can not find uniform: ' + name + ' in shader ' + this.shaderName
       );
     }
     return loc as number;
+  }
+
+  /**
+   * Sets a uniform for a vec4
+   * @param loc
+   * @param value
+   */
+  setVec4(loc: number, value: vec4) {
+    this.gl.uniform4f(loc, value.x, value.y, value.z, value.w);
+  }
+
+  /**
+   * Sets a uniform for a vec3
+   * @param loc
+   * @param value
+   */
+  setVec3(loc: number, value: vec3) {
+    this.gl.uniform3f(loc, value.x, value.y, value.z);
   }
 
   /**
@@ -86,7 +118,7 @@ export class ShaderController {
    * @param {*} source
    * @returns
    */
-  _loadShader(type: number, source:string) {
+  _loadShader(type: number, source: string) {
     const shader = this.gl.createShader(type);
 
     // Send the source to the shader object
@@ -97,10 +129,11 @@ export class ShaderController {
 
     // See if it compiled successfully
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+      const typeString = type == this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
       console.error(
-        `An error occurred compiling the shaders: ${this.gl.getShaderInfoLog(
-          shader
-        )}`
+        `An error occurred compiling the ${typeString} shaders in ${
+          this.shaderName
+        }: ${this.gl.getShaderInfoLog(shader)}`
       );
       this.gl.deleteShader(shader);
       return null;

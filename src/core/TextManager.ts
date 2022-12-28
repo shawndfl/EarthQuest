@@ -1,40 +1,37 @@
 import { TextController } from './TextController';
 import { IFontData } from './IFontData';
 import { ITextModel } from './ITextModel';
+import { ShaderController } from './ShaderController';
+import { Texture } from './Texture';
+import vec4 from '../math/vec4';
 
 /**
  * Vertex shader for Font
  */
 const FontVS = `
-    #version 330 core
+    attribute vec3 aPos;
+    attribute vec2 aTex;
 
-    uniform mat4 u_projection;
-
-    layout (location = 0) in vec3 a_pos;
-    layout (location = 1) in vec2 a_tex;
-
-    out vec2 v_tex;
+    varying highp vec2 vTex;
                                                 
     void main() {
-        gl_Position = u_projection  * vec4(a_pos, 1.0);
-        v_tex = a_tex;
+        vTex = aTex;
+        gl_Position = vec4(aPos.xyz, 1.0);
     }                          
 `;
 
 /**
  * Fragment shader for Font
  */
-const FontFS = `
-        #version 330 core
-                 
-        in vec2 v_tex;
-        uniform sampler2D u_font;
-        uniform vec4 u_color;
-        out vec4 color;
+const FontFS = ` 
+      varying highp vec2 vTex;
+
+      uniform sampler2D uFont;
+      uniform highp vec4 uColor;
                             
-        void main() {
-            color = texture(u_font, v_tex) * u_color;
-        }
+      void main() {
+        gl_FragColor = texture2D(uFont, vTex) * uColor;
+      }
 `;
 
 /**
@@ -45,9 +42,24 @@ export class TextManager {
   fontData: IFontData[];
   fontImage: string;
   maxHeightOfCharacters: number;
+  shader: ShaderController;
+  fontTexture: Texture;
+
+  shaderInfo: {
+    attr: { aPos: number; aTex: number };
+    uniform: { uFont: number; uColor: number };
+  };
 
   constructor(private gl: WebGL2RenderingContext) {
     this.texts = [];
+    this.shader = new ShaderController(gl, 'fontShader');
+    this.fontTexture = new Texture(this.gl);
+
+    /** Shader info for this shader */
+    this.shaderInfo = {
+      attr: { aPos: 0, aTex: 0 },
+      uniform: { uFont: 0, uColor: 0 },
+    };
   }
 
   /**
@@ -59,6 +71,14 @@ export class TextManager {
   initialize(fontImage: string, fontData: IFontData[]) {
     this.fontImage = fontImage;
     this.fontData = fontData;
+
+    this.fontTexture.initialize(fontImage);
+
+    this.shader.initShaderProgram(FontVS, FontFS);
+    this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
+    this.shaderInfo.attr.aTex = this.shader.getAttribute('aTex');
+    this.shaderInfo.uniform.uFont = this.shader.getUniform('uFont');
+    this.shaderInfo.uniform.uColor = this.shader.getUniform('uColor');
 
     // find the tallest character. This will be used when calculating new lines
     this.maxHeightOfCharacters = 0;
@@ -77,7 +97,19 @@ export class TextManager {
    * @param {number} dt Delta time in ms
    */
   update(dt: number) {
+    // enable the shader
+    this.shader.enable();
+
+    // Bind the texture to texture unit 0
+    this.fontTexture.enable(this.shaderInfo.uniform.uFont);
+
     this.texts.forEach((text) => {
+      this.shader.setVec4(
+        this.shaderInfo.uniform.uColor,
+        new vec4([1, 1, 1, 1])
+      );
+      this.shaderInfo.uniform.uColor;
+
       text.update(dt);
     });
   }
@@ -87,7 +119,6 @@ export class TextManager {
 
     text.initialize(textModel, this.maxHeightOfCharacters);
     this.texts.push(text);
-    console.warn('Implement fontManager');
   }
 
   /**

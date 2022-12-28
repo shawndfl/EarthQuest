@@ -21,7 +21,12 @@ export class TextController {
    * @param block Text properties
    * @param lineHeight The height of the tallest character in pixels
    */
-  initialize(block: ITextModel, lineHeight: number) {
+  initialize(
+    block: ITextModel,
+    lineHeight: number,
+    screenWidth: number = 1024,
+    screenHeight: number = 1024
+  ) {
     const originX = block.position.x;
     const originY = block.position.y - lineHeight;
     let offsetX = originX;
@@ -72,10 +77,10 @@ export class TextController {
       const tv2 = font.v1;
 
       const quad: IQuadModel = {
-        min: new vec2([xpos1, ypos1]),
-        max: new vec2([xpos2, ypos2]),
-        maxTex: new vec2([tu1, tv1]),
-        minTex: new vec2([tu2, tv2]),
+        min: new vec2([xpos1 / screenWidth, ypos1 / screenHeight]),
+        max: new vec2([xpos2 / screenWidth, ypos2 / screenHeight]),
+        minTex: new vec2([tu1, tv1]),
+        maxTex: new vec2([tu2, tv2]),
         depth: zpos,
         color: block.color,
       };
@@ -92,5 +97,15 @@ export class TextController {
    * Updates the text animations.
    * @param {float} dt Delta time in ms
    */
-  update(dt: number) {}
+  update(dt: number) {
+    // enable the buffer
+    this.buffer.enable();
+
+    {
+      const vertexCount = this.buffer.indexCount;
+      const type = this.gl.UNSIGNED_SHORT;
+      const offset = 0;
+      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+    }
+  }
 }

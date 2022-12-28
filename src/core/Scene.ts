@@ -10,15 +10,14 @@ import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 
 const vsSource = `
-    attribute vec4 aPos;
+    attribute vec3 aPos;
     attribute vec2 aTex;
-    uniform vec2 uImageSize; // the image size in pixels
 
     varying highp vec2 vTex;
 
     void main() {
-        vTex = aTex / uImageSize;
-        gl_Position = aPos;
+        vTex = aTex;
+        gl_Position = vec4(aPos.xyz, 1.0);
     }
 `;
 
@@ -26,6 +25,7 @@ const vsSource = `
 
 const fsSource = `
     varying highp vec2 vTex;
+
     uniform sampler2D uSampler;
 
     void main() {
@@ -46,7 +46,7 @@ export class Scene {
 
   shaderInfo: {
     attr: { aPos: number; aTex: number };
-    uniform: { uSampler: number; uImageSize: number };
+    uniform: { uSampler: number };
   };
   /**
    * Constructor
@@ -58,10 +58,10 @@ export class Scene {
     this.textManager.initialize(FontImage, FontData);
     this.textManager.addText({
       id: 'welcomeText',
-      text: 'hello',
-      position: new vec2([0, 0]),
-      color: new vec4([1, 1, 1, 1]),
-      depth: 0,
+      text: 'Hello are you doing ok?\n  Only if this works :)',
+      position: new vec2([-1, 0]),
+      color: new vec4([1, 1, 1, 0]),
+      depth: 0.5,
       scale: 1.0,
     });
 
@@ -71,7 +71,7 @@ export class Scene {
     /** Shader info for this shader */
     this.shaderInfo = {
       attr: { aPos: 0, aTex: 0 },
-      uniform: { uSampler: 0, uImageSize: 0 },
+      uniform: { uSampler: 0 },
     };
   }
 
@@ -89,7 +89,7 @@ export class Scene {
     // rendered, we need to make the following call, to cause the pixels to
     // be flipped into the bottom-to-top order that WebGL expects.
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
-    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+    //this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
     // Create a new buffer
     this.buffer = new GlBuffer(this.gl);
@@ -100,7 +100,7 @@ export class Scene {
         min: new vec2([-0.5, -0.5]),
         depth: 0,
         minTex: new vec2([0, 0]),
-        maxTex: new vec2([1024, 1024]),
+        maxTex: new vec2([1, 1]),
         color: new vec4([1, 0, 0, 1]),
       },
     ];
@@ -114,7 +114,6 @@ export class Scene {
     this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
     this.shaderInfo.attr.aTex = this.shader.getAttribute('aTex');
     this.shaderInfo.uniform.uSampler = this.shader.getUniform('uSampler');
-    this.shaderInfo.uniform.uImageSize = this.shader.getUniform('uImageSize');
   }
 
   /**
@@ -123,7 +122,9 @@ export class Scene {
    */
   update(dt: number) {
     this.fps.update(dt);
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+
+    this.gl.enable(this.gl.BLEND);
+    this.gl.clearColor(0.3, 0.3, 0.6, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
@@ -136,7 +137,7 @@ export class Scene {
     this.textManager.update(dt);
 
     // enable the buffer
-    this.buffer.enable(this.shaderInfo.attr.aPos, this.shaderInfo.attr.aTex);
+    this.buffer.enable();
 
     // enable the shader
     this.shader.enable();
@@ -144,16 +145,11 @@ export class Scene {
     // Bind the texture to texture unit 0
     this.texture.enable(this.shaderInfo.uniform.uSampler);
 
-    this.gl.uniform2f(
-      this.shaderInfo.uniform.uImageSize,
-      this.texture.width,
-      this.texture.height
-    );
     {
       const vertexCount = this.buffer.indexCount;
       const type = this.gl.UNSIGNED_SHORT;
       const offset = 0;
-      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      //this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
     }
   }
 
