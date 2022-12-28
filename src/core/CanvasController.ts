@@ -9,7 +9,6 @@ export class CanvasController {
     this.container = document.createElement('div');
     this.container.classList.add('canvas-container');
 
-    /** @type {HTMLCanvasElement} Canvas element */
     const canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;

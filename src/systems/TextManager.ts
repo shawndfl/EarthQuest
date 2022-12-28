@@ -1,8 +1,8 @@
-import { TextController } from './TextController';
-import { IFontData } from './IFontData';
-import { ITextModel } from './ITextModel';
-import { ShaderController } from './ShaderController';
-import { Texture } from './Texture';
+import { TextController } from '../core/TextController';
+import { IFontData } from '../core/IFontData';
+import { ITextModel } from '../core/ITextModel';
+import { ShaderController } from '../core/ShaderController';
+import { Texture } from '../core/Texture';
 
 /**
  * Vertex shader for Font

@@ -1,7 +1,8 @@
-import { TextManager } from './TextManager';
+import { TextManager } from '../systems/TextManager';
 import { FpsController } from './FpsController';
 import { Texture } from './Texture';
 import grassImage from '../assets/grass.png';
+import CharacterImage from '../assets/characters.png';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
@@ -57,7 +58,7 @@ export class Scene {
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    this.texture.initialize(grassImage);
+    this.texture.initialize(CharacterImage);
     this.ground.initialize(this.texture);
 
     this.gl.enable(this.gl.CULL_FACE);

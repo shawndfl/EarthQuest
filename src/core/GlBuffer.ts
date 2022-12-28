@@ -1,6 +1,3 @@
-import vec2 from '../math/vec2';
-import vec4 from '../math/vec4';
-
 /**
  * This is the model data that represents a quad
  */
@@ -61,7 +58,11 @@ export class GlBuffer {
    * @param isStatic Is this buffer static
    * @returns
    */
-  setBuffers(quads: IQuadModel[], isStatic: boolean = true) {
+  setBuffers(
+    quads: IQuadModel[],
+    isStatic: boolean = true,
+    bufferIndex: number = 0
+  ) {
     // Now create an array of positions for the square.
     const verts: number[] = [];
     const index: number[] = [];
@@ -123,7 +124,8 @@ export class GlBuffer {
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
       new Float32Array(verts),
-      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW
+      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
+      bufferIndex
     );
 
     // in order for this to work the vertex shader will
@@ -179,7 +181,8 @@ export class GlBuffer {
     this.gl.bufferData(
       this.gl.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(index),
-      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW
+      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
+      bufferIndex
     );
   }
 

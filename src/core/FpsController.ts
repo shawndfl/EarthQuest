@@ -1,6 +1,6 @@
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
-import { TextManager } from './TextManager';
+import { TextManager } from '../systems/TextManager';
 
 /**
  * Shows the FPS

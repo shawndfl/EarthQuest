@@ -2,6 +2,7 @@ import { Texture } from '../core/Texture';
 import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import vec2 from '../math/vec2';
 import { ShaderController } from '../core/ShaderController';
+import { TileBuilder } from './TileBuilder';
 
 const vsSource = `
     attribute vec3 aPos;
@@ -52,11 +53,19 @@ export class Ground {
   }
 
   initialize(texture: Texture) {
-    const topLeft = [-1, -1, 1, 1, 0, 1, 0.2, 0.8];
+    //const topLeft = [-1, -1, 1, 1, 0, 1, 0.2, 0.8];
     const topRight = [-1, 0, 0.5, 1];
+    const topLeft = TileBuilder.buildQuad({
+      position: [0.5, 0.5],
+      scale: 5.0,
+      screenSize: [this.gl.canvas.width, this.gl.canvas.height],
+      tileOffset: [2, 24],
+      textureSize: [1013, 900],
+      tileSize: [16, 24],
+    });
 
-    const quads: IQuadModel[] = [this.buildQuad(topLeft)];
-
+    const quads: IQuadModel[] = [topLeft];
+    console.debug('quad ', quads);
     this._buffer.setBuffers(quads);
 
     this._texture = texture;
