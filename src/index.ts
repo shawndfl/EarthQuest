@@ -5,10 +5,14 @@ import './css/canvas.css';
 /**
  * Create the only instance of a canvas controller
  */
-const canvas = new CanvasController();
+const canvas = new CanvasController(onResize);
 const scene = new Scene(canvas.gl);
 
 scene.init();
+
+function onResize(width: number, height: number) {
+  scene.resize(width, height);
+}
 
 /** time tracking variables */
 let previousTimeStamp: number;
@@ -34,4 +38,4 @@ function step(timestamp: number) {
 window.requestAnimationFrame(step);
 
 // add the canvas to the body
-document.body.appendChild(canvas.component());
+document.body.appendChild(canvas.element());

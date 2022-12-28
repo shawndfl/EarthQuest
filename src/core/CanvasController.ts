@@ -2,21 +2,31 @@
  * This controller manages the canvas
  */
 export class CanvasController {
-  canvas: HTMLCanvasElement;
+  container: HTMLElement;
   gl: WebGL2RenderingContext;
 
-  constructor() {
-    /** @type {HTMLCanvasElement} Canvas element */
-    this.canvas = document.createElement('canvas');
+  constructor(onResize: (width: number, height: number) => void) {
+    this.container = document.createElement('div');
+    this.container.classList.add('canvas-container');
 
-    this.canvas.setAttribute('width', '800px');
-    this.canvas.setAttribute('height', '500px');
-    this.canvas.classList.add('canvas');
+    /** @type {HTMLCanvasElement} Canvas element */
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.classList.add('canvas');
+
+    this.container.append(canvas);
+
+    window.addEventListener('resize', (e) => {
+      if (onResize) {
+        onResize(canvas.clientWidth, canvas.clientHeight);
+      }
+    });
 
     /** @type {WebGL2RenderingContext} render context from this canvas*/
     // @ts-ignore
     this.gl = (WebGLDebugUtils as any).makeDebugContext(
-      this.canvas.getContext('webgl2'),
+      canvas.getContext('webgl2'),
       this.logGlError.bind(this),
       this.logGLCall.bind(this)
     );
@@ -57,10 +67,10 @@ export class CanvasController {
   }
 
   /**
-   * Get the canvas component
+   * Get the container element
    * @returns
    */
-  component() {
-    return this.canvas;
+  element() {
+    return this.container;
   }
 }

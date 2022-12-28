@@ -3,7 +3,6 @@ import { IFontData } from './IFontData';
 import { ITextModel } from './ITextModel';
 import { ShaderController } from './ShaderController';
 import { Texture } from './Texture';
-import vec4 from '../math/vec4';
 
 /**
  * Vertex shader for Font
@@ -115,7 +114,12 @@ export class TextManager {
   addText(textModel: ITextModel) {
     const text = new TextController(this.gl, this.fontData);
 
-    text.initialize(textModel, this.maxHeightOfCharacters);
+    text.initialize(
+      textModel,
+      this.maxHeightOfCharacters,
+      this.gl.canvas.width,
+      this.gl.canvas.height
+    );
     this.texts.push(text);
   }
 

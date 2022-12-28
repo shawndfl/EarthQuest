@@ -1,4 +1,15 @@
+body {
+    margin: 0px;
+    padding: 10px;
+    overflow: hidden;
+}
+.canvas-container {
+    width: 100%;
+    height: 100vh;
+    margin: 0px;
+}
 .canvas {
     background-color: lightgray;
-    border: solid #ff0000;
+    margin:auto;
+    display: flex;
 }

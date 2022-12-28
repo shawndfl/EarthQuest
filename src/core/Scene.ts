@@ -7,6 +7,7 @@ import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
+import mat4 from '../math/mat4';
 
 const vsSource = `
     attribute vec3 aPos;
@@ -43,24 +44,32 @@ export class Scene {
   fps: FpsController;
   texture: Texture;
 
+  /**
+   * The projection for the scene
+   */
+  projection: mat4;
+
   shaderInfo: {
     attr: { aPos: number; aTex: number };
     uniform: { uSampler: number };
   };
+
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
   constructor(private gl: WebGL2RenderingContext) {
+    // Create projection
+    //this.projection = mat4.frustum(0,
     // test text manager
     this.textManager = new TextManager(this.gl);
     this.textManager.initialize(FontImage, FontData);
     this.textManager.addText({
       id: 'welcomeText',
       text: 'Hello how are you doing?\n :)',
-      position: new vec2([-1000, 300]),
+      position: new vec2([-800, 600]),
       color: new vec4([1, 0, 0, 0]),
-      depth: 0.5,
+      depth: 0,
       scale: 1.0,
     });
 
@@ -153,6 +162,8 @@ export class Scene {
       //this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
     }
   }
+
+  resize(width: number, height: number) {}
 
   dispose() {
     console.log('dispose');

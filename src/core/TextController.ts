@@ -25,8 +25,8 @@ export class TextController {
   initialize(
     block: ITextModel,
     lineHeight: number,
-    screenWidth: number = 1024,
-    screenHeight: number = 1024
+    screenWidth: number,
+    screenHeight: number
   ) {
     const originX = block.position.x;
     const originY = block.position.y - lineHeight;
