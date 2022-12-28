@@ -47,7 +47,7 @@ export class PlayerController extends Component {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
     // set the position of the sprite in the center of the screen
-    this._position = new vec2([200, 300]);
+    this._position = new vec2([400, 185]);
 
     this._spriteController.setSpritePosition(
       this._position.x,
@@ -107,7 +107,6 @@ export class PlayerController extends Component {
       this._walkAnimation.start(true);
     } else if (!this._walking) {
       this._walkAnimation.pause(0);
-      console.debug('stop ' + this._walkAnimation.getValue());
     }
 
     return true;

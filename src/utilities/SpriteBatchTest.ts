@@ -92,7 +92,7 @@ export class SpriteBatchTest extends Component {
         this._spriteBatch.scale(5.0);
         this._spriteBatch.setSpritePosition(x, y, 0.5);
       }
-      this._spriteBatch.commitBuffer();
+      this._spriteBatch.commitToBuffer();
     } else {
       let step = 0;
       for (let i = 0; i < this._sprites.length; i++) {

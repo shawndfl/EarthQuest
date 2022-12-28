@@ -183,7 +183,7 @@ export class SpritBatchController
     }
   }
 
-  commitBuffer() {
+  commitToBuffer() {
     const quads: IQuadModel[] = [];
     this._sprites.forEach((sprite) => {
       quads.push(sprite.quad);

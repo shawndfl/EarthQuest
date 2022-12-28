@@ -72,7 +72,7 @@ export class DialogMenu extends Component {
     //this._spriteBatch.setSprite('sprite_' + i, 0);
     //this._spriteBatch.setSpritePosition('sprite_' + i, x, y, 5, 0.5);
 
-    this._spriteBatch.commitBuffer();
+    this._spriteBatch.commitToBuffer();
   }
 
   /**

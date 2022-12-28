@@ -1,40 +1,43 @@
 import { Texture } from '../core/Texture';
-import { GlBuffer, IQuadModel } from '../core/GlBuffer';
-import { ShaderController } from '../core/ShaderController';
+import { Component } from '../components/Component';
+import { Engine } from '../core/Engine';
+import TileImg from '../assets/IsometricTile.png';
+import TileData from '../assets/IsometricTile.json';
+import { SpritBatchController } from './SpriteBatchController';
+import vec2 from '../math/vec2';
 
-const vsSource = `
-    attribute vec3 aPos;
-    attribute vec2 aTex;
+export class Ground extends Component {
+  protected _spriteController: SpritBatchController;
 
-    varying highp vec2 vTex;
-
-    void main() {
-        vTex = aTex;
-        gl_Position = vec4(aPos.xyz, 1.0);
-    }
-`;
-
-// Fragment shader program
-
-const fsSource = `
-    varying highp vec2 vTex;
-
-    uniform sampler2D uSampler;
-
-    void main() {
-        gl_FragColor = texture2D(uSampler, vTex);
-    }
-`;
-
-export class Ground {
-  private _texture: Texture;
-  private _buffer: GlBuffer;
-
-  constructor(private gl: WebGL2RenderingContext) {
-    this._buffer = new GlBuffer(this.gl);
+  constructor(eng: Engine) {
+    super(eng);
+    this._spriteController = new SpritBatchController(eng);
   }
 
-  initialize(texture: Texture) {}
+  async initialize() {
+    const texture = new Texture(this.gl);
+    await texture.loadImage(TileImg);
+    this._spriteController.initialize(texture, TileData);
 
-  update(dt: number) {}
+    const scale = 5;
+    const start = new vec2([0, 200]);
+
+    for (let j = 0; j < 10; j++) {
+      for (let i = 0; i < 10; i++) {
+        this._spriteController.activeSprite('tile' + i + '_' + j);
+        const xOffset = j % 2 == 0 ? 0 : 8 * scale;
+        const x = start.x + i * 16 * scale + xOffset;
+        const y = start.y + j * 4 * scale;
+        this._spriteController.setSpritePosition(x, y, 1.0 - j / 5.0);
+
+        this._spriteController.scale(5);
+        this._spriteController.setSprite('block');
+      }
+    }
+    this._spriteController.commitToBuffer();
+  }
+
+  update(dt: number) {
+    this._spriteController.update(dt);
+  }
 }

@@ -41,7 +41,7 @@ export class Scene extends Component {
 
     this.spriteSheetTexture = new Texture(this.gl);
     this.textManager = new TextManager(eng);
-    this.ground = new Ground(this.gl);
+    this.ground = new Ground(eng);
 
     this.player = new PlayerController(eng);
     this.spriteDebugger = new SpriteDebugger(eng);
@@ -70,7 +70,7 @@ export class Scene extends Component {
     this.gl.cullFace(this.gl.BACK);
 
     await this.spriteSheetTexture.loadImage(CharacterImage);
-    this.ground.initialize(this.spriteSheetTexture);
+    this.ground.initialize();
     this.player.initialize(this.spriteSheetTexture, CharacterData);
     this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
     await this.dialog.initialize();

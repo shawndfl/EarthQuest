@@ -13,6 +13,14 @@ export class Engine {
   private _editor: Editor;
   readonly spriteShader: SpriteShader;
 
+  get width(): number {
+    return this.gl.canvas.width;
+  }
+
+  get height(): number {
+    return this.gl.canvas.height;
+  }
+
   get editor(): Editor {
     return this._editor;
   }
