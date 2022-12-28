@@ -26,4 +26,10 @@ export class TextController {
     width,
     height
   ) {}
+
+  /**
+   * Updates the text animations.
+   * @param {float} dt Delta time in ms
+   */
+  udpate(dt) {}
 }

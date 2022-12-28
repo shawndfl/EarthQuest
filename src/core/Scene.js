@@ -1,50 +1,68 @@
-import { GlBuffer } from './GlBuffer';
+import { GlBuffer, QuadModel } from './GlBuffer';
 import * as mat4 from '../math/mat4';
 import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
 
 const vsSource = `
-  attribute vec4 aPos;
-  void main() {
-    gl_Position = aPos;
-  }
+    attribute vec4 aPos;
+    attribute vec2 aTex;
+
+    varying vec2 vTextureCoord;
+
+    void main() {
+        vTex = aTex;
+        gl_Position = aPos;
+    }
 `;
 
 // Fragment shader program
 
 const fsSource = `
-  void main() {
-    gl_FragColor = vec4(0.0, 0.2, .6, 1.0);
-  }
+    varying vec2 vTextureCoord;
+    uniform sampler2D uSampler;
+
+    void main() {
+        gl_FragColor = texture2D(uSampler, vTextureCoord);
+    }
 `;
 
 /**
  * Sample scene
  */
 export class Scene {
-  constructor() {
+  /**
+   * Constructor
+   * @param {WebGL2RenderingContext} gl The render context
+   */
+  constructor(gl) {
+    /** @type {GlBuffer} The gl buffer object that manages the vertex and index buffer */
     this.buffer;
-    this.gl;
-    this.shader;
-    this.programInfo = {
-      program: null,
 
-      attribLocations: {
-        vertexPosition: null,
-      },
-    };
+    /** @type {WebGL2RenderingContext} The gl object. All openGL calls go through this */
+    this.gl = gl;
+
+    /** @type {ShaderController} Manages the shader for this scene */
+    this.shader;
+
+    /** @type {TextManager} TextManager */
     this.textManager = new TextManager();
+
+    /** @type {FpsController} */
     this.fps = new FpsController();
+
+    /** Shader info for this shader */
+    this.shaderInfo = {
+      attr: { aPos: 0, aTex: 0 },
+      uniform: { uSampler: 0 },
+    };
   }
 
   /**
    * Sets up the scene
-   * @param {*} gl - The gl context from the canvas
    */
-  init(gl) {
-    console.log('init');
-    this.gl = gl;
+  init() {
+    console.log('init scene');
 
     // Create font manager
     this.textManager.initialize();
@@ -54,19 +72,29 @@ export class Scene {
     console.debug(m);
 
     // Create a new buffer
-    this.buffer = new GlBuffer();
-    this.buffer.initBuffers(this.gl);
+    this.buffer = new GlBuffer(this.gl);
 
-    this.shader = new ShaderController();
-    this.shader.initShaderProgram(this.gl, vsSource, fsSource);
-    this.programInfo = {
-      program: this.shader.shaderProgram,
-
-      attribLocations: {
-        vertexPosition: gl.getAttribLocation(this.shader.shaderProgram, 'aPos'),
+    /** @type {QuadModel} */
+    const quads = [
+      {
+        max: [0.5, 0.5],
+        min: [-0.5, -0.5],
+        depth: 0,
+        minTex: [0, 0],
+        maxTex: [1, 1],
+        color: [1, 0, 0, 1],
       },
-      uniformLocations: {},
-    };
+    ];
+    this.buffer.initBuffers(quads, true);
+
+    // create the shader from the vertex and fragment source
+    this.shader = new ShaderController(this.gl, 'simple');
+    this.shader.initShaderProgram(vsSource, fsSource);
+
+    // set the info
+    this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
+    this.shaderInfo.attr.aTex = this.shader.getAttribute('aTex');
+    this.shaderInfo.uniform.uSampler = this.shader.getUniform('uSampler');
   }
 
   /**
@@ -84,36 +112,20 @@ export class Scene {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    // Tell WebGL how to pull out the positions from the position
-    // buffer into the vertexPosition attribute.
-    {
-      const numComponents = 3; // pull out 2 values per iteration
-      const type = this.gl.FLOAT; // the data in the buffer is 32bit floats
-      const normalize = false; // don't normalize
-      const stride = 0; // how many bytes to get from one set of values to the next
-      // 0 = use type and numComponents above
-      const offset = 0; // how many bytes inside the buffer to start from
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer.buffer);
-      this.gl.vertexAttribPointer(
-        this.programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset
-      );
-      this.gl.enableVertexAttribArray(
-        this.programInfo.attribLocations.vertexPosition
-      );
-    }
+    // update the texture manager
+    this.textManager.update(dt);
 
-    // Tell WebGL to use our program when drawing
-    this.gl.useProgram(this.programInfo.program);
+    // enable the buffer
+    this.buffer.enable(this.shaderInfo.attr.aPos, this.shaderInfo.attr.aTex);
+
+    // enable the shader
+    this.shader.enable();
 
     {
+      const vertexCount = this.buffer.indexCount;
+      const type = gl.UNSIGNED_SHORT;
       const offset = 0;
-      const vertexCount = 4;
-      this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, vertexCount);
+      gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
   }
 

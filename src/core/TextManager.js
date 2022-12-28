@@ -69,11 +69,11 @@ const FontFS = `
  */
 export class TextManager {
   constructor() {
-    /**
-     * Collection of fonts to render
-     */
-    this.fonts = [];
+    /** Collection of TextController to render  */
+    this.texts = [];
+    /** FontData object */
     this.fontData;
+    /** png image that contains the characters of the font */
     this.fontImage;
   }
 
@@ -92,6 +92,16 @@ export class TextManager {
     this.fonts.push(font);
 
     console.warn('Implement fontManager');
+  }
+
+  /**
+   * Updates all the TextureController
+   * @param {float} dt Delta time in ms
+   */
+  update(dt) {
+    this.texts.forEach((text) => {
+      text.update(dt);
+    });
   }
 
   addFont(FontModel) {}

@@ -7,9 +7,9 @@ import './css/canvas.css';
  * Create the only instance of a canvas controller
  */
 const canvas = new CanvasController();
-const scene = new Scene();
+const scene = new Scene(canvas.gl);
 
-scene.init(canvas.gl);
+scene.init();
 
 /** time tracking variables */
 let previousTimeStamp;
