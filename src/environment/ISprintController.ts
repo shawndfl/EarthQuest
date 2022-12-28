@@ -22,4 +22,10 @@ export interface ISpriteController {
    * @param angle in degrees
    */
   rotate(angle: number): void;
+
+  /**
+   * Sets the scale of the sprite keeping the aspect ratio.
+   * @param scale
+   */
+  scale(scale: number): void;
 }

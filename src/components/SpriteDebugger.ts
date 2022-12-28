@@ -16,8 +16,8 @@ export class SpriteDebugger extends PlayerController {
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
     super.initialize(spriteSheet, characterData);
 
-    this._spriteController.setSpritePosition(100, 300, 5);
-    this._spriteController.setSprite('ness.right.stand');
+    this._spriteController.setSpritePosition(10, 300, 0);
+    this._spriteController.setSprite('ness.left.stand');
     this._spriteController.commitToBuffer();
   }
 
@@ -33,7 +33,7 @@ export class SpriteDebugger extends PlayerController {
         index = this._spriteController.spriteCount - 1;
       }
 
-      this._spriteController.setSprite(index, SpriteFlip.None, true);
+      this._spriteController.setSprite(index, true);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Left;
@@ -43,7 +43,7 @@ export class SpriteDebugger extends PlayerController {
         index = 0;
       }
 
-      this._spriteController.setSprite(index, SpriteFlip.None, true);
+      this._spriteController.setSprite(index, true);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Right;

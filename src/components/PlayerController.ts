@@ -37,24 +37,13 @@ export class PlayerController extends Component {
     this._animationController = new AnimationController(this._spriteController);
   }
 
-  buildAnimationClip(): IAnimationData {
-    return;
-    {
-      frames: [
-        {
-          id: 'ness.forward.step.left',
-          frame: 10,
-        },
-      ];
-    }
-  }
-
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
     // set the position of the sprite in the center of the screen
-    this._spriteController.setSpritePosition(200, 300, 5);
-    this._spriteController.setSprite('ness.right.stand');
+    this._spriteController.setSpritePosition(200, 300, 0);
+    this._spriteController.scale(5);
+    this._spriteController.setSprite('ness.left.stand');
     this._spriteController.commitToBuffer();
 
     console.info('sprite list ', this._spriteController.getSpriteList());
@@ -107,17 +96,11 @@ export class PlayerController extends Component {
 
     // toggle and animation
     if (this._animationState == 0) {
-      this._spriteController.setSprite(
-        sprites[0],
-        flip ? SpriteFlip.XFlip : SpriteFlip.None,
-        true
-      );
+      this._spriteController.setFlip(flip ? SpriteFlip.XFlip : SpriteFlip.None);
+      this._spriteController.setSprite(sprites[0], true);
     } else if (this._animationState == 1) {
-      this._spriteController.setSprite(
-        sprites[1],
-        flip ? SpriteFlip.XFlip : SpriteFlip.None,
-        true
-      );
+      this._spriteController.setFlip(flip ? SpriteFlip.XFlip : SpriteFlip.None);
+      this._spriteController.setSprite(sprites[1], true);
     }
 
     this._animationTimer += dt;

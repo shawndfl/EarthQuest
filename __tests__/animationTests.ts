@@ -7,8 +7,12 @@ class MockSpriteController implements ISpriteController {
   flipValue: SpriteFlip;
   rotateValue: number;
   spriteId: string;
+  scaleValue: number;
 
-  constructor(private onSpriteChange: (id: string) => void) {}
+  constructor(private onSpriteChange?: (id: string) => void) {}
+  scale(scale: number): void {
+    this.scaleValue = scale;
+  }
 
   flip(flipDirection: SpriteFlip): void {
     this.flipValue = flipDirection;
@@ -24,47 +28,6 @@ class MockSpriteController implements ISpriteController {
     }
   }
 }
-/*
-test('Find animation', () => {
-  const animationData: IAnimationData = {
-    clip: [],
-    startFrame: 990,
-  };
-
-  const frameCount = 10;
-  // create some test frames
-  for (let i = 0; i < frameCount; i++) {
-    animationData.clip.push({
-      frame: i * 10,
-      events: [
-        {
-          eventType: AnimationEvent.CallbackEvent,
-          value: 'testing ' + i,
-        },
-      ],
-    });
-  }
-
-  animationData.onCallbackEvent = (ctrl: AnimationController) => {
-    console.debug(
-      'callback event: current frame ' +
-        ctrl.currentFrame.frame +
-        ' animation time ' +
-        ctrl.animationTime
-    );
-  };
-  //console.debug('animationClip ', animationData.clip);
-
-  const animation = new AnimationController(new MockSpriteController());
-  animation.start(animationData);
-  expect(animation.clip.length).toBe(frameCount);
-  //animation.clip.forEach((val) => {
-  //  console.debug(val.frame);
-  //});
-
-  expect(animation.frameRate).toBe(30);
-});
-*/
 
 /**
  * Test animation clip event raising and running through 10 frames
@@ -141,11 +104,7 @@ test('Animation sprite change event', () => {
     });
   }
 
-  let setSprite = jest.fn((id: string) => {
-    //NOP
-  });
-
-  const spriteController = new MockSpriteController(setSprite);
+  const spriteController = new MockSpriteController();
   const animation = new AnimationController(spriteController);
 
   animation.start(animationData);
@@ -153,8 +112,6 @@ test('Animation sprite change event', () => {
   for (let i = 0; i < 90; i++) {
     animation.update(30 / 60);
   }
-
-  expect(setSprite).toBeCalledTimes(10);
 
   expect(spriteController.flipValue).toBe(SpriteFlip.XFlip);
   expect(spriteController.rotateValue).toBe(90);

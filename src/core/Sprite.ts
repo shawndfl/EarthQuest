@@ -1,5 +1,8 @@
+import mat2 from '../math/mat2';
+import vec2 from '../math/vec2';
 import { IQuadModel } from './GlBuffer';
 import { Texture } from './Texture';
+import * as MathConst from '../math/constants';
 
 export enum SpriteFlip {
   None,
@@ -74,6 +77,7 @@ export class Sprite {
     this._position = { x: 0, y: 0 };
     this._spriteLoc = { x: 0, y: 0, width: 0, height: 0 };
     this._spriteFlip = SpriteFlip.None;
+    this._scale = 1.0;
     this._spriteRotate = 0;
   }
 
@@ -105,6 +109,7 @@ export class Sprite {
     this._screenSize = { width: screenWidth, height: screenHeight };
     this._spriteFlip = SpriteFlip.None;
     this._spriteRotate = 0;
+    this._scale = 1.0;
   }
 
   /**
@@ -115,31 +120,47 @@ export class Sprite {
     pixelYOffset: number;
     spriteWidth: number;
     spriteHeight: number;
-    spriteFlip?: SpriteFlip;
   }) {
     this._spriteLoc.x = opt.pixelXOffset;
     this._spriteLoc.y = opt.pixelYOffset;
     this._spriteLoc.width = opt.spriteWidth;
     this._spriteLoc.height = opt.spriteHeight;
-    this._spriteFlip = opt.spriteFlip ?? SpriteFlip.None;
 
     this.calculateQuad();
   }
+
+  setSpriteFlip(spriteFlip: SpriteFlip) {
+    this._spriteFlip = spriteFlip ?? SpriteFlip.None;
+
+    this.calculateQuad();
+  }
+
+  setSpriteScale(scale: number = 1.0) {
+    this._scale = scale;
+
+    this.calculateQuad();
+  }
+
   /**
-   *
-   * @param positionX Position in pixels
-   * @param positionY Position in pixels
-   * @param scale scale of the sprite default is 1.0
+   * Set the rotate of the sprite
+   * @param rotation rotation in degrees
    */
-  setPosition(opt: { x: number; y: number; depth: number; scale?: number }) {
-    if (!opt.scale) {
-      this._scale = 1.0;
-    } else {
-      this._scale = opt.scale;
-    }
-    this._position.x = opt.x;
-    this._position.y = opt.y;
-    this._depth = opt.depth;
+  setSpriteRotate(rotation: number = 1.0) {
+    this._spriteRotate = rotation;
+
+    this.calculateQuad();
+  }
+
+  /**
+   * Set  x and y in pixels and depth in screen space
+   * @param x
+   * @param y
+   * @param depth screen space [-1, 1]. 1 is far -1 is close
+   */
+  setPosition(x: number, y: number, depth: number) {
+    this._position.x = x;
+    this._position.y = y;
+    this._depth = depth;
 
     this.calculateQuad();
   }
@@ -155,6 +176,16 @@ export class Sprite {
     const maxX = (this._spriteLoc.x + this._spriteLoc.width) / sheetW;
     const maxY = 1.0 - (this._spriteLoc.y + this._spriteLoc.height) / sheetH;
 
+    // if we have some rotation then apply it
+    if (!MathConst.equals(this._spriteRotate, 0.0)) {
+      const min = new vec2([minX, minY]);
+      const max = new vec2([maxX, maxY]);
+      const rotation = new mat2();
+      rotation.setIdentity();
+      rotation.rotate(MathConst.toRadian(this._spriteRotate));
+      min.multiplyMat2(rotation);
+      max.multiplyMat2(rotation);
+    }
     if (this._spriteFlip == SpriteFlip.XFlip) {
       this._quad.minTex = [maxX, minY];
       this._quad.maxTex = [minX, maxY];

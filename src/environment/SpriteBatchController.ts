@@ -5,19 +5,24 @@ import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
 import { SpriteShader } from '../shaders/SpriteShader';
+import { ISpriteController } from './ISprintController';
 
 /**
  * This class controls a sprite's position and scale
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritBatchController extends Component {
+export class SpritBatchController
+  extends Component
+  implements ISpriteController
+{
   private _spriteData: ISpriteData[];
   private _sprites: Map<string, Sprite>;
   private _spriteTexture: Texture;
   private _buffer: GlBuffer;
   private _selectedSpriteIndex: number;
   private _selectedSpriteId: string;
+  private _activeSprite: string;
 
   get selectedSpriteIndex() {
     return this._selectedSpriteIndex;
@@ -91,25 +96,49 @@ export class SpritBatchController extends Component {
     return sprite;
   }
 
+  activeSprite(spriteId: string) {
+    this._activeSprite = spriteId;
+  }
+
+  flip(flipDirection: SpriteFlip): void {
+    if (!this._activeSprite) {
+      throw new Error('activeSprite not set call activeSprite()');
+    }
+
+    const spriteModel = this.getSprite(this._activeSprite);
+    spriteModel.setSpriteFlip(flipDirection);
+  }
+  rotate(angle: number): void {
+    if (!this._activeSprite) {
+      throw new Error('activeSprite not set call activeSprite()');
+    }
+
+    const spriteModel = this.getSprite(this._activeSprite);
+    spriteModel.setSpriteRotate(angle);
+  }
+  scale(scale: number): void {
+    if (!this._activeSprite) {
+      throw new Error('activeSprite not set call activeSprite()');
+    }
+
+    const spriteModel = this.getSprite(this._activeSprite);
+    spriteModel.setSpriteScale(scale);
+  }
+
   /**
    * Sets the sprites position.
    * NOTE: You must call commitBuffer() for the changes to take affect.
    *
    * @param x in screen pixels
    * @param y in screen pixels
-   * @param scale multiplied by the sprite width and height
    * @param depth is depth buffer space (-1 to 1) 1 is far -1 is near
    */
-  setSpritePosition(
-    spriteId: string,
-    x: number,
-    y: number,
-    scale: number = 1.0,
-    depth?: number
-  ) {
-    const spriteModel = this.getSprite(spriteId);
-
-    spriteModel.setPosition({ x: x, y: y, scale: scale, depth: depth ?? 0 });
+  setSpritePosition(x: number, y: number, depth?: number) {
+    if (!this._activeSprite) {
+      throw new Error('activeSprite not set call activeSprite()');
+    }
+    const spriteModel = this.getSprite(this._activeSprite);
+    spriteModel.setPosition(x, y, depth ?? 0);
   }
 
   /**
@@ -117,13 +146,13 @@ export class SpritBatchController extends Component {
    *
    * NOTE: You must call commitBuffer() for the changes to take affect.
    */
-  setSprite(
-    spriteId: string,
-    id?: string | number,
-    flip: SpriteFlip = SpriteFlip.None
-  ) {
+  setSprite(id?: string | number) {
+    if (!this._activeSprite) {
+      throw new Error('activeSprite not set call activeSprite()');
+    }
+
     // find the sprite of a given id
-    const spriteModel = this.getSprite(spriteId);
+    const spriteModel = this.getSprite(this._activeSprite);
 
     // if id is an number clamp the rang
     if (typeof id === 'number') {
@@ -148,7 +177,6 @@ export class SpritBatchController extends Component {
           pixelYOffset: sprite.loc[1],
           spriteWidth: sprite.loc[2],
           spriteHeight: sprite.loc[3],
-          spriteFlip: flip,
         });
         break;
       }

@@ -87,8 +87,10 @@ export class SpriteBatchTest extends Component {
         const y = (step / 800 + 16) * 16;
 
         step += 32;
-        this._spriteBatch.setSprite('sprite_' + i, 0);
-        this._spriteBatch.setSpritePosition('sprite_' + i, x, y, 5, 0.5);
+        this._spriteBatch.activeSprite('sprite_' + i);
+        this._spriteBatch.setSprite(0);
+        this._spriteBatch.scale(5.0);
+        this._spriteBatch.setSpritePosition(x, y, 0.5);
       }
       this._spriteBatch.commitBuffer();
     } else {
@@ -100,7 +102,8 @@ export class SpriteBatchTest extends Component {
         step += 32;
         this._sprites[i].initialize(texture, spriteData);
         this._sprites[i].setSprite(0);
-        this._sprites[i].setSpritePosition(x, y, 5, 0.5);
+        this._sprites[i].scale(5);
+        this._sprites[i].setSpritePosition(x, y, 0.5);
         this._sprites[i].commitToBuffer();
       }
     }

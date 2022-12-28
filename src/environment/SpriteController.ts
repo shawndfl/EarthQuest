@@ -70,7 +70,7 @@ export class SpritController extends Component implements ISpriteController {
     this.setSprite(defaultSprite);
 
     // set the position of the sprite on the screen
-    this._sprite.setPosition({ x: 0, y: 0, scale: 1, depth: 0 });
+    this._sprite.setPosition(0, 0, 0);
 
     // setup the shader for the sprite
     this._spriteTexture = texture;
@@ -96,25 +96,37 @@ export class SpritController extends Component implements ISpriteController {
   setSpritePosition(
     x: number,
     y: number,
-    scale: number = 1.0,
     depth?: number,
     commitToBuffer?: boolean
   ) {
-    this._sprite.setPosition({ x: x, y: y, scale: scale, depth: depth ?? 0 });
+    this._sprite.setPosition(x, y, depth ?? 0);
     if (commitToBuffer) {
       this.commitToBuffer();
     }
   }
 
+  scale(scale: number) {
+    this._sprite.setSpriteScale(scale);
+  }
+
+  flip(flipDirection: SpriteFlip): void {
+    this._sprite.setSpriteFlip(flipDirection);
+  }
+  rotate(angle: number): void {
+    this._sprite.setSpriteRotate(angle);
+  }
+
+  setFlip(flip: SpriteFlip, commitToBuffer?: boolean) {
+    this._sprite.setSpriteFlip(flip);
+    if (commitToBuffer) {
+      this.commitToBuffer();
+    }
+  }
   /**
    * Select a sprite
    * @param id the id in the sprite sheet
    */
-  setSprite(
-    id?: string | number,
-    flip: SpriteFlip = SpriteFlip.None,
-    commitToBuffer?: boolean
-  ) {
+  setSprite(id?: string | number, commitToBuffer?: boolean) {
     // find the sprite of a given id
 
     // if id is an number clamp the rang
@@ -141,7 +153,6 @@ export class SpritController extends Component implements ISpriteController {
           pixelYOffset: sprite.loc[1],
           spriteWidth: sprite.loc[2],
           spriteHeight: sprite.loc[3],
-          spriteFlip: flip,
         });
         if (commitToBuffer) {
           this.commitToBuffer();
