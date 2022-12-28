@@ -3,6 +3,8 @@ import * as mat4 from '../math/mat4';
 import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
+import { Texture } from './Texture';
+import FontImage from '../assets/font.png';
 
 const vsSource = `
     attribute vec4 aPos;
@@ -31,17 +33,17 @@ const fsSource = `
  * Sample scene
  */
 export class Scene {
-
-  buffer:GlBuffer;
+  buffer: GlBuffer;
   shader: ShaderController;
   textManager: TextManager;
 
   fps: FpsController;
+  texture: Texture;
 
-shaderInfo: {
-  attr: { aPos: number, aTex: number },
-  uniform: { uSampler: number },
-}
+  shaderInfo: {
+    attr: { aPos: number; aTex: number };
+    uniform: { uSampler: number };
+  };
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
@@ -49,6 +51,7 @@ shaderInfo: {
   constructor(private gl: WebGL2RenderingContext) {
     this.textManager = new TextManager();
 
+    this.texture = new Texture(this.gl);
     this.fps = new FpsController();
 
     /** Shader info for this shader */
@@ -66,6 +69,16 @@ shaderInfo: {
 
     // Create font manager
     //this.textManager.initialize();
+
+    this.texture.initialize(FontImage);
+    // Browsers copy pixels from the loaded image in top-to-bottom order —
+    // from the top-left corner; but WebGL wants the pixels in bottom-to-top
+    // order — starting from the bottom-left corner. So in order to prevent
+    // the resulting image texture from having the wrong orientation when
+    // rendered, we need to make the following call, to cause the pixels to
+    // be flipped into the bottom-to-top order that WebGL expects.
+    // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
     // Debug matrix
     const m = mat4.create();
@@ -120,6 +133,15 @@ shaderInfo: {
 
     // enable the shader
     this.shader.enable();
+
+    // Tell WebGL we want to affect texture unit 0
+    this.gl.activeTexture(this.gl.TEXTURE0);
+
+    // Bind the texture to texture unit 0
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture.texture);
+
+    // Tell the shader we bound the texture to texture unit 0
+    this.gl.uniform1i(this.shaderInfo.uniform.uSampler, 0);
 
     {
       const vertexCount = this.buffer.indexCount;

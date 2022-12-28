@@ -6,35 +6,32 @@ import * as vec4 from '../math/vec4';
  * This is the model data that represents a quad
  */
 export class QuadModel {
-   /** @type {vec2} min position range is (-1,-1) to (1,1) */
-   min = vec2.create();
-   /** @type {vec2} max position range is (-1,-1) to (1,1) */
-   max = vec2.create();
-   /** @type {number} the depth 1 is in front -1 is behind */
-   depth = 0.0;
-   /** @type {vec2} min texture coordinate (0,0) to (1,1) */
-   minTex = vec2.create();
-   /** @type {vec2} max texture coordinate (0,0) to (1,1) */
-   maxTex = vec2.create();
-   /** @type {vec4} color RGBA */
-   color = vec4.create();
+  /** @type {vec2} min position range is (-1,-1) to (1,1) */
+  min = vec2.create();
+  /** @type {vec2} max position range is (-1,-1) to (1,1) */
+  max = vec2.create();
+  /** @type {number} the depth 1 is in front -1 is behind */
+  depth = 0.0;
+  /** @type {vec2} min texture coordinate (0,0) to (1,1) */
+  minTex = vec2.create();
+  /** @type {vec2} max texture coordinate (0,0) to (1,1) */
+  maxTex = vec2.create();
+  /** @type {vec4} color RGBA */
+  color = vec4.create();
 
-  constructor() {
-   
-  }
+  constructor() {}
 }
 
 /**
  * Creates a buffer of a quad.
  */
 export class GlBuffer {
+  buffer: WebGLBuffer;
+  bufferTex: WebGLBuffer;
+  indexBuffer: WebGLBuffer;
 
-buffer : WebGLBuffer;
-bufferTex: WebGLBuffer;
-indexBuffer: WebGLBuffer;
-
-/** @type {number} How many indices do we have */
-indexCount: number;
+  /** @type {number} How many indices do we have */
+  indexCount: number;
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl
@@ -87,10 +84,10 @@ indexCount: number;
     //  (min)
     //
     quads.forEach((quad) => {
-      positions.push(quad.min[0], quad.max[1], quad.depth);
-      positions.push(quad.max[0], quad.max[1], quad.depth);
-      positions.push(quad.max[0], quad.min[1], quad.depth);
       positions.push(quad.min[0], quad.min[1], quad.depth);
+      positions.push(quad.max[0], quad.min[1], quad.depth);
+      positions.push(quad.max[0], quad.max[1], quad.depth);
+      positions.push(quad.min[0], quad.max[1], quad.depth);
 
       texture.push(quad.minTex[0], quad.minTex[1]);
       texture.push(quad.maxTex[0], quad.minTex[1]);
@@ -105,7 +102,7 @@ indexCount: number;
       index.push(this.indexCount + 2);
       index.push(this.indexCount + 3);
 
-      this.indexCount += 4;
+      this.indexCount += 6;
     });
 
     console.debug('pos ', positions);
@@ -125,7 +122,7 @@ indexCount: number;
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.bufferTex);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(positions),
+      new Float32Array(texture),
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW
     );
 
@@ -162,9 +159,7 @@ indexCount: number;
         stride,
         offset
       );
-      this.gl.enableVertexAttribArray(
-        positionAttribute
-      );
+      this.gl.enableVertexAttribArray(positionAttribute);
     }
 
     // Tell WebGL how to pull out the texture coordinates from

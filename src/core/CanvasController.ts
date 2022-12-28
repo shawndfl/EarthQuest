@@ -1,5 +1,3 @@
-
-
 /**
  * This controller manages the canvas
  */
@@ -19,7 +17,7 @@ export class CanvasController {
     // @ts-ignore
     this.gl = (WebGLDebugUtils as any).makeDebugContext(
       this.canvas.getContext('webgl2'),
-      undefined,
+      this.logGlError.bind(this),
       this.logGLCall.bind(this)
     );
 
@@ -32,7 +30,21 @@ export class CanvasController {
     }
   }
 
+  logGlError(error: string, functionName: string, args: any) {
+    console.error(
+      'GL error: ' +
+        error +
+        ' in gl.' +
+        functionName +
+        '(' +
+        // @ts-ignore
+        (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
+        ')'
+    );
+  }
+
   logGLCall(functionName: string, args: any) {
+    /*
     console.log(
       'gl.' +
         functionName +
@@ -41,6 +53,7 @@ export class CanvasController {
         (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
         ')'
     );
+    */
   }
 
   /**
