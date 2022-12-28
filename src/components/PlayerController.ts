@@ -1,25 +1,22 @@
 import { Engine } from '../core/Engine';
-import { GlBuffer } from '../core/GlBuffer';
-import { ShaderController } from '../core/ShaderController';
+import { ISpriteSheetData } from '../core/ISpriteSheetData';
 import { Texture } from '../core/Texture';
+import { SpritController } from '../environment/SpriteController';
 import { Component } from './Component';
 
 export class PlayerController extends Component {
-  private _spriteSheet: Texture;
-  private _buffer: GlBuffer;
-  private _shader: ShaderController;
-  private _shaderInfo: {
-    attr: { aPos: number; aTex: number };
-    uniform: { uSampler: number };
-  };
+  private _spriteController: SpritController;
 
-  constructor(eg: Engine) {
-    super(eg);
+  constructor(eng: Engine) {
+    super(eng);
   }
 
-  initialize(spriteSheet: Texture) {
-    this._spriteSheet = spriteSheet;
+  initialize(spriteSheet: Texture, characterData: ISpriteSheetData) {
+    this._spriteController = new SpritController(this.gl);
+    this._spriteController.initialize(spriteSheet, characterData);
   }
 
-  setSpriteActive() {}
+  update(dt: number) {
+    this._spriteController.update(dt);
+  }
 }

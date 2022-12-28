@@ -1,16 +1,20 @@
+import { Component } from '../components/Component';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 import { TextManager } from '../systems/TextManager';
+import { Engine } from './Engine';
 
 /**
  * Shows the FPS
  */
-export class FpsController {
+export class FpsController extends Component {
   fps: number;
   delayCounter: number;
   displayInterval: number;
 
-  constructor(private textManager: TextManager) {
+  constructor(eng: Engine) {
+    super(eng);
+
     /** The frames per second (float) */
     this.fps = 0;
     /** Just a counter for displaying FPS to the console */
@@ -28,7 +32,7 @@ export class FpsController {
     this.delayCounter += dt;
     if (this.delayCounter >= this.displayInterval) {
       //console.debug('ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2));
-      this.textManager.setTextBlock({
+      this.eng.scene.textManager.setTextBlock({
         id: 'FPS',
         text: 'ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2),
         position: new vec2([250, 600]),

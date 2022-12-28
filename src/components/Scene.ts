@@ -1,21 +1,24 @@
 import { TextManager } from '../systems/TextManager';
-import { FpsController } from './FpsController';
-import { Texture } from './Texture';
+import { FpsController } from '../core/FpsController';
+import { Texture } from '../core/Texture';
 import grassImage from '../assets/grass.png';
 import CharacterImage from '../assets/characters.png';
+import CharacterData from '../assets/characters.json';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 import { Ground } from '../environment/Ground';
-import { PlayerController } from '../components/PlayerController';
+import { PlayerController } from './PlayerController';
+import { Engine } from '../core/Engine';
+import { Component } from './Component';
 
 /**
  * Sample scene
  */
-export class Scene {
+export class Scene extends Component {
   readonly fps: FpsController;
-  readonly texture: Texture;
+  readonly spriteSheetTexture: Texture;
   readonly ground: Ground;
   readonly player: PlayerController;
   readonly textManager: TextManager;
@@ -24,29 +27,23 @@ export class Scene {
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
-  constructor(readonly gl: WebGL2RenderingContext) {
-    this.fps = new FpsController(this.textManager);
+  constructor(eng: Engine) {
+    super(eng);
 
-    this.texture = new Texture(this.gl);
+    this.fps = new FpsController(eng);
+
+    this.spriteSheetTexture = new Texture(this.gl);
+    this.textManager = new TextManager(eng);
     this.ground = new Ground(this.gl);
-    this.textManager = new TextManager(this.gl);
+
+    this.player = new PlayerController(eng);
   }
 
   /**
    * Sets up the scene
    */
-  init() {
+  async initialize() {
     console.log('init scene');
-
-    this.textManager.initialize(FontImage, FontData);
-    this.textManager.setTextBlock({
-      id: 'welcomeText',
-      text: 'Earth Quest',
-      position: new vec2([-800, 600]),
-      color: new vec4([1, 0, 0, 0.5]),
-      depth: 0,
-      scale: 0.5,
-    });
 
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
@@ -55,13 +52,25 @@ export class Scene {
     // rendered, we need to make the following call, to cause the pixels to
     // be flipped into the bottom-to-top order that WebGL expects.
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
+    // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
-
-    this.texture.initialize(CharacterImage);
-    this.ground.initialize(this.texture);
 
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.cullFace(this.gl.BACK);
+
+    await this.spriteSheetTexture.loadImage(CharacterImage);
+    this.ground.initialize(this.spriteSheetTexture);
+    this.player.initialize(this.spriteSheetTexture, CharacterData);
+
+    await this.textManager.initialize(FontImage, FontData);
+    this.textManager.setTextBlock({
+      id: 'welcomeText',
+      text: 'Earth Quest',
+      position: new vec2([-800, 600]),
+      color: new vec4([1, 0, 0, 0.5]),
+      depth: 0,
+      scale: 0.5,
+    });
   }
 
   /**
@@ -87,6 +96,8 @@ export class Scene {
     this.textManager.update(dt);
 
     this.ground.update(dt);
+
+    this.player.update(dt);
   }
 
   resize(width: number, height: number) {}

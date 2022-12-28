@@ -3,6 +3,8 @@ import { IFontData } from '../core/IFontData';
 import { ITextModel } from '../core/ITextModel';
 import { ShaderController } from '../core/ShaderController';
 import { Texture } from '../core/Texture';
+import { Engine } from '../core/Engine';
+import { Component } from '../components/Component';
 
 /**
  * Vertex shader for Font
@@ -41,7 +43,7 @@ const FontFS = `
 /**
  * Font manager keeps track of all FontController objects
  */
-export class TextManager {
+export class TextManager extends Component {
   texts: Map<string, TextController>;
   fontData: IFontData[];
   fontImage: string;
@@ -54,9 +56,10 @@ export class TextManager {
     uniform: { uFont: number; uColor: number };
   };
 
-  constructor(private gl: WebGL2RenderingContext) {
+  constructor(eng: Engine) {
+    super(eng);
     this.texts = new Map<string, TextController>();
-    this.shader = new ShaderController(gl, 'fontShader');
+    this.shader = new ShaderController(this.gl, 'fontShader');
     this.fontTexture = new Texture(this.gl);
 
     /** Shader info for this shader */
@@ -72,11 +75,11 @@ export class TextManager {
    * @param {} fontImage
    * @param {FontData} fontData
    */
-  initialize(fontImage: string, fontData: IFontData[]) {
+  async initialize(fontImage: string, fontData: IFontData[]): Promise<void> {
     this.fontImage = fontImage;
     this.fontData = fontData;
 
-    this.fontTexture.initialize(fontImage);
+    await this.fontTexture.loadImage(fontImage);
 
     this.shader.initShaderProgram(FontVS, FontFS);
     this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');

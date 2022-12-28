@@ -9,11 +9,6 @@ const canvas = new CanvasController(onResize);
 const engine = new Engine(canvas.gl);
 
 /**
- * Start the engine
- */
-engine.initialize();
-
-/**
  * Handle resize
  * @param width
  * @param height
@@ -42,8 +37,18 @@ function step(timestamp: number) {
   window.requestAnimationFrame(step);
 }
 
-// request a frame
-window.requestAnimationFrame(step);
+/**
+ * Start the engine then request and animation frame
+ */
+engine
+  .initialize()
+  .then(() => {
+    // request the first frame
+    window.requestAnimationFrame(step);
+  })
+  .catch(() => {
+    console.error('Error initializing');
+  });
 
 // add the canvas to the body
 document.body.appendChild(canvas.element());

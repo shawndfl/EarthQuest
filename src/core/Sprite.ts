@@ -1,5 +1,4 @@
 import { IQuadModel } from './GlBuffer';
-import { ITileData } from './ITileData';
 import { Texture } from './Texture';
 
 /**
@@ -7,29 +6,39 @@ import { Texture } from './Texture';
  * is used to create a GLBuffer.
  */
 export class Sprite {
-  /** the width, height of a texture */
-  private textureSize: [number, number];
+  /** The size (width, height) in pixels of the sprite within the sprite sheet */
+  private _spriteSize: [number, number];
 
-  /** The tile offset (x, y) in pixels*/
-  private tileOffset: [number, number];
-
-  /** The tile size (width, height) in pixels */
-  private tileSize: [number, number];
+  /** The width and height of the texture */
+  private _spriteSheetSize: [number, number];
 
   /** The position in screen space where the tile will go. (-1 to 1)  */
-  private position: [number, number];
+  private _position: [number, number];
 
   /** The scale value in screen space where the tile will go. (-1 to 1)  */
-  private scale: number;
+  private _scale: number;
 
   /** Screen size (width, height) */
-  private screenSize: [number, number];
+  private _screenSize: [number, number];
 
   /** The texture of all the sprites */
-  private spriteSheet: Texture;
+  private _spriteSheet: Texture;
 
   /** this is used by the buffer */
   private _quad: IQuadModel;
+
+  /**
+   * Get the position in pixels.
+   */
+  get position(): { x: number; y: number } {
+    const x = (this._position[0] * 2.0 - 1.0) * this._screenSize[0];
+    const y = (this._position[1] * 2.0 - 1.0) * this._screenSize[1];
+    return { x: x, y: y };
+  }
+
+  get spriteSize(): { width: number; height: number } {
+    return;
+  }
 
   get quad() {
     return this._quad;
@@ -52,38 +61,86 @@ export class Sprite {
    * @param screenHeight
    */
   initialize(spriteSheet: Texture, screenWidth: number, screenHeight: number) {
-    this.spriteSheet = spriteSheet;
-    this.screenSize = [screenWidth, screenHeight];
+    this._spriteSheet = spriteSheet;
+    this._spriteSheetSize = [this._spriteSheet.width, this._spriteSheet.height];
+    this._screenSize = [screenWidth, screenHeight];
   }
 
+  /**
+   * This function is used to select a sprite from the sprite sheet
+   */
+  setSprite(options: {
+    pixelXOffset: number;
+    pixelYOffset: number;
+    spriteWidth: number;
+    spriteHeight: number;
+  }) {
+    this._quad.minTex = [
+      options.pixelXOffset / this._spriteSheetSize[0],
+      1.0 - options.pixelYOffset / this._spriteSheetSize[1],
+    ];
+    this._quad.maxTex = [
+      (options.pixelXOffset + options.spriteWidth) / this._spriteSheetSize[0],
+      1.0 -
+        (options.pixelYOffset + options.spriteHeight) /
+          this._spriteSheetSize[1],
+    ];
+
+    this._spriteSize = [options.spriteWidth, options.spriteHeight];
+  }
   /**
    *
    * @param positionX Position in pixels
    * @param positionY Position in pixels
    * @param scale scale of the sprite default is 1.0
    */
-  setPosition(positionX: number, positionY: number, scale: number = 1.0) {}
+  setPosition(options: { x: number; y: number; scale?: number }) {
+    if (!this._spriteSize) {
+      throw '_tileSize not set call setSprite() first';
+    }
+    if (!options.scale) {
+      options.scale = 1.0;
+    }
+    this._scale = options.scale;
+
+    // convert to screen space, min is the top left corner
+    this._quad.min = [
+      (options.x / this._screenSize[0]) * 2.0 - 1,
+      (options.y / this._screenSize[1]) * 2.0 - 1,
+    ];
+
+    const tileWidth = (this._spriteSize[0] / this._screenSize[0]) * this._scale;
+    const tileHeight =
+      (this._spriteSize[1] / this._screenSize[1]) * this._scale;
+
+    // max is the bottom right
+    this._quad.max = [
+      this._quad.min[0] + tileWidth,
+      this._quad.min[1] + tileHeight,
+    ];
+  }
 
   /**
    * Builds a IQuadModel from ITileData. This makes it easier to build sprites
    * @param options
    * @returns
    */
+  /*
   getQuadModel(): IQuadModel {
-    const minX = this.position[0] * 2 - 1;
-    const minY = this.position[1] * 2 - 1;
+    const minX = this._position[0] * 2 - 1;
+    const minY = this._position[1] * 2 - 1;
 
-    const tileWidth = (this.tileSize[0] / this.screenSize[0]) * this.scale;
-    const tileHeight = (this.tileSize[1] / this.screenSize[1]) * this.scale;
+    const tileWidth = (this._tileSize[0] / this._screenSize[0]) * this._scale;
+    const tileHeight = (this._tileSize[1] / this._screenSize[1]) * this._scale;
 
     const maxX = minX + tileWidth;
     const maxY = minY + tileHeight;
 
-    const minU = this.tileOffset[0] / this.textureSize[0];
-    const minV = 1.0 - this.tileOffset[1] / this.textureSize[1];
+    const minU = this._tileOffset[0] / this.textureSize[0];
+    const minV = 1.0 - this._tileOffset[1] / this.textureSize[1];
 
-    const maxU = minU + this.tileSize[0] / this.textureSize[0];
-    const maxV = minV - this.tileSize[1] / this.textureSize[1];
+    const maxU = minU + this._tileSize[0] / this.textureSize[0];
+    const maxV = minV - this._tileSize[1] / this.textureSize[1];
 
     // min v is bottom, max v is top
     return {
@@ -93,4 +150,5 @@ export class Sprite {
       maxTex: [maxU, maxV],
     };
   }
+  */
 }

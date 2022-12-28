@@ -5,5 +5,11 @@ import { Engine } from '../core/Engine';
  * to the game engine and all the subsystems like text managers, collision and raise events.
  */
 export class Component {
-  constructor(readonly engine: Engine) {}
+  /**
+   * Give components easier access to gl
+   */
+  get gl(): WebGL2RenderingContext {
+    return this.eng.gl;
+  }
+  constructor(readonly eng: Engine) {}
 }

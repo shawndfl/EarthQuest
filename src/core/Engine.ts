@@ -1,4 +1,5 @@
-import { Scene } from './Scene';
+import { Scene } from '../components/Scene';
+import { TextManager } from '../systems/TextManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -8,11 +9,11 @@ export class Engine {
   readonly scene: Scene;
 
   constructor(readonly gl: WebGL2RenderingContext) {
-    this.scene = new Scene(this.gl);
+    this.scene = new Scene(this);
   }
 
-  initialize() {
-    this.scene.init();
+  async initialize() {
+    await this.scene.initialize();
   }
 
   update(dt: number) {
