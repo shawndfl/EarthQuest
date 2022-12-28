@@ -2,17 +2,37 @@
  * OpenGL texture
  */
 export class Texture {
-  texture: WebGLTexture;
+  glTexture: WebGLTexture;
   texturePath: string;
+  width: number;
+  height: number;
 
   constructor(private gl: WebGL2RenderingContext) {
-    this.texture = 0;
+    this.glTexture = 0;
+  }
+
+  /**
+   * Enable this texture, activate the texture and set the uniform for the shader
+   */
+  enable(
+    uniformIndex: number,
+    slot: number = 0,
+    activeTexture: GLenum = this.gl.TEXTURE0
+  ) {
+    // Tell WebGL we want to affect texture unit
+    this.gl.activeTexture(activeTexture);
+
+    // Bind the texture to texture unit 0
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+
+    // Tell the shader we bound the texture to texture unit
+    this.gl.uniform1i(uniformIndex, slot);
   }
 
   initialize(imagePath: string) {
     this.texturePath = imagePath;
-    this.texture = this.gl.createTexture();
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+    this.glTexture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
 
     // Because images have to be download over the internet
     // they might take a moment until they are ready.
@@ -41,7 +61,9 @@ export class Texture {
 
     const image = new Image();
     image.onload = () => {
-      this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
+      this.width = image.width;
+      this.height = image.height;
       this.gl.texImage2D(
         this.gl.TEXTURE_2D,
         level,

@@ -5,15 +5,18 @@ import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
 import { Texture } from './Texture';
 import FontImage from '../assets/font.png';
+import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 
 const vsSource = `
     attribute vec4 aPos;
     attribute vec2 aTex;
+    uniform vec2 uImageSize; // the image size in pixels
 
     varying highp vec2 vTex;
 
     void main() {
-        vTex = aTex;
+        vTex = aTex / uImageSize;
         gl_Position = aPos;
     }
 `;
@@ -42,14 +45,19 @@ export class Scene {
 
   shaderInfo: {
     attr: { aPos: number; aTex: number };
-    uniform: { uSampler: number };
+    uniform: { uSampler: number; uImageSize: number };
   };
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
   constructor(private gl: WebGL2RenderingContext) {
-    this.textManager = new TextManager();
+    this.textManager = new TextManager(this.gl);
+    this.textManager.addText({
+      text: 'hello',
+      position: new vec2([0, 0]),
+      color: new vec4([1, 1, 1, 1]),
+    });
 
     this.texture = new Texture(this.gl);
     this.fps = new FpsController();
@@ -57,7 +65,7 @@ export class Scene {
     /** Shader info for this shader */
     this.shaderInfo = {
       attr: { aPos: 0, aTex: 0 },
-      uniform: { uSampler: 0 },
+      uniform: { uSampler: 0, uImageSize: 0 },
     };
   }
 
@@ -80,22 +88,17 @@ export class Scene {
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    // Debug matrix
-    const m = mat4.create();
-    console.debug(m);
-
     // Create a new buffer
     this.buffer = new GlBuffer(this.gl);
 
-    /** @type {QuadModel} */
-    const quads = [
+    const quads: QuadModel[] = [
       {
-        max: [0.5, 0.5],
-        min: [-0.5, -0.5],
+        max: new vec2([0.5, 0.5]),
+        min: new vec2([-0.5, -0.5]),
         depth: 0,
-        minTex: [0, 0],
-        maxTex: [1, 1],
-        color: [1, 0, 0, 1],
+        minTex: new vec2([0, 0]),
+        maxTex: new vec2([1024, 1024]),
+        color: new vec4([1, 0, 0, 1]),
       },
     ];
     this.buffer.initBuffers(quads, true);
@@ -108,6 +111,7 @@ export class Scene {
     this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
     this.shaderInfo.attr.aTex = this.shader.getAttribute('aTex');
     this.shaderInfo.uniform.uSampler = this.shader.getUniform('uSampler');
+    this.shaderInfo.uniform.uImageSize = this.shader.getUniform('uImageSize');
   }
 
   /**
@@ -134,15 +138,14 @@ export class Scene {
     // enable the shader
     this.shader.enable();
 
-    // Tell WebGL we want to affect texture unit 0
-    this.gl.activeTexture(this.gl.TEXTURE0);
-
     // Bind the texture to texture unit 0
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture.texture);
+    this.texture.enable(this.shaderInfo.uniform.uSampler);
 
-    // Tell the shader we bound the texture to texture unit 0
-    this.gl.uniform1i(this.shaderInfo.uniform.uSampler, 0);
-
+    this.gl.uniform2f(
+      this.shaderInfo.uniform.uImageSize,
+      this.texture.width,
+      this.texture.height
+    );
     {
       const vertexCount = this.buffer.indexCount;
       const type = this.gl.UNSIGNED_SHORT;

@@ -1,11 +1,13 @@
-import { IFontData } from "./IFontData";
+import { IFontData } from './IFontData';
 
 export class TextController {
-  constructor() {}
+  constructor(
+    private gl: WebGL2RenderingContext,
+    private fontData: IFontData
+  ) {}
 
   /**
    *
-   * @param {FontData} fontData Used to look up character information
    * @param {string} text
    * @param {int} x
    * @param {int} y
@@ -17,7 +19,6 @@ export class TextController {
    * @param {int} height
    */
   initialize(
-    fontData: IFontData ,
     text: string,
     x: number,
     y: number,
@@ -33,5 +34,5 @@ export class TextController {
    * Updates the text animations.
    * @param {float} dt Delta time in ms
    */
-  update(dt:number) {}
+  update(dt: number) {}
 }

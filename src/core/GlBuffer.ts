@@ -1,25 +1,16 @@
-import * as vec3 from '../math/vec3';
-import * as vec2 from '../math/vec2';
-import * as vec4 from '../math/vec4';
+import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 
 /**
  * This is the model data that represents a quad
  */
-export class QuadModel {
-  /** @type {vec2} min position range is (-1,-1) to (1,1) */
-  min = vec2.create();
-  /** @type {vec2} max position range is (-1,-1) to (1,1) */
-  max = vec2.create();
-  /** @type {number} the depth 1 is in front -1 is behind */
-  depth = 0.0;
-  /** @type {vec2} min texture coordinate (0,0) to (1,1) */
-  minTex = vec2.create();
-  /** @type {vec2} max texture coordinate (0,0) to (1,1) */
-  maxTex = vec2.create();
-  /** @type {vec4} color RGBA */
-  color = vec4.create();
-
-  constructor() {}
+export interface QuadModel {
+  min: vec2;
+  max: vec2;
+  depth: number;
+  minTex: vec2;
+  maxTex: vec2;
+  color: vec4;
 }
 
 /**
@@ -84,15 +75,15 @@ export class GlBuffer {
     //  (min)
     //
     quads.forEach((quad) => {
-      positions.push(quad.min[0], quad.min[1], quad.depth);
-      positions.push(quad.max[0], quad.min[1], quad.depth);
-      positions.push(quad.max[0], quad.max[1], quad.depth);
-      positions.push(quad.min[0], quad.max[1], quad.depth);
+      positions.push(quad.min.x, quad.min.y, quad.depth);
+      positions.push(quad.max.x, quad.min.y, quad.depth);
+      positions.push(quad.max.x, quad.max.y, quad.depth);
+      positions.push(quad.min.x, quad.max.y, quad.depth);
 
-      texture.push(quad.minTex[0], quad.minTex[1]);
-      texture.push(quad.maxTex[0], quad.minTex[1]);
-      texture.push(quad.maxTex[0], quad.maxTex[1]);
-      texture.push(quad.minTex[0], quad.maxTex[1]);
+      texture.push(quad.minTex.x, quad.minTex.y);
+      texture.push(quad.maxTex.x, quad.minTex.y);
+      texture.push(quad.maxTex.x, quad.maxTex.y);
+      texture.push(quad.minTex.x, quad.maxTex.y);
 
       index.push(this.indexCount + 0);
       index.push(this.indexCount + 1);

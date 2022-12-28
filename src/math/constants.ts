@@ -1,14 +1,16 @@
+export const epsilon = 0.00001;
+
+//
+// Custom math functions
+//
+
 /**
  * Common utilities
  * @module glMatrix
  */
 
 // Configuration Constants
-export const EPSILON = 0.000001;
-export let ARRAY_TYPE =
-  typeof Float32Array !== "undefined" ? Float32Array : Array;
 export let RANDOM = Math.random;
-export let ANGLE_ORDER = "zyx";
 
 /**
  * Symmetric round
@@ -16,30 +18,20 @@ export let ANGLE_ORDER = "zyx";
  *
  * @param {Number} a value to round
  */
-export function round(a) {
-  if (a >= 0)
-    return Math.round(a);
+export function round(a: number): number {
+  if (a >= 0) return Math.round(a);
 
-  return (a % 0.5 === 0) ? Math.floor(a) : Math.round(a);
+  return a % 0.5 === 0 ? Math.floor(a) : Math.round(a);
 }
 
-/**
- * Sets the type of array used when creating new vectors and matrices
- *
- * @param {Float32ArrayConstructor | ArrayConstructor} type Array type, such as Float32Array or Array
- */
-export function setMatrixArrayType(type) {
-  ARRAY_TYPE = type;
-}
-
-const degree = Math.PI / 180;
+export const degree = Math.PI / 180;
 
 /**
  * Convert Degree To Radian
  *
  * @param {Number} a Angle in Degrees
  */
-export function toRadian(a) {
+export function toRadian(a: number): number {
   return a * degree;
 }
 
@@ -52,6 +44,6 @@ export function toRadian(a) {
  * @param {Number} b The second number to test.
  * @returns {Boolean} True if the numbers are approximately equal, false otherwise.
  */
-export function equals(a, b) {
-  return Math.abs(a - b) <= EPSILON * Math.max(1.0, Math.abs(a), Math.abs(b));
+export function equals(a: number, b: number): boolean {
+  return Math.abs(a - b) <= epsilon * Math.max(1.0, Math.abs(a), Math.abs(b));
 }

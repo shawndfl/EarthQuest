@@ -1,27 +1,26 @@
-
 /**
- * The data for a font file. This comes from a json file that is created 
+ * The data for a font file. This comes from a json file that is created
  * along with the font image.
  */
 export interface IFontData {
   /** @type {string} The ascii character */
   ch: string;
   /**  The int value of the ascii character */
-  value : number;
+  value: number;
   /** Size of the character */
-  sizeX : number;
+  sizeX: number;
   /** Size of the character */
-  sizeY : number;
+  sizeY: number;
   /** Offset of the character */
-  bearingX : number;
+  bearingX: number;
   /** Offset of the character */
-  bearingY : number;
+  bearingY: number;
   /** Where to draw the next character */
-  advance : number;
+  advance: number;
   /** uv coordinates for the character in the texture */
-  u1 : number;
-  v1 : number;
+  u1: number;
+  v1: number;
   /** uv coordinates for the character in the texture */
-  u2 : number;
-  v2 : number;   
+  u2: number;
+  v2: number;
 }

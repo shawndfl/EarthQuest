@@ -1,5 +1,6 @@
 import { TextController } from './TextController';
-import {IFontData } from './IFontData';
+import { IFontData } from './IFontData';
+import { ITextModel } from './ITextModel';
 
 /**
  * Vertex shader for Font
@@ -44,10 +45,10 @@ export class TextManager {
   fontData: IFontData;
   fontImage: string;
 
-  constructor() {
+  constructor(private gl: WebGL2RenderingContext) {
     this.texts = [];
   }
-  
+
   /**
    * Initialize the font manage. Only one font can be used per manager
    * The font data is a json structure.
@@ -59,11 +60,6 @@ export class TextManager {
     this.fontData = fontData;
 
     this.texts = [];
-    const text = new TextController();
-    //text.initialize();
-    this.texts.push(text);
-
-    console.warn('Implement fontManager');
   }
 
   /**
@@ -76,7 +72,13 @@ export class TextManager {
     });
   }
 
-  addFont(FontModel: IFontData) {}
+  addText(textModel: ITextModel) {
+    const text = new TextController(this.gl, this.fontData);
+
+    //text.initialize(textModel.text, textModel.position[0])
+    //this.texts.push(new )
+    console.warn('Implement fontManager');
+  }
 
   /**
    * clean up everything
