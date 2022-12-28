@@ -73,6 +73,30 @@ export class Texture {
         image
       );
 
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_S,
+        this.gl.MIRRORED_REPEAT
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_WRAP_T,
+        this.gl.MIRRORED_REPEAT
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_MIN_FILTER,
+        this.gl.NEAREST
+      );
+      this.gl.texParameteri(
+        this.gl.TEXTURE_2D,
+        this.gl.TEXTURE_MAG_FILTER,
+        this.gl.NEAREST
+      );
+
+      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+      /*
+
       // WebGL1 has different requirements for power of 2 images
       // vs non power of 2 images so check if the image is a
       // power of 2 in both dimensions.
@@ -98,6 +122,7 @@ export class Texture {
           this.gl.LINEAR
         );
       }
+      */
     };
     image.src = imagePath;
   }

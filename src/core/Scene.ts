@@ -1,5 +1,3 @@
-import { GlBuffer, IQuadModel } from './GlBuffer';
-import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
 import { FpsController } from './FpsController';
 import { Texture } from './Texture';
@@ -8,80 +6,40 @@ import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
-import mat4 from '../math/mat4';
-
-const vsSource = `
-    attribute vec3 aPos;
-    attribute vec2 aTex;
-
-    varying highp vec2 vTex;
-
-    void main() {
-        vTex = aTex;
-        gl_Position = vec4(aPos.xyz, 1.0);
-    }
-`;
-
-// Fragment shader program
-
-const fsSource = `
-    varying highp vec2 vTex;
-
-    uniform sampler2D uSampler;
-
-    void main() {
-        gl_FragColor = texture2D(uSampler, vTex);
-    }
-`;
+import { Ground } from '../environment/Ground';
 
 /**
  * Sample scene
  */
 export class Scene {
-  buffer: GlBuffer;
-  shader: ShaderController;
   textManager: TextManager;
 
   fps: FpsController;
   texture: Texture;
-
-  /**
-   * The projection for the scene
-   */
-  projection: mat4;
-
-  shaderInfo: {
-    attr: { aPos: number; aTex: number };
-    uniform: { uSampler: number };
-  };
+  ground: Ground;
 
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
   constructor(private gl: WebGL2RenderingContext) {
-    // Create projection
-    //this.projection = mat4.frustum(0,
     // test text manager
     this.textManager = new TextManager(this.gl);
+
     this.textManager.initialize(FontImage, FontData);
-    this.textManager.addText({
+    this.textManager.setTextBlock({
       id: 'welcomeText',
-      text: 'Hello how are you doing?\n :)',
+      text: 'Earth Quest',
       position: new vec2([-800, 600]),
-      color: new vec4([1, 0, 0, 1.0]),
+      color: new vec4([1, 0, 0, 0.5]),
       depth: 0,
-      scale: 1.0,
+      scale: 0.5,
     });
 
-    this.texture = new Texture(this.gl);
-    this.fps = new FpsController();
+    this.fps = new FpsController(this.textManager);
 
-    /** Shader info for this shader */
-    this.shaderInfo = {
-      attr: { aPos: 0, aTex: 0 },
-      uniform: { uSampler: 0 },
-    };
+    this.texture = new Texture(this.gl);
+    this.ground = new Ground(this.gl);
   }
 
   /**
@@ -90,7 +48,6 @@ export class Scene {
   init() {
     console.log('init scene');
 
-    this.texture.initialize(grassImage);
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
     // order — starting from the bottom-left corner. So in order to prevent
@@ -100,28 +57,11 @@ export class Scene {
     // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    // Create a new buffer
-    this.buffer = new GlBuffer(this.gl);
+    this.texture.initialize(grassImage);
+    this.ground.initialize(this.texture);
 
-    const quads: IQuadModel[] = [
-      {
-        max: [1, 0.5],
-        min: [-1, -1],
-        depth: 0,
-        minTex: [0, 0],
-        maxTex: [1, 1],
-      },
-    ];
-    this.buffer.setBuffers(quads, true);
-
-    // create the shader from the vertex and fragment source
-    this.shader = new ShaderController(this.gl, 'simple');
-    this.shader.initShaderProgram(vsSource, fsSource);
-
-    // set the info
-    this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
-    this.shaderInfo.attr.aTex = this.shader.getAttribute('aTex');
-    this.shaderInfo.uniform.uSampler = this.shader.getUniform('uSampler');
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.cullFace(this.gl.BACK);
   }
 
   /**
@@ -132,9 +72,9 @@ export class Scene {
     this.fps.update(dt);
 
     this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-    this.gl.clearColor(0.3, 0.3, 0.6, 1.0); // Clear to black, fully opaque
+    this.gl.clearColor(0.1, 0.1, 0.1, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
@@ -146,21 +86,7 @@ export class Scene {
     // update the texture manager
     this.textManager.update(dt);
 
-    // enable the buffer
-    this.buffer.enable();
-
-    // enable the shader
-    this.shader.enable();
-
-    // Bind the texture to texture unit 0
-    this.texture.enable(this.shaderInfo.uniform.uSampler);
-
-    {
-      const vertexCount = this.buffer.indexCount;
-      const type = this.gl.UNSIGNED_SHORT;
-      const offset = 0;
-      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
-    }
+    this.ground.update(dt);
   }
 
   resize(width: number, height: number) {}

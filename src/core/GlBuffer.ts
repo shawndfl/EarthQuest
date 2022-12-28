@@ -77,29 +77,29 @@ export class GlBuffer {
     //               Building a quad
     //
     //    Pos[-1, 1]                Texture [0,1]
-    //   p0---------p1 (max)      p0 (min)----p1
+    //   p0---------p1 (max)      p0 ---------p1 (max)
     //   |        / |              |        / |
     //   |      /   |              |      /   |
     //   |    /     |              |    /     |
     //   |  /       |              |  /       |
-    //   p3---------p2             p3---------p2 (max)
-    //  (min)
+    //   p3---------p2             p3---------p2
+    //  (min)                      (min)
     //
     let vertCount = 0;
     quads.forEach((quad) => {
       const depth = quad.depth ?? 0;
 
       verts.push(quad.min[0], quad.min[1], depth);
-      verts.push(quad.minTex[0], quad.minTex[1]);
+      verts.push(quad.minTex[0], quad.maxTex[1]);
 
       verts.push(quad.max[0], quad.min[1], depth);
-      verts.push(quad.maxTex[0], quad.minTex[1]);
-
-      verts.push(quad.max[0], quad.max[1], depth);
       verts.push(quad.maxTex[0], quad.maxTex[1]);
 
+      verts.push(quad.max[0], quad.max[1], depth);
+      verts.push(quad.maxTex[0], quad.minTex[1]);
+
       verts.push(quad.min[0], quad.max[1], depth);
-      verts.push(quad.minTex[0], quad.maxTex[1]);
+      verts.push(quad.minTex[0], quad.minTex[1]);
 
       index.push(vertCount + 0);
       index.push(vertCount + 1);

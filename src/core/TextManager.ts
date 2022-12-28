@@ -29,7 +29,12 @@ const FontFS = `
       uniform highp vec4 uColor;
                             
       void main() {
-        gl_FragColor = texture2D(uFont, vTex) * uColor;
+        highp vec4 color = texture2D(uFont, vTex) * uColor;
+        if(color.w > 0.2) { 
+          gl_FragColor = texture2D(uFont, vTex) * uColor;
+        } else {
+          discard;
+        }
       }
 `;
 
@@ -37,7 +42,7 @@ const FontFS = `
  * Font manager keeps track of all FontController objects
  */
 export class TextManager {
-  texts: TextController[];
+  texts: Map<string, TextController>;
   fontData: IFontData[];
   fontImage: string;
   maxHeightOfCharacters: number;
@@ -50,7 +55,7 @@ export class TextManager {
   };
 
   constructor(private gl: WebGL2RenderingContext) {
-    this.texts = [];
+    this.texts = new Map<string, TextController>();
     this.shader = new ShaderController(gl, 'fontShader');
     this.fontTexture = new Texture(this.gl);
 
@@ -88,7 +93,7 @@ export class TextManager {
     });
 
     // reset the text controllers
-    this.texts = [];
+    this.texts.clear();
   }
 
   /**
@@ -110,16 +115,21 @@ export class TextManager {
     });
   }
 
-  addText(textModel: ITextModel) {
-    const text = new TextController(this.gl, this.fontData);
+  setTextBlock(textModel: ITextModel) {
+    let controller = this.texts.get(textModel.id);
 
-    text.initialize(
+    // create one if needed
+    if (!controller) {
+      controller = new TextController(this.gl, this.fontData);
+      this.texts.set(textModel.id, controller);
+    }
+
+    controller.initialize(
       textModel,
       this.maxHeightOfCharacters,
       this.gl.canvas.width,
       this.gl.canvas.height
     );
-    this.texts.push(text);
   }
 
   /**

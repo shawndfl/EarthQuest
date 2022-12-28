@@ -80,8 +80,8 @@ export class TextController {
       const quad: IQuadModel = {
         min: [xpos1 / screenWidth, ypos1 / screenHeight],
         max: [xpos2 / screenWidth, ypos2 / screenHeight],
-        minTex: [tu1, tv1],
-        maxTex: [tu2, tv2],
+        minTex: [tu1, tv2],
+        maxTex: [tu2, tv1],
         depth: zpos,
       };
 
