@@ -14,10 +14,25 @@ export class SpritController {
   private _sprite: Sprite;
   private _shader: SpriteShader;
   private _buffer: GlBuffer;
+  private _selectedSpriteIndex: number;
+  private _selectedSpriteId: string;
+
+  get selectedSpriteIndex() {
+    return this._selectedSpriteIndex;
+  }
+
+  get selectedSpriteId(): string {
+    return this._selectedSpriteId;
+  }
+
+  get spriteCount(): number {
+    return this._spriteData.length;
+  }
 
   constructor(private gl: WebGL2RenderingContext) {
     this._sprite = new Sprite();
     this._spriteData = [];
+    this._selectedSpriteIndex = 0;
   }
 
   /**
@@ -28,7 +43,7 @@ export class SpritController {
   initialize(
     texture: Texture,
     spriteData: ISpriteData[],
-    defaultSprite?: string
+    defaultSprite?: string | number
   ) {
     // save the data
     this._spriteData = spriteData;
@@ -47,7 +62,7 @@ export class SpritController {
     this.setSprite(defaultSprite);
 
     // set the position of the sprite on the screen
-    this._sprite.setPosition({ x: 100, y: 100, scale: 10 });
+    this._sprite.setPosition({ x: 0, y: 0, scale: 1 });
 
     // setup the shader for the sprite
     this._shader = new SpriteShader(this.gl, 'sprite');
@@ -80,18 +95,32 @@ export class SpritController {
    * Select a sprite
    * @param id the id in the sprite sheet
    */
-  setSprite(id?: string, flip: SpriteFlip = SpriteFlip.None) {
+  setSprite(id?: string | number, flip: SpriteFlip = SpriteFlip.None) {
     // find the sprite of a given id
+
+    // if id is an number clamp the rang
+    if (typeof id === 'number') {
+      if (id >= this._spriteData.length) {
+        id = this._spriteData.length - 1;
+      } else if (id < 0) {
+        id = 0;
+      }
+    }
+
     for (let i = 0; i < this._spriteData.length; i++) {
       const sprite = this._spriteData[i];
 
-      // does the id match or if the id is null just pick the first one
-      if (!id || sprite.id == id) {
+      // does the id match or if the id is null just pick the first one or if id is a
+      // number does the index match
+      if (!id || sprite.id === id || i === id) {
+        this._selectedSpriteIndex = i;
+        this._selectedSpriteId = sprite.id;
+
         this._sprite.setSprite({
-          pixelXOffset: sprite.x,
-          pixelYOffset: sprite.y,
-          spriteWidth: sprite.w,
-          spriteHeight: sprite.h,
+          pixelXOffset: sprite.loc[0],
+          pixelYOffset: sprite.loc[1],
+          spriteWidth: sprite.loc[2],
+          spriteHeight: sprite.loc[3],
           spriteFlip: flip,
         });
 

@@ -3,8 +3,5 @@
  */
 export interface ISpriteData {
   id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  loc: [number, number, number, number];
 }

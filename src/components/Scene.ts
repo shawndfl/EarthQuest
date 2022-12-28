@@ -13,6 +13,7 @@ import { PlayerController } from './PlayerController';
 import { Engine } from '../core/Engine';
 import { Component } from './Component';
 import { UserAction } from '../core/UserAction';
+import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
 
 /**
  * Sample scene
@@ -45,6 +46,8 @@ export class Scene extends Component {
    */
   async initialize() {
     console.log('init scene');
+
+    CreateSimpleAnimationClip.create(CharacterData);
 
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
@@ -85,7 +88,9 @@ export class Scene extends Component {
    * @returns True if the action was handled else false
    */
   handleUserAction(action: UserAction): boolean {
+    //console.debug('user action ', action);
     // handle main menu, pause menu, battles menu, dialog menu, environment
+
     return this.player.handleUserAction(action);
   }
 

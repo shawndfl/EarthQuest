@@ -1,6 +1,6 @@
 import { Scene } from '../components/Scene';
+import { Editor } from '../editor/Editor';
 import { InputHandler } from './InputHandler';
-import { UserAction } from './UserAction';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -9,36 +9,41 @@ import { UserAction } from './UserAction';
 export class Engine {
   readonly scene: Scene;
   readonly input: InputHandler;
+  private _editor: Editor;
+
+  get editor(): Editor {
+    return this._editor;
+  }
 
   constructor(readonly gl: WebGL2RenderingContext) {
     this.scene = new Scene(this);
     this.input = new InputHandler(this);
   }
 
+  /**
+   * Create the editor
+   * @param parentContainer
+   */
+  createEditor(parentContainer: HTMLElement) {
+    this._editor = new Editor(this, parentContainer);
+  }
+
   async initialize() {
     await this.scene.initialize();
   }
 
-  handleUserAction(action: UserAction) {
-    this.scene.handleUserAction(action);
-  }
-
-  gamepad() {
-    // Always call `navigator.getGamepads()` inside of
-    // the game loop, not outside.
-    const gamepads = navigator.getGamepads();
-    for (const gamepad of gamepads) {
-      // Disregard empty slots.
-      if (!gamepad) {
-        continue;
-      }
-    }
-  }
-
   update(dt: number) {
-    this.handleUserAction(this.input.action);
+    // handle gamepad polling
+    this.input.preUpdate(dt);
 
+    // handle input
+    this.scene.handleUserAction(this.input.action);
+
+    // update most of the game components
     this.scene.update(dt);
+
+    // used to reset flags and update hold timers
+    this.input.postUpdate(dt);
   }
 
   resize(width: number, height: number) {

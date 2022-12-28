@@ -1,4 +1,6 @@
+import { AnimationController } from '../core/AnimationController';
 import { Engine } from '../core/Engine';
+import { IAnimationData } from '../core/IAnimationData';
 import { ISpriteData } from '../core/ISpriteData';
 import { SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
@@ -22,17 +24,36 @@ export class PlayerController extends Component {
   private _direction: SpriteDirection;
   private _spriteFlip: boolean;
 
+  private _walkAnimationData: IAnimationData;
+  private _animationController: AnimationController;
+
   constructor(eng: Engine) {
     super(eng);
     this._spriteFlip = false;
     this._direction = SpriteDirection.Down;
     this._animationState = 0;
     this._animationTimer = 0;
+
+    this._animationController = new AnimationController(this._spriteController);
+  }
+
+  buildAnimationClip(): IAnimationData {
+    return;
+    {
+      frames: [
+        {
+          id: 'ness.forward.step.left',
+          frame: 10,
+        },
+      ];
+    }
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
     this._spriteController = new SpritController(this.gl);
     this._spriteController.initialize(spriteSheet, characterData);
+    // set the position of the sprite in the center of the screen
+    this._spriteController.setSpritePosition(200, 300, 5);
     this._spriteController.setSprite('ness.right.stand');
     console.info('sprite list ', this._spriteController.getSpriteList());
   }
@@ -43,25 +64,44 @@ export class PlayerController extends Component {
    * @returns True if the action was handled else false
    */
   handleUserAction(action: UserAction): boolean {
-    if (action != UserAction.None) {
-      console.log('player action ', action);
+    if (action == UserAction.LeftPressed) {
+      const index =
+        (this._spriteController.selectedSpriteIndex - 1) %
+        this._spriteController.spriteCount;
+
+      this._spriteController.setSprite(index);
+
+      console.debug('Showing ' + this._spriteController.selectedSpriteId);
+      //this._direction = SpriteDirection.Left;
+    } else if (action == UserAction.RightPressed) {
+      const index =
+        (this._spriteController.selectedSpriteIndex + 1) %
+        this._spriteController.spriteCount;
+
+      this._spriteController.setSprite(index);
+
+      console.debug('Showing ' + this._spriteController.selectedSpriteId);
+      //this._direction = SpriteDirection.Right;
+    } else if (action == UserAction.UpPressed) {
+      this._direction = SpriteDirection.Up;
+    } else if (action == UserAction.DownPressed) {
+      this._direction = SpriteDirection.Down;
+    } else if (action == UserAction.ActionPressed) {
+      const index =
+        (this._spriteController.selectedSpriteIndex + 1) %
+        this._spriteController.spriteCount;
+
+      this._spriteController.setSprite(index);
+
+      console.debug('Showing ' + this._spriteController.selectedSpriteId);
     }
 
-    if (action == UserAction.Left) {
-      this._direction = SpriteDirection.Left;
-    } else if (action == UserAction.Right) {
-      this._direction = SpriteDirection.Right;
-    } else if (action == UserAction.Up) {
-      this._direction = SpriteDirection.Up;
-    } else if (action == UserAction.Down) {
-      this._direction = SpriteDirection.Down;
-    }
     return true;
   }
 
   update(dt: number) {
     this._spriteController.update(dt);
-    this.walkAnimation(dt, this._direction);
+    //this.walkAnimation(dt, this._direction);
   }
 
   walkAnimation(dt: number, direction: SpriteDirection) {
@@ -69,11 +109,11 @@ export class PlayerController extends Component {
     let flip: boolean = false;
     switch (direction) {
       case SpriteDirection.Right:
-        sprites = ['ness.right.stand', 'ness.right.step'];
+        sprites = ['ness.left.stand', 'ness.left.step'];
+        flip = true;
         break;
       case SpriteDirection.Left:
-        sprites = ['ness.right.stand', 'ness.right.step'];
-        flip = true;
+        sprites = ['ness.left.stand', 'ness.left.step'];
         break;
     }
 
