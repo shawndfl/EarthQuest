@@ -3,17 +3,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, './src/index.js'),
-  mode: 'production',
+  mode: 'development',
   output: {
     filename: 'main.js',
-    path: path.resolve(__dirname, './dist')
+    path: path.resolve(__dirname, './docs'),
   },
 
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Earth Quest',
 
-      template:  path.resolve(__dirname, 'src/index.html')
+      template: path.resolve(__dirname, 'src/index.html'),
     }),
   ],
   output: {
@@ -22,14 +22,15 @@ module.exports = {
     clean: true,
   },
 
- optimization: {
-
-   runtimeChunk: 'single',
-
- },
- module: {
+  optimization: {
+    runtimeChunk: 'single',
+  },
+  module: {
     rules: [
-     
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
 };
