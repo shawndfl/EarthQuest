@@ -1,9 +1,14 @@
+
+
 /**
  * This controller manages the canvas
  */
 export class CanvasController {
+  canvas: HTMLCanvasElement;
+  gl: WebGL2RenderingContext;
+
   constructor() {
-    /** @type {HTMLElement} Canvas element */
+    /** @type {HTMLCanvasElement} Canvas element */
     this.canvas = document.createElement('canvas');
 
     this.canvas.setAttribute('width', '800px');
@@ -11,7 +16,8 @@ export class CanvasController {
     this.canvas.classList.add('canvas');
 
     /** @type {WebGL2RenderingContext} render context from this canvas*/
-    this.gl = WebGLDebugUtils.makeDebugContext(
+    // @ts-ignore
+    this.gl = (WebGLDebugUtils as any).makeDebugContext(
       this.canvas.getContext('webgl2'),
       undefined,
       this.logGLCall.bind(this)
@@ -26,12 +32,13 @@ export class CanvasController {
     }
   }
 
-  logGLCall(functionName, args) {
+  logGLCall(functionName: string, args: any) {
     console.log(
       'gl.' +
         functionName +
         '(' +
-        WebGLDebugUtils.glFunctionArgsToString(functionName, args) +
+        // @ts-ignore
+        (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
         ')'
     );
   }

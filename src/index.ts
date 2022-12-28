@@ -1,6 +1,5 @@
 import { CanvasController } from './core/CanvasController';
 import { Scene } from './core/Scene';
-
 import './css/canvas.css';
 
 /**
@@ -12,9 +11,9 @@ const scene = new Scene(canvas.gl);
 scene.init();
 
 /** time tracking variables */
-let previousTimeStamp;
+let previousTimeStamp: number;
 
-function step(timestamp) {
+function step(timestamp: number) {
   // save the start time
   if (previousTimeStamp === undefined) {
     previousTimeStamp = timestamp;

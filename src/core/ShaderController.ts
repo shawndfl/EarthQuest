@@ -2,18 +2,14 @@
  * Manages one shader program
  */
 export class ShaderController {
+  shaderProgram: WebGLProgram;
+
   /**
    * Creates the shader controller
    * @param {WebGL2RenderingContext} gl GL Context
    * @param {string} shaderName The name of the shader. This is just a way to id different shader for debugging
    */
-  constructor(gl, shaderName) {
-    /** @type {WebGLProgram} The web gl program */
-    this.program;
-    /** @type {WebGL2RenderingContext} gl context */
-    this.gl = gl;
-    /** @type {string} The shader id */
-    this.shaderName = shaderName;
+  constructor(private gl: WebGL2RenderingContext, private shaderName: string) {
   }
 
   /**
@@ -22,7 +18,7 @@ export class ShaderController {
    * @param {*} fsSource
    * @returns
    */
-  initShaderProgram(vsSource, fsSource) {
+  initShaderProgram(vsSource: string, fsSource: string) {
     const vertexShader = this._loadShader(this.gl.VERTEX_SHADER, vsSource);
     const fragmentShader = this._loadShader(this.gl.FRAGMENT_SHADER, fsSource);
 
@@ -50,10 +46,10 @@ export class ShaderController {
    * @param {string} name Name of the attribute
    * @return {number} The attribute location
    */
-  getAttribute(name) {
+  getAttribute(name : string) :number {
     const loc = this.gl.getAttribLocation(this.shaderProgram, name);
     if (loc == -1) {
-      log.error(
+      console.error(
         'can not find attribute: ' + name + ' in shader ' + this.shaderName
       );
     }
@@ -65,14 +61,14 @@ export class ShaderController {
    * @param {string} name Name of the attribute
    * @return {number} The attribute location
    */
-  getUniform(name) {
+  getUniform(name: string): number {
     const loc = this.gl.getUniformLocation(this.shaderProgram, name);
     if (loc == -1) {
-      log.error(
+      console.error(
         'can not find uniform: ' + name + ' in shader ' + this.shaderName
       );
     }
-    return loc;
+    return loc as number;
   }
 
   /**
@@ -80,7 +76,7 @@ export class ShaderController {
    */
   enable() {
     // Tell WebGL to use our program when drawing
-    this.gl.useProgram(this.program);
+    this.gl.useProgram(this.shaderProgram);
   }
   /**
    * creates a shader of the given type, uploads the source and
@@ -90,7 +86,7 @@ export class ShaderController {
    * @param {*} source
    * @returns
    */
-  _loadShader(type, source) {
+  _loadShader(type: number, source:string) {
     const shader = this.gl.createShader(type);
 
     // Send the source to the shader object

@@ -4,9 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: {
     debug: './src/utilities/webgl-debug.js',
-    main: { import: './src/index.js', dependOn: 'debug' },
+    main: { import: './src/index.ts', dependOn: 'debug' },
   },
   mode: 'development',
+  resolve: { extensions: ['.ts', '.js'] },
   devtool: 'inline-source-map',
 
   devServer: {
@@ -26,6 +27,11 @@ module.exports = {
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,

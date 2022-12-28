@@ -31,24 +31,24 @@ const fsSource = `
  * Sample scene
  */
 export class Scene {
+
+  buffer:GlBuffer;
+  shader: ShaderController;
+  textManager: TextManager;
+
+  fps: FpsController;
+
+shaderInfo: {
+  attr: { aPos: number, aTex: number },
+  uniform: { uSampler: number },
+}
   /**
    * Constructor
    * @param {WebGL2RenderingContext} gl The render context
    */
-  constructor(gl) {
-    /** @type {GlBuffer} The gl buffer object that manages the vertex and index buffer */
-    this.buffer;
-
-    /** @type {WebGL2RenderingContext} The gl object. All openGL calls go through this */
-    this.gl = gl;
-
-    /** @type {ShaderController} Manages the shader for this scene */
-    this.shader;
-
-    /** @type {TextManager} TextManager */
+  constructor(private gl: WebGL2RenderingContext) {
     this.textManager = new TextManager();
 
-    /** @type {FpsController} */
     this.fps = new FpsController();
 
     /** Shader info for this shader */
@@ -65,7 +65,7 @@ export class Scene {
     console.log('init scene');
 
     // Create font manager
-    this.textManager.initialize();
+    //this.textManager.initialize();
 
     // Debug matrix
     const m = mat4.create();
@@ -101,7 +101,7 @@ export class Scene {
    * Called for each frame.
    * @param {float} dt delta time from the last frame
    */
-  update(dt) {
+  update(dt: number) {
     this.fps.update(dt);
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
@@ -123,9 +123,9 @@ export class Scene {
 
     {
       const vertexCount = this.buffer.indexCount;
-      const type = gl.UNSIGNED_SHORT;
+      const type = this.gl.UNSIGNED_SHORT;
       const offset = 0;
-      gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
     }
   }
 

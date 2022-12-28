@@ -2,6 +2,10 @@
  * Shows the FPS
  */
 export class FpsController {
+  fps: number;
+  delayCounter: number;
+  displayInterval: number;
+
   constructor() {
     /** The frames per second (float) */
     this.fps = 0;
@@ -15,7 +19,7 @@ export class FpsController {
    * Calculate the FPS
    * @param {float} dt delta time in ms
    */
-  update(dt) {
+  update(dt:number) {
     this.fps = 1000.0 / dt;
     this.delayCounter += dt;
     if (this.delayCounter >= this.displayInterval) {

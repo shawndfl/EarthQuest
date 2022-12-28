@@ -1,15 +1,16 @@
+import * as vec2 from '../math/vec2'
+import * as vec4 from '../math/vec4'
+
 /**
  * This describes a model data used by a TextController
  */
-class TextModel {
-  constructor() {
+export interface ITextModel {
     /** The text for the FontController */
-    this.text;
+    text: string;
 
     /** The xy position float[2] */
-    this.position;
+    position: number[];
 
     /** The RGBA color float[3] */
-    this.color;
-  }
+    color: number[];
 }

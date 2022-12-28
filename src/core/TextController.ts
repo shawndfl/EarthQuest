@@ -1,3 +1,5 @@
+import { IFontData } from "./IFontData";
+
 export class TextController {
   constructor() {}
 
@@ -15,21 +17,21 @@ export class TextController {
    * @param {int} height
    */
   initialize(
-    fontData,
-    text,
-    x,
-    y,
-    depth,
-    scale,
-    color,
-    maxHeight,
-    width,
-    height
+    fontData: IFontData ,
+    text: string,
+    x: number,
+    y: number,
+    depth: number,
+    scale: number,
+    color: number[],
+    maxHeight: number,
+    width: number,
+    height: number
   ) {}
 
   /**
    * Updates the text animations.
    * @param {float} dt Delta time in ms
    */
-  udpate(dt) {}
+  update(dt:number) {}
 }

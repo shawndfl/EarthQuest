@@ -1,33 +1,5 @@
 import { TextController } from './TextController';
-
-/**
- * Font data that tells the FontController how to position the vertices
- * and what the uv coordinates would be.
- */
-class FontData {
-  constructor() {
-    /** @type {string} The ascii character */
-    this.ch = '';
-    /**  The int value of the ascii character */
-    this.value = undefined;
-    /** Size of the character */
-    this.sizeX = undefined;
-    /** Size of the character */
-    this.sizeY = undefined;
-    /** Offset of the character */
-    this.bearingX = undefined;
-    /** Offset of the character */
-    this.bearingY = undefined;
-    /** Where to draw the next character */
-    this.advance = undefined;
-    /** uv coordinates for the character in the texture */
-    this.u1 = undefined;
-    this.v1 = undefined;
-    /** uv coordinates for the character in the texture */
-    this.u2 = undefined;
-    this.v2 = undefined;
-  }
-}
+import {IFontData } from './IFontData';
 
 /**
  * Vertex shader for Font
@@ -68,25 +40,25 @@ const FontFS = `
  * Font manager keeps track of all FontController objects
  */
 export class TextManager {
-  constructor() {
-    /** Collection of TextController to render  */
-    this.texts = [];
-    /** FontData object */
-    this.fontData;
-    /** png image that contains the characters of the font */
-    this.fontImage;
-  }
+  texts: TextController[];
+  fontData: IFontData;
+  fontImage: string;
 
+  constructor() {
+    this.texts = [];
+  }
+  
   /**
    * Initialize the font manage. Only one font can be used per manager
    * The font data is a json structure.
    * @param {} fontImage
    * @param {FontData} fontData
    */
-  initialize(fontImage, fontData) {
+  initialize(fontImage: string, fontData: IFontData) {
     this.fontImage = fontImage;
     this.fontData = fontData;
 
+    this.texts = [];
     const text = new TextController();
     //text.initialize();
     this.texts.push(text);
@@ -98,13 +70,13 @@ export class TextManager {
    * Updates all the TextureController
    * @param {number} dt Delta time in ms
    */
-  update(dt) {
+  update(dt: number) {
     this.texts.forEach((text) => {
       text.update(dt);
     });
   }
 
-  addFont(FontModel) {}
+  addFont(FontModel: IFontData) {}
 
   /**
    * clean up everything
