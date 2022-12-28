@@ -70,8 +70,6 @@ export class TextManager {
 
     // reset the text controllers
     this.texts = [];
-
-    console.debug('fontData ', fontData);
   }
 
   /**
@@ -88,7 +86,7 @@ export class TextManager {
     const text = new TextController(this.gl, this.fontData);
 
     text.initialize(textModel, this.maxHeightOfCharacters);
-    //this.texts.push(new )
+    this.texts.push(text);
     console.warn('Implement fontManager');
   }
 

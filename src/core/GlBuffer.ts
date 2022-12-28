@@ -4,7 +4,7 @@ import vec4 from '../math/vec4';
 /**
  * This is the model data that represents a quad
  */
-export interface QuadModel {
+export interface IQuadModel {
   min: vec2;
   max: vec2;
   depth: number;
@@ -17,8 +17,7 @@ export interface QuadModel {
  * Creates a buffer of a quad.
  */
 export class GlBuffer {
-  buffer: WebGLBuffer;
-  bufferTex: WebGLBuffer;
+  vertBuffer: WebGLBuffer;
   indexBuffer: WebGLBuffer;
 
   /** @type {number} How many indices do we have */
@@ -28,40 +27,40 @@ export class GlBuffer {
    * @param {WebGL2RenderingContext} gl
    */
   constructor(private gl: WebGL2RenderingContext) {
-    /** @type {WebGLBuffer} position buffer */
-    this.buffer = 0;
-
-    /** @type {WebGLBuffer} texture buffer */
-    this.bufferTex = 0;
-
-    /** @type {WebGLBuffer} index buffer */
+    this.vertBuffer = 0;
     this.indexBuffer = 0;
-
-    /** @type {number} How many indices do we have */
     this.indexCount = 0;
   }
 
   /**
+   * Creates the buffers
+   */
+  createBuffer() {
+    this.dispose();
+    // position buffer
+    this.vertBuffer = this.gl.createBuffer();
+    // index buffer
+    this.indexBuffer = this.gl.createBuffer();
+  }
+
+  /**
    * Create the buffer
-   * @param {QuadModel[]} quads A array of quads that will be added to this buffer
-   * @param {boolean} isStatic Is this buffer static
+   * @param quads A array of quads that will be added to this buffer
+   * @param isStatic Is this buffer static
    * @returns
    */
-  initBuffers(quads: QuadModel[], isStatic: boolean) {
+  setBuffers(quads: IQuadModel[], isStatic: boolean) {
     // Now create an array of positions for the square.
-    const positions: number[] = [];
-    const texture: number[] = [];
+    const verts: number[] = [];
     const index: number[] = [];
+
+    // check if we have buffer
+    if (!this.vertBuffer || !this.indexBuffer) {
+      this.createBuffer();
+    }
 
     // reset counters
     this.indexCount = 0;
-
-    //const positions = [
-    // -0.1,  0.1, 0.0,
-    // -0.1, -0.1, 0.0,
-    //  0.1,  0.1, 0.0,
-    //  0.1, -0.1, 0.0,
-    //];
 
     //               Building a quad
     //
@@ -75,15 +74,17 @@ export class GlBuffer {
     //  (min)
     //
     quads.forEach((quad) => {
-      positions.push(quad.min.x, quad.min.y, quad.depth);
-      positions.push(quad.max.x, quad.min.y, quad.depth);
-      positions.push(quad.max.x, quad.max.y, quad.depth);
-      positions.push(quad.min.x, quad.max.y, quad.depth);
+      verts.push(quad.min.x, quad.min.y, quad.depth);
+      verts.push(quad.minTex.x, quad.minTex.y);
 
-      texture.push(quad.minTex.x, quad.minTex.y);
-      texture.push(quad.maxTex.x, quad.minTex.y);
-      texture.push(quad.maxTex.x, quad.maxTex.y);
-      texture.push(quad.minTex.x, quad.maxTex.y);
+      verts.push(quad.max.x, quad.min.y, quad.depth);
+      verts.push(quad.maxTex.x, quad.minTex.y);
+
+      verts.push(quad.max.x, quad.max.y, quad.depth);
+      verts.push(quad.maxTex.x, quad.maxTex.y);
+
+      verts.push(quad.min.x, quad.max.y, quad.depth);
+      verts.push(quad.minTex.x, quad.maxTex.y);
 
       index.push(this.indexCount + 0);
       index.push(this.indexCount + 1);
@@ -96,29 +97,15 @@ export class GlBuffer {
       this.indexCount += 6;
     });
 
-    console.debug('pos ', positions);
-    console.debug('tex ', texture);
-
     // Create a buffer for positions.
-    this.buffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(positions),
-      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW
-    );
-
-    // texture buffer
-    this.bufferTex = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.bufferTex);
-    this.gl.bufferData(
-      this.gl.ARRAY_BUFFER,
-      new Float32Array(texture),
+      new Float32Array(verts),
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW
     );
 
     // index buffer
-    this.indexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.gl.bufferData(
       this.gl.ELEMENT_ARRAY_BUFFER,
@@ -136,12 +123,12 @@ export class GlBuffer {
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute
     {
-      const numComponents = 3;
+      const numComponents = 3; // position x, y, z
       const type = this.gl.FLOAT;
       const normalize = false;
-      const stride = 0;
+      const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
       const offset = 0;
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
       this.gl.vertexAttribPointer(
         positionAttribute,
         numComponents,
@@ -159,9 +146,9 @@ export class GlBuffer {
       const numComponents = 2;
       const type = this.gl.FLOAT;
       const normalize = false;
-      const stride = 0;
-      const offset = 0;
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.bufferTex);
+      const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
+      const offset = 3 * 4; // start after the position
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
       this.gl.vertexAttribPointer(
         textureAttribute,
         numComponents,
@@ -181,14 +168,9 @@ export class GlBuffer {
    * Clean up buffer
    */
   dispose() {
-    if (this.buffer) {
-      this.gl.deleteBuffer(this.buffer);
-      this.buffer = 0;
-    }
-
-    if (this.bufferTex) {
-      this.gl.deleteBuffer(this.bufferTex);
-      this.bufferTex = 0;
+    if (this.vertBuffer) {
+      this.gl.deleteBuffer(this.vertBuffer);
+      this.vertBuffer = 0;
     }
 
     if (this.indexBuffer) {

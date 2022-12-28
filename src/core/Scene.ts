@@ -1,4 +1,4 @@
-import { GlBuffer, QuadModel } from './GlBuffer';
+import { GlBuffer, IQuadModel } from './GlBuffer';
 import * as mat4 from '../math/mat4';
 import { ShaderController } from './ShaderController';
 import { TextManager } from './TextManager';
@@ -53,6 +53,7 @@ export class Scene {
    * @param {WebGL2RenderingContext} gl The render context
    */
   constructor(private gl: WebGL2RenderingContext) {
+    // test text manager
     this.textManager = new TextManager(this.gl);
     this.textManager.initialize(FontImage, FontData);
     this.textManager.addText({
@@ -80,9 +81,6 @@ export class Scene {
   init() {
     console.log('init scene');
 
-    // Create font manager
-    //this.textManager.initialize();
-
     this.texture.initialize(FontImage);
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
@@ -96,7 +94,7 @@ export class Scene {
     // Create a new buffer
     this.buffer = new GlBuffer(this.gl);
 
-    const quads: QuadModel[] = [
+    const quads: IQuadModel[] = [
       {
         max: new vec2([0.5, 0.5]),
         min: new vec2([-0.5, -0.5]),
@@ -106,7 +104,7 @@ export class Scene {
         color: new vec4([1, 0, 0, 1]),
       },
     ];
-    this.buffer.initBuffers(quads, true);
+    this.buffer.setBuffers(quads, true);
 
     // create the shader from the vertex and fragment source
     this.shader = new ShaderController(this.gl, 'simple');

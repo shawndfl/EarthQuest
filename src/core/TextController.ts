@@ -1,12 +1,20 @@
+import vec2 from '../math/vec2';
+import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
+import { GlBuffer, IQuadModel } from './GlBuffer';
 import { IFontData } from './IFontData';
 import { ITextModel } from './ITextModel';
 
 export class TextController {
+  buffer: GlBuffer;
+
   constructor(
     private gl: WebGL2RenderingContext,
     private fontData: IFontData[]
-  ) {}
+  ) {
+    // Create a new buffer
+    this.buffer = new GlBuffer(this.gl);
+  }
 
   /**
    * Initialize a new text block
@@ -24,8 +32,9 @@ export class TextController {
     let ypos2 = offsetY;
 
     const zpos = block.depth;
-    const charCount = 0;
+    let charCount = 0;
     const text = block.text;
+    const quads: IQuadModel[] = [];
 
     // loop over all the characters in the text block
     // and create geometry for them.
@@ -54,58 +63,29 @@ export class TextController {
       xpos2 = offsetX + block.scale * font.advance;
       ypos2 = offsetY + block.scale * font.bearingY; // top of the letter
 
+      // set for the next letter
       offsetX = xpos2;
-
-      //LOGD("Character " << (int) ch << " = " <<ch);
-      //LOGD("offset " << xpos1 << ", " << ypos1 << " to " << xpos2 << ", " << ypos2);
 
       const tu1 = font.u1;
       const tv1 = font.v2;
-
       const tu2 = font.u2;
       const tv2 = font.v1;
 
-      //LOGD("texture " << tu1 << ", " << tv1 << " to " << tu2 << ", " << tv2);
-      /*
-      // top left
-      verts.push_back(xpos1);
-      verts.push_back(ypos1);
-      verts.push_back(zpos);
-      verts.push_back(tu1);
-      verts.push_back(tv1);
-
-      // top right
-      verts.push_back(xpos2);
-      verts.push_back(ypos1);
-      verts.push_back(zpos);
-      verts.push_back(tu2);
-      verts.push_back(tv1);
-
-      // bottom right
-      verts.push_back(xpos2);
-      verts.push_back(ypos2);
-      verts.push_back(zpos);
-      verts.push_back(tu2);
-      verts.push_back(tv2);
-
-      // bottom left
-      verts.push_back(xpos1);
-      verts.push_back(ypos2);
-      verts.push_back(zpos);
-      verts.push_back(tu1);
-      verts.push_back(tv2);
-
-      indices.push_back(charCount * 4 + 0);
-      indices.push_back(charCount * 4 + 1);
-      indices.push_back(charCount * 4 + 3);
-
-      indices.push_back(charCount * 4 + 1);
-      indices.push_back(charCount * 4 + 2);
-      indices.push_back(charCount * 4 + 3);
+      const quad: IQuadModel = {
+        min: new vec2([xpos1, ypos1]),
+        max: new vec2([xpos2, ypos2]),
+        maxTex: new vec2([tu1, tv1]),
+        minTex: new vec2([tu2, tv2]),
+        depth: zpos,
+        color: block.color,
+      };
 
       charCount++;
-      */
+
+      quads.push(quad);
     }
+
+    this.buffer.setBuffers(quads, false);
   }
 
   /**
