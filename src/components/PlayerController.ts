@@ -50,11 +50,13 @@ export class PlayerController extends Component {
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
-    this._spriteController = new SpritController(this.gl);
+    this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
     // set the position of the sprite in the center of the screen
     this._spriteController.setSpritePosition(200, 300, 5);
     this._spriteController.setSprite('ness.right.stand');
+    this._spriteController.commitToBuffer();
+
     console.info('sprite list ', this._spriteController.getSpriteList());
   }
 
@@ -69,7 +71,7 @@ export class PlayerController extends Component {
         (this._spriteController.selectedSpriteIndex - 1) %
         this._spriteController.spriteCount;
 
-      this._spriteController.setSprite(index);
+      this._spriteController.setSprite(index, SpriteFlip.None, true);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Left;
@@ -78,7 +80,7 @@ export class PlayerController extends Component {
         (this._spriteController.selectedSpriteIndex + 1) %
         this._spriteController.spriteCount;
 
-      this._spriteController.setSprite(index);
+      this._spriteController.setSprite(index, SpriteFlip.None, true);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Right;

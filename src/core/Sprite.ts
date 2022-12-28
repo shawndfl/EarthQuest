@@ -13,6 +13,9 @@ export enum SpriteFlip {
  * is used to create a GLBuffer.
  */
 export class Sprite {
+  /** referencing the sprite. Used in collections */
+  private _tag: string;
+
   /** The width and height in pixels of the sprite within the sprite sheet */
   private _spriteLoc: { x: number; y: number; width: number; height: number };
 
@@ -21,6 +24,9 @@ export class Sprite {
 
   /** The position in pixels of the canvas where the sprite will go. */
   private _position: { x: number; y: number };
+
+  /** the depth of the sprite -1 is nearest 1 is farthest  */
+  private _depth: number;
 
   /** is the sprite flipped some way */
   private _spriteFlip: SpriteFlip;
@@ -34,11 +40,12 @@ export class Sprite {
   /** Screen size */
   private _screenSize: { width: number; height: number };
 
-  /** The texture of all the sprites */
-  private _spriteSheet: Texture;
-
   /** this is used by the buffer */
   private _quad: IQuadModel;
+
+  get tag(): string {
+    return this._tag;
+  }
 
   /**
    * Get the position in pixels.
@@ -51,7 +58,8 @@ export class Sprite {
     return this._quad;
   }
 
-  constructor() {
+  constructor(tag?: string) {
+    this._tag = tag;
     this._quad = {
       min: [-1, -1],
       max: [1, 1],
@@ -76,7 +84,11 @@ export class Sprite {
    * @param screenWidth
    * @param screenHeight
    */
-  initialize(spriteSheet: Texture, screenWidth: number, screenHeight: number) {
+  initialize(
+    spriteSheetSize: { width: number; height: number },
+    screenWidth: number,
+    screenHeight: number
+  ) {
     this._quad = {
       min: [-1, -1],
       max: [1, 1],
@@ -86,10 +98,9 @@ export class Sprite {
     this._position = { x: 0, y: 0 };
     this._spriteLoc = { x: 0, y: 0, width: 0, height: 0 };
 
-    this._spriteSheet = spriteSheet;
     this._spriteSheetSize = {
-      width: this._spriteSheet.width,
-      height: this._spriteSheet.height,
+      width: spriteSheetSize.width,
+      height: spriteSheetSize.height,
     };
     this._screenSize = { width: screenWidth, height: screenHeight };
     this._spriteFlip = SpriteFlip.None;
@@ -112,7 +123,7 @@ export class Sprite {
     this._spriteLoc.height = opt.spriteHeight;
     this._spriteFlip = opt.spriteFlip ?? SpriteFlip.None;
 
-    this.updateBuffer();
+    this.calculateQuad();
   }
   /**
    *
@@ -120,7 +131,7 @@ export class Sprite {
    * @param positionY Position in pixels
    * @param scale scale of the sprite default is 1.0
    */
-  setPosition(opt: { x: number; y: number; scale?: number }) {
+  setPosition(opt: { x: number; y: number; depth: number; scale?: number }) {
     if (!opt.scale) {
       this._scale = 1.0;
     } else {
@@ -128,11 +139,15 @@ export class Sprite {
     }
     this._position.x = opt.x;
     this._position.y = opt.y;
+    this._depth = opt.depth;
 
-    this.updateBuffer();
+    this.calculateQuad();
   }
 
-  updateBuffer() {
+  /**
+   * Builds a IQuadModel
+   */
+  calculateQuad() {
     const sheetW = this._spriteSheetSize.width;
     const sheetH = this._spriteSheetSize.height;
     const minX = this._spriteLoc.x / sheetW;
@@ -157,7 +172,9 @@ export class Sprite {
     // convert to screen space, min is the top left corner
     this._quad.min = [
       (this._position.x / this._screenSize.width) * 2.0 - 1,
-      (this._position.y / this._screenSize.height) * 2.0 - 1,
+      ((this._screenSize.height - this._position.y) / this._screenSize.height) *
+        2.0 -
+        1,
     ];
 
     const spriteWidth =
@@ -170,37 +187,6 @@ export class Sprite {
       this._quad.min[0] + spriteWidth,
       this._quad.min[1] + spriteHeight,
     ];
+    this._quad.depth = this._depth;
   }
-
-  /**
-   * Builds a IQuadModel from ITileData. This makes it easier to build sprites
-   * @param opt
-   * @returns
-   */
-  /*
-  getQuadModel(): IQuadModel {
-    const minX = this._position[0] * 2 - 1;
-    const minY = this._position[1] * 2 - 1;
-
-    const tileWidth = (this._tileSize[0] / this._screenSize[0]) * this._scale;
-    const tileHeight = (this._tileSize[1] / this._screenSize[1]) * this._scale;
-
-    const maxX = minX + tileWidth;
-    const maxY = minY + tileHeight;
-
-    const minU = this._tileOffset[0] / this.textureSize[0];
-    const minV = 1.0 - this._tileOffset[1] / this.textureSize[1];
-
-    const maxU = minU + this._tileSize[0] / this.textureSize[0];
-    const maxV = minV - this._tileSize[1] / this.textureSize[1];
-
-    // min v is bottom, max v is top
-    return {
-      min: [minX, minY],
-      max: [maxX, maxY],
-      minTex: [minU, minV],
-      maxTex: [maxU, maxV],
-    };
-  }
-  */
 }

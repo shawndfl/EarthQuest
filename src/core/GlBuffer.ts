@@ -26,6 +26,11 @@ export class GlBuffer {
   indexBuffer: WebGLBuffer;
   vertArrayBuffer: WebGLVertexArrayObject;
 
+  /** were the buffers created */
+  get buffersCreated() {
+    return this.vertArrayBuffer != 0;
+  }
+
   /** @type {number} How many indices do we have */
   indexCount: number;
   /**
@@ -190,9 +195,13 @@ export class GlBuffer {
    * Enable vertex attributes and element buffer
    */
   enable() {
-    // the vertex and index buffer are grouped with this so we only need
-    // to enable this array buffer
-    this.gl.bindVertexArray(this.vertArrayBuffer);
+    if (!this.buffersCreated) {
+      console.error('buffers were not created!');
+    } else {
+      // the vertex and index buffer are grouped with this so we only need
+      // to enable this array buffer
+      this.gl.bindVertexArray(this.vertArrayBuffer);
+    }
   }
 
   /**

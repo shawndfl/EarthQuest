@@ -1,3 +1,5 @@
+import { Component } from '../components/Component';
+import { Engine } from '../core/Engine';
 import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
@@ -9,13 +11,17 @@ import { SpriteShader } from '../shaders/SpriteShader';
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritController {
+export class SpritController extends Component {
   private _spriteData: ISpriteData[];
   private _sprite: Sprite;
-  private _shader: SpriteShader;
+  private _spriteTexture: Texture;
   private _buffer: GlBuffer;
   private _selectedSpriteIndex: number;
   private _selectedSpriteId: string;
+
+  protected get buffer() {
+    return this._buffer;
+  }
 
   get selectedSpriteIndex() {
     return this._selectedSpriteIndex;
@@ -29,7 +35,8 @@ export class SpritController {
     return this._spriteData.length;
   }
 
-  constructor(private gl: WebGL2RenderingContext) {
+  constructor(eng: Engine) {
+    super(eng);
     this._sprite = new Sprite();
     this._spriteData = [];
     this._selectedSpriteIndex = 0;
@@ -50,7 +57,7 @@ export class SpritController {
 
     // set up the sprite
     this._sprite.initialize(
-      texture,
+      { width: texture.width, height: texture.height },
       this.gl.canvas.width,
       this.gl.canvas.height
     );
@@ -62,11 +69,10 @@ export class SpritController {
     this.setSprite(defaultSprite);
 
     // set the position of the sprite on the screen
-    this._sprite.setPosition({ x: 0, y: 0, scale: 1 });
+    this._sprite.setPosition({ x: 0, y: 0, scale: 1, depth: 0 });
 
     // setup the shader for the sprite
-    this._shader = new SpriteShader(this.gl, 'sprite');
-    this._shader.setSpriteSheet(texture);
+    this._spriteTexture = texture;
   }
 
   /**
@@ -84,18 +90,30 @@ export class SpritController {
    * @param x in screen pixels
    * @param y in screen pixels
    * @param scale multiplied by the sprite width and height
+   * @param depth is depth buffer space (-1 to 1) 1 is far -1 is near
    */
-  setSpritePosition(x: number, y: number, scale: number = 1.0) {
-    this._sprite.setPosition({ x: x, y: y, scale: scale });
-    // update the buffer
-    this._buffer.setBuffers([this._sprite.quad], false);
+  setSpritePosition(
+    x: number,
+    y: number,
+    scale: number = 1.0,
+    depth?: number,
+    commitToBuffer?: boolean
+  ) {
+    this._sprite.setPosition({ x: x, y: y, scale: scale, depth: depth ?? 0 });
+    if (commitToBuffer) {
+      this.commitToBuffer();
+    }
   }
 
   /**
    * Select a sprite
    * @param id the id in the sprite sheet
    */
-  setSprite(id?: string | number, flip: SpriteFlip = SpriteFlip.None) {
+  setSprite(
+    id?: string | number,
+    flip: SpriteFlip = SpriteFlip.None,
+    commitToBuffer?: boolean
+  ) {
     // find the sprite of a given id
 
     // if id is an number clamp the rang
@@ -123,12 +141,16 @@ export class SpritController {
           spriteHeight: sprite.loc[3],
           spriteFlip: flip,
         });
-
-        // update the buffer
-        this._buffer.setBuffers([this._sprite.quad], false);
+        if (commitToBuffer) {
+          this.commitToBuffer();
+        }
         break;
       }
     }
+  }
+
+  commitToBuffer() {
+    this._buffer.setBuffers([this._sprite.quad], false);
   }
 
   /**
@@ -136,14 +158,19 @@ export class SpritController {
    * @param dt
    */
   update(dt: number) {
-    this._buffer.enable();
-    this._shader.enable();
+    if (!this._buffer.buffersCreated) {
+      console.error('buffers are not created. Call commitToBuffers() first.');
+    } else {
+      this._buffer.enable();
+      this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
+      this.eng.spriteShader.enable();
 
-    {
-      const vertexCount = this._buffer.indexCount;
-      const type = this.gl.UNSIGNED_SHORT;
-      const offset = 0;
-      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      {
+        const vertexCount = this._buffer.indexCount;
+        const type = this.gl.UNSIGNED_SHORT;
+        const offset = 0;
+        this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      }
     }
   }
 }
