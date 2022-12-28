@@ -11,17 +11,13 @@ import { SpriteShader } from '../shaders/SpriteShader';
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritController extends Component {
+export class SpritBatchController extends Component {
   private _spriteData: ISpriteData[];
-  private _sprite: Sprite;
+  private _sprites: Map<string, Sprite>;
   private _spriteTexture: Texture;
   private _buffer: GlBuffer;
   private _selectedSpriteIndex: number;
   private _selectedSpriteId: string;
-
-  protected get buffer() {
-    return this._buffer;
-  }
 
   get selectedSpriteIndex() {
     return this._selectedSpriteIndex;
@@ -37,7 +33,7 @@ export class SpritController extends Component {
 
   constructor(eng: Engine) {
     super(eng);
-    this._sprite = new Sprite();
+    this._sprites = new Map<string, Sprite>();
     this._spriteData = [];
     this._selectedSpriteIndex = 0;
   }
@@ -55,21 +51,8 @@ export class SpritController extends Component {
     // save the data
     this._spriteData = spriteData;
 
-    // set up the sprite
-    this._sprite.initialize(
-      { width: texture.width, height: texture.height },
-      this.gl.canvas.width,
-      this.gl.canvas.height
-    );
-
     // create the gl buffers for this sprite
     this._buffer = new GlBuffer(this.gl);
-
-    // set a default sprite
-    this.setSprite(defaultSprite);
-
-    // set the position of the sprite on the screen
-    this._sprite.setPosition({ x: 0, y: 0, scale: 1, depth: 0 });
 
     // setup the shader for the sprite
     this._spriteTexture = texture;
@@ -86,35 +69,61 @@ export class SpritController extends Component {
   }
 
   /**
-   * Sets the sprites position
+   * A way of keeping track of our sprites
+   * @param id
+   * @returns
+   */
+  private getSprite(id: string): Sprite {
+    let sprite = this._sprites.get(id);
+    if (!this._sprites.has(id)) {
+      // create new sprite and initialize it
+      sprite = new Sprite(id);
+      sprite.initialize(
+        {
+          width: this._spriteTexture.width,
+          height: this._spriteTexture.height,
+        },
+        this.gl.canvas.width,
+        this.gl.canvas.height
+      );
+      this._sprites.set(id, sprite);
+    }
+    return sprite;
+  }
+
+  /**
+   * Sets the sprites position.
+   * NOTE: You must call commitBuffer() for the changes to take affect.
+   *
    * @param x in screen pixels
    * @param y in screen pixels
    * @param scale multiplied by the sprite width and height
    * @param depth is depth buffer space (-1 to 1) 1 is far -1 is near
    */
   setSpritePosition(
+    spriteId: string,
     x: number,
     y: number,
     scale: number = 1.0,
-    depth?: number,
-    commitToBuffer?: boolean
+    depth?: number
   ) {
-    this._sprite.setPosition({ x: x, y: y, scale: scale, depth: depth ?? 0 });
-    if (commitToBuffer) {
-      this.commitToBuffer();
-    }
+    const spriteModel = this.getSprite(spriteId);
+
+    spriteModel.setPosition({ x: x, y: y, scale: scale, depth: depth ?? 0 });
   }
 
   /**
-   * Select a sprite
-   * @param id the id in the sprite sheet
+   * Select a sprite from the sprite sheet
+   *
+   * NOTE: You must call commitBuffer() for the changes to take affect.
    */
   setSprite(
+    spriteId: string,
     id?: string | number,
-    flip: SpriteFlip = SpriteFlip.None,
-    commitToBuffer?: boolean
+    flip: SpriteFlip = SpriteFlip.None
   ) {
     // find the sprite of a given id
+    const spriteModel = this.getSprite(spriteId);
 
     // if id is an number clamp the rang
     if (typeof id === 'number') {
@@ -124,7 +133,6 @@ export class SpritController extends Component {
         id = 0;
       }
     }
-    let found: boolean = false;
 
     for (let i = 0; i < this._spriteData.length; i++) {
       const sprite = this._spriteData[i];
@@ -135,28 +143,26 @@ export class SpritController extends Component {
         this._selectedSpriteIndex = i;
         this._selectedSpriteId = sprite.id;
 
-        this._sprite.setSprite({
+        spriteModel.setSprite({
           pixelXOffset: sprite.loc[0],
           pixelYOffset: sprite.loc[1],
           spriteWidth: sprite.loc[2],
           spriteHeight: sprite.loc[3],
           spriteFlip: flip,
         });
-        if (commitToBuffer) {
-          this.commitToBuffer();
-        }
-        found = true;
         break;
       }
     }
-
-    if (!found) {
-      console.error('cannot find sprite ' + id);
-    }
   }
 
-  commitToBuffer() {
-    this._buffer.setBuffers([this._sprite.quad], false);
+  commitBuffer() {
+    const quads: IQuadModel[] = [];
+    this._sprites.forEach((sprite) => {
+      quads.push(sprite.quad);
+    });
+
+    // update the buffer
+    this._buffer.setBuffers(quads, false);
   }
 
   /**
@@ -164,19 +170,15 @@ export class SpritController extends Component {
    * @param dt
    */
   update(dt: number) {
-    if (!this._buffer.buffersCreated) {
-      console.error('buffers are not created. Call commitToBuffers() first.');
-    } else {
-      this._buffer.enable();
-      this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
-      this.eng.spriteShader.enable();
+    this._buffer.enable();
+    this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
+    this.eng.spriteShader.enable();
 
-      {
-        const vertexCount = this._buffer.indexCount;
-        const type = this.gl.UNSIGNED_SHORT;
-        const offset = 0;
-        this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
-      }
+    {
+      const vertexCount = this._buffer.indexCount;
+      const type = this.gl.UNSIGNED_SHORT;
+      const offset = 0;
+      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
     }
   }
 }

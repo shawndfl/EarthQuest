@@ -14,7 +14,8 @@ import { Engine } from '../core/Engine';
 import { Component } from './Component';
 import { UserAction } from '../core/UserAction';
 import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
-import { Menu } from '../menus/Menu';
+import { DialogMenu } from '../menus/DialogMenu';
+import { SpriteDebugger } from './SpriteDebugger';
 
 /**
  * Sample scene
@@ -25,7 +26,9 @@ export class Scene extends Component {
   readonly ground: Ground;
   readonly player: PlayerController;
   readonly textManager: TextManager;
-  readonly menu: Menu;
+  readonly dialog: DialogMenu;
+
+  readonly spriteDebugger: SpriteDebugger;
 
   /**
    * Constructor
@@ -41,7 +44,8 @@ export class Scene extends Component {
     this.ground = new Ground(this.gl);
 
     this.player = new PlayerController(eng);
-    this.menu = new Menu(eng);
+    this.spriteDebugger = new SpriteDebugger(eng);
+    this.dialog = new DialogMenu(eng);
   }
 
   /**
@@ -68,7 +72,8 @@ export class Scene extends Component {
     await this.spriteSheetTexture.loadImage(CharacterImage);
     this.ground.initialize(this.spriteSheetTexture);
     this.player.initialize(this.spriteSheetTexture, CharacterData);
-    await this.menu.initialize();
+    this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
+    await this.dialog.initialize();
 
     await this.textManager.initialize(FontImage, FontData);
     this.textManager.setTextBlock({
@@ -96,7 +101,9 @@ export class Scene extends Component {
     // handle main menu, pause menu, battles menu, dialog menu, environment
 
     return (
-      this.menu.handleUserAction(action) || this.player.handleUserAction(action)
+      this.dialog.handleUserAction(action) ||
+      this.spriteDebugger.handleUserAction(action) ||
+      this.player.handleUserAction(action)
     );
   }
 
@@ -126,7 +133,9 @@ export class Scene extends Component {
 
     this.player.update(dt);
 
-    this.menu.update(dt);
+    this.spriteDebugger.update(dt);
+
+    this.dialog.update(dt);
   }
 
   resize(width: number, height: number) {}

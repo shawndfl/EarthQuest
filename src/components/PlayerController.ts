@@ -18,14 +18,14 @@ export enum SpriteDirection {
  * Controls the player sprite.
  */
 export class PlayerController extends Component {
-  private _spriteController: SpritController;
-  private _animationState: number;
-  private _animationTimer: number;
-  private _direction: SpriteDirection;
-  private _spriteFlip: boolean;
+  protected _spriteController: SpritController;
+  protected _animationState: number;
+  protected _animationTimer: number;
+  protected _direction: SpriteDirection;
+  protected _spriteFlip: boolean;
 
-  private _walkAnimationData: IAnimationData;
-  private _animationController: AnimationController;
+  protected _walkAnimationData: IAnimationData;
+  protected _animationController: AnimationController;
 
   constructor(eng: Engine) {
     super(eng);
@@ -67,23 +67,9 @@ export class PlayerController extends Component {
    */
   handleUserAction(action: UserAction): boolean {
     if (action == UserAction.LeftPressed) {
-      const index =
-        (this._spriteController.selectedSpriteIndex - 1) %
-        this._spriteController.spriteCount;
-
-      this._spriteController.setSprite(index, SpriteFlip.None, true);
-
-      console.debug('Showing ' + this._spriteController.selectedSpriteId);
-      //this._direction = SpriteDirection.Left;
+      this._direction = SpriteDirection.Left;
     } else if (action == UserAction.RightPressed) {
-      const index =
-        (this._spriteController.selectedSpriteIndex + 1) %
-        this._spriteController.spriteCount;
-
-      this._spriteController.setSprite(index, SpriteFlip.None, true);
-
-      console.debug('Showing ' + this._spriteController.selectedSpriteId);
-      //this._direction = SpriteDirection.Right;
+      this._direction = SpriteDirection.Right;
     } else if (action == UserAction.UpPressed) {
       this._direction = SpriteDirection.Up;
     } else if (action == UserAction.DownPressed) {
@@ -103,11 +89,11 @@ export class PlayerController extends Component {
 
   update(dt: number) {
     this._spriteController.update(dt);
-    //this.walkAnimation(dt, this._direction);
+    this.walkAnimation(dt, this._direction);
   }
 
   walkAnimation(dt: number, direction: SpriteDirection) {
-    let sprites = ['ness.forward.step.left', 'ness.forward.step.right'];
+    let sprites = ['ness.down.step.left', 'ness.down.step.right'];
     let flip: boolean = false;
     switch (direction) {
       case SpriteDirection.Right:
@@ -123,12 +109,14 @@ export class PlayerController extends Component {
     if (this._animationState == 0) {
       this._spriteController.setSprite(
         sprites[0],
-        flip ? SpriteFlip.XFlip : SpriteFlip.None
+        flip ? SpriteFlip.XFlip : SpriteFlip.None,
+        true
       );
     } else if (this._animationState == 1) {
       this._spriteController.setSprite(
         sprites[1],
-        flip ? SpriteFlip.XFlip : SpriteFlip.None
+        flip ? SpriteFlip.XFlip : SpriteFlip.None,
+        true
       );
     }
 

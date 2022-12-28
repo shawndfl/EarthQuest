@@ -1,6 +1,6 @@
 [
   {
-    "id": "ness.forward.step.left",
+    "id": "ness.down.step.left",
     "loc": [2, 24, 16, 24]
   },
   {
@@ -86,10 +86,10 @@
   },
   {
     "id": "ness.pj.down.step",
-    "loc": [176, 49, 24, 16]
+    "loc": [176, 49, 16, 24]
   },
   {
     "id": "ness.pj.up.step",
-    "loc": [193, 49, 24, 16]
+    "loc": [193, 49, 16, 24]
   }
 ]
