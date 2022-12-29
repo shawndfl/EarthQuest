@@ -24,6 +24,9 @@ export class SpritBatchController
   private _selectedSpriteId: string;
   private _activeSprite: string;
 
+  get sprite(): Sprite {
+    return this._sprites.get(this._activeSprite);
+  }
   get selectedSpriteIndex() {
     return this._selectedSpriteIndex;
   }

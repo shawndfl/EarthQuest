@@ -47,3 +47,14 @@ export function toRadian(a: number): number {
 export function equals(a: number, b: number): boolean {
   return Math.abs(a - b) <= epsilon * Math.max(1.0, Math.abs(a), Math.abs(b));
 }
+
+/**
+ * Clamp a number between values
+ * @param num
+ * @param min
+ * @param max
+ * @returns
+ */
+export function Clamp(num: number, min: number, max: number): number {
+  return Math.min(Math.max(num, min), max);
+}

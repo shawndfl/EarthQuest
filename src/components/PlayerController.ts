@@ -7,6 +7,7 @@ import { UserAction } from '../core/UserAction';
 import { SpritController } from '../environment/SpriteController';
 import vec2 from '../math/vec2';
 import { Component } from './Component';
+import * as MathConst from '../math/constants';
 
 export enum MoveDirection {
   N,
@@ -159,13 +160,23 @@ export class PlayerController extends Component {
       newPos.y =
         this._position.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
-      console.debug('pos ' + newPos.x + ', ' + newPos.y);
+
+      const depthPadding = 0.3; // magic number
+
+      let newDepth = MathConst.Clamp(
+        -((newPos.y / this.eng.height) * 2 - 1) - depthPadding,
+        -1,
+        1
+      );
+
+      console.debug('pos ' + newPos.x + ', ' + newPos.y + ', ' + newDepth);
+      //this.eng.scene.ground.
 
       // move the player
       this._spriteController.setSpritePosition(
         newPos.x,
         newPos.y,
-        undefined,
+        newDepth,
         true
       );
 

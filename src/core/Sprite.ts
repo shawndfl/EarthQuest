@@ -61,6 +61,14 @@ export class Sprite {
     return this._spriteRotate;
   }
 
+  getSpriteWidth(): number {
+    return this._screenSize.width * this._scale;
+  }
+
+  getSpriteHeight(): number {
+    return this._screenSize.height * this._scale;
+  }
+
   get quad() {
     return this._quad;
   }

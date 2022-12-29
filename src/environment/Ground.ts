@@ -5,6 +5,7 @@ import TileImg from '../assets/IsometricTile.png';
 import TileData from '../assets/IsometricTile.json';
 import { SpritBatchController } from './SpriteBatchController';
 import vec2 from '../math/vec2';
+import mat2 from '../math/mat2';
 
 export class Ground extends Component {
   protected _spriteController: SpritBatchController;
@@ -20,15 +21,24 @@ export class Ground extends Component {
     this._spriteController.initialize(texture, TileData);
 
     const scale = 5;
-    const start = new vec2([0, 200]);
+    const start = new vec2([0, 10]);
 
-    for (let j = 0; j < 10; j++) {
+    const tileTransform = new mat2([]);
+    for (let j = 0; j < 30; j++) {
       for (let i = 0; i < 10; i++) {
         this._spriteController.activeSprite('tile' + i + '_' + j);
+        //const w = this._spriteController.sprite.getSpriteWidth();
+        //const h = this._spriteController.sprite.getSpriteHeight();
+
         const xOffset = j % 2 == 0 ? 0 : 8 * scale;
+
         const x = start.x + i * 16 * scale + xOffset;
         const y = start.y + j * 4 * scale;
-        this._spriteController.setSpritePosition(x, y, 1.0 - j / 5.0);
+        const z = -((y / this.eng.height) * 2 - 1);
+        if (i == 0) {
+          console.debug('ground depth: ' + z + ' i: ' + i);
+        }
+        this._spriteController.setSpritePosition(x, y, z);
 
         this._spriteController.scale(5);
         this._spriteController.setSprite('block');
