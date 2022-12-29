@@ -1,3 +1,4 @@
+import mat4 from '../math/mat4';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 
@@ -92,6 +93,15 @@ export class ShaderController {
    */
   setVec4(loc: number, value: vec4) {
     this.gl.uniform4f(loc, value.x, value.y, value.z, value.w);
+  }
+
+  /**
+   * Set the mat 4
+   * @param loc
+   * @param value
+   */
+  setMat4(loc: number, value: mat4) {
+    this.gl.uniformMatrix4fv(loc, false, value.getValues());
   }
 
   /**

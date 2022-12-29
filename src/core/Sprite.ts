@@ -46,6 +46,8 @@ export class Sprite {
   /** this is used by the buffer */
   private _quad: IQuadModel;
 
+  worldSpace: boolean;
+
   get tag(): string {
     return this._tag;
   }
@@ -55,6 +57,10 @@ export class Sprite {
    */
   get position(): { x: number; y: number } {
     return this._position;
+  }
+
+  get depth(): number {
+    return this._depth;
   }
 
   get rotation(): number {
@@ -92,6 +98,7 @@ export class Sprite {
     this._scale = 1.0;
     this._spriteRotate = 0;
     this._depth = 0;
+    this.worldSpace = false;
   }
 
   /**
@@ -124,6 +131,7 @@ export class Sprite {
     this._spriteRotate = 0;
     this._scale = 1.0;
     this._depth = 0;
+    this.worldSpace = false;
   }
 
   /**
@@ -207,23 +215,34 @@ export class Sprite {
     }
 
     // convert to screen space, min is the top left corner
-    this._quad.min = [
-      (this._position.x / this._screenSize.width) * 2.0 - 1,
-      ((this._screenSize.height - this._position.y) / this._screenSize.height) *
-        2.0 -
-        1,
-    ];
+    if (!this.worldSpace) {
+      this._quad.min = [
+        (this._position.x / this._screenSize.width) * 2.0 - 1,
+        ((this._screenSize.height - this._position.y) /
+          this._screenSize.height) *
+          2.0 -
+          1,
+      ];
+    } else {
+      this._quad.min = [this._position.x, this._position.y];
+    }
 
-    const spriteWidth =
+    let spriteWidth =
       (this._spriteLoc.width / this._screenSize.width) * this._scale;
-    const spriteHeight =
+    let spriteHeight =
       (this._spriteLoc.height / this._screenSize.height) * this._scale;
+
+    if (this.worldSpace) {
+      spriteWidth = this._spriteLoc.width * this._scale;
+      spriteHeight = this._spriteLoc.height * this._scale;
+    }
 
     // max is the bottom right
     this._quad.max = [
       this._quad.min[0] + spriteWidth,
       this._quad.min[1] + spriteHeight,
     ];
+
     this._quad.depth = this._depth;
 
     // if we have some rotation then apply it

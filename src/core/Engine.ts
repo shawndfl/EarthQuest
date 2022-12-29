@@ -1,5 +1,7 @@
 import { Scene } from '../components/Scene';
 import { Editor } from '../editor/Editor';
+import { SpritBatchController } from '../environment/SpriteBatchController';
+import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { SpriteShader } from '../shaders/SpriteShader';
 import { InputHandler } from './InputHandler';
 
@@ -12,6 +14,7 @@ export class Engine {
   readonly input: InputHandler;
   private _editor: Editor;
   readonly spriteShader: SpriteShader;
+  readonly spritePerspectiveShader: SpritePerspectiveShader;
 
   get width(): number {
     return this.gl.canvas.width;
@@ -29,6 +32,10 @@ export class Engine {
     this.scene = new Scene(this);
     this.input = new InputHandler(this);
     this.spriteShader = new SpriteShader(this.gl, 'spriteShader');
+    this.spritePerspectiveShader = new SpritePerspectiveShader(
+      this.gl,
+      'spritePerspecticeShader'
+    );
   }
 
   /**

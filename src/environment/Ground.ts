@@ -6,6 +6,7 @@ import TileData from '../assets/IsometricTile.json';
 import { SpritBatchController } from './SpriteBatchController';
 import vec2 from '../math/vec2';
 import mat2 from '../math/mat2';
+import mat4 from '../math/mat4';
 
 export class Ground extends Component {
   protected _spriteController: SpritBatchController;
