@@ -4,7 +4,8 @@ import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
-import { SpriteShader } from '../shaders/SpriteShader';
+import mat4 from '../math/mat4';
+import vec4 from '../math/vec4';
 import { ISpriteController } from './ISprintController';
 
 /**
@@ -75,6 +76,7 @@ export class SpritController extends Component implements ISpriteController {
 
     // set the position of the sprite on the screen
     this._sprite.setPosition(0, 0, 0);
+    this.commitToBuffer();
 
     // setup the shader for the sprite
     this._spriteTexture = texture;
@@ -184,8 +186,18 @@ export class SpritController extends Component implements ISpriteController {
       console.error('buffers are not created. Call commitToBuffers() first.');
     } else {
       this._buffer.enable();
-      this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
-      this.eng.spriteShader.enable();
+      this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
+      this.eng.spritePerspectiveShader.enable();
+
+      const proj = mat4.orthographic(
+        0,
+        this.eng.width,
+        0,
+        this.eng.height,
+        -1,
+        1000
+      );
+      this.eng.spritePerspectiveShader.setProj(proj);
 
       {
         const vertexCount = this._buffer.indexCount;

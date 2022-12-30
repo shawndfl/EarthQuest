@@ -16,7 +16,6 @@ import { UserAction } from '../core/UserAction';
 import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
 import { DialogMenu } from '../menus/DialogMenu';
 import { SpriteDebugger } from './SpriteDebugger';
-import { SpritePerspectiveController } from '../environment/SpritePerspectiveController';
 
 /**
  * Sample scene
@@ -29,7 +28,6 @@ export class Scene extends Component {
   readonly textManager: TextManager;
   readonly dialog: DialogMenu;
 
-  readonly spritePerspective: SpritePerspectiveController;
   readonly spriteDebugger: SpriteDebugger;
 
   /**
@@ -47,7 +45,6 @@ export class Scene extends Component {
 
     this.player = new PlayerController(eng);
     this.spriteDebugger = new SpriteDebugger(eng);
-    this.spritePerspective = new SpritePerspectiveController(eng);
 
     this.dialog = new DialogMenu(eng);
   }
@@ -77,7 +74,6 @@ export class Scene extends Component {
     this.ground.initialize();
     this.player.initialize(this.spriteSheetTexture, CharacterData);
     this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
-    this.spritePerspective.initialize(this.spriteSheetTexture, CharacterData);
 
     await this.dialog.initialize();
 
@@ -140,8 +136,6 @@ export class Scene extends Component {
     this.player.update(dt);
 
     this.spriteDebugger.update(dt);
-
-    //this.spritePerspective.update(dt);
 
     this.dialog.update(dt);
   }

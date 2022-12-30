@@ -17,36 +17,34 @@ export enum SpriteFlip {
  */
 export class Sprite {
   /** referencing the sprite. Used in collections */
-  private _tag: string;
+  protected _tag: string;
 
   /** The width and height in pixels of the sprite within the sprite sheet */
-  private _spriteLoc: { x: number; y: number; width: number; height: number };
+  protected _spriteLoc: { x: number; y: number; width: number; height: number };
 
   /** The width and height of the texture in pixels*/
-  private _spriteSheetSize: { width: number; height: number };
+  protected _spriteSheetSize: { width: number; height: number };
 
   /** The position in pixels of the canvas where the sprite will go. */
-  private _position: { x: number; y: number };
+  protected _position: { x: number; y: number };
 
   /** the depth of the sprite -1 is nearest 1 is farthest  */
-  private _depth: number;
+  protected _depth: number;
 
   /** is the sprite flipped some way */
-  private _spriteFlip: SpriteFlip;
+  protected _spriteFlip: SpriteFlip;
 
   /** sprite rotation in degrees */
-  private _spriteRotate: number;
+  protected _spriteRotate: number;
 
   /** The scale image and keep the aspect ratio  */
-  private _scale: number;
+  protected _scale: number;
 
   /** Screen size */
-  private _screenSize: { width: number; height: number };
+  protected _screenSize: { width: number; height: number };
 
   /** this is used by the buffer */
-  private _quad: IQuadModel;
-
-  worldSpace: boolean;
+  protected _quad: IQuadModel;
 
   get tag(): string {
     return this._tag;
@@ -68,11 +66,11 @@ export class Sprite {
   }
 
   getSpriteWidth(): number {
-    return this._screenSize.width * this._scale;
+    return this._spriteLoc.width * this._scale;
   }
 
   getSpriteHeight(): number {
-    return this._screenSize.height * this._scale;
+    return this._spriteLoc.height * this._scale;
   }
 
   get quad() {
@@ -98,7 +96,6 @@ export class Sprite {
     this._scale = 1.0;
     this._spriteRotate = 0;
     this._depth = 0;
-    this.worldSpace = false;
   }
 
   /**
@@ -131,7 +128,6 @@ export class Sprite {
     this._spriteRotate = 0;
     this._scale = 1.0;
     this._depth = 0;
-    this.worldSpace = false;
   }
 
   /**
@@ -215,27 +211,10 @@ export class Sprite {
     }
 
     // convert to screen space, min is the top left corner
-    if (!this.worldSpace) {
-      this._quad.min = [
-        (this._position.x / this._screenSize.width) * 2.0 - 1,
-        ((this._screenSize.height - this._position.y) /
-          this._screenSize.height) *
-          2.0 -
-          1,
-      ];
-    } else {
-      this._quad.min = [this._position.x, this._position.y];
-    }
 
-    let spriteWidth =
-      (this._spriteLoc.width / this._screenSize.width) * this._scale;
-    let spriteHeight =
-      (this._spriteLoc.height / this._screenSize.height) * this._scale;
-
-    if (this.worldSpace) {
-      spriteWidth = this._spriteLoc.width * this._scale;
-      spriteHeight = this._spriteLoc.height * this._scale;
-    }
+    this._quad.min = [this._position.x, this._position.y];
+    const spriteWidth = this._spriteLoc.width * this._scale;
+    const spriteHeight = this._spriteLoc.height * this._scale;
 
     // max is the bottom right
     this._quad.max = [

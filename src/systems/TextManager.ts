@@ -123,7 +123,7 @@ export class TextManager extends Component {
 
     // create one if needed
     if (!controller) {
-      controller = new TextController(this.gl, this.fontData);
+      controller = new TextController(this.eng, this.fontData);
       this.texts.set(textModel.id, controller);
     }
 

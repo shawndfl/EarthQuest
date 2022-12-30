@@ -4,6 +4,7 @@ import { GlBuffer, IQuadModel } from '../core/GlBuffer';
 import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
+import mat4 from '../math/mat4';
 import { SpriteShader } from '../shaders/SpriteShader';
 import { ISpriteController } from './ISprintController';
 
@@ -141,7 +142,7 @@ export class SpritBatchController
       throw new Error('activeSprite not set call activeSprite()');
     }
     const spriteModel = this.getSprite(this._activeSprite);
-    spriteModel.setPosition(x, y, depth ?? 0);
+    spriteModel.setPosition(x, y, depth);
   }
 
   /**
@@ -204,6 +205,19 @@ export class SpritBatchController
     this._buffer.enable();
     this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
     this.eng.spriteShader.enable();
+
+    this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
+    this.eng.spritePerspectiveShader.enable();
+
+    const proj = mat4.orthographic(
+      0,
+      this.eng.width,
+      0,
+      this.eng.height,
+      0.001,
+      1000
+    );
+    this.eng.spritePerspectiveShader.setProj(proj);
 
     {
       const vertexCount = this._buffer.indexCount;

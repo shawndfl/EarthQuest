@@ -55,7 +55,7 @@ export class PlayerController extends Component {
       this._position.y,
       0
     );
-    this._spriteController.scale(5);
+    this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
     this._spriteController.commitToBuffer();
 
@@ -137,7 +137,7 @@ export class PlayerController extends Component {
         break;
       case MoveDirection.S:
         sprites = ['ness.down.step.left', 'ness.down.step.right'];
-        dir.y = 1;
+        dir.y = -1;
 
         break;
       case MoveDirection.N:
@@ -145,7 +145,7 @@ export class PlayerController extends Component {
         if (this._walkAnimation.getValue() == 0) {
           flip = true;
         }
-        dir.y = -1;
+        dir.y = 1;
         break;
     }
 

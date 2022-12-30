@@ -1,17 +1,17 @@
+import { Component } from '../components/Component';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
+import { Engine } from './Engine';
 import { GlBuffer, IQuadModel } from './GlBuffer';
 import { IFontData } from './IFontData';
 import { ITextModel } from './ITextModel';
 
-export class TextController {
+export class TextController extends Component {
   buffer: GlBuffer;
   color: vec4;
 
-  constructor(
-    private gl: WebGL2RenderingContext,
-    private fontData: IFontData[]
-  ) {
+  constructor(eng: Engine, private fontData: IFontData[]) {
+    super(eng);
     // Create a new buffer
     this.buffer = new GlBuffer(this.gl);
   }
