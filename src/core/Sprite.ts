@@ -43,6 +43,9 @@ export class Sprite {
   /** Screen size */
   protected _screenSize: { width: number; height: number };
 
+  /** this is used to offset a sprites position so it can be centered on a tile */
+  protected _positionOffset: { x: number; y: number };
+
   /** this is used by the buffer */
   protected _quad: IQuadModel;
 
@@ -79,23 +82,7 @@ export class Sprite {
 
   constructor(tag?: string) {
     this._tag = tag;
-    this._quad = {
-      min: [-1, -1],
-      max: [1, 1],
-      minTex: [0, 0],
-      maxTex: [1, 1],
-    };
-    this._spriteSheetSize = {
-      width: 0,
-      height: 0,
-    };
-    this._screenSize = { width: 0, height: 0 };
-    this._position = { x: 0, y: 0 };
-    this._spriteLoc = { x: 0, y: 0, width: 0, height: 0 };
-    this._spriteFlip = SpriteFlip.None;
-    this._scale = 1.0;
-    this._spriteRotate = 0;
-    this._depth = 0;
+    this.initialize({ width: 0, height: 0 }, 800, 600);
   }
 
   /**
@@ -128,6 +115,7 @@ export class Sprite {
     this._spriteRotate = 0;
     this._scale = 1.0;
     this._depth = 0;
+    this._positionOffset = { x: 0, y: 0 };
   }
 
   /**
@@ -157,6 +145,17 @@ export class Sprite {
     this._scale = scale;
 
     this.calculateQuad();
+  }
+
+  /**
+   * Sets an offset for the position based on what the image is.
+   * This allows sprites to be position in the cells correctly.
+   * @param x in pixels
+   * @param y in pixels
+   */
+  setSpritePositionOffset(x: number, y: number) {
+    this._positionOffset.x = x;
+    this._positionOffset.y = y;
   }
 
   /**
@@ -212,7 +211,10 @@ export class Sprite {
 
     // convert to screen space, min is the top left corner
 
-    this._quad.min = [this._position.x, this._position.y];
+    this._quad.min = [
+      this._position.x + this._positionOffset.x,
+      this._position.y + this._positionOffset.y,
+    ];
     const spriteWidth = this._spriteLoc.width * this._scale;
     const spriteHeight = this._spriteLoc.height * this._scale;
 

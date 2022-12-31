@@ -154,6 +154,11 @@ export class SpritController extends Component implements ISpriteController {
         this._selectedSpriteIndex = i;
         this._selectedSpriteId = sprite.id;
 
+        const xOffset = sprite.offset ? sprite.offset[0] : 0;
+        const yOffset = sprite.offset ? sprite.offset[1] : 0;
+
+        this._sprite.setSpritePositionOffset(xOffset, yOffset);
+
         this._sprite.setSprite({
           pixelXOffset: sprite.loc[0],
           pixelYOffset: sprite.loc[1],
@@ -194,8 +199,8 @@ export class SpritController extends Component implements ISpriteController {
         this.eng.width,
         0,
         this.eng.height,
-        -1,
-        1000
+        1,
+        -1
       );
       this.eng.spritePerspectiveShader.setProj(proj);
 

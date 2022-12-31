@@ -23,14 +23,17 @@ export class CanvasController {
       }
     });
 
-    /** @type {WebGL2RenderingContext} render context from this canvas*/
-    // @ts-ignore
-    this.gl = (WebGLDebugUtils as any).makeDebugContext(
-      canvas.getContext('webgl2'),
-      this.logGlError.bind(this),
-      this.logGLCall.bind(this)
-    );
-
+    if (true) {
+      /** @type {WebGL2RenderingContext} render context from this canvas*/
+      // @ts-ignore
+      this.gl = (WebGLDebugUtils as any).makeDebugContext(
+        canvas.getContext('webgl2'),
+        this.logGlError.bind(this),
+        this.logGLCall.bind(this)
+      );
+    } else {
+      this.gl = canvas.getContext('webgl2');
+    }
     // Only continue if WebGL is available and working
     if (this.gl === null) {
       console.error(

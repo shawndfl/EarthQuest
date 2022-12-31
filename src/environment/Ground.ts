@@ -78,19 +78,22 @@ export class Ground extends Component {
           spriteId = 'block';
         } else if (cellId.includes('highlight')) {
           spriteId = 'block.half.highlight';
+        } else if (cellId.includes('tree')) {
+          spriteId = 'tree';
         }
 
         this._spriteController.setSprite(spriteId);
         this._spriteController.scale(scale);
 
-        // get width and height after the sprite is set and scaled
-        const w = this._spriteController.sprite.getSpriteWidth();
-        const h = this._spriteController.sprite.getSpriteHeight();
+        // the width and the height are hard coded because the grid is
+        // 16 x 8
+        const w = 32 * scale; //this._spriteController.sprite.getSpriteWidth();
+        const h = 32 * scale; //this._spriteController.sprite.getSpriteHeight();
 
         const xOffset = j % 2 == 0 ? 0 : w * 0.25 * scale;
         const x = i * w + xOffset;
         const y = this.eng.height - h - j * h * 0.25;
-        const z = -50; //-((y / this.eng.height) * 2 - 1);
+        const z = (y / this.eng.height) * 2 - 1;
 
         if (i == 0) {
           console.debug('ground depth: ' + z + ' i: ' + i);

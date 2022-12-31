@@ -1,8 +1,6 @@
 import { Scene } from '../components/Scene';
 import { Editor } from '../editor/Editor';
-import { SpritBatchController } from '../environment/SpriteBatchController';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
-import { SpriteShader } from '../shaders/SpriteShader';
 import { InputHandler } from './InputHandler';
 
 /**
@@ -13,7 +11,6 @@ export class Engine {
   readonly scene: Scene;
   readonly input: InputHandler;
   private _editor: Editor;
-  readonly spriteShader: SpriteShader;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
 
   get width(): number {
@@ -31,10 +28,9 @@ export class Engine {
   constructor(readonly gl: WebGL2RenderingContext) {
     this.scene = new Scene(this);
     this.input = new InputHandler(this);
-    this.spriteShader = new SpriteShader(this.gl, 'spriteShader');
     this.spritePerspectiveShader = new SpritePerspectiveShader(
       this.gl,
-      'spritePerspecticeShader'
+      'spritePerspectiveShader'
     );
   }
 

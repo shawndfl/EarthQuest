@@ -13,7 +13,7 @@ const FontVS = `
     attribute vec3 aPos;
     attribute vec2 aTex;
 
-    varying highp vec2 vTex;
+    varying mediump vec2 vTex;
                                                 
     void main() {
         vTex = aTex;
@@ -25,13 +25,13 @@ const FontVS = `
  * Fragment shader for Font
  */
 const FontFS = ` 
-      varying highp vec2 vTex;
+      varying mediump vec2 vTex;
 
       uniform sampler2D uFont;
-      uniform highp vec4 uColor;
+      uniform mediump vec4 uColor;
                             
       void main() {
-        highp vec4 color = texture2D(uFont, vTex) * uColor;
+        mediump vec4 color = texture2D(uFont, vTex) * uColor;
         if(color.w > 0.2) { 
           gl_FragColor = texture2D(uFont, vTex) * uColor;
         } else {

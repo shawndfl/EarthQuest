@@ -161,10 +161,10 @@ export class PlayerController extends Component {
         this._position.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
-      const depthPadding = 0.3; // magic number
+      const depthPadding = 0.2; // magic number
 
       let newDepth = MathConst.Clamp(
-        -((newPos.y / this.eng.height) * 2 - 1) - depthPadding,
+        (newPos.y / this.eng.height) * 2 - 1 - depthPadding,
         -1,
         1
       );

@@ -5,7 +5,6 @@ import { ISpriteData } from '../core/ISpriteData';
 import { Sprite, SpriteFlip } from '../core/Sprite';
 import { Texture } from '../core/Texture';
 import mat4 from '../math/mat4';
-import { SpriteShader } from '../shaders/SpriteShader';
 import { ISpriteController } from './ISprintController';
 
 /**
@@ -179,7 +178,10 @@ export class SpritBatchController
       if (!id || sprite.id === id || i === id) {
         this._selectedSpriteIndex = i;
         this._selectedSpriteId = sprite.id;
+        const xOffset = sprite.offset ? sprite.offset[0] : 0;
+        const yOffset = sprite.offset ? sprite.offset[1] : 0;
 
+        spriteModel.setSpritePositionOffset(xOffset, yOffset);
         spriteModel.setSprite({
           pixelXOffset: sprite.loc[0],
           pixelYOffset: sprite.loc[1],
@@ -207,8 +209,6 @@ export class SpritBatchController
    */
   update(dt: number) {
     this._buffer.enable();
-    this.eng.spriteShader.setSpriteSheet(this._spriteTexture);
-    this.eng.spriteShader.enable();
 
     this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
     this.eng.spritePerspectiveShader.enable();
@@ -218,8 +218,8 @@ export class SpritBatchController
       this.eng.width,
       0,
       this.eng.height,
-      0.001,
-      1000
+      1,
+      -1
     );
     this.eng.spritePerspectiveShader.setProj(proj);
 
