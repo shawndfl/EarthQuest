@@ -29,7 +29,7 @@ export class Scene extends Component {
   readonly textManager: TextManager;
   readonly dialog: DialogMenu;
 
-  readonly spriteDebugger: SpriteDebugger;
+  //readonly spriteDebugger: SpriteDebugger;
 
   /**
    * Constructor
@@ -45,7 +45,7 @@ export class Scene extends Component {
     this.ground = new Ground(eng, Level1);
 
     this.player = new PlayerController(eng);
-    this.spriteDebugger = new SpriteDebugger(eng);
+    //this.spriteDebugger = new SpriteDebugger(eng);
 
     this.dialog = new DialogMenu(eng);
   }
@@ -74,7 +74,7 @@ export class Scene extends Component {
     await this.spriteSheetTexture.loadImage(CharacterImage);
     this.ground.initialize();
     this.player.initialize(this.spriteSheetTexture, CharacterData);
-    this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
+    //this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
 
     await this.dialog.initialize();
 
@@ -105,7 +105,7 @@ export class Scene extends Component {
 
     return (
       this.dialog.handleUserAction(action) ||
-      this.spriteDebugger.handleUserAction(action) ||
+      //this.spriteDebugger.handleUserAction(action) ||
       this.player.handleUserAction(action)
     );
   }
@@ -136,7 +136,7 @@ export class Scene extends Component {
 
     this.player.update(dt);
 
-    this.spriteDebugger.update(dt);
+    //this.spriteDebugger.update(dt);
 
     this.dialog.update(dt);
   }

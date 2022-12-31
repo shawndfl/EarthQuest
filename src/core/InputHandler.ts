@@ -6,7 +6,7 @@ import { UserAction } from './UserAction';
  */
 export class InputHandler extends Component {
   hasGamePad: boolean;
-  action: number;
+  action: UserAction;
 
   constructor(eng: Engine) {
     super(eng);

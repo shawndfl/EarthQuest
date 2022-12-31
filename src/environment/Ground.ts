@@ -80,6 +80,8 @@ export class Ground extends Component {
           spriteId = 'block.half.highlight';
         } else if (cellId.includes('tree')) {
           spriteId = 'tree';
+        } else if (cellId.includes('slop')) {
+          spriteId = 'slop.right';
         }
 
         this._spriteController.setSprite(spriteId);

@@ -2,6 +2,7 @@ import { Scene } from '../components/Scene';
 import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
+import { UserAction } from './UserAction';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -51,7 +52,9 @@ export class Engine {
     this.input.preUpdate(dt);
 
     // handle input
-    this.scene.handleUserAction(this.input.action);
+    if (this.input.action != UserAction.None) {
+      this.scene.handleUserAction(this.input.action);
+    }
 
     // update most of the game components
     this.scene.update(dt);

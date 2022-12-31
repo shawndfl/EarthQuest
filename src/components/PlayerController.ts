@@ -10,14 +10,11 @@ import { Component } from './Component';
 import * as MathConst from '../math/constants';
 
 export enum MoveDirection {
-  N,
-  NE,
-  E,
-  SE,
-  S,
-  SW,
-  W,
-  NW,
+  None = 0x00,
+  N = 0x01,
+  E = 0x02,
+  S = 0x04,
+  W = 0x08,
 }
 /**
  * Controls the player sprite.
@@ -29,6 +26,8 @@ export class PlayerController extends Component {
   protected _walkAnimation: Curve;
   private _position: vec2;
   private _speed: number;
+  private _sprites: string[];
+  private _spriteFlip: boolean;
 
   get position(): vec2 {
     return this._position;
@@ -39,6 +38,8 @@ export class PlayerController extends Component {
     this._walkDirection = MoveDirection.S;
     this._walking = false;
     this._speed = 80; // pixels per second
+    this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
+    this._spriteFlip = false;
 
     // set the start position
     this._position = new vec2([0, 0]);
@@ -53,7 +54,7 @@ export class PlayerController extends Component {
     this._spriteController.setSpritePosition(
       this._position.x,
       this._position.y,
-      0
+      -1
     );
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
@@ -79,28 +80,24 @@ export class PlayerController extends Component {
   handleUserAction(action: UserAction): boolean {
     const wasWalking = this._walking;
 
-    if (action == UserAction.Left) {
-      this._walkDirection = MoveDirection.W;
-      this._walking = true;
-    } else if (action == UserAction.Right) {
-      this._walkDirection = MoveDirection.E;
-      this._walking = true;
-    } else if (action == UserAction.Up) {
-      this._walkDirection = MoveDirection.N;
-      this._walking = true;
-    } else if (action == UserAction.Down) {
-      this._walkDirection = MoveDirection.S;
+    //console.debug('action ' + action + ' was walking ' + wasWalking);
+    this._walkDirection = MoveDirection.None;
+    this._walking = false;
+    if ((action & UserAction.Left) > 0) {
+      this._walkDirection = this._walkDirection | MoveDirection.W;
       this._walking = true;
     }
-
-    if (action == UserAction.LeftPressed) {
-      this._walking = false;
-    } else if (action == UserAction.RightPressed) {
-      this._walking = false;
-    } else if (action == UserAction.UpPressed) {
-      this._walking = false;
-    } else if (action == UserAction.DownPressed) {
-      this._walking = false;
+    if ((action & UserAction.Right) > 0) {
+      this._walkDirection = this._walkDirection | MoveDirection.E;
+      this._walking = true;
+    }
+    if ((action & UserAction.Up) > 0) {
+      this._walkDirection = this._walkDirection | MoveDirection.N;
+      this._walking = true;
+    }
+    if ((action & UserAction.Down) > 0) {
+      this._walkDirection = this._walkDirection | MoveDirection.S;
+      this._walking = true;
     }
 
     // We are now walking start the animations
@@ -121,39 +118,39 @@ export class PlayerController extends Component {
   }
 
   walkAnimation(dt: number, direction: MoveDirection) {
-    let sprites = ['ness.down.step.left', 'ness.down.step.right'];
-    let flip: boolean = false;
     const dir = new vec2([0, 0]);
 
-    switch (direction) {
-      case MoveDirection.E:
-        sprites = ['ness.left.stand', 'ness.left.step'];
-        flip = true;
-        dir.x = 1;
-        break;
-      case MoveDirection.W:
-        sprites = ['ness.left.stand', 'ness.left.step'];
-        dir.x = -1;
-        break;
-      case MoveDirection.S:
-        sprites = ['ness.down.step.left', 'ness.down.step.right'];
-        dir.y = -1;
-
-        break;
-      case MoveDirection.N:
-        sprites = ['ness.up.step', 'ness.up.step'];
-        if (this._walkAnimation.getValue() == 0) {
-          flip = true;
-        }
-        dir.y = 1;
-        break;
+    if (direction != 0) {
+      //console.debug('direction ' + direction);
+    }
+    if ((direction & MoveDirection.E) > 0) {
+      this._sprites = ['ness.left.stand', 'ness.left.step'];
+      this._spriteFlip = true;
+      dir.x = 1;
+    }
+    if ((direction & MoveDirection.W) > 0) {
+      this._sprites = ['ness.left.stand', 'ness.left.step'];
+      this._spriteFlip = false;
+      dir.x = -1;
+    }
+    if ((direction & MoveDirection.S) > 0) {
+      this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
+      this._spriteFlip = false;
+      dir.y = -1;
+    }
+    if ((direction & MoveDirection.N) > 0) {
+      this._sprites = ['ness.up.step', 'ness.up.step'];
+      this._spriteFlip = false;
+      if (this._walkAnimation.getValue() == 0) {
+        this._spriteFlip = true;
+      }
+      dir.y = 1;
     }
 
     // only move if we are walking
     if (this._walking) {
       const aspectRatio = this.gl.canvas.width / this.gl.canvas.height;
 
-      //let newPos = this._position.add(dir.scale((dt / 1000.0) * this._speed));
       let newPos = new vec2();
       newPos.x =
         this._position.x + dir.x * (dt / 1000.0) * this._speed * aspectRatio;
@@ -161,7 +158,7 @@ export class PlayerController extends Component {
         this._position.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
-      const depthPadding = 0.2; // magic number
+      const depthPadding = 0.2; //0.2; // magic number
 
       let newDepth = MathConst.Clamp(
         (newPos.y / this.eng.height) * 2 - 1 - depthPadding,
@@ -183,13 +180,17 @@ export class PlayerController extends Component {
       this._position = newPos;
     }
 
-    // toggle and animation
+    // toggle and animation. This can happen when not walking too.
     if (this._walkAnimation.getValue() == 0) {
-      this._spriteController.setFlip(flip ? SpriteFlip.XFlip : SpriteFlip.None);
-      this._spriteController.setSprite(sprites[0], true);
+      this._spriteController.setFlip(
+        this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
+      );
+      this._spriteController.setSprite(this._sprites[0], true);
     } else if (this._walkAnimation.getValue() == 1) {
-      this._spriteController.setFlip(flip ? SpriteFlip.XFlip : SpriteFlip.None);
-      this._spriteController.setSprite(sprites[1], true);
+      this._spriteController.setFlip(
+        this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
+      );
+      this._spriteController.setSprite(this._sprites[1], true);
     }
   }
 }
