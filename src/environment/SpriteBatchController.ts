@@ -100,6 +100,10 @@ export class SpritBatchController
     return sprite;
   }
 
+  clearAllSprites() {
+    this._sprites.clear();
+  }
+
   activeSprite(spriteId: string) {
     this._activeSprite = spriteId;
   }

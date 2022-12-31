@@ -14,5 +14,13 @@
   {
     "id": "block.half",
     "loc": [112, 0, 32, 32]
+  },
+  {
+    "id": "block.half.highlight",
+    "loc": [144, 0, 32, 32]
+  },
+  {
+    "id": "empty",
+    "loc": [0, 32, 32, 32]
   }
 ]

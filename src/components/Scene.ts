@@ -16,6 +16,7 @@ import { UserAction } from '../core/UserAction';
 import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
 import { DialogMenu } from '../menus/DialogMenu';
 import { SpriteDebugger } from './SpriteDebugger';
+import Level1 from '../assets/level1.json';
 
 /**
  * Sample scene
@@ -41,7 +42,7 @@ export class Scene extends Component {
 
     this.spriteSheetTexture = new Texture(this.gl);
     this.textManager = new TextManager(eng);
-    this.ground = new Ground(eng);
+    this.ground = new Ground(eng, Level1);
 
     this.player = new PlayerController(eng);
     this.spriteDebugger = new SpriteDebugger(eng);
