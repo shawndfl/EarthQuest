@@ -3,13 +3,10 @@
  */
 export interface IQuadModel {
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  min: [number, number];
+  min: [number, number, number];
 
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  max: [number, number];
-
-  /** depth (z) from -1 t0 1 */
-  depth?: number;
+  max: [number, number, number];
 
   /** min texture (u,v) in uv space -1 to 1 */
   minTex: [number, number];
@@ -93,18 +90,16 @@ export class GlBuffer {
     //
     let vertCount = 0;
     quads.forEach((quad) => {
-      const depth = quad.depth ?? 0;
-
-      verts.push(quad.min[0], quad.min[1], depth);
+      verts.push(quad.min[0], quad.min[1], quad.min[2]);
       verts.push(quad.minTex[0], quad.maxTex[1]);
 
-      verts.push(quad.max[0], quad.min[1], depth);
+      verts.push(quad.max[0], quad.min[1], quad.min[2]);
       verts.push(quad.maxTex[0], quad.maxTex[1]);
 
-      verts.push(quad.max[0], quad.max[1], depth);
+      verts.push(quad.max[0], quad.max[1], quad.max[2]);
       verts.push(quad.maxTex[0], quad.minTex[1]);
 
-      verts.push(quad.min[0], quad.max[1], depth);
+      verts.push(quad.min[0], quad.max[1], quad.max[2]);
       verts.push(quad.minTex[0], quad.minTex[1]);
 
       index.push(vertCount + 0);

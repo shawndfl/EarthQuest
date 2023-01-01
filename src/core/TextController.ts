@@ -78,11 +78,10 @@ export class TextController extends Component {
       const tv2 = 1 - font.v1;
 
       const quad: IQuadModel = {
-        min: [xpos1 / screenWidth, ypos1 / screenHeight],
-        max: [xpos2 / screenWidth, ypos2 / screenHeight],
+        min: [xpos1 / screenWidth, ypos1 / screenHeight, zpos],
+        max: [xpos2 / screenWidth, ypos2 / screenHeight, zpos],
         minTex: [tu1, tv2],
         maxTex: [tu2, tv1],
-        depth: zpos,
       };
 
       charCount++;

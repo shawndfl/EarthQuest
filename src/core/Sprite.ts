@@ -28,8 +28,11 @@ export class Sprite {
   /** The position in pixels of the canvas where the sprite will go. */
   protected _position: { x: number; y: number };
 
-  /** the depth of the sprite -1 is nearest 1 is farthest  */
-  protected _depth: number;
+  /** the depth of the bottom 2 verts of the sprite -1 is nearest 1 is farthest  */
+  protected _lowerDepth: number;
+
+  /** the depth of the top two verts of the sprite -1 is nearest 1 is farthest  */
+  protected _upperDepth: number;
 
   /** is the sprite flipped some way */
   protected _spriteFlip: SpriteFlip;
@@ -60,8 +63,12 @@ export class Sprite {
     return this._position;
   }
 
-  get depth(): number {
-    return this._depth;
+  get lowerDepth(): number {
+    return this._lowerDepth;
+  }
+
+  get upperDepth(): number {
+    return this._upperDepth;
   }
 
   get rotation(): number {
@@ -98,8 +105,8 @@ export class Sprite {
     screenHeight: number
   ) {
     this._quad = {
-      min: [-1, -1],
-      max: [1, 1],
+      min: [-1, -1, -1],
+      max: [1, 1, 1],
       minTex: [0, 0],
       maxTex: [1, 1],
     };
@@ -114,7 +121,8 @@ export class Sprite {
     this._spriteFlip = SpriteFlip.None;
     this._spriteRotate = 0;
     this._scale = 1.0;
-    this._depth = 0;
+    this._lowerDepth = 0;
+    this._upperDepth = 0;
     this._positionOffset = { x: 0, y: 0 };
   }
 
@@ -174,11 +182,15 @@ export class Sprite {
    * @param y
    * @param depth screen space [-1, 1]. 1 is far -1 is close
    */
-  setPosition(x: number, y: number, depth?: number) {
+  setPosition(x: number, y: number, lowerDepth?: number, upperDepth?: number) {
     this._position.x = x;
     this._position.y = y;
-    if (depth != undefined) {
-      this._depth = depth;
+    if (lowerDepth != undefined) {
+      this._lowerDepth = lowerDepth;
+    }
+
+    if (upperDepth != undefined) {
+      this._upperDepth = upperDepth;
     }
 
     this.calculateQuad();
@@ -214,6 +226,7 @@ export class Sprite {
     this._quad.min = [
       this._position.x + this._positionOffset.x,
       this._position.y + this._positionOffset.y,
+      this._lowerDepth,
     ];
     const spriteWidth = this._spriteLoc.width * this._scale;
     const spriteHeight = this._spriteLoc.height * this._scale;
@@ -222,9 +235,8 @@ export class Sprite {
     this._quad.max = [
       this._quad.min[0] + spriteWidth,
       this._quad.min[1] + spriteHeight,
+      this._upperDepth,
     ];
-
-    this._quad.depth = this._depth;
 
     // if we have some rotation then apply it
     if (!MathConst.equals(this._spriteRotate, 0.0)) {

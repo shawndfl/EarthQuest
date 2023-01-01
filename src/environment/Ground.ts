@@ -62,15 +62,34 @@ export class Ground extends Component {
     */
   }
 
+  cellToWorldCoord(
+    i: number,
+    j: number,
+    height: number
+  ): { x: number; y: number; z: number } {
+    const scale = 2;
+    const w = 32;
+    const h = 16;
+
+    let world = { x: 0, y: 0, z: 0 };
+
+    const xOffset = j % 2 == 0 ? 0 : w * 0.25 * scale;
+    const x = i * w + xOffset;
+    const y = this.eng.height - h - j * h * 0.25;
+    const z = (y / this.eng.height) * 2 - 1;
+
+    return world;
+  }
+
   buildLevel() {
     const tileTransform = new mat2([]);
 
     const scale = 2;
 
-    for (let j = 0; j < this._levelData.cells.length; j++) {
+    for (let i = 0; i < this._levelData.cells.length; i++) {
       // draw the rows first
-      for (let i = 0; i < this._levelData.cells[j].length; i++) {
-        const cellId = this._levelData.ids[this._levelData.cells[j][i]];
+      for (let j = 0; j < this._levelData.cells[i].length; j++) {
+        const cellId = this._levelData.ids[this._levelData.cells[i][j]];
 
         this._spriteController.activeSprite('tile' + i + '_' + j);
         let spriteId = 'empty';
@@ -88,20 +107,37 @@ export class Ground extends Component {
         this._spriteController.scale(scale);
 
         // the width and the height are hard coded because the grid is
-        // 16 x 8
-        const w = 32 * scale; //this._spriteController.sprite.getSpriteWidth();
-        const h = 32 * scale; //this._spriteController.sprite.getSpriteHeight();
+        // 32 x 16
+        const cellSize = 32 * scale; //this._spriteController.sprite.getSpriteWidth();
+        const halfWidth = this.eng.width * 0.5;
+        const heightOffset = this.eng.height - cellSize;
 
-        const xOffset = j % 2 == 0 ? 0 : w * 0.25 * scale;
-        const x = i * w + xOffset;
-        const y = this.eng.height - h - j * h * 0.25;
-        const z = (y / this.eng.height) * 2 - 1;
+        let k = 0;
+        if ((i == 1 && j == 4) || i == 0) {
+          k = 1;
+        }
+        const x = halfWidth - j * cellSize * 0.5 + i * cellSize * 0.5;
+        const y =
+          heightOffset -
+          j * cellSize * 0.25 -
+          i * cellSize * 0.25 +
+          k * cellSize * 0.5;
+
+        // calculate the top and bottom depth values of the quad.
+        // event though the cells are drawn as diamonds they are really quads
+        // for depth calculations the top and bottom verts of the quad need to
+        // be calculated
+        const yRemoveHeight = y - k * cellSize;
+        const spriteHeight = this._spriteController.sprite.getSpriteHeight();
+
+        const zLower = (yRemoveHeight / this.eng.height) * 2 - 1;
+        const zUpper = (yRemoveHeight / this.eng.height) * 2 - 1;
 
         if (i == 0) {
-          console.debug('ground depth: ' + z + ' i: ' + i);
+          console.debug('ground depth: ' + zLower + ', ' + zUpper + ' i: ' + i);
         }
 
-        this._spriteController.setSpritePosition(x, y, z);
+        this._spriteController.setSpritePosition(x, y, zLower, zUpper);
       }
     }
     this._spriteController.commitToBuffer();

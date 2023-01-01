@@ -174,6 +174,7 @@ export class PlayerController extends Component {
         newPos.x,
         newPos.y,
         newDepth,
+        newDepth,
         true
       );
 
