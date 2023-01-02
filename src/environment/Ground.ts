@@ -108,14 +108,15 @@ export class Ground extends Component {
 
         // the width and the height are hard coded because the grid is
         // 32 x 16
-        const cellSize = 32 * scale; //this._spriteController.sprite.getSpriteWidth();
+        const cellSize = 32 * scale;
         const halfWidth = this.eng.width * 0.5;
         const heightOffset = this.eng.height - cellSize;
 
         let k = 0;
-        if ((i == 1 && j == 4) || i == 0) {
+        if (i == 1 && j == 4) {
           k = 1;
         }
+
         const x = halfWidth - j * cellSize * 0.5 + i * cellSize * 0.5;
         const y =
           heightOffset -
@@ -128,14 +129,11 @@ export class Ground extends Component {
         // for depth calculations the top and bottom verts of the quad need to
         // be calculated
         const yRemoveHeight = y - k * cellSize;
-        const spriteHeight = this._spriteController.sprite.getSpriteHeight();
+        const depthStepDown = cellSize;
 
-        const zLower = (yRemoveHeight / this.eng.height) * 2 - 1;
+        const zLower =
+          ((yRemoveHeight - depthStepDown) / this.eng.height) * 2 - 1;
         const zUpper = (yRemoveHeight / this.eng.height) * 2 - 1;
-
-        if (i == 0) {
-          console.debug('ground depth: ' + zLower + ', ' + zUpper + ' i: ' + i);
-        }
 
         this._spriteController.setSpritePosition(x, y, zLower, zUpper);
       }

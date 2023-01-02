@@ -158,23 +158,21 @@ export class PlayerController extends Component {
         this._position.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
-      const depthPadding = 0.2; //0.2; // magic number
+      const depth =
+        ((newPos.y - this._spriteController.sprite.getSpriteHeight() * 1.5) /
+          this.eng.height) *
+          2 -
+        1;
 
-      let newDepth = MathConst.Clamp(
-        (newPos.y / this.eng.height) * 2 - 1 - depthPadding,
-        -1,
-        1
-      );
-
-      console.debug('pos ' + newPos.x + ', ' + newPos.y + ', ' + newDepth);
+      console.debug('pos ' + newPos.x + ', ' + newPos.y + ', ' + depth);
       //this.eng.scene.ground.
 
       // move the player
       this._spriteController.setSpritePosition(
         newPos.x,
         newPos.y,
-        newDepth,
-        newDepth,
+        depth,
+        depth,
         true
       );
 

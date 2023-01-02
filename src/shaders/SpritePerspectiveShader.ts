@@ -10,10 +10,13 @@ attribute vec3 aPos;
 attribute vec2 aTex;
 uniform mat4 uProj;
 varying mediump vec2 vTex;
+varying mediump vec3 depth;
 
 void main() {
     vTex = aTex;
-    gl_Position =  uProj * vec4(aPos.xyz, 1.0);
+    vec4 pos = uProj * vec4(aPos.xyz, 1.0);
+    gl_Position =  pos;
+    depth = vec3((pos.z + 1.0) *.5);
 }
 `;
 
@@ -22,7 +25,7 @@ void main() {
 //
 const fsSource = `
 varying mediump vec2 vTex;
-
+varying mediump  vec3 depth;
 uniform sampler2D uSampler;
 
 void main() {
@@ -30,6 +33,7 @@ void main() {
     if(color.a < 1.0) {
       discard;
     } 
+    //gl_FragColor = vec4(depth.xyz, 1.0);
     gl_FragColor = color;
 }
 `;
