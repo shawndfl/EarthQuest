@@ -33,6 +33,11 @@ export class InputHandler extends Component {
     window.addEventListener('keyup', (e) => {
       this.keyup(e);
     });
+    window.addEventListener('mousedown', (e) => {
+      console.debug(
+        'mouse ' + e.offsetX + ', ' + ((e.target as any).height - e.offsetY)
+      );
+    });
   }
 
   keydown(e: KeyboardEvent) {

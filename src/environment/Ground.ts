@@ -107,22 +107,22 @@ export class Ground extends Component {
         this._spriteController.scale(scale);
 
         // the width and the height are hard coded because the grid is
-        // 32 x 16
+        // 32 x 32
         const cellSize = 32 * scale;
         const halfWidth = this.eng.width * 0.5;
-        const heightOffset = this.eng.height - cellSize;
+        const heightOffset = this.eng.height - cellSize * 0.25;
 
         let k = 0;
         if (i == 1 && j == 4) {
           k = 1;
         }
 
-        const x = halfWidth - j * cellSize * 0.5 + i * cellSize * 0.5;
+        const x = -j * cellSize * 0.5 + i * cellSize * 0.5 + halfWidth;
         const y =
-          heightOffset -
-          j * cellSize * 0.25 -
+          -j * cellSize * 0.25 -
           i * cellSize * 0.25 +
-          k * cellSize * 0.5;
+          k * cellSize * 0.5 +
+          heightOffset;
 
         // calculate the top and bottom depth values of the quad.
         // event though the cells are drawn as diamonds they are really quads
@@ -130,15 +130,38 @@ export class Ground extends Component {
         // be calculated
         const yRemoveHeight = y - k * cellSize;
         const depthStepDown = cellSize;
-
-        const zLower =
-          ((yRemoveHeight - depthStepDown) / this.eng.height) * 2 - 1;
+        //+ depthStepDown
+        const zLower = (yRemoveHeight / this.eng.height) * 2 - 1;
         const zUpper = (yRemoveHeight / this.eng.height) * 2 - 1;
+
+        if (i == 0 && j == 0) {
+          console.debug(' cell[0,0] = ' + x + ', ' + y + ', ' + zLower);
+        }
 
         this._spriteController.setSpritePosition(x, y, zLower, zUpper);
       }
     }
     this._spriteController.commitToBuffer();
+  }
+
+  collisionDetection(x: number, y: number, z: number) {
+    const scale = 2;
+    // the width and the height are hard coded because the grid is
+    // 32 x 32
+    const cellSize = 32 * scale;
+    const halfWidth = this.eng.width * 0.5 + cellSize * 0.5;
+    const heightOffset = this.eng.height - cellSize;
+    const i = x / (cellSize * 0.5) + y / (cellSize * 0.5) - halfWidth;
+    const j =
+      -y / (cellSize * 0.25) -
+      x / (cellSize * 0.25) +
+      z / (cellSize * 0.5) +
+      heightOffset;
+
+    //console.debug(' cell ' + i + ', ' + j);
+
+    this._spriteController.activeSprite('tile' + i + '_' + j);
+    this._spriteController.setSprite('block.half.highlight');
   }
 
   highlight(i: number, j: number) {

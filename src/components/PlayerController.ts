@@ -159,13 +159,13 @@ export class PlayerController extends Component {
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
       const depth =
-        ((newPos.y - this._spriteController.sprite.getSpriteHeight() * 1.5) /
+        ((newPos.y - this._spriteController.sprite.getSpriteHeight() - 8) /
           this.eng.height) *
           2 -
         1;
 
-      console.debug('pos ' + newPos.x + ', ' + newPos.y + ', ' + depth);
-      //this.eng.scene.ground.
+      console.debug('pos ' + newPos.toString() + ', ' + depth.toFixed(5));
+      this.eng.scene.ground.collisionDetection(newPos.x, newPos.y, 0);
 
       // move the player
       this._spriteController.setSpritePosition(

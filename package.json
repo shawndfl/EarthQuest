@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "2D Game",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
+    "cover": "jest --coverage",
     "start": "webpack serve --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js"
   },
