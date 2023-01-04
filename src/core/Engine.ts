@@ -2,6 +2,7 @@ import { Scene } from '../components/Scene';
 import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
+import { TileManager } from './TileManager';
 import { UserAction } from './UserAction';
 
 /**
@@ -13,6 +14,7 @@ export class Engine {
   readonly input: InputHandler;
   private _editor: Editor;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
+  readonly tileManger: TileManager;
 
   get width(): number {
     return this.gl.canvas.width;
@@ -29,6 +31,7 @@ export class Engine {
   constructor(readonly gl: WebGL2RenderingContext) {
     this.scene = new Scene(this);
     this.input = new InputHandler(this);
+    this.tileManger = new TileManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(
       this.gl,
       'spritePerspectiveShader'
