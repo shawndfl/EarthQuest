@@ -164,19 +164,23 @@ export class PlayerController extends Component {
           2 -
         1;
 
-      console.debug('pos ' + newPos.toString() + ', ' + depth.toFixed(5));
-      this.eng.scene.ground.collisionDetection(newPos.x, newPos.y, 0);
+      // check if the player can access this tile
+      if (this.eng.scene.ground.canAccessTile(newPos.x, newPos.y, 0)) {
+        console.debug('pos ' + newPos.toString() + ', ' + depth.toFixed(5));
+        this.eng.scene.ground.onExit(this._position.x, this._position.y, 0);
+        this.eng.scene.ground.onEnter(newPos.x, newPos.y, 0);
 
-      // move the player
-      this._spriteController.setSpritePosition(
-        newPos.x,
-        newPos.y,
-        depth,
-        depth,
-        true
-      );
+        // move the player
+        this._spriteController.setSpritePosition(
+          newPos.x,
+          newPos.y,
+          depth,
+          depth,
+          true
+        );
 
-      this._position = newPos;
+        this._position = newPos;
+      }
     }
 
     // toggle and animation. This can happen when not walking too.

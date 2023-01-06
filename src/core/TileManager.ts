@@ -64,21 +64,21 @@ export class TileManager extends Component {
     x: number,
     y: number,
     z: number
-  ): { x: number; y: number; z: number } {
+  ): { i: number; j: number; k: number } {
     const screen = new vec3([x, y, z]);
     let cell = this._toTile.multiplyVec3(screen);
     cell.x = Math.round(cell.x);
     cell.y = Math.round(cell.y);
     cell.z = Math.round(cell.z);
-    return cell;
+    return { i: cell.x, j: cell.y, k: cell.z };
   }
 
   toScreenLoc(
-    tileX: number,
-    tileY: number,
-    tileZ: number
+    i: number,
+    j: number,
+    k: number
   ): { x: number; y: number; z: number } {
-    const screen = new vec3([tileX, tileY, tileZ]);
+    const screen = new vec3([i, j, k]);
 
     return this._toScreen.multiplyVec3(screen);
   }

@@ -7,6 +7,9 @@ import { SpritBatchController } from './SpriteBatchController';
 import mat2 from '../math/mat2';
 import { ILevelData } from './ILevelData';
 
+/**
+ * The ground class is the cell environment the player interacts with
+ */
 export class Ground extends Component {
   protected _spriteController: SpritBatchController;
   protected _levelData: ILevelData;
@@ -21,6 +24,7 @@ export class Ground extends Component {
     const texture = new Texture(this.gl);
     await texture.loadImage(TileImg);
     this._spriteController.initialize(texture, TileData);
+    console.debug(this._spriteController.getSpriteList());
     this.buildLevel();
   }
 
@@ -37,16 +41,7 @@ export class Ground extends Component {
           const cellId = this._levelData.ids[this._levelData.cells[k][i][j]];
 
           this._spriteController.activeSprite('tile_' + k + '_' + i + '_' + j);
-          let spriteId = 'empty';
-          if (cellId.includes('ground')) {
-            spriteId = 'block';
-          } else if (cellId.includes('highlight')) {
-            spriteId = 'block.half.highlight';
-          } else if (cellId.includes('tree')) {
-            spriteId = 'tree';
-          } else if (cellId.includes('slop')) {
-            spriteId = 'slop.right';
-          }
+          let spriteId = this.getCellType(i, j, k);
 
           this._spriteController.setSprite(spriteId);
           this._spriteController.scale(scale);
@@ -83,14 +78,103 @@ export class Ground extends Component {
     this._spriteController.commitToBuffer();
   }
 
-  collisionDetection(x: number, y: number, z: number) {
-    const tile = this.eng.tileManger.toTileLoc(x, y, z);
-    this._spriteController.activeSprite(
-      'tile_' + tile.z + '_' + tile.x + '_' + tile.y
-    );
-    this._spriteController.setSprite('block.half.highlight', true);
+  /**
+   * Get the cell type. x y and z are int cells values
+   * @param i
+   * @param j
+   * @param k
+   */
+  getCellType(i: number, j: number, k: number): string {
+    let type = 'empty';
+    try {
+      const typeIndex = this._levelData.cells[k][i][j];
+      type = this._levelData.ids[typeIndex];
+    } catch (e) {
+      console.warn('invalid tile ' + k + ', ' + i + ',' + j);
+    }
+    return type;
   }
 
+  /**
+   * Sets a cell type
+   * @param type The type of the cell
+   * @param i
+   * @param j
+   * @param k
+   */
+  setCellType(type: string, i: number, j: number, k: number): boolean {
+    let index = 0;
+    const found = this._levelData.ids.find((t, i) => {
+      if (t == type) {
+        index = i;
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    if (found) {
+      try {
+        this._levelData.cells[k][i][j] = index;
+        this._spriteController.activeSprite('tile_' + k + '_' + i + '_' + j);
+        this._spriteController.setSprite(found, true);
+      } catch (e) {
+        console.warn('invalid tile ' + k + ', ' + i + ',' + j);
+      }
+    } else {
+      console.warn('cannot find cell type: ' + type);
+    }
+    return true;
+  }
+
+  /**
+   * Can the player access this tile
+   * @param x screen space
+   * @param y screen space
+   * @param z screen space
+   * @returns true if the player can access this cell
+   */
+  canAccessTile(x: number, y: number, z: number): boolean {
+    const tile = this.eng.tileManger.toTileLoc(x, y, z);
+
+    let type = this.getCellType(tile.i, tile.j, tile.k);
+
+    if (type != 'tree' && type != 'empty') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * When the player enters a cell
+   * @param x screen space
+   * @param y screen space
+   * @param z screen space
+   */
+  onEnter(x: number, y: number, z: number) {
+    const tile = this.eng.tileManger.toTileLoc(x, y, z);
+    this.setCellType('block.highlight', tile.i, tile.j, tile.k);
+  }
+
+  /**
+   * Fired when a player exits a cell
+   * @param x
+   * @param y
+   * @param z
+   */
+  onExit(x: number, y: number, z: number) {
+    const tile = this.eng.tileManger.toTileLoc(x, y, z);
+    const type = this.getCellType(tile.i, tile.j, tile.k);
+    if (type == 'block.highlight') {
+      this.setCellType('block', tile.i, tile.j, tile.k);
+    }
+  }
+
+  /**
+   * Update the sprite controller and actions
+   * @param dt
+   */
   update(dt: number) {
     this._spriteController.update(dt);
   }
