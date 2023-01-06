@@ -1,5 +1,4 @@
 import { TileManager } from '../src/core/TileManager';
-import { QuadTree } from '../src/environment/QuadTree';
 
 class MockEngine {
   constructor() {}
@@ -16,15 +15,15 @@ test('TileToScreen', () => {
 
   const t = new TileManager(eng as any);
 
-  const point = t.toScreenLoc(0, 2, 0);
+  const point = t.toScreenLoc(0, 0, 0);
   expect(point.x).toBeCloseTo(336, 2);
   expect(point.y).toBeCloseTo(552, 2);
   expect(point.z).toBeCloseTo(0, 2);
 
   const newCell = t.toTileLoc(point.x, point.y, point.z);
-  expect(newCell.x).toBeCloseTo(0, 2);
-  expect(newCell.y).toBeCloseTo(2, 2);
-  expect(newCell.z).toBeCloseTo(0, 2);
+  expect(newCell.i).toBeCloseTo(0, 2);
+  expect(newCell.j).toBeCloseTo(2, 2);
+  expect(newCell.k).toBeCloseTo(0, 2);
 });
 
 test('TileToScreenHeight', () => {

@@ -8,6 +8,7 @@ import { SpritController } from '../environment/SpriteController';
 import vec2 from '../math/vec2';
 import { Component } from './Component';
 import * as MathConst from '../math/constants';
+import { TileManager } from '../core/TileManager';
 
 export enum MoveDirection {
   None = 0x00,
@@ -29,6 +30,13 @@ export class PlayerController extends Component {
   private _sprites: string[];
   private _spriteFlip: boolean;
 
+  /** the height above sea level of the player */
+  private _playerHeight: number;
+
+  get height(): number {
+    return this._playerHeight;
+  }
+
   get position(): vec2 {
     return this._position;
   }
@@ -40,6 +48,7 @@ export class PlayerController extends Component {
     this._speed = 80; // pixels per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
+    this._playerHeight = 0;
 
     // set the start position
     this._position = new vec2([0, 0]);
@@ -49,7 +58,7 @@ export class PlayerController extends Component {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
     // set the position of the sprite in the center of the screen
-    this._position = new vec2([400, 185]);
+    this._position = new vec2([400, 580]);
 
     this._spriteController.setSpritePosition(
       this._position.x,
@@ -158,24 +167,48 @@ export class PlayerController extends Component {
         this._position.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
-      const depth =
-        ((newPos.y - this._spriteController.sprite.getSpriteHeight() - 8) /
-          this.eng.height) *
-          2 -
-        1;
+      // TODO need to calculate height
+      const depth = (newPos.y / this.eng.height) * 2 - 1;
+
+      // we need to know what tile the player is on
+      const tile = this.eng.tileManger.toTileLoc(newPos.x, newPos.y, depth);
+
+      console.debug(
+        '\n  pos ' +
+          newPos.toString() +
+          ', ' +
+          depth.toFixed(5) +
+          '\ncell[' +
+          tile.i.toFixed(5) +
+          ', ' +
+          tile.j.toFixed(5) +
+          ', ' +
+          tile.k.toFixed(5)
+      );
+
+      // recalculated the screen position to get the correct depth for the sprite
+      const screen = this.eng.tileManger.toScreenLoc(
+        tile.i,
+        tile.j,
+        tile.k + this._playerHeight
+      );
+
+      // we need this to be an int to lookup the tiles
+      tile.i = Math.round(tile.i);
+      tile.j = Math.round(tile.j);
+      tile.k = Math.floor(tile.k); // just take the floor, b/c this is the floor
 
       // check if the player can access this tile
-      if (this.eng.scene.ground.canAccessTile(newPos.x, newPos.y, 0)) {
-        console.debug('pos ' + newPos.toString() + ', ' + depth.toFixed(5));
-        this.eng.scene.ground.onExit(this._position.x, this._position.y, 0);
-        this.eng.scene.ground.onEnter(newPos.x, newPos.y, 0);
+      if (this.eng.scene.ground.canAccessTile(tile.i, tile.j, tile.k)) {
+        this.eng.scene.ground.onExit(tile.i, tile.j, tile.k);
+        this.eng.scene.ground.onEnter(tile.i, tile.j, tile.k);
 
         // move the player
         this._spriteController.setSpritePosition(
-          newPos.x,
-          newPos.y,
-          depth,
-          depth,
+          screen.x,
+          screen.y,
+          -1,
+          -1,
           true
         );
 

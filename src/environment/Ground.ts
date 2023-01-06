@@ -46,32 +46,19 @@ export class Ground extends Component {
           this._spriteController.setSprite(spriteId);
           this._spriteController.scale(scale);
 
-          // the width and the height are hard coded because the grid is
-          // 32 x 32
-          const cellSize = 32 * scale;
-          const halfWidth = this.eng.width * 0.5;
-          const heightOffset = this.eng.height - cellSize * 0.25;
-
-          const x = -j * cellSize * 0.5 + i * cellSize * 0.5 + halfWidth;
-          const y =
-            -j * cellSize * 0.25 -
-            i * cellSize * 0.25 +
-            k * cellSize * 0.5 +
-            heightOffset;
-
-          // calculate the top and bottom depth values of the quad.
-          // event though the cells are drawn as diamonds they are really quads
-          // for depth calculations the top and bottom verts of the quad need to
-          // be calculated
-          const yRemoveHeight = y - k * cellSize;
-          const zLower = (yRemoveHeight / this.eng.height) * 2 - 1;
-          const zUpper = (yRemoveHeight / this.eng.height) * 2 - 1;
-
-          if (i == 0 && j == 0) {
-            console.debug(' cell[0,0] = ' + x + ', ' + y + ', ' + zLower);
-          }
-
-          this._spriteController.setSpritePosition(x, y, zLower, zUpper);
+          const screen = this.eng.tileManger.toScreenLoc(i, j, k);
+          const tile = this.eng.tileManger.toTileLoc(
+            screen.x,
+            screen.y,
+            screen.z
+          );
+          //this._spriteController.setSpritePosition(x, y, zLower, zUpper);
+          this._spriteController.setSpritePosition(
+            screen.x,
+            screen.y,
+            screen.z,
+            screen.z
+          );
         }
       }
     }
@@ -87,8 +74,8 @@ export class Ground extends Component {
   getCellType(i: number, j: number, k: number): string {
     let type = 'empty';
     try {
-      const typeIndex = this._levelData.cells[k][i][j];
-      type = this._levelData.ids[typeIndex];
+      const typeIndex = this._levelData.cells[k][i][j] ?? 0;
+      type = this._levelData.ids[typeIndex] ?? 'empty';
     } catch (e) {
       console.warn('invalid tile ' + k + ', ' + i + ',' + j);
     }
@@ -134,10 +121,8 @@ export class Ground extends Component {
    * @param z screen space
    * @returns true if the player can access this cell
    */
-  canAccessTile(x: number, y: number, z: number): boolean {
-    const tile = this.eng.tileManger.toTileLoc(x, y, z);
-
-    let type = this.getCellType(tile.i, tile.j, tile.k);
+  canAccessTile(i: number, j: number, k: number): boolean {
+    let type = this.getCellType(i, j, k);
 
     if (type != 'tree' && type != 'empty') {
       return true;
@@ -152,9 +137,14 @@ export class Ground extends Component {
    * @param y screen space
    * @param z screen space
    */
-  onEnter(x: number, y: number, z: number) {
-    const tile = this.eng.tileManger.toTileLoc(x, y, z);
-    this.setCellType('block.highlight', tile.i, tile.j, tile.k);
+  onEnter(i: number, j: number, k: number) {
+    let type = this.getCellType(i, j, k);
+
+    if (type != 'tree' && type != 'empty') {
+      this.setCellType('block.highlight', i, j, k);
+    } else {
+      console.debug('tile error ' + i + ', ' + j + ', ' + k);
+    }
   }
 
   /**
@@ -163,11 +153,10 @@ export class Ground extends Component {
    * @param y
    * @param z
    */
-  onExit(x: number, y: number, z: number) {
-    const tile = this.eng.tileManger.toTileLoc(x, y, z);
-    const type = this.getCellType(tile.i, tile.j, tile.k);
+  onExit(i: number, j: number, k: number) {
+    const type = this.getCellType(i, j, k);
     if (type == 'block.highlight') {
-      this.setCellType('block', tile.i, tile.j, tile.k);
+      this.setCellType('block', i, j, k);
     }
   }
 
