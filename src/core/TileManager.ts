@@ -47,13 +47,14 @@ export class TileManager extends Component {
     const cellSize = tileSize * scale;
     const halfCell = cellSize * 0.5;
     const quarterCell = cellSize * 0.25;
+    const eighthCell = cellSize * 0.125;
 
     const xAxis = new vec3([halfCell, -halfCell, 0]);
     const yAxis = new vec3([-quarterCell, -quarterCell, halfCell]);
     const zAxis = new vec3([
       (-quarterCell / screenHeight) * 2,
       (-quarterCell / screenHeight) * 2,
-      ((halfCell - cellSize) / screenHeight) * 2,
+      0,
     ]);
 
     // translation part
@@ -89,13 +90,14 @@ export class TileManager extends Component {
     const xAxis = this._toTile.col(0);
     const yAxis = this._toTile.col(1);
 
-    const right = new vec3(xAxis[0], xAxis[1], xAxis[2]);
-    const up = new vec3(yAxis[0], yAxis[1], yAxis[2]);
+    const right = new vec3(0.5, -0.5, 0);
+    const up = new vec3(-0.5, -0.5, 0);
 
-    const x = vec3.dot(screenVector, right);
-    const y = vec3.dot(screenVector, up);
+    const x = vec3.dot(screenVector, right.normalize());
+    const y = vec3.dot(screenVector, up.normalize());
 
     return new vec3(x, y, 0);
+    //return this._toTile.multiplyVec3(screenVector);
   }
 
   toTileLoc(

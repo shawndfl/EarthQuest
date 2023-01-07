@@ -49,7 +49,7 @@ export class PlayerController extends TileComponent {
     super(eng);
     this._walkDirection = MoveDirection.S;
     this._walking = false;
-    this._speed = 80; // tiles per second
+    this._speed = 4.0; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
     this._playerHeight = 0;
@@ -63,6 +63,7 @@ export class PlayerController extends TileComponent {
     this._spriteController.setSprite('ness.left.stand');
     // set the position of the sprite in the center of the screen
     this.setTilePosition(4, 5, 0.2);
+
     this._spriteController.commitToBuffer();
 
     this._walkAnimation = new Curve();

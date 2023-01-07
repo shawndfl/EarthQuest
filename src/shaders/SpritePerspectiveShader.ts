@@ -33,6 +33,7 @@ void main() {
     if(color.a < 1.0) {
       discard;
     } 
+    // uncomment to show depth
     //gl_FragColor = vec4(depth.xyz, 1.0);
     gl_FragColor = color;
 }

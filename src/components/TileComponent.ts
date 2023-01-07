@@ -120,11 +120,19 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   OffsetTilePosition(i: number, j: number, k: number) {
-    this.moveToTilePosition(
-      this._tilePosition.x + i,
-      this._tilePosition.y + j,
-      this._tilePosition.z + k
-    );
+    const lookAheadScale = 2.0;
+    const tileX = Math.floor(this._tilePosition.x + i * lookAheadScale);
+    const tileY = Math.floor(this._tilePosition.y + j * lookAheadScale);
+    const tileZ = Math.floor(this._tilePosition.z + k * lookAheadScale);
+
+    // check if the player can access this tile
+    if (this.eng.scene.ground.canAccessTile(this, tileX, tileY, tileZ)) {
+      this.moveToTilePosition(
+        this._tilePosition.x + i,
+        this._tilePosition.y + j,
+        this._tilePosition.z + k
+      );
+    }
   }
 
   /**
@@ -135,50 +143,47 @@ export abstract class TileComponent extends Component {
    */
   moveToTilePosition(i: number, j: number, k: number) {
     console.debug(
-      'tile ' + i.toFixed(5) + ', ' + j.toFixed(5) + ', ' + j.toFixed(5)
+      'tile ' + i.toFixed(5) + ', ' + j.toFixed(5) + ', ' + k.toFixed(5)
     );
 
     // we need this to be an int to lookup the tiles
     const tileX = Math.floor(i);
     const tileY = Math.floor(j);
-    const tileZ = Math.floor(k); // just take the floor, b/c this is the floor
+    const tileZ = Math.floor(k);
 
-    // check if the player can access this tile
-    if (this.eng.scene.ground.canAccessTile(this, tileX, tileY, tileZ)) {
-      // we moved off the last tile call on exit
-      if (this._tileIndex.x != tileX || this._tileIndex.y != tileY) {
-        this.eng.scene.ground.onExit(
-          this,
-          this._tileIndex.x,
-          this._tileIndex.y,
-          this._tileIndex.z
-        );
-      }
-
-      const screen = this.eng.tileManger.toScreenLoc(i, j, k);
-      // perform all state updates
-      this._screenPosition.x = screen.x;
-      this._screenPosition.y = screen.y;
-      this._screenPosition.z = screen.z;
-
-      this._tilePosition.x = i;
-      this._tilePosition.y = j;
-      this._tilePosition.z = k;
-
-      this._tileIndex.x = tileX;
-      this._tileIndex.y = tileY;
-      this._tileIndex.z = tileZ; // just take the floor, b/c this is the floor
-
-      // enter a new tile
-      this.eng.scene.ground.onEnter(
+    // we moved off the last tile call on exit
+    if (this._tileIndex.x != tileX || this._tileIndex.y != tileY) {
+      this.eng.scene.ground.onExit(
         this,
         this._tileIndex.x,
         this._tileIndex.y,
         this._tileIndex.z
       );
-
-      this.updateSpritePosition();
     }
+
+    const screen = this.eng.tileManger.toScreenLoc(i, j, k);
+    // perform all state updates
+    this._screenPosition.x = screen.x;
+    this._screenPosition.y = screen.y;
+    this._screenPosition.z = screen.z;
+
+    this._tilePosition.x = i;
+    this._tilePosition.y = j;
+    this._tilePosition.z = k;
+
+    this._tileIndex.x = tileX;
+    this._tileIndex.y = tileY;
+    this._tileIndex.z = tileZ; // just take the floor, b/c this is the floor
+
+    // enter a new tile
+    this.eng.scene.ground.onEnter(
+      this,
+      this._tileIndex.x,
+      this._tileIndex.y,
+      this._tileIndex.z
+    );
+
+    this.updateSpritePosition();
   }
 
   /**
