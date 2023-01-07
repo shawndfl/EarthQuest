@@ -22,6 +22,19 @@ export abstract class TileComponent extends Component {
   protected _spriteController: SpritController;
 
   /**
+   * This is the tile height index
+   */
+  get tileHeightIndex(): number {
+    return this, this._tileIndex.z;
+  }
+
+  /**
+   * Get the height offset in tile space
+   */
+  get tileHeight(): number {
+    return this._tilePosition.z;
+  }
+  /**
    * get the screen position
    */
   get screenPosition(): vec3 {
@@ -51,6 +64,54 @@ export abstract class TileComponent extends Component {
     this._screenPosition = new vec3([0, 0, 0]);
     this._tileIndex = new vec3([0, 0, 0]);
     this._tilePosition = new vec3([0, 0, 0]);
+  }
+
+  /**
+   * Set the position in screen space. This will recalculate the tile position
+   * and set the sprite position. This function allows for the options of
+   * not providing a height (z can be undefined)
+   * @param x
+   * @param y
+   * @param z
+   */
+  setScreenPosition(x: number, y: number, z?: number) {
+    const tile = this.eng.tileManger.toTileLoc(x, y, z ?? 0);
+
+    this._tilePosition.x = tile.i;
+    this._tilePosition.y = tile.j;
+    this._tilePosition.z = z ? tile.k : 0;
+
+    this._tileIndex.x = Math.round(this._tilePosition.x);
+    this._tileIndex.y = Math.round(this._tilePosition.z);
+    this._tileIndex.z = Math.floor(this._tilePosition.z);
+
+    this._screenPosition.x = x;
+    this._screenPosition.y = y;
+    this._screenPosition.z = z ?? 0;
+
+    this.updateSpritePosition();
+  }
+
+  /**
+   * Sets the height of the tile component
+   * @param increment -Float value. The value that will be added to the tile position. This can be negative
+   * if the tile is to move down.
+   */
+  adjustTileHeight(increment: number) {
+    this._tilePosition.z += increment;
+    this._tileIndex.z = Math.floor(this._tilePosition.z);
+
+    const screen = this.eng.tileManger.toScreenLoc(
+      this.tilePosition.x,
+      this.tilePosition.y,
+      this.tilePosition.z
+    );
+
+    this._screenPosition.x = screen.x;
+    this._screenPosition.y = screen.y;
+    this._screenPosition.z = screen.z;
+
+    this.updateSpritePosition();
   }
 
   moveToScreenPosition(x: number, y: number, z: number) {
@@ -99,8 +160,21 @@ export abstract class TileComponent extends Component {
         this._tileIndex.z
       );
 
-      // move the player
-      this._spriteController.setSpritePosition(x, y, z, z, true);
+      this.updateSpritePosition();
     }
+  }
+
+  /**
+   * Updates the sprite's position
+   */
+  protected updateSpritePosition() {
+    // move the player
+    this._spriteController.setSpritePosition(
+      this._screenPosition.x,
+      this._screenPosition.y,
+      this._screenPosition.z,
+      this._screenPosition.z,
+      true
+    );
   }
 }

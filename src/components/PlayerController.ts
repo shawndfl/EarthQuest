@@ -58,16 +58,11 @@ export class PlayerController extends TileComponent {
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
-    // set the position of the sprite in the center of the screen
-    this._screenPosition = new vec3([400, 580, -1]);
 
-    this._spriteController.setSpritePosition(
-      this._screenPosition.x,
-      this._screenPosition.y,
-      this._screenPosition.z
-    );
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
+    // set the position of the sprite in the center of the screen
+    this.setScreenPosition(400, 450);
     this._spriteController.commitToBuffer();
 
     this._walkAnimation = new Curve();

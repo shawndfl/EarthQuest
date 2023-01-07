@@ -67,6 +67,49 @@ export class Ground extends Component {
   }
 
   /**
+   * Returns true if the cell is empty
+   * @param i
+   * @param j
+   * @param k
+   * @returns
+   */
+  isEmpty(i: number, j: number, k: number): boolean {
+    try {
+      let typeIndex = this._levelData.cells[k][i][j] ?? 0;
+      return typeIndex == 0;
+    } catch (e) {
+      //NOP
+    }
+    return true;
+  }
+
+  /**
+   * Gets the cells height by searching up and down until a tile is found
+   * @param i
+   * @param j
+   * @param k
+   * @returns
+   */
+  getCellHeight(i: number, j: number, k: number) {
+    let height = k;
+    try {
+      // if it is empty search down to zero
+      if (this.isEmpty(i, j, k) && k > 0) {
+        while (this.isEmpty(i, j, --k) && k > 0) {
+          height = k;
+        }
+      } else {
+        // else search up
+        while (!this.isEmpty(i, j, ++k)) {
+          height = k;
+        }
+      }
+    } catch (e) {
+      //NOP
+    }
+    return height;
+  }
+  /**
    * Get the cell type. x y and z are int cells values
    * @param i
    * @param j
@@ -129,7 +172,14 @@ export class Ground extends Component {
     k: number
   ): boolean {
     let type = this.getCellType(i, j, k);
+    const height = this.getCellHeight(i, j, k);
 
+    // check tile height
+    if (tileComponent.tileHeightIndex != height) {
+      return false;
+    }
+
+    // check for collision
     if (type != 'tree' && type != 'empty') {
       return true;
     } else {
