@@ -9,6 +9,8 @@ import vec2 from '../math/vec2';
 import { Component } from './Component';
 import * as MathConst from '../math/constants';
 import { TileManager } from '../core/TileManager';
+import { TileComponent } from './TileComponent';
+import vec3 from '../math/vec3';
 
 export enum MoveDirection {
   None = 0x00,
@@ -20,12 +22,10 @@ export enum MoveDirection {
 /**
  * Controls the player sprite.
  */
-export class PlayerController extends Component {
-  protected _spriteController: SpritController;
+export class PlayerController extends TileComponent {
   protected _walkDirection: MoveDirection;
   private _walking: boolean;
   protected _walkAnimation: Curve;
-  private _position: vec2;
   private _speed: number;
   private _sprites: string[];
   private _spriteFlip: boolean;
@@ -33,12 +33,16 @@ export class PlayerController extends Component {
   /** the height above sea level of the player */
   private _playerHeight: number;
 
-  get height(): number {
-    return this._playerHeight;
+  get id(): string {
+    return 'player';
   }
 
-  get position(): vec2 {
-    return this._position;
+  get type(): string {
+    return 'player';
+  }
+
+  get height(): number {
+    return this._playerHeight;
   }
 
   constructor(eng: Engine) {
@@ -49,21 +53,18 @@ export class PlayerController extends Component {
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
     this._playerHeight = 0;
-
-    // set the start position
-    this._position = new vec2([0, 0]);
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
     // set the position of the sprite in the center of the screen
-    this._position = new vec2([400, 580]);
+    this._screenPosition = new vec3([400, 580, -1]);
 
     this._spriteController.setSpritePosition(
-      this._position.x,
-      this._position.y,
-      -1
+      this._screenPosition.x,
+      this._screenPosition.y,
+      this._screenPosition.z
     );
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
@@ -160,60 +161,17 @@ export class PlayerController extends Component {
     if (this._walking) {
       const aspectRatio = this.gl.canvas.width / this.gl.canvas.height;
 
-      let newPos = new vec2();
-      newPos.x =
-        this._position.x + dir.x * (dt / 1000.0) * this._speed * aspectRatio;
-      newPos.y =
-        this._position.y +
+      const x =
+        this._screenPosition.x +
+        dir.x * (dt / 1000.0) * this._speed * aspectRatio;
+      const y =
+        this._screenPosition.y +
         dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
 
       // TODO need to calculate height
-      const depth = (newPos.y / this.eng.height) * 2 - 1;
+      const z = (y / this.eng.height) * 2 - 1;
 
-      // we need to know what tile the player is on
-      const tile = this.eng.tileManger.toTileLoc(newPos.x, newPos.y, depth);
-
-      console.debug(
-        '\n  pos ' +
-          newPos.toString() +
-          ', ' +
-          depth.toFixed(5) +
-          '\ncell[' +
-          tile.i.toFixed(5) +
-          ', ' +
-          tile.j.toFixed(5) +
-          ', ' +
-          tile.k.toFixed(5)
-      );
-
-      // recalculated the screen position to get the correct depth for the sprite
-      const screen = this.eng.tileManger.toScreenLoc(
-        tile.i,
-        tile.j,
-        tile.k + this._playerHeight
-      );
-
-      // we need this to be an int to lookup the tiles
-      tile.i = Math.round(tile.i);
-      tile.j = Math.round(tile.j);
-      tile.k = Math.floor(tile.k); // just take the floor, b/c this is the floor
-
-      // check if the player can access this tile
-      if (this.eng.scene.ground.canAccessTile(tile.i, tile.j, tile.k)) {
-        this.eng.scene.ground.onExit(tile.i, tile.j, tile.k);
-        this.eng.scene.ground.onEnter(tile.i, tile.j, tile.k);
-
-        // move the player
-        this._spriteController.setSpritePosition(
-          screen.x,
-          screen.y,
-          -1,
-          -1,
-          true
-        );
-
-        this._position = newPos;
-      }
+      this.moveToScreenPosition(x, y, z);
     }
 
     // toggle and animation. This can happen when not walking too.

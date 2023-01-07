@@ -6,6 +6,7 @@ import TileData from '../assets/IsometricTile.json';
 import { SpritBatchController } from './SpriteBatchController';
 import mat2 from '../math/mat2';
 import { ILevelData } from './ILevelData';
+import { TileComponent } from '../components/TileComponent';
 
 /**
  * The ground class is the cell environment the player interacts with
@@ -121,7 +122,12 @@ export class Ground extends Component {
    * @param z screen space
    * @returns true if the player can access this cell
    */
-  canAccessTile(i: number, j: number, k: number): boolean {
+  canAccessTile(
+    tileComponent: TileComponent,
+    i: number,
+    j: number,
+    k: number
+  ): boolean {
     let type = this.getCellType(i, j, k);
 
     if (type != 'tree' && type != 'empty') {
@@ -137,7 +143,7 @@ export class Ground extends Component {
    * @param y screen space
    * @param z screen space
    */
-  onEnter(i: number, j: number, k: number) {
+  onEnter(tileComponent: TileComponent, i: number, j: number, k: number) {
     let type = this.getCellType(i, j, k);
 
     if (type != 'tree' && type != 'empty') {
@@ -153,7 +159,7 @@ export class Ground extends Component {
    * @param y
    * @param z
    */
-  onExit(i: number, j: number, k: number) {
+  onExit(tileComponent: TileComponent, i: number, j: number, k: number) {
     const type = this.getCellType(i, j, k);
     if (type == 'block.highlight') {
       this.setCellType('block', i, j, k);
