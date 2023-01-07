@@ -85,6 +85,19 @@ export class TileManager extends Component {
     this._toTile.inverse();
   }
 
+  screenVectorToTileSpace(screenVector: vec3): vec3 {
+    const xAxis = this._toTile.col(0);
+    const yAxis = this._toTile.col(1);
+
+    const right = new vec3(xAxis[0], xAxis[1], xAxis[2]);
+    const up = new vec3(yAxis[0], yAxis[1], yAxis[2]);
+
+    const x = vec3.dot(screenVector, right);
+    const y = vec3.dot(screenVector, up);
+
+    return new vec3(x, y, 0);
+  }
+
   toTileLoc(
     x: number,
     y: number,

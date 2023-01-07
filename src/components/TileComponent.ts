@@ -67,27 +67,26 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * Set the position in screen space. This will recalculate the tile position
-   * and set the sprite position. This function allows for the options of
-   * not providing a height (z can be undefined)
-   * @param x
-   * @param y
-   * @param z
+   * Set the position in tile space. This will recalculate the tile position
+   * and set the sprite position.
+   * @param i
+   * @param j
+   * @param k
    */
-  setScreenPosition(x: number, y: number, z?: number) {
-    const tile = this.eng.tileManger.toTileLoc(x, y, z ?? 0);
+  setTilePosition(i: number, j: number, k: number) {
+    const screen = this.eng.tileManger.toScreenLoc(i, j, k);
 
-    this._tilePosition.x = tile.i;
-    this._tilePosition.y = tile.j;
-    this._tilePosition.z = z ? tile.k : 0;
+    this._tilePosition.x = i;
+    this._tilePosition.y = j;
+    this._tilePosition.z = k;
 
-    this._tileIndex.x = Math.round(this._tilePosition.x);
-    this._tileIndex.y = Math.round(this._tilePosition.z);
+    this._tileIndex.x = Math.floor(this._tilePosition.x);
+    this._tileIndex.y = Math.floor(this._tilePosition.z);
     this._tileIndex.z = Math.floor(this._tilePosition.z);
 
-    this._screenPosition.x = x;
-    this._screenPosition.y = y;
-    this._screenPosition.z = z ?? 0;
+    this._screenPosition.x = screen.x;
+    this._screenPosition.y = screen.y;
+    this._screenPosition.z = screen.z;
 
     this.updateSpritePosition();
   }
@@ -114,18 +113,35 @@ export abstract class TileComponent extends Component {
     this.updateSpritePosition();
   }
 
-  moveToScreenPosition(x: number, y: number, z: number) {
+  /**
+   * Moves the tile by a given amount
+   * @param i
+   * @param j
+   * @param k
+   */
+  OffsetTilePosition(i: number, j: number, k: number) {
+    this.moveToTilePosition(
+      this._tilePosition.x + i,
+      this._tilePosition.y + j,
+      this._tilePosition.z + k
+    );
+  }
+
+  /**
+   * Sets the tile position to a new value
+   * @param i
+   * @param j
+   * @param k
+   */
+  moveToTilePosition(i: number, j: number, k: number) {
     console.debug(
-      'pos ' + x.toFixed(5) + ', ' + y.toFixed(5) + ', ' + z.toFixed(5)
+      'tile ' + i.toFixed(5) + ', ' + j.toFixed(5) + ', ' + j.toFixed(5)
     );
 
-    // recalculated the screen position to get the correct depth for the sprite
-    const tile = this.eng.tileManger.toTileLoc(x, y, z);
-
     // we need this to be an int to lookup the tiles
-    const tileX = Math.round(tile.i);
-    const tileY = Math.round(tile.j);
-    const tileZ = Math.floor(tile.k); // just take the floor, b/c this is the floor
+    const tileX = Math.floor(i);
+    const tileY = Math.floor(j);
+    const tileZ = Math.floor(k); // just take the floor, b/c this is the floor
 
     // check if the player can access this tile
     if (this.eng.scene.ground.canAccessTile(this, tileX, tileY, tileZ)) {
@@ -139,14 +155,15 @@ export abstract class TileComponent extends Component {
         );
       }
 
+      const screen = this.eng.tileManger.toScreenLoc(i, j, k);
       // perform all state updates
-      this._screenPosition.x = x;
-      this._screenPosition.y = y;
-      this._screenPosition.z = z;
+      this._screenPosition.x = screen.x;
+      this._screenPosition.y = screen.y;
+      this._screenPosition.z = screen.z;
 
-      this._tilePosition.x = tile.i;
-      this._tilePosition.y = tile.j;
-      this._tilePosition.z = tile.k;
+      this._tilePosition.x = i;
+      this._tilePosition.y = j;
+      this._tilePosition.z = k;
 
       this._tileIndex.x = tileX;
       this._tileIndex.y = tileY;

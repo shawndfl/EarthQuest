@@ -47,9 +47,24 @@ export default class vec3 {
     this.values[2] = values[2];
   }
 
-  constructor(values?: [number, number, number]) {
+  constructor(
+    values?: [number, number, number] | number,
+    y?: number,
+    z?: number
+  ) {
     if (values !== undefined) {
-      this.xyz = values;
+      if (typeof values === 'number') {
+        this.values[0] = values;
+      } else if (Array.isArray(values)) {
+        this.xyz = values;
+      }
+
+      if (y !== undefined) {
+        this.values[1] = y;
+      }
+      if (y !== undefined) {
+        this.values[2] = z;
+      }
     }
   }
 

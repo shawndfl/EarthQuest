@@ -49,7 +49,7 @@ export class PlayerController extends TileComponent {
     super(eng);
     this._walkDirection = MoveDirection.S;
     this._walking = false;
-    this._speed = 80; // pixels per second
+    this._speed = 80; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
     this._playerHeight = 0;
@@ -62,7 +62,7 @@ export class PlayerController extends TileComponent {
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
     // set the position of the sprite in the center of the screen
-    this.setScreenPosition(400, 450);
+    this.setTilePosition(4, 5, 0.2);
     this._spriteController.commitToBuffer();
 
     this._walkAnimation = new Curve();
@@ -154,19 +154,17 @@ export class PlayerController extends TileComponent {
 
     // only move if we are walking
     if (this._walking) {
-      const aspectRatio = this.gl.canvas.width / this.gl.canvas.height;
+      const moveVector = new vec3(
+        dir.x * (dt / 1000.0) * this._speed,
+        dir.y * (dt / 1000.0) * this._speed,
+        0
+      );
 
-      const x =
-        this._screenPosition.x +
-        dir.x * (dt / 1000.0) * this._speed * aspectRatio;
-      const y =
-        this._screenPosition.y +
-        dir.y * (dt / 1000.0) * this._speed * (1.0 / aspectRatio);
+      // convert movement vector from screen space to tile space
+      const tileVector =
+        this.eng.tileManger.screenVectorToTileSpace(moveVector);
 
-      // TODO need to calculate height
-      const z = (y / this.eng.height) * 2 - 1;
-
-      this.moveToScreenPosition(x, y, z);
+      this.OffsetTilePosition(tileVector.x, tileVector.y, tileVector.z);
     }
 
     // toggle and animation. This can happen when not walking too.
