@@ -6,9 +6,6 @@ import { Texture } from '../core/Texture';
 import { UserAction } from '../core/UserAction';
 import { SpritController } from '../environment/SpriteController';
 import vec2 from '../math/vec2';
-import { Component } from './Component';
-import * as MathConst from '../math/constants';
-import { TileManager } from '../core/TileManager';
 import { TileComponent } from './TileComponent';
 import vec3 from '../math/vec3';
 
@@ -29,6 +26,7 @@ export class PlayerController extends TileComponent {
   private _speed: number;
   private _sprites: string[];
   private _spriteFlip: boolean;
+  private _slopVector: vec2;
 
   /** the height above sea level of the player */
   private _playerHeight: number;
@@ -45,6 +43,14 @@ export class PlayerController extends TileComponent {
     return this._playerHeight;
   }
 
+  set slopVector(val: vec2) {
+    this._slopVector = val;
+  }
+
+  get slopVector(): vec2 {
+    return this._slopVector;
+  }
+
   constructor(eng: Engine) {
     super(eng);
     this._walkDirection = MoveDirection.S;
@@ -53,6 +59,7 @@ export class PlayerController extends TileComponent {
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
     this._playerHeight = 0;
+    this._slopVector = new vec2([0, 0]);
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
@@ -158,14 +165,28 @@ export class PlayerController extends TileComponent {
       const moveVector = new vec3(
         dir.x * (dt / 1000.0) * this._speed,
         dir.y * (dt / 1000.0) * this._speed,
-        0
+        vec2.dot(dir, this._slopVector)
       );
 
       // convert movement vector from screen space to tile space
       const tileVector =
         this.eng.tileManger.screenVectorToTileSpace(moveVector);
 
-      this.OffsetTilePosition(tileVector.x, tileVector.y, tileVector.z);
+      console.debug(
+        'slop ' + moveVector.z,
+        ' slop vector: ' +
+          this._slopVector.toString() +
+          ' dir ' +
+          dir.toString()
+      );
+      // screen space converted to tile space for x and y position (ground plane)
+      // then use the movement dot of the slope vector which will allow the player for
+      // move up and down on stairs and slops
+      this.OffsetTilePosition(
+        tileVector.x,
+        tileVector.y,
+        vec2.dot(dir, this._slopVector)
+      );
     }
 
     // toggle and animation. This can happen when not walking too.

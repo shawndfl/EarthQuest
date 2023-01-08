@@ -7,9 +7,12 @@ import { SpritBatchController } from './SpriteBatchController';
 import mat2 from '../math/mat2';
 import { ILevelData } from './ILevelData';
 import { TileComponent } from '../components/TileComponent';
+import vec2 from '../math/vec2';
 
 /**
- * The ground class is the cell environment the player interacts with
+ * The ground class is the cell environment the player interacts with. Cells are block that
+ * that different tile components interact with. Think of it as the world tile components live in.
+ * This class is driven by Tile image data and LevelData.
  */
 export class Ground extends Component {
   protected _spriteController: SpritBatchController;
@@ -29,9 +32,10 @@ export class Ground extends Component {
     this.buildLevel();
   }
 
+  /**
+   * build the level from the level data
+   */
   buildLevel() {
-    const tileTransform = new mat2([]);
-
     const scale = 2;
     // loop over each height layer
     for (let k = 0; k < this._levelData.cells.length; k++) {
@@ -169,6 +173,25 @@ export class Ground extends Component {
     let type = this.getCellType(i, j, k);
     const height = this.getCellHeight(i, j, k);
 
+    // reset slop vector
+    this.eng.scene.player.slopVector = new vec2([0, 0]);
+
+    let AboveType = this.getCellType(i, j, k + 1);
+    if (AboveType == 'slop.left') {
+      console.debug(
+        'hit slop tile index: ' +
+          tileComponent.tileIndex.toString() +
+          ' tileComponent '
+      );
+      if (
+        tileComponent.tileIndex.x == i &&
+        tileComponent.tileIndex.y == j + 1
+      ) {
+        console.debug('facing sloping vector');
+        this.eng.scene.player.slopVector = new vec2([0, 0.1]);
+      }
+    }
+
     // check tile height.
     if (tileComponent.tileHeightIndex != height) {
       return false;
@@ -191,7 +214,7 @@ export class Ground extends Component {
   onEnter(tileComponent: TileComponent, i: number, j: number, k: number) {
     let type = this.getCellType(i, j, k);
 
-    if (type != 'tree' && type != 'empty') {
+    if (!type.includes('slop')) {
       this.setCellType('block.highlight', i, j, k);
     } else {
       console.debug('tile error ' + i + ', ' + j + ', ' + k);

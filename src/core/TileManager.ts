@@ -19,29 +19,6 @@ export class TileManager extends Component {
     const screenWidth = this.eng.width;
     const screenHeight = this.eng.height;
 
-    /*
-    // the width and the height are hard coded because the grid is
-          // 32 x 32
-          const cellSize = 32 * scale;
-          const halfWidth = this.eng.width * 0.5;
-          const heightOffset = this.eng.height - cellSize * 0.25;
-
-          const x = -j * cellSize * 0.5 + i * cellSize * 0.5 + halfWidth;
-          const y =
-            -j * cellSize * 0.25 -
-            i * cellSize * 0.25 +
-            k * cellSize * 0.5 +
-            heightOffset;
-
-          // calculate the top and bottom depth values of the quad.
-          // event though the cells are drawn as diamonds they are really quads
-          // for depth calculations the top and bottom verts of the quad need to
-          // be calculated
-          const yRemoveHeight = y - k * cellSize;
-          const zLower = (yRemoveHeight / this.eng.height) * 2 - 1;
-          const zUpper = (yRemoveHeight / this.eng.height) * 2 - 1;
-    */
-
     const scale = 2.0;
     const tileSize = 32;
     const cellSize = tileSize * scale;

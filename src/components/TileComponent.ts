@@ -31,6 +31,13 @@ export abstract class TileComponent extends Component {
   }
 
   /**
+   * Get the tile index
+   */
+  get tileIndex(): vec3 {
+    return this._tileIndex;
+  }
+
+  /**
    * Get the height offset in tile space
    */
   get tileHeight(): number {
@@ -94,25 +101,29 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * Sets the height of the tile component
-   * @param increment -Float value. The value that will be added to the tile position. This can be negative
-   * if the tile is to move down.
+   * Can this tile be accessed by the given component. This happens when a player tries to move to a tile.
+   * It can also happen when an NPC tile tries to access a another tile
+   * @param tileComponent
+   * @returns
    */
-  adjustTileHeight(increment: number) {
-    this._tilePosition.z += increment;
-    this._tileIndex.z = Math.floor(this._tilePosition.z);
+  canAccessTile(tileComponent: TileComponent): boolean {
+    return false;
+  }
 
-    const screen = this.eng.tileManger.toScreenLoc(
-      this.tilePosition.x,
-      this.tilePosition.y,
-      this.tilePosition.z
-    );
+  /**
+   * Called when a tile tries to enter this tile. This happens after canAccessTile returns true
+   * @param tileComponent
+   */
+  onEnter(tileComponent: TileComponent) {
+    //NOP
+  }
 
-    this._screenPosition.x = screen.x;
-    this._screenPosition.y = screen.y;
-    this._screenPosition.z = screen.z;
-
-    this.updateSpritePosition();
+  /**
+   * Exit a this tile
+   * @param tileComponent
+   */
+  onExit(tileComponent: TileComponent) {
+    //NOP
   }
 
   /**
@@ -122,6 +133,14 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   OffsetTilePosition(i: number, j: number, k: number) {
+    console.debug(
+      'before moving in dir ' +
+        i.toFixed(5) +
+        ', ' +
+        j.toFixed(5) +
+        ', ' +
+        k.toFixed(5)
+    );
     const tileX = Math.floor(this._tilePosition.x);
     const tileY = Math.floor(this._tilePosition.y);
     const tileZ = Math.floor(this._tilePosition.z);
@@ -131,7 +150,6 @@ export abstract class TileComponent extends Component {
     const fractionJ = this.tilePosition.y % 1;
     const dir = new vec3([i, j, k]);
 
-    let access = true;
     const ground = this.eng.scene.ground;
 
     // left
@@ -206,6 +224,7 @@ export abstract class TileComponent extends Component {
 
     // check if the player can access this tile
     if (dir.length() > 0) {
+      console.debug('moving in dir ' + dir.toString());
       this.moveToTilePosition(
         this._tilePosition.x + dir.x,
         this._tilePosition.y + dir.y,
