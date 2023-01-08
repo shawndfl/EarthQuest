@@ -2,117 +2,117 @@
   {
     "id": "ness.down.step.left",
     "loc": [2, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.down.step.right",
     "loc": [19, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.up.step",
     "loc": [36, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.left.stand",
     "loc": [53, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.left.step",
     "loc": [70, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.scared",
     "loc": [120, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.climb",
     "loc": [137, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.sit",
     "loc": [155, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.down.step.right",
     "loc": [242, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.down.step",
     "loc": [260, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.left.stand",
     "loc": [293, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.dead",
     "loc": [326, 32, 24, 16],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.burn",
     "loc": [351, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.left.stand",
     "loc": [293, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.robot.up.step",
     "loc": [276, 24, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
 
   {
     "id": "ness.down.left.stand",
     "loc": [2, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.down.left.step",
     "loc": [19, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.up.left.stand",
     "loc": [36, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.up.left.step",
     "loc": [53, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.success",
     "loc": [70, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.dead",
     "loc": [87, 57, 24, 16],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.pj.down.step",
     "loc": [176, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   },
   {
     "id": "ness.pj.up.step",
     "loc": [193, 49, 16, 24],
-    "offset": [-16, 0]
+    "offset": [-16, -16]
   }
 ]

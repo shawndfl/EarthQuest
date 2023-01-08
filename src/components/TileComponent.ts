@@ -23,10 +23,11 @@ export abstract class TileComponent extends Component {
   protected _spriteController: SpritController;
 
   /**
-   * This is the tile height index
+   * This is the tile height index. Subtract one because
+   * the tile is one level above the cell it is on.
    */
   get tileHeightIndex(): number {
-    return this, this._tileIndex.z;
+    return this._tileIndex.z - 1;
   }
 
   /**
@@ -82,7 +83,7 @@ export abstract class TileComponent extends Component {
     this._tilePosition.z = k;
 
     this._tileIndex.x = Math.floor(this._tilePosition.x);
-    this._tileIndex.y = Math.floor(this._tilePosition.z);
+    this._tileIndex.y = Math.floor(this._tilePosition.y);
     this._tileIndex.z = Math.floor(this._tilePosition.z);
 
     this._screenPosition.x = screen.x;
@@ -124,6 +125,7 @@ export abstract class TileComponent extends Component {
     const tileX = Math.floor(this._tilePosition.x);
     const tileY = Math.floor(this._tilePosition.y);
     const tileZ = Math.floor(this._tilePosition.z);
+    const floorHeight = tileZ - 1;
 
     const fractionI = this.tilePosition.x % 1;
     const fractionJ = this.tilePosition.y % 1;
@@ -135,7 +137,7 @@ export abstract class TileComponent extends Component {
     // left
     if (dir.x < 0 && fractionI < 0.25) {
       // cancel x movement
-      if (!ground.canAccessTile(this, tileX - 1, tileY, tileZ)) {
+      if (!ground.canAccessTile(this, tileX - 1, tileY, floorHeight)) {
         dir.x = 0;
       }
     }
@@ -143,7 +145,7 @@ export abstract class TileComponent extends Component {
     // right
     else if (dir.x > 0 && fractionI > 0.75) {
       // cancel x movement
-      if (!ground.canAccessTile(this, tileX + 1, tileY, tileZ)) {
+      if (!ground.canAccessTile(this, tileX + 1, tileY, floorHeight)) {
         dir.x = 0;
       }
     }
@@ -151,49 +153,49 @@ export abstract class TileComponent extends Component {
     // down
     if (dir.y < 0 && fractionJ < 0.25) {
       // cancel y movement
-      if (!ground.canAccessTile(this, tileX, tileY - 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX, tileY - 1, floorHeight)) {
         dir.y = 0;
       }
     }
     // up
     else if (dir.y > 0 && fractionJ > 0.75) {
       // cancel y movement
-      if (!ground.canAccessTile(this, tileX, tileY + 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX, tileY + 1, floorHeight)) {
         dir.y = 0;
       }
     }
 
     // check corners
-    if (dir.x > 0 && dir.y > 0) {
+    if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
       //top right
-      if (!ground.canAccessTile(this, tileX + 1, tileY + 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX + 1, tileY + 1, floorHeight)) {
         if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
         } else {
           dir.x = 0;
         }
       }
-    } else if (dir.x < 0 && dir.y > 0) {
+    } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
       //top left
-      if (!ground.canAccessTile(this, tileX - 1, tileY + 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX - 1, tileY + 1, floorHeight)) {
         if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
         } else {
           dir.x = 0;
         }
       }
-    } else if (dir.x < 0 && dir.y < 0) {
+    } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
       //bottom left
-      if (!ground.canAccessTile(this, tileX - 1, tileY - 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX - 1, tileY - 1, floorHeight)) {
         if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
         } else {
           dir.x = 0;
         }
       }
-    } else if (dir.x < 0 && dir.y > 0) {
+    } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
       //bottom right
-      if (!ground.canAccessTile(this, tileX + 1, tileY + 1, tileZ)) {
+      if (!ground.canAccessTile(this, tileX - 1, tileY + 1, floorHeight)) {
         if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
         } else {
@@ -228,13 +230,15 @@ export abstract class TileComponent extends Component {
     const tileY = Math.floor(j);
     const tileZ = Math.floor(k);
 
+    const floor = tileZ - 1;
+
     // we moved off the last tile call on exit
     if (this._tileIndex.x != tileX || this._tileIndex.y != tileY) {
       this.eng.scene.ground.onExit(
         this,
         this._tileIndex.x,
         this._tileIndex.y,
-        this._tileIndex.z
+        floor
       );
     }
 
@@ -250,14 +254,14 @@ export abstract class TileComponent extends Component {
 
     this._tileIndex.x = tileX;
     this._tileIndex.y = tileY;
-    this._tileIndex.z = tileZ; // just take the floor, b/c this is the floor
+    this._tileIndex.z = tileZ;
 
     // enter a new tile
     this.eng.scene.ground.onEnter(
       this,
       this._tileIndex.x,
       this._tileIndex.y,
-      this._tileIndex.z
+      floor
     );
 
     this.updateSpritePosition();
@@ -267,12 +271,19 @@ export abstract class TileComponent extends Component {
    * Updates the sprite's position
    */
   protected updateSpritePosition() {
+    // We only need the depth this way the tile matches the depth it is on.
+    const screenDepth = this.eng.tileManger.toScreenLoc(
+      this._tileIndex.x,
+      this._tileIndex.y,
+      this._tileIndex.z
+    );
+
     // move the player
     this._spriteController.setSpritePosition(
       this._screenPosition.x,
       this._screenPosition.y,
-      this._screenPosition.z,
-      this._screenPosition.z,
+      screenDepth.z,
+      screenDepth.z,
       true
     );
   }

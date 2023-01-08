@@ -47,7 +47,6 @@ export class TileManager extends Component {
     const cellSize = tileSize * scale;
     const halfCell = cellSize * 0.5;
     const quarterCell = cellSize * 0.25;
-    const eighthCell = cellSize * 0.125;
 
     const xAxis = new vec3([halfCell, -halfCell, 0]);
     const yAxis = new vec3([-quarterCell, -quarterCell, halfCell]);
@@ -97,7 +96,6 @@ export class TileManager extends Component {
     const y = vec3.dot(screenVector, up.normalize());
 
     return new vec3(x, y, 0);
-    //return this._toTile.multiplyVec3(screenVector);
   }
 
   toTileLoc(

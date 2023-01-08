@@ -41,19 +41,14 @@ export class Ground extends Component {
         for (let j = 0; j < this._levelData.cells[k][i].length; j++) {
           const cellId = this._levelData.ids[this._levelData.cells[k][i][j]];
 
-          this._spriteController.activeSprite('tile_' + k + '_' + i + '_' + j);
+          this._spriteController.activeSprite('tile_' + i + '_' + j + '_' + k);
           let spriteId = this.getCellType(i, j, k);
 
           this._spriteController.setSprite(spriteId);
           this._spriteController.scale(scale);
 
           const screen = this.eng.tileManger.toScreenLoc(i, j, k);
-          const tile = this.eng.tileManger.toTileLoc(
-            screen.x,
-            screen.y,
-            screen.z
-          );
-          //this._spriteController.setSpritePosition(x, y, zLower, zUpper);
+
           this._spriteController.setSpritePosition(
             screen.x,
             screen.y,
@@ -121,7 +116,7 @@ export class Ground extends Component {
       const typeIndex = this._levelData.cells[k][i][j] ?? 0;
       type = this._levelData.ids[typeIndex] ?? 'empty';
     } catch (e) {
-      console.warn('invalid tile ' + k + ', ' + i + ',' + j);
+      console.warn('invalid tile ' + i + ', ' + j + ',' + k);
     }
     return type;
   }
@@ -147,10 +142,10 @@ export class Ground extends Component {
     if (found) {
       try {
         this._levelData.cells[k][i][j] = index;
-        this._spriteController.activeSprite('tile_' + k + '_' + i + '_' + j);
+        this._spriteController.activeSprite('tile_' + i + '_' + j + '_' + k);
         this._spriteController.setSprite(found, true);
       } catch (e) {
-        console.warn('invalid tile ' + k + ', ' + i + ',' + j);
+        console.warn('invalid tile ' + i + '_' + j + '_' + k);
       }
     } else {
       console.warn('cannot find cell type: ' + type);
@@ -174,7 +169,7 @@ export class Ground extends Component {
     let type = this.getCellType(i, j, k);
     const height = this.getCellHeight(i, j, k);
 
-    // check tile height
+    // check tile height.
     if (tileComponent.tileHeightIndex != height) {
       return false;
     }
