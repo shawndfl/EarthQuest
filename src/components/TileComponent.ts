@@ -1,14 +1,10 @@
 import { Engine } from '../core/Engine';
-import { SpritController } from '../environment/SpriteController';
+import { SpritController } from '../graphics/SpriteController';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import { Component } from './Component';
 
 export abstract class TileComponent extends Component {
-  /**
-   * Screen position in pixels of the screen. z range is from 1 to -1  (-1 is in front)
-   */
-  protected _screenPosition: vec3;
   /**
    * Tile position as a float
    */
@@ -43,12 +39,6 @@ export abstract class TileComponent extends Component {
   get tileHeight(): number {
     return this._tilePosition.z;
   }
-  /**
-   * get the screen position
-   */
-  get screenPosition(): vec3 {
-    return this._screenPosition;
-  }
 
   /**
    * get the tile position
@@ -70,7 +60,6 @@ export abstract class TileComponent extends Component {
   constructor(eng: Engine) {
     super(eng);
 
-    this._screenPosition = new vec3([0, 0, 0]);
     this._tileIndex = new vec3([0, 0, 0]);
     this._tilePosition = new vec3([0, 0, 0]);
   }
@@ -83,8 +72,6 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   setTilePosition(i: number, j: number, k: number) {
-    const screen = this.eng.tileManger.toScreenLoc(i, j, k);
-
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;
@@ -92,10 +79,6 @@ export abstract class TileComponent extends Component {
     this._tileIndex.x = Math.floor(this._tilePosition.x);
     this._tileIndex.y = Math.floor(this._tilePosition.y);
     this._tileIndex.z = Math.floor(this._tilePosition.z);
-
-    this._screenPosition.x = screen.x;
-    this._screenPosition.y = screen.y;
-    this._screenPosition.z = screen.z;
 
     this.updateSpritePosition();
   }
@@ -263,10 +246,6 @@ export abstract class TileComponent extends Component {
 
     const screen = this.eng.tileManger.toScreenLoc(i, j, k);
     // perform all state updates
-    this._screenPosition.x = screen.x;
-    this._screenPosition.y = screen.y;
-    this._screenPosition.z = screen.z;
-
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;
@@ -290,17 +269,24 @@ export abstract class TileComponent extends Component {
    * Updates the sprite's position
    */
   protected updateSpritePosition() {
-    // We only need the depth this way the tile matches the depth it is on.
+    // Get the screen depth using the tile index not position of this tile
     const screenDepth = this.eng.tileManger.toScreenLoc(
       this._tileIndex.x,
       this._tileIndex.y,
       this._tileIndex.z
     );
 
+    // Get the screen position of this tile using the position
+    const screenPosition = this.eng.tileManger.toScreenLoc(
+      this._tilePosition.x,
+      this._tilePosition.y,
+      this._tilePosition.z
+    );
+
     // move the player
     this._spriteController.setSpritePosition(
-      this._screenPosition.x,
-      this._screenPosition.y,
+      screenPosition.x,
+      screenPosition.y,
       screenDepth.z,
       screenDepth.z,
       true

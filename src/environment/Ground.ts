@@ -1,9 +1,9 @@
-import { Texture } from '../core/Texture';
+import { Texture } from '../graphics/Texture';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import TileImg from '../assets/IsometricTile.png';
 import TileData from '../assets/IsometricTile.json';
-import { SpritBatchController } from './SpriteBatchController';
+import { SpritBatchController } from '../graphics/SpriteBatchController';
 import mat2 from '../math/mat2';
 import { ILevelData } from './ILevelData';
 import { TileComponent } from '../components/TileComponent';

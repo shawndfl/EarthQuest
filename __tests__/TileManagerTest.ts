@@ -1,4 +1,4 @@
-import { TileManager } from '../src/core/TileManager';
+import { TileManager } from '../src/systems/TileManager';
 
 class MockEngine {
   constructor() {}

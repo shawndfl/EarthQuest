@@ -1,6 +1,6 @@
 import { TextManager } from '../systems/TextManager';
 import { FpsController } from '../core/FpsController';
-import { Texture } from '../core/Texture';
+import { Texture } from '../graphics/Texture';
 import grassImage from '../assets/grass.png';
 import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';

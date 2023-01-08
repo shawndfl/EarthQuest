@@ -1,5 +1,5 @@
-import { ShaderController } from '../core/ShaderController';
-import { Texture } from '../core/Texture';
+import { ShaderController } from '../graphics/ShaderController';
+import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
 
 //

@@ -2,7 +2,7 @@ import { Scene } from '../components/Scene';
 import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
-import { TileManager } from './TileManager';
+import { TileManager } from '../systems/TileManager';
 import { UserAction } from './UserAction';
 
 /**

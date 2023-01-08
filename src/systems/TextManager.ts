@@ -1,8 +1,8 @@
-import { TextController } from '../core/TextController';
-import { IFontData } from '../core/IFontData';
-import { ITextModel } from '../core/ITextModel';
-import { ShaderController } from '../core/ShaderController';
-import { Texture } from '../core/Texture';
+import { TextController } from '../graphics/TextController';
+import { IFontData } from '../graphics/IFontData';
+import { ITextModel } from '../graphics/ITextModel';
+import { ShaderController } from '../graphics/ShaderController';
+import { Texture } from '../graphics/Texture';
 import { Engine } from '../core/Engine';
 import { Component } from '../components/Component';
 

@@ -1,8 +1,8 @@
 import { Engine } from '../core/Engine';
-import { IQuadModel } from '../core/GlBuffer';
-import { ISpriteData } from '../core/ISpriteData';
-import { Sprite, SpriteFlip } from '../core/Sprite';
-import { Texture } from '../core/Texture';
+import { IQuadModel } from '../graphics/GlBuffer';
+import { ISpriteData } from '../graphics/ISpriteData';
+import { Sprite } from '../graphics/Sprite';
+import { Texture } from './Texture';
 import { ISpriteController } from './ISprintController';
 import { SpritBaseController } from './SpriteBaseController';
 

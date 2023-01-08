@@ -1,5 +1,4 @@
-import { cli } from 'webpack';
-import { ISpriteData } from '../core/ISpriteData';
+import { ISpriteData } from '../graphics/ISpriteData';
 
 /**
  * This will create a animation clip that can be modified manually after it is copied from the console window.

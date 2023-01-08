@@ -1,11 +1,10 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
-import { SpritController } from '../environment/SpriteController';
 import MenuImage from '../assets/menu.png';
-import { ISpriteData } from '../core/ISpriteData';
+import { ISpriteData } from '../graphics/ISpriteData';
 import { UserAction } from '../core/UserAction';
-import { Texture } from '../core/Texture';
-import { SpritBatchController } from '../environment/SpriteBatchController';
+import { Texture } from '../graphics/Texture';
+import { SpritBatchController } from '../graphics/SpriteBatchController';
 
 /**
  * Test sprite batch vs normal sprites

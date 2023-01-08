@@ -11,5 +11,6 @@ export class Component {
   get gl(): WebGL2RenderingContext {
     return this.eng.gl;
   }
+
   constructor(readonly eng: Engine) {}
 }

@@ -1,7 +1,6 @@
 import { Engine } from '../core/Engine';
-import { ISpriteData } from '../core/ISpriteData';
-import { SpriteFlip } from '../core/Sprite';
-import { Texture } from '../core/Texture';
+import { ISpriteData } from '../graphics/ISpriteData';
+import { Texture } from '../graphics/Texture';
 import { UserAction } from '../core/UserAction';
 import { PlayerController } from './PlayerController';
 

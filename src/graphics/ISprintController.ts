@@ -1,4 +1,4 @@
-import { SpriteFlip } from '../core/Sprite';
+import { SpriteFlip } from './Sprite';
 
 /**
  * Interface for setting a sprite

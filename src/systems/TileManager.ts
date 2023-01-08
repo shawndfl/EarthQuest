@@ -1,7 +1,7 @@
 import { Component } from '../components/Component';
 import mat4 from '../math/mat4';
 import vec3 from '../math/vec3';
-import { Engine } from './Engine';
+import { Engine } from '../core/Engine';
 
 /**
  * This class is used to convert tile and screen coordinates

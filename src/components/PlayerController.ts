@@ -1,10 +1,10 @@
 import { Curve } from '../core/Curve';
 import { Engine } from '../core/Engine';
-import { ISpriteData } from '../core/ISpriteData';
-import { SpriteFlip } from '../core/Sprite';
-import { Texture } from '../core/Texture';
+import { ISpriteData } from '../graphics/ISpriteData';
+import { SpriteFlip } from '../graphics/Sprite';
+import { Texture } from '../graphics/Texture';
 import { UserAction } from '../core/UserAction';
-import { SpritController } from '../environment/SpriteController';
+import { SpritController } from '../graphics/SpriteController';
 import vec2 from '../math/vec2';
 import { TileComponent } from './TileComponent';
 import vec3 from '../math/vec3';

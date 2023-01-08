@@ -1,7 +1,7 @@
 import { Engine } from '../core/Engine';
-import { ISpriteData } from '../core/ISpriteData';
-import { Sprite } from '../core/Sprite';
-import { Texture } from '../core/Texture';
+import { ISpriteData } from '../graphics/ISpriteData';
+import { Sprite } from '../graphics/Sprite';
+import { Texture } from './Texture';
 import { ISpriteController } from './ISprintController';
 import { SpritBaseController } from './SpriteBaseController';
 
