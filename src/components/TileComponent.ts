@@ -1,5 +1,6 @@
 import { Engine } from '../core/Engine';
 import { SpritController } from '../environment/SpriteController';
+import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import { Component } from './Component';
 
@@ -120,17 +121,93 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   OffsetTilePosition(i: number, j: number, k: number) {
-    const lookAheadScale = 2.0;
-    const tileX = Math.floor(this._tilePosition.x + i * lookAheadScale);
-    const tileY = Math.floor(this._tilePosition.y + j * lookAheadScale);
-    const tileZ = Math.floor(this._tilePosition.z + k * lookAheadScale);
+    const tileX = Math.floor(this._tilePosition.x);
+    const tileY = Math.floor(this._tilePosition.y);
+    const tileZ = Math.floor(this._tilePosition.z);
+
+    const fractionI = this.tilePosition.x % 1;
+    const fractionJ = this.tilePosition.y % 1;
+    const dir = new vec3([i, j, k]);
+
+    let access = true;
+    const ground = this.eng.scene.ground;
+
+    // left
+    if (dir.x < 0 && fractionI < 0.25) {
+      // cancel x movement
+      if (!ground.canAccessTile(this, tileX - 1, tileY, tileZ)) {
+        dir.x = 0;
+      }
+    }
+
+    // right
+    else if (dir.x > 0 && fractionI > 0.75) {
+      // cancel x movement
+      if (!ground.canAccessTile(this, tileX + 1, tileY, tileZ)) {
+        dir.x = 0;
+      }
+    }
+
+    // down
+    if (dir.y < 0 && fractionJ < 0.25) {
+      // cancel y movement
+      if (!ground.canAccessTile(this, tileX, tileY - 1, tileZ)) {
+        dir.y = 0;
+      }
+    }
+    // up
+    else if (dir.y > 0 && fractionJ > 0.75) {
+      // cancel y movement
+      if (!ground.canAccessTile(this, tileX, tileY + 1, tileZ)) {
+        dir.y = 0;
+      }
+    }
+
+    // check corners
+    if (dir.x > 0 && dir.y > 0) {
+      //top right
+      if (!ground.canAccessTile(this, tileX + 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
+          dir.x = 0;
+        }
+      }
+    } else if (dir.x < 0 && dir.y > 0) {
+      //top left
+      if (!ground.canAccessTile(this, tileX - 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
+          dir.x = 0;
+        }
+      }
+    } else if (dir.x < 0 && dir.y < 0) {
+      //bottom left
+      if (!ground.canAccessTile(this, tileX - 1, tileY - 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
+          dir.x = 0;
+        }
+      }
+    } else if (dir.x < 0 && dir.y > 0) {
+      //bottom right
+      if (!ground.canAccessTile(this, tileX + 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
+          dir.x = 0;
+        }
+      }
+    }
 
     // check if the player can access this tile
-    if (this.eng.scene.ground.canAccessTile(this, tileX, tileY, tileZ)) {
+    if (dir.length() > 0) {
       this.moveToTilePosition(
-        this._tilePosition.x + i,
-        this._tilePosition.y + j,
-        this._tilePosition.z + k
+        this._tilePosition.x + dir.x,
+        this._tilePosition.y + dir.y,
+        this._tilePosition.z + dir.z
       );
     }
   }
