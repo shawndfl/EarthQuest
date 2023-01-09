@@ -1,4 +1,4 @@
-import { Curve } from '../core/Curve';
+import { Curve } from '../math/Curve';
 import { Engine } from '../core/Engine';
 import { ISpriteData } from '../graphics/ISpriteData';
 import { SpriteFlip } from '../graphics/Sprite';

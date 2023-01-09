@@ -4,6 +4,13 @@ import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import { Component } from './Component';
 
+/**
+ * A tile component is a component that controls a single tile.
+ * The visual sprite might be part of a spriteBatch or a single sprite.
+ * This is up to the implementation. This class has functions that
+ * allow the implementation to handle collision detection and response and
+ * update state of other tiles as needed via the {@link Ground}.
+ */
 export abstract class TileComponent extends Component {
   /**
    * Tile position as a float

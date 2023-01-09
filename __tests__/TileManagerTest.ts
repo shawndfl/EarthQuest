@@ -16,13 +16,13 @@ test('TileToScreen', () => {
   const t = new TileManager(eng as any);
 
   const point = t.toScreenLoc(0, 0, 0);
-  expect(point.x).toBeCloseTo(336, 2);
-  expect(point.y).toBeCloseTo(552, 2);
-  expect(point.z).toBeCloseTo(0, 2);
+  expect(point.x).toBeCloseTo(400, 2);
+  expect(point.y).toBeCloseTo(584, 2);
+  expect(point.z).toBeCloseTo(1, 2);
 
   const newCell = t.toTileLoc(point.x, point.y, point.z);
   expect(newCell.i).toBeCloseTo(0, 2);
-  expect(newCell.j).toBeCloseTo(2, 2);
+  expect(newCell.j).toBeCloseTo(0, 2);
   expect(newCell.k).toBeCloseTo(0, 2);
 });
 

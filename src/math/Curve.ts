@@ -3,6 +3,9 @@ export enum CurveType {
   linear,
 }
 
+/**
+ * Class used to create an animation.
+ */
 export class Curve {
   private _points: { p: number; t: number }[];
   private _point0: number;

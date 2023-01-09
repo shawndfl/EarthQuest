@@ -1,4 +1,4 @@
-import { Curve, CurveType } from '../src/core/Curve';
+import { Curve, CurveType } from '../src/math/Curve';
 
 test('curve', () => {
   const curve = new Curve();
