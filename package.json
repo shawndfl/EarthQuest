@@ -6,7 +6,8 @@
     "test": "jest",
     "cover": "jest --coverage",
     "start": "webpack serve --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "docs": "./node_modules/.bin/tsc --out documentation src/index.ts"
   },
   "keywords": [
     "game"

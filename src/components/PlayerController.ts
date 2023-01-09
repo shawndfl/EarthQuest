@@ -133,25 +133,52 @@ export class PlayerController extends TileComponent {
   walkAnimation(dt: number, direction: MoveDirection) {
     const dir = new vec2([0, 0]);
 
-    if (direction != 0) {
-      //console.debug('direction ' + direction);
-    }
-    if ((direction & MoveDirection.E) > 0) {
+    // check multiple angle movements first so the else statements work correctly
+    if (
+      (direction & MoveDirection.S) > 0 &&
+      (direction & MoveDirection.W) > 0
+    ) {
+      this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
+      this._spriteFlip = false;
+      dir.x = -1;
+      dir.y = -1;
+    } else if (
+      (direction & MoveDirection.S) > 0 &&
+      (direction & MoveDirection.E) > 0
+    ) {
+      this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
+      this._spriteFlip = true;
+      dir.x = 1;
+      dir.y = -1;
+    } else if (
+      (direction & MoveDirection.N) > 0 &&
+      (direction & MoveDirection.W) > 0
+    ) {
+      this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
+      this._spriteFlip = false;
+      dir.x = -1;
+      dir.y = 1;
+    } else if (
+      (direction & MoveDirection.N) > 0 &&
+      (direction & MoveDirection.E) > 0
+    ) {
+      this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
+      this._spriteFlip = true;
+      dir.x = 1;
+      dir.y = 1;
+    } else if ((direction & MoveDirection.E) > 0) {
       this._sprites = ['ness.left.stand', 'ness.left.step'];
       this._spriteFlip = true;
       dir.x = 1;
-    }
-    if ((direction & MoveDirection.W) > 0) {
+    } else if ((direction & MoveDirection.W) > 0) {
       this._sprites = ['ness.left.stand', 'ness.left.step'];
       this._spriteFlip = false;
       dir.x = -1;
-    }
-    if ((direction & MoveDirection.S) > 0) {
+    } else if ((direction & MoveDirection.S) > 0) {
       this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
       this._spriteFlip = false;
       dir.y = -1;
-    }
-    if ((direction & MoveDirection.N) > 0) {
+    } else if ((direction & MoveDirection.N) > 0) {
       this._sprites = ['ness.up.step', 'ness.up.step'];
       this._spriteFlip = false;
       if (this._walkAnimation.getValue() == 0) {

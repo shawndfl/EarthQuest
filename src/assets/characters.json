@@ -114,5 +114,50 @@
     "id": "ness.pj.up.step",
     "loc": [193, 49, 16, 24],
     "offset": [-16, -16]
+  },
+  {
+    "id": "poo.down.step",
+    "loc": [1, 74, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.up.step",
+    "loc": [18, 74, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.left.stand",
+    "loc": [34, 74, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.site.1",
+    "loc": [67, 74, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.site.2",
+    "loc": [84, 74, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.down.left.stand",
+    "loc": [1, 99, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.down.left.step",
+    "loc": [18, 99, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.up.left.stand",
+    "loc": [35, 99, 16, 24],
+    "offset": [-16, -16]
+  },
+  {
+    "id": "poo.down.left.step",
+    "loc": [50, 99, 16, 24],
+    "offset": [-16, -16]
   }
 ]
