@@ -6,7 +6,7 @@ import { Engine } from '../core/Engine';
 /**
  * This class is used to convert tile and screen coordinates
  */
-export class TileManager extends Component {
+export class TileHelper extends Component {
   protected _toScreen: mat4;
   protected _toTile: mat4;
 

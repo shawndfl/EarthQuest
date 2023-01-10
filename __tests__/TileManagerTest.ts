@@ -1,4 +1,4 @@
-import { TileManager } from '../src/systems/TileManager';
+import { TileHelper } from '../src/utilities/TileHelper';
 
 class MockEngine {
   constructor() {}
@@ -13,7 +13,7 @@ class MockEngine {
 test('TileToScreen', () => {
   const eng = new MockEngine();
 
-  const t = new TileManager(eng as any);
+  const t = new TileHelper(eng as any);
 
   const point = t.toScreenLoc(0, 0, 0);
   expect(point.x).toBeCloseTo(400, 2);
@@ -29,7 +29,7 @@ test('TileToScreen', () => {
 test('TileToScreenHeight', () => {
   const eng = new MockEngine();
 
-  const t = new TileManager(eng as any);
+  const t = new TileHelper(eng as any);
 
   const point = t.toScreenLoc(0, 2, 1);
   console.debug('point ' + point.x + ', ' + point.y + ', ' + point.z);

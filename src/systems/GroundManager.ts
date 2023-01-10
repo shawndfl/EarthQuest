@@ -4,8 +4,7 @@ import { Engine } from '../core/Engine';
 import TileImg from '../assets/IsometricTile.png';
 import TileData from '../assets/IsometricTile.json';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import mat2 from '../math/mat2';
-import { ILevelData } from './ILevelData';
+import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import vec2 from '../math/vec2';
 
@@ -14,7 +13,7 @@ import vec2 from '../math/vec2';
  * that different tile components interact with. Think of it as the world tile components live in.
  * This class is driven by Tile image data and LevelData.
  */
-export class Ground extends Component {
+export class GroundManager extends Component {
   protected _spriteController: SpritBatchController;
   protected _levelData: ILevelData;
 
@@ -51,7 +50,7 @@ export class Ground extends Component {
           this._spriteController.setSprite(spriteId);
           this._spriteController.scale(scale);
 
-          const screen = this.eng.tileManger.toScreenLoc(i, j, k);
+          const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
 
           this._spriteController.setSpritePosition(
             screen.x,

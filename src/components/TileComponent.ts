@@ -20,10 +20,6 @@ export abstract class TileComponent extends Component {
    * Tile position as an int. Used in look up tables
    */
   protected _tileIndex: vec3;
-  /**
-   * Sprite for this tile
-   */
-  protected _spriteController: SpritController;
 
   /**
    * This is the tile height index. Subtract one because
@@ -53,6 +49,11 @@ export abstract class TileComponent extends Component {
   get tilePosition(): vec3 {
     return this._tilePosition;
   }
+
+  /**
+   * Sprite for this tile
+   */
+  abstract get spriteController(): SpritController;
 
   /**
    * Gets the id of the thing
@@ -251,7 +252,7 @@ export abstract class TileComponent extends Component {
       );
     }
 
-    const screen = this.eng.tileManger.toScreenLoc(i, j, k);
+    const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
     // perform all state updates
     this._tilePosition.x = i;
     this._tilePosition.y = j;
@@ -277,21 +278,21 @@ export abstract class TileComponent extends Component {
    */
   protected updateSpritePosition() {
     // Get the screen depth using the tile index not position of this tile
-    const screenDepth = this.eng.tileManger.toScreenLoc(
+    const screenDepth = this.eng.tileHelper.toScreenLoc(
       this._tileIndex.x,
       this._tileIndex.y,
       this._tileIndex.z
     );
 
     // Get the screen position of this tile using the position
-    const screenPosition = this.eng.tileManger.toScreenLoc(
+    const screenPosition = this.eng.tileHelper.toScreenLoc(
       this._tilePosition.x,
       this._tilePosition.y,
       this._tilePosition.z
     );
 
     // move the player
-    this._spriteController.setSpritePosition(
+    this.spriteController.setSpritePosition(
       screenPosition.x,
       screenPosition.y,
       screenDepth.z,

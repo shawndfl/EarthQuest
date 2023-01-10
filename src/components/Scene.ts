@@ -8,7 +8,7 @@ import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
-import { Ground } from '../environment/Ground';
+import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from './PlayerController';
 import { Engine } from '../core/Engine';
 import { Component } from './Component';
@@ -24,7 +24,7 @@ import Level1 from '../assets/level1.json';
 export class Scene extends Component {
   readonly fps: FpsController;
   readonly spriteSheetTexture: Texture;
-  readonly ground: Ground;
+  readonly ground: GroundManager;
   readonly player: PlayerController;
   readonly textManager: TextManager;
   readonly dialog: DialogMenu;
@@ -42,7 +42,7 @@ export class Scene extends Component {
 
     this.spriteSheetTexture = new Texture(this.gl);
     this.textManager = new TextManager(eng);
-    this.ground = new Ground(eng, Level1);
+    this.ground = new GroundManager(eng, Level1);
 
     this.player = new PlayerController(eng);
     //this.spriteDebugger = new SpriteDebugger(eng);

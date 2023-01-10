@@ -20,16 +20,33 @@ export enum MoveDirection {
  * Controls the player sprite.
  */
 export class PlayerController extends TileComponent {
+  /** The direction the player is facing */
   protected _walkDirection: MoveDirection;
+  /** is the player walking */
   private _walking: boolean;
+  /** the walk animation. This is just two frames */
   protected _walkAnimation: Curve;
+  /** The speed the player can walk at */
   private _speed: number;
+  /** Used for animations */
   private _sprites: string[];
+  /** Should the sprites be flipped */
   private _spriteFlip: boolean;
+  /** the slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
+
+  /** The sprite controller for the player */
+  protected _spriteController: SpritController;
 
   /** the height above sea level of the player */
   private _playerHeight: number;
+
+  /**
+   * Get the sprite controller
+   */
+  get spriteController(): SpritController {
+    return this._spriteController;
+  }
 
   get id(): string {
     return 'player';
@@ -197,7 +214,7 @@ export class PlayerController extends TileComponent {
 
       // convert movement vector from screen space to tile space
       const tileVector =
-        this.eng.tileManger.screenVectorToTileSpace(moveVector);
+        this.eng.tileHelper.screenVectorToTileSpace(moveVector);
 
       console.debug(
         'slop ' + moveVector.z,
