@@ -40,7 +40,8 @@ export class TileFactory extends Component {
       return new SlopTileComponent(
         this.eng,
         this.spriteBatch,
-        TileFactory.createStaticID(i, j, k)
+        TileFactory.createStaticID(i, j, k),
+        type
       );
     } else {
       return new EmptyTile(

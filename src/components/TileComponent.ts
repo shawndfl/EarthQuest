@@ -103,6 +103,20 @@ export abstract class TileComponent extends Component {
   }
 
   /**
+   * When a cell is created
+   */
+  onCreate() {
+    //NOP
+  }
+
+  /**
+   * When a cell is destroyed
+   */
+  onDestroy() {
+    //NOP
+  }
+
+  /**
    * Called when a tile tries to enter this tile. This happens after canAccessTile returns true
    * @param tileComponent
    */

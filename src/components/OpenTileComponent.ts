@@ -1,11 +1,12 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { SpritController } from '../graphics/SpriteController';
-import { Component } from './Component';
 import { TileComponent } from './TileComponent';
 
-export class SlopTileComponent extends TileComponent {
+/**
+ * This is any thing that the player or some NPC can walk on
+ */
+export class OpenTileComponent extends TileComponent {
   get id(): string {
     return this._spriteId;
   }
