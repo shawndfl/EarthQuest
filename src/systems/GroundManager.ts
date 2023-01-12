@@ -42,7 +42,7 @@ export class GroundManager extends Component {
       for (let i = 0; i < this._levelData.cells[k].length; i++) {
         // j is the rows that run from top left to bottom right
         for (let j = 0; j < this._levelData.cells[k][i].length; j++) {
-          const cellId = this._levelData.ids[this._levelData.cells[k][i][j]];
+          const cellId = this._levelData.types[this._levelData.cells[k][i][j]];
 
           this._spriteController.activeSprite('tile_' + i + '_' + j + '_' + k);
           let spriteId = this.getCellType(i, j, k);
@@ -117,9 +117,9 @@ export class GroundManager extends Component {
     let type = 'empty';
     try {
       const typeIndex = this._levelData.cells[k][i][j] ?? 0;
-      type = this._levelData.ids[typeIndex] ?? 'empty';
+      type = this._levelData.types[typeIndex] ?? 'empty';
     } catch (e) {
-      console.warn('invalid tile ' + i + ', ' + j + ',' + k);
+      //NOP we will just return empty
     }
     return type;
   }
@@ -133,7 +133,7 @@ export class GroundManager extends Component {
    */
   setCellType(type: string, i: number, j: number, k: number): boolean {
     let index = 0;
-    const found = this._levelData.ids.find((t, i) => {
+    const found = this._levelData.types.find((t, i) => {
       if (t == type) {
         index = i;
         return true;

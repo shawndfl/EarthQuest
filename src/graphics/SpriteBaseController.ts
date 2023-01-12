@@ -7,6 +7,8 @@ import { Texture } from './Texture';
 import mat4 from '../math/mat4';
 import vec4 from '../math/vec4';
 import { ISpriteController } from './ISprintController';
+import vec2 from '../math/vec2';
+import { ViewManager } from '../systems/ViewManager';
 
 /**
  * This class controls a sprite's position and scale
@@ -177,8 +179,15 @@ export abstract class SpritBaseController
    * Calculates a projection
    * @returns
    */
-  calculateProjection() {
-    return mat4.orthographic(0, this.eng.width, 0, this.eng.height, 1, -1);
+  calculateProjection(offset: vec2, scale: number = 1.0) {
+    return mat4.orthographic(
+      offset.x,
+      this.eng.width * scale + offset.x,
+      offset.y,
+      this.eng.height * scale + offset.y,
+      1,
+      -1
+    );
   }
 
   /**
@@ -193,7 +202,17 @@ export abstract class SpritBaseController
       this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
       this.eng.spritePerspectiveShader.enable();
 
-      this.eng.spritePerspectiveShader.setProj(this.calculateProjection());
+      // set the project
+      this.eng.spritePerspectiveShader.setProj(
+        // calculate the project using the view manager
+        this.calculateProjection(
+          new vec2([
+            this.eng.viewManager.screenX,
+            this.eng.viewManager.screenY,
+          ]),
+          this.eng.viewManager.scale
+        )
+      );
 
       this.render();
     }

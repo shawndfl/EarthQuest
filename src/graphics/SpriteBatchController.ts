@@ -18,13 +18,14 @@ export class SpritBatchController
   private _sprites: Map<string, Sprite>;
   private _activeSprite: string;
 
+  /** The sprite */
   get sprite(): Sprite {
     return this.getSprite(this._activeSprite);
   }
-  get selectedSpriteIndex() {
-    return this._selectedSpriteIndex;
-  }
 
+  /**
+   * Get the number of sprites
+   */
   get spriteCount(): number {
     return this._spriteData.length;
   }
@@ -70,14 +71,43 @@ export class SpritBatchController
     return sprite;
   }
 
+  /**
+   * Do we have a sprite with this id
+   * @param id
+   * @returns
+   */
+  hasSprite(id: string) {
+    return this._sprites.has(id);
+  }
+
+  /**
+   * clear all sprites
+   */
   clearAllSprites() {
     this._sprites.clear();
   }
 
+  /**
+   * Sets an active sprite
+   * @param spriteId
+   */
   activeSprite(spriteId: string) {
     this._activeSprite = spriteId;
   }
 
+  /**
+   * remove a sprite. You will need to call Commit for the
+   * sprite to be removed.
+   * @param spriteId
+   * @returns
+   */
+  removeSprite(spriteId: string): boolean {
+    return this._sprites.delete(spriteId);
+  }
+
+  /**
+   * Commit all sprites to the buffer
+   */
   commitToBuffer() {
     const quads: IQuadModel[] = [];
     this._sprites.forEach((sprite) => {

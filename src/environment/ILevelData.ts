@@ -11,7 +11,6 @@ export interface ICellProps {
  * This interface is used to build levels.
  */
 export interface ILevelData {
-  ids: string[];
-  props: ICellProps[];
+  types: string[];
   cells: number[][][];
 }

@@ -4,6 +4,8 @@ import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
 import { TileHelper } from '../utilities/TileHelper';
 import { UserAction } from './UserAction';
+import { SoundManager } from '../systems/SoundManager';
+import { ViewManager } from '../systems/ViewManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -15,6 +17,8 @@ export class Engine {
   private _editor: Editor;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
   readonly tileHelper: TileHelper;
+  readonly soundManager: SoundManager;
+  readonly viewManager: ViewManager;
 
   get width(): number {
     return this.gl.canvas.width;
@@ -32,6 +36,8 @@ export class Engine {
     this.scene = new Scene(this);
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper(this);
+    this.soundManager = new SoundManager();
+    this.viewManager = new ViewManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(
       this.gl,
       'spritePerspectiveShader'
@@ -56,6 +62,7 @@ export class Engine {
 
     // handle input
     if (this.input.action != UserAction.None) {
+      this.soundManager.UserReady();
       this.scene.handleUserAction(this.input.action);
     }
 

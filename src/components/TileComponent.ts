@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritController } from '../graphics/SpriteController';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
@@ -53,7 +54,7 @@ export abstract class TileComponent extends Component {
   /**
    * Sprite for this tile
    */
-  abstract get spriteController(): SpritController;
+  abstract get spriteController(): SpritBaseController;
 
   /**
    * Gets the id of the thing
@@ -124,14 +125,6 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   OffsetTilePosition(i: number, j: number, k: number) {
-    console.debug(
-      'before moving in dir ' +
-        i.toFixed(5) +
-        ', ' +
-        j.toFixed(5) +
-        ', ' +
-        k.toFixed(5)
-    );
     const tileX = Math.floor(this._tilePosition.x);
     const tileY = Math.floor(this._tilePosition.y);
     const tileZ = Math.floor(this._tilePosition.z);
@@ -215,7 +208,6 @@ export abstract class TileComponent extends Component {
 
     // check if the player can access this tile
     if (dir.length() > 0) {
-      console.debug('moving in dir ' + dir.toString());
       this.moveToTilePosition(
         this._tilePosition.x + dir.x,
         this._tilePosition.y + dir.y,
@@ -231,10 +223,6 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   moveToTilePosition(i: number, j: number, k: number) {
-    console.debug(
-      'tile ' + i.toFixed(5) + ', ' + j.toFixed(5) + ', ' + k.toFixed(5)
-    );
-
     // we need this to be an int to lookup the tiles
     const tileX = Math.floor(i);
     const tileY = Math.floor(j);
