@@ -58,6 +58,13 @@ export abstract class TileComponent extends Component {
   }
 
   /**
+   * Does this component require an update
+   */
+  get requiresUpdate(): boolean {
+    return false;
+  }
+
+  /**
    * Sprite for this tile
    */
   abstract get spriteController(): SpritBaseController;
@@ -135,6 +142,15 @@ export abstract class TileComponent extends Component {
    * @param tileComponent
    */
   onExit(tileComponent: TileComponent) {
+    //NOP
+  }
+
+  /**
+   * This is only called if require update returns true when
+   * this object is created. This is called form GroundManager
+   * @param dt
+   */
+  update(dt: number) {
     //NOP
   }
 
@@ -261,24 +277,11 @@ export abstract class TileComponent extends Component {
     }
 
     const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
-    // perform all state updates
-    this._tilePosition.x = i;
-    this._tilePosition.y = j;
-    this._tilePosition.z = k;
-
-    this._tileIndex.x = tileX;
-    this._tileIndex.y = tileY;
-    this._tileIndex.z = tileZ;
 
     // enter a new tile
-    this.eng.scene.ground.onEnter(
-      this,
-      this._tileIndex.x,
-      this._tileIndex.y,
-      floor
-    );
+    this.eng.scene.ground.onEnter(this, tileX, tileY, floor);
 
-    this.updateSpritePosition();
+    this.setTilePosition(i, j, k);
   }
 
   /**

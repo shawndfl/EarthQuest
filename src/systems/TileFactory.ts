@@ -1,6 +1,7 @@
 import { CollideTileComponent } from '../components/CollideTileComponent';
 import { Component } from '../components/Component';
 import { EmptyTile } from '../components/EmptyTile';
+import { NpcComponent } from '../components/NpcComponent';
 import { OpenTileComponent } from '../components/OpenTileComponent';
 import { SlopTileComponent } from '../components/SlopTileComponent';
 import { TileComponent } from '../components/TileComponent';
@@ -49,10 +50,19 @@ export class TileFactory extends Component {
     j: number,
     k: number
   ): TileComponent {
-    if (type.includes('slop')) {
+    if (type == '---' || type == 'empty') {
+      return new EmptyTile(this.eng, i, j, k);
+    } else if (type.includes('slop')) {
       return new SlopTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('open')) {
       return new OpenTileComponent(this.eng, this.spriteBatch, type, i, j, k);
+    } else if (type.startsWith('player')) {
+      // the player is already created. Just set his position
+      const player = this.eng.scene.player;
+      player.setTilePosition(i, j, k);
+      return player;
+    } else if (type.startsWith('npc')) {
+      return new NpcComponent(this.eng, type, i, j, k);
     } else if (type.startsWith('collide')) {
       return new CollideTileComponent(
         this.eng,
@@ -63,6 +73,9 @@ export class TileFactory extends Component {
         k
       );
     } else {
+      console.warn(
+        ' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')'
+      );
       return new EmptyTile(this.eng, i, j, k);
     }
   }

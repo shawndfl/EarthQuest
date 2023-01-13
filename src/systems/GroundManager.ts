@@ -23,6 +23,8 @@ export class GroundManager extends Component {
   protected _tiles: TileComponent[][][];
   /** used to crate the tiles from the model data */
   protected _tileFactory: TileFactory;
+  /** tiles that require an update */
+  protected _updateTiles: TileComponent[];
 
   constructor(eng: Engine, levelData: ILevelData) {
     super(eng);
@@ -46,6 +48,8 @@ export class GroundManager extends Component {
    */
   buildLevel() {
     this._tiles = [];
+    this._updateTiles = [];
+
     // k is the height layer of the level
     for (let k = 0; k < this._levelData.cells.length; k++) {
       // j is the columns that run from top right to bottom left
@@ -58,10 +62,18 @@ export class GroundManager extends Component {
           // get the type and sprite id
           const tileTypeAndSprite = this.getCellTypeAndSprite(i, j, k);
 
-          // add the new tile
-          this._tiles[k][j].push(
-            this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, k)
+          const newTile = this._tileFactory.createStaticTile(
+            tileTypeAndSprite,
+            i,
+            j,
+            k
           );
+          // add the new tile
+          this._tiles[k][j].push(newTile);
+
+          if (newTile.requiresUpdate) {
+            this._updateTiles.push(newTile);
+          }
         }
       }
     }
@@ -195,5 +207,8 @@ export class GroundManager extends Component {
    */
   update(dt: number) {
     this._spriteController.update(dt);
+    for (const tile of this._updateTiles) {
+      tile.update(dt);
+    }
   }
 }

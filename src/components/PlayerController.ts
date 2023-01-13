@@ -216,17 +216,6 @@ export class PlayerController extends TileComponent {
       const tileVector =
         this.eng.tileHelper.screenVectorToTileSpace(moveVector);
 
-      const screenPosition = this.eng.tileHelper.toScreenLoc(
-        this._tilePosition.x,
-        this._tilePosition.y,
-        this._tilePosition.z
-      );
-      // update the view manger with the player new position
-      this.eng.viewManager.setTarget(
-        screenPosition.x - this.eng.width * 0.5,
-        -this.eng.height * 0.5 + screenPosition.y
-      );
-
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
       // move up and down on stairs and slops
@@ -248,6 +237,40 @@ export class PlayerController extends TileComponent {
         this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
       );
       this._spriteController.setSprite(this._sprites[1], true);
+    }
+  }
+
+  protected updateSpritePosition() {
+    // Get the screen depth using the tile index not position of this tile
+    const screenDepth = this.eng.tileHelper.toScreenLoc(
+      this._tileIndex.x,
+      this._tileIndex.y,
+      this._tileIndex.z
+    );
+
+    // Get the screen position of this tile using the position
+    const screenPosition = this.eng.tileHelper.toScreenLoc(
+      this._tilePosition.x,
+      this._tilePosition.y,
+      this._tilePosition.z
+    );
+
+    // update the view manger with the player new position
+    this.eng.viewManager.setTarget(
+      screenPosition.x - this.eng.width * 0.5,
+      -this.eng.height * 0.5 + screenPosition.y
+    );
+
+    // move the sprite if there is one. some tiles like empty
+    // don't need sprite controllers
+    if (this.spriteController) {
+      this.spriteController.setSpritePosition(
+        screenPosition.x,
+        screenPosition.y,
+        screenDepth.z,
+        screenDepth.z,
+        true
+      );
     }
   }
 }
