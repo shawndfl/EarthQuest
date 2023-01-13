@@ -1,12 +1,13 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { SpritController } from '../graphics/SpriteController';
 import { TileFactory } from '../systems/TileFactory';
-import { Component } from './Component';
 import { TileComponent } from './TileComponent';
 
-export class SlopTileComponent extends TileComponent {
+/**
+ * This is any thing that the player or some NPC can walk on
+ */
+export class CollideTileComponent extends TileComponent {
   protected _tileId: string;
   protected _spriteId: string;
   protected _type: string;
@@ -19,29 +20,13 @@ export class SlopTileComponent extends TileComponent {
     return this._type;
   }
 
+  canAccessTile(tileComponent: TileComponent): boolean {
+    return false;
+  }
+
   get spriteController(): SpritBaseController {
     this._spriteController.activeSprite(this.id);
     return this._spriteController;
-  }
-
-  onEnter(tileComponent: TileComponent): void {
-    // TODO set the tile component to the correct direction
-  }
-
-  canAccessTile(tileComponent: TileComponent): boolean {
-    // TODO check if the tile is
-    // accessing from the correct location
-    return false;
-    // if slop is to the left the tile component
-    // needs to be entering from the left i-1
-    if (this.type.includes('left')) {
-      if (
-        tileComponent.tileIndex.x == this.tileIndex.x - 1 &&
-        tileComponent.tileIndex.y == this.tileIndex.y
-      ) {
-        //tileComponent.
-      }
-    }
   }
 
   constructor(

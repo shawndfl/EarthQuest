@@ -8,7 +8,6 @@ import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import vec2 from '../math/vec2';
 import { TileFactory } from './TileFactory';
-import { EmptyTile } from '../components/EmptyTile';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -21,7 +20,7 @@ export class GroundManager extends Component {
   /** model data for the level */
   protected _levelData: ILevelData;
   /** tile components created from the model data */
-  protected _tiles: TileComponent[];
+  protected _tiles: TileComponent[][][];
   /** used to crate the tiles from the model data */
   protected _tileFactory: TileFactory;
 
@@ -46,41 +45,28 @@ export class GroundManager extends Component {
    * build the level from the level data
    */
   buildLevel() {
-    const scale = 2;
     this._tiles = [];
-    // loop over each height layer
+    // k is the height layer of the level
     for (let k = 0; k < this._levelData.cells.length; k++) {
-      // i is the columns that run from top right to bottom left
-      for (let i = 0; i < this._levelData.cells[k].length; i++) {
-        // j is the rows that run from top left to bottom right
-        for (let j = 0; j < this._levelData.cells[k][i].length; j++) {
-          const tileType = this.getCellType(i, j, k);
-          this._levelData.types[this._levelData.cells[k][i][j]];
+      // j is the columns that run from top right to bottom left
+
+      this._tiles.push([]);
+      for (let j = 0; j < this._levelData.cells[k].length; j++) {
+        // i is the rows that run from top left to bottom right
+        this._tiles[k].push([]);
+        for (let i = 0; i < this._levelData.cells[k][j].length; i++) {
+          // get the type and sprite id
+          const tileTypeAndSprite = this.getCellTypeAndSprite(i, j, k);
 
           // add the new tile
-          this._tiles.push(
-            this._tileFactory.createStaticTile(tileType, i, j, k)
-          );
-
-          this._spriteController.activeSprite(
-            TileFactory.createStaticID(i, j, k)
-          );
-          let spriteId = this.getCellType(i, j, k);
-
-          this._spriteController.setSprite(spriteId);
-          this._spriteController.scale(scale);
-
-          const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
-
-          this._spriteController.setSpritePosition(
-            screen.x,
-            screen.y,
-            screen.z,
-            screen.z
+          this._tiles[k][j].push(
+            this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, k)
           );
         }
       }
     }
+
+    // commit all the sprites to the buffer to be drawn
     this._spriteController.commitToBuffer();
   }
 
@@ -92,7 +78,7 @@ export class GroundManager extends Component {
    * @returns
    */
   isEmpty(i: number, j: number, k: number): boolean {
-    return this.getCellType(i, j, k) == 'empty';
+    return this.getTile(i, j, k).type == 'empty';
   }
 
   /**
@@ -123,17 +109,33 @@ export class GroundManager extends Component {
   }
 
   /**
+   * Get the tile at this location. If there is none just return empty
+   * @param i
+   * @param j
+   * @param k
+   * @returns
+   */
+  getTile(i: number, j: number, k: number) {
+    let tile: TileComponent = this._tileFactory.empty;
+
+    if (this._tiles[k] != undefined && this._tiles[k][j] != undefined) {
+      tile = this._tiles[k][j][i] ?? this._tileFactory.empty;
+    }
+    return tile;
+  }
+
+  /**
    * Get the cell type. x y and z are int cells values
    * @param i
    * @param j
    * @param k
    */
-  getCellType(i: number, j: number, k: number): string {
+  getCellTypeAndSprite(i: number, j: number, k: number): string {
     let type = 'empty';
     try {
       // subtract 10 because all the cell indices are offset by 10
-      const typeIndex = this._levelData.cells[k][i][j] - 10 ?? 0;
-      type = this._levelData.types[typeIndex] ?? 'empty';
+      const typeIndex = this._levelData.cells[k][j][i] - 10 ?? 0;
+      type = this._levelData.typesAndSprites[typeIndex] ?? 'empty';
 
       // this is used as a separator between groups of 10 tile types.
       // it's there to make the json easier to read. It also means empty.
@@ -144,42 +146,6 @@ export class GroundManager extends Component {
       //NOP we will just return empty
     }
     return type;
-  }
-
-  /**
-   * Sets a cell type
-   * @param type The type of the cell
-   * @param i
-   * @param j
-   * @param k
-   */
-  setCellType(type: string, i: number, j: number, k: number): boolean {
-    let index = 0;
-    const found = this._levelData.types.find((t, i) => {
-      if (t == type) {
-        index = i;
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    if (found) {
-      try {
-        // remember to offset the index by 10. All cell indices
-        // start at 10 not 0
-        this._levelData.cells[k][i][j] = index + 10;
-        this._spriteController.activeSprite(
-          TileFactory.createStaticID(i, j, k)
-        );
-        this._spriteController.setSprite(found, true);
-      } catch (e) {
-        console.warn('invalid tile: ' + TileFactory.createStaticID(i, j, k));
-      }
-    } else {
-      console.warn('cannot find cell type: ' + type);
-    }
-    return true;
   }
 
   /**
@@ -195,68 +161,32 @@ export class GroundManager extends Component {
     j: number,
     k: number
   ): boolean {
-    let type = this.getCellType(i, j, k);
-    const height = this.getCellHeight(i, j, k);
-
-    // reset slop vector
-    this.eng.scene.player.slopVector = new vec2([0, 0]);
-
-    let AboveType = this.getCellType(i, j, k + 1);
-    if (AboveType == 'slop.left') {
-      console.debug(
-        'hit slop tile index: ' +
-          tileComponent.tileIndex.toString() +
-          ' tileComponent '
-      );
-      if (
-        tileComponent.tileIndex.x == i &&
-        tileComponent.tileIndex.y == j + 1
-      ) {
-        console.debug('facing sloping vector');
-        this.eng.scene.player.slopVector = new vec2([0, 0.1]);
-      }
-    }
-
-    // check tile height.
-    if (tileComponent.tileHeightIndex != height) {
-      return false;
-    }
-
-    // check for collision
-    if (type != 'tree' && type != 'empty') {
-      return true;
-    } else {
-      return false;
-    }
+    let tile = this.getTile(i, j, k);
+    return tile.canAccessTile(tileComponent);
   }
 
   /**
-   * When the player enters a cell
-   * @param x screen space
-   * @param y screen space
-   * @param z screen space
+   * When a tile access another tile
+   * @param tileComponent
+   * @param i
+   * @param j
+   * @param k
+   * @returns
    */
   onEnter(tileComponent: TileComponent, i: number, j: number, k: number) {
-    let type = this.getCellType(i, j, k);
-
-    if (!type.includes('slop')) {
-      this.setCellType('block.highlight', i, j, k);
-    } else {
-      console.debug('tile error ' + i + ', ' + j + ', ' + k);
-    }
+    let tile = this.getTile(i, j, k);
+    return tile.onEnter(tileComponent);
   }
 
   /**
-   * Fired when a player exits a cell
+   * Fired when a tile exits a cell
    * @param x
    * @param y
    * @param z
    */
   onExit(tileComponent: TileComponent, i: number, j: number, k: number) {
-    const type = this.getCellType(i, j, k);
-    if (type == 'block.highlight') {
-      this.setCellType('block', i, j, k);
-    }
+    let tile = this.getTile(i, j, k);
+    return tile.onExit(tileComponent);
   }
 
   /**

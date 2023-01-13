@@ -20,6 +20,13 @@ export class Engine {
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
 
+  /**
+   * Tile scale for the game
+   */
+  get tileScale(): number {
+    return 2;
+  }
+
   get width(): number {
     return this.gl.canvas.width;
   }

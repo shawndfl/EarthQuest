@@ -1,8 +1,7 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
-import { SpritController } from '../graphics/SpriteController';
-import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
+import { GroundManager } from '../systems/GroundManager';
 import { Component } from './Component';
 
 /**
@@ -35,6 +34,13 @@ export abstract class TileComponent extends Component {
    */
   get tileIndex(): vec3 {
     return this._tileIndex;
+  }
+
+  /**
+   * Easy access to ground
+   */
+  get ground(): GroundManager {
+    return this.eng.scene.ground;
   }
 
   /**
@@ -293,13 +299,16 @@ export abstract class TileComponent extends Component {
       this._tilePosition.z
     );
 
-    // move the player
-    this.spriteController.setSpritePosition(
-      screenPosition.x,
-      screenPosition.y,
-      screenDepth.z,
-      screenDepth.z,
-      true
-    );
+    // move the sprite if there is one. some tiles like empty
+    // don't need sprite controllers
+    if (this.spriteController) {
+      this.spriteController.setSpritePosition(
+        screenPosition.x,
+        screenPosition.y,
+        screenDepth.z,
+        screenDepth.z,
+        true
+      );
+    }
   }
 }

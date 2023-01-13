@@ -11,6 +11,8 @@ export interface ICellProps {
  * This interface is used to build levels.
  */
 export interface ILevelData {
-  types: string[];
+  /** the formate is <tile type|sprite id> */
+  typesAndSprites: string[];
+  /** the index returned by the cells is offset by 10 to make it easier to align number in the json */
   cells: number[][][];
 }
