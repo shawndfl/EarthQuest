@@ -1,11 +1,8 @@
-import { TextManager } from '../systems/TextManager';
 import { FpsController } from '../core/FpsController';
 import { Texture } from '../graphics/Texture';
 import grassImage from '../assets/grass.png';
 import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';
-import FontImage from '../assets/font.png';
-import FontData from '../assets/font.json';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 import { GroundManager } from '../systems/GroundManager';
@@ -26,7 +23,7 @@ export class Scene extends Component {
   readonly spriteSheetTexture: Texture;
   readonly ground: GroundManager;
   readonly player: PlayerController;
-  readonly textManager: TextManager;
+
   readonly dialog: DialogMenu;
 
   //readonly spriteDebugger: SpriteDebugger;
@@ -41,7 +38,6 @@ export class Scene extends Component {
     this.fps = new FpsController(eng);
 
     this.spriteSheetTexture = new Texture(this.gl);
-    this.textManager = new TextManager(eng);
     this.ground = new GroundManager(eng, Level1);
 
     this.player = new PlayerController(eng);
@@ -58,16 +54,6 @@ export class Scene extends Component {
 
     CreateSimpleAnimationClip.create(CharacterData);
 
-    // Browsers copy pixels from the loaded image in top-to-bottom order —
-    // from the top-left corner; but WebGL wants the pixels in bottom-to-top
-    // order — starting from the bottom-left corner. So in order to prevent
-    // the resulting image texture from having the wrong orientation when
-    // rendered, we need to make the following call, to cause the pixels to
-    // be flipped into the bottom-to-top order that WebGL expects.
-    // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
-    // NOTE, this must be done before any textures are loaded
-    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
-
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.cullFace(this.gl.BACK);
 
@@ -77,18 +63,7 @@ export class Scene extends Component {
     //this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
 
     await this.dialog.initialize();
-
-    await this.textManager.initialize(FontImage, FontData);
-    this.textManager.setTextBlock({
-      id: 'welcomeText',
-      text: 'Earth Quest',
-      position: new vec2([-800, 600]),
-      color: new vec4([1, 0, 0, 0.5]),
-      depth: 0,
-      scale: 0.5,
-    });
   }
-
   /**
    * Handles user input. The logic goes through a chain of commands
    *    1) Main menu
@@ -128,9 +103,6 @@ export class Scene extends Component {
     // Clear the canvas before we start drawing on it.
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-
-    // update the texture manager
-    this.textManager.update(dt);
 
     this.ground.update(dt);
 

@@ -89,7 +89,7 @@ export class NpcComponent extends TileComponent {
       this._spriteFlip = false;
     }
 
-    this._spriteController.setFlip(
+    this._spriteController.flip(
       this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
     );
     this._spriteController.setSprite(this._sprites[index], true);

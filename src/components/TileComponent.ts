@@ -309,7 +309,6 @@ export abstract class TileComponent extends Component {
         screenPosition.x,
         screenPosition.y,
         screenDepth.z,
-        screenDepth.z,
         true
       );
     }

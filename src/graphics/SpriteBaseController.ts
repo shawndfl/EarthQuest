@@ -24,6 +24,8 @@ export abstract class SpritBaseController
   protected _buffer: GlBuffer;
   protected _selectedSpriteIndex: number;
   protected _selectedSpriteId: string;
+  protected _viewOffset: vec2;
+  protected _viewScale: number;
 
   abstract get sprite(): Sprite;
 
@@ -93,33 +95,65 @@ export abstract class SpritBaseController
   setSpritePosition(
     x: number,
     y: number,
-    lowerDepth?: number,
-    upperDepth?: number,
+    depth?: number,
     commitToBuffer?: boolean
   ) {
-    this.sprite.setPosition(x, y, lowerDepth, upperDepth);
+    this.sprite.setPosition(x, y, depth);
     if (commitToBuffer) {
       this.commitToBuffer();
     }
   }
 
-  scale(scale: number) {
+  spriteWidth() {
+    return this.sprite.getSpriteWidth();
+  }
+
+  spriteHeight() {
+    return this.sprite.getSpriteHeight();
+  }
+
+  /**
+   * Scale the image default is 1.0
+   * @param scale uniform scale or separate components (x,y)
+   */
+  scale(scale: number | { x: number; y: number }) {
     this.sprite.setSpriteScale(scale);
   }
 
+  /**
+   * Flip the image.
+   * @param flipDirection
+   */
   flip(flipDirection: SpriteFlip): void {
     this.sprite.setSpriteFlip(flipDirection);
   }
+
+  /**
+   * Rotate the angle in degrees
+   * @param angle In Degrees
+   */
   rotate(angle: number): void {
     this.sprite.setSpriteRotate(angle);
   }
 
-  setFlip(flip: SpriteFlip, commitToBuffer?: boolean) {
-    this.sprite.setSpriteFlip(flip);
-    if (commitToBuffer) {
-      this.commitToBuffer();
-    }
+  /**
+   * Sets the view offset for the projection. If undefined it will use the
+   * offset from ViewManager
+   * @param offset
+   */
+  viewOffset(offset?: vec2) {
+    this._viewOffset = offset;
   }
+
+  /**
+   * Sets a view scale for the projection. If undefined it will use the
+   * offset from ViewManager
+   * @param scale
+   */
+  viewScale(scale?: number) {
+    this._viewScale = scale;
+  }
+
   /**
    * Select a sprite
    * @param id the id in the sprite sheet
@@ -202,16 +236,14 @@ export abstract class SpritBaseController
       this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
       this.eng.spritePerspectiveShader.enable();
 
+      const view = this.eng.viewManager;
+      const offset = this._viewOffset ?? new vec2([view.screenX, view.screenY]);
+      const scale = this._viewScale ?? view.scale;
+
       // set the project
       this.eng.spritePerspectiveShader.setProj(
-        // calculate the project using the view manager
-        this.calculateProjection(
-          new vec2([
-            this.eng.viewManager.screenX,
-            this.eng.viewManager.screenY,
-          ]),
-          this.eng.viewManager.scale
-        )
+        // calculate the project
+        this.calculateProjection(offset, scale)
       );
 
       this.render();

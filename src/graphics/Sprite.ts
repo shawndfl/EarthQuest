@@ -17,40 +17,37 @@ export enum SpriteFlip {
  */
 export class Sprite {
   /** referencing the sprite. Used in collections */
-  protected _tag: string;
+  private _tag: string;
 
   /** The width and height in pixels of the sprite within the sprite sheet */
-  protected _spriteLoc: { x: number; y: number; width: number; height: number };
+  private _spriteLoc: { x: number; y: number; width: number; height: number };
 
   /** The width and height of the texture in pixels*/
-  protected _spriteSheetSize: { width: number; height: number };
+  private _spriteSheetSize: { width: number; height: number };
 
   /** The position in pixels of the canvas where the sprite will go. */
-  protected _position: { x: number; y: number };
+  private _position: { x: number; y: number };
 
   /** the depth of the bottom 2 verts of the sprite -1 is nearest 1 is farthest  */
-  protected _lowerDepth: number;
-
-  /** the depth of the top two verts of the sprite -1 is nearest 1 is farthest  */
-  protected _upperDepth: number;
+  private _depth: number;
 
   /** is the sprite flipped some way */
-  protected _spriteFlip: SpriteFlip;
+  private _spriteFlip: SpriteFlip;
 
   /** sprite rotation in degrees */
-  protected _spriteRotate: number;
+  private _spriteRotate: number;
 
   /** The scale image and keep the aspect ratio  */
-  protected _scale: number;
+  private _scale: { x: number; y: number };
 
   /** Screen size */
-  protected _screenSize: { width: number; height: number };
+  private _screenSize: { width: number; height: number };
 
   /** this is used to offset a sprites position so it can be centered on a tile */
-  protected _positionOffset: { x: number; y: number };
+  private _positionOffset: { x: number; y: number };
 
   /** this is used by the buffer */
-  protected _quad: IQuadModel;
+  private _quad: IQuadModel;
 
   get tag(): string {
     return this._tag;
@@ -63,12 +60,8 @@ export class Sprite {
     return this._position;
   }
 
-  get lowerDepth(): number {
-    return this._lowerDepth;
-  }
-
-  get upperDepth(): number {
-    return this._upperDepth;
+  get depth(): number {
+    return this._depth;
   }
 
   get rotation(): number {
@@ -76,11 +69,11 @@ export class Sprite {
   }
 
   getSpriteWidth(): number {
-    return this._spriteLoc.width * this._scale;
+    return this._spriteLoc.width * this._scale.x;
   }
 
   getSpriteHeight(): number {
-    return this._spriteLoc.height * this._scale;
+    return this._spriteLoc.height * this._scale.y;
   }
 
   get quad() {
@@ -120,9 +113,8 @@ export class Sprite {
     this._screenSize = { width: screenWidth, height: screenHeight };
     this._spriteFlip = SpriteFlip.None;
     this._spriteRotate = 0;
-    this._scale = 1.0;
-    this._lowerDepth = 0;
-    this._upperDepth = 0;
+    this._scale = { x: 1.0, y: 1.0 };
+    this._depth = 0;
     this._positionOffset = { x: 0, y: 0 };
   }
 
@@ -149,8 +141,17 @@ export class Sprite {
     this.calculateQuad();
   }
 
-  setSpriteScale(scale: number = 1.0) {
-    this._scale = scale;
+  /**
+   * Scale can be set uniform as one number or as separate components (x,y).
+   * @param scale a number or {x: number, y: number}
+   */
+  setSpriteScale(scale: number | { x: number; y: number }) {
+    if (typeof scale === 'number') {
+      this._scale = { x: scale, y: scale };
+    } else {
+      this._scale.x = scale.x;
+      this._scale.y = scale.y;
+    }
 
     this.calculateQuad();
   }
@@ -182,15 +183,11 @@ export class Sprite {
    * @param y
    * @param depth screen space [-1, 1]. 1 is far -1 is close
    */
-  setPosition(x: number, y: number, lowerDepth?: number, upperDepth?: number) {
+  setPosition(x: number, y: number, depth?: number) {
     this._position.x = x;
     this._position.y = y;
-    if (lowerDepth != undefined) {
-      this._lowerDepth = lowerDepth;
-    }
-
-    if (upperDepth != undefined) {
-      this._upperDepth = upperDepth;
+    if (depth != undefined) {
+      this._depth = depth;
     }
 
     this.calculateQuad();
@@ -226,16 +223,16 @@ export class Sprite {
     this._quad.min = [
       this._position.x + this._positionOffset.x,
       this._position.y + this._positionOffset.y,
-      this._lowerDepth,
+      this._depth,
     ];
-    const spriteWidth = this._spriteLoc.width * this._scale;
-    const spriteHeight = this._spriteLoc.height * this._scale;
+    const spriteWidth = this._spriteLoc.width * this._scale.x;
+    const spriteHeight = this._spriteLoc.height * this._scale.y;
 
     // max is the bottom right
     this._quad.max = [
       this._quad.min[0] + spriteWidth,
       this._quad.min[1] + spriteHeight,
-      this._upperDepth,
+      this._depth,
     ];
 
     // if we have some rotation then apply it

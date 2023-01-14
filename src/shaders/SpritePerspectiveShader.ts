@@ -30,7 +30,7 @@ uniform sampler2D uSampler;
 
 void main() {
   mediump vec4 color = texture2D(uSampler, vTex);
-    if(color.a < 1.0) {
+    if(color.a < .10) {
       discard;
     } 
     // uncomment to show depth

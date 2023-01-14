@@ -6,6 +6,10 @@ import { TileHelper } from '../utilities/TileHelper';
 import { UserAction } from './UserAction';
 import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
+import { MenuManager } from '../systems/MenuManager';
+import { TextManager } from '../systems/TextManager';
+import FontImage from '../assets/font.png';
+import FontData from '../assets/font.json';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -19,6 +23,8 @@ export class Engine {
   readonly tileHelper: TileHelper;
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
+  readonly textManager: TextManager;
+  readonly menuManager: MenuManager;
 
   /**
    * Tile scale for the game
@@ -45,6 +51,8 @@ export class Engine {
     this.tileHelper = new TileHelper(this);
     this.soundManager = new SoundManager();
     this.viewManager = new ViewManager(this);
+    this.menuManager = new MenuManager(this);
+    this.textManager = new TextManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(
       this.gl,
       'spritePerspectiveShader'
@@ -60,7 +68,19 @@ export class Engine {
   }
 
   async initialize() {
+    // Browsers copy pixels from the loaded image in top-to-bottom order —
+    // from the top-left corner; but WebGL wants the pixels in bottom-to-top
+    // order — starting from the bottom-left corner. So in order to prevent
+    // the resulting image texture from having the wrong orientation when
+    // rendered, we need to make the following call, to cause the pixels to
+    // be flipped into the bottom-to-top order that WebGL expects.
+    // See jameshfisher.com/2020/10/22/why-is-my-webgl-texture-upside-down
+    // NOTE, this must be done before any textures are loaded
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+
+    await this.textManager.initialize(FontImage, FontData);
     await this.scene.initialize();
+    await this.menuManager.initialize();
   }
 
   update(dt: number) {
@@ -75,6 +95,12 @@ export class Engine {
 
     // update most of the game components
     this.scene.update(dt);
+
+    // update the menu manager
+    this.menuManager.update(dt);
+
+    // update text manager
+    this.textManager.update(dt);
 
     // used to reset flags and update hold timers
     this.input.postUpdate(dt);

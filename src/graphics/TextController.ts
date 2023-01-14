@@ -26,8 +26,8 @@ export class TextController extends Component {
     screenWidth: number,
     screenHeight: number
   ) {
-    const originX = block.position.x;
-    const originY = block.position.y - lineHeight;
+    const originX = block.position.x / this.eng.width - 1;
+    const originY = (block.position.y - lineHeight) / this.eng.height - 1;
     let offsetX = originX;
     let offsetY = originY;
     let xpos1 = offsetX;
@@ -62,8 +62,8 @@ export class TextController extends Component {
         console.warn("Don't have data for ch: " + ch);
       }
 
-      xpos1 = offsetX + block.scale * font.bearingX;
-      ypos1 = offsetY - block.scale * (font.sizeY - font.bearingY); // bottom of the letter
+      xpos1 = offsetX + font.bearingX;
+      ypos1 = offsetY - (font.sizeY - font.bearingY); // bottom of the letter
 
       xpos2 = offsetX + block.scale * font.advance;
       ypos2 = offsetY + block.scale * font.bearingY; // top of the letter

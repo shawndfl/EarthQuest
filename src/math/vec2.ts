@@ -30,9 +30,17 @@ export default class vec2 {
     this.values[1] = values[1];
   }
 
-  constructor(values?: [number, number]) {
+  constructor(values?: [number, number] | number, y?: number) {
     if (values !== undefined) {
-      this.xy = values;
+      if (typeof values === 'number') {
+        this.values[0] = values;
+      } else if (Array.isArray(values)) {
+        this.xy = values;
+      }
+
+      if (y !== undefined) {
+        this.values[1] = y;
+      }
     }
   }
 

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "menu.left.top",
+    "loc": [0, 0, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.left.middle",
+    "loc": [0, 3, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.left.bottom",
+    "loc": [0, 8, 8, 8],
+    "offset": [0, 0]
+  },
+
+  {
+    "id": "menu.center.top",
+    "loc": [8, 0, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.center.middle",
+    "loc": [8, 3, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.center.bottom",
+    "loc": [8, 8, 8, 8],
+    "offset": [0, 0]
+  },
+
+  {
+    "id": "menu.right.top",
+    "loc": [24, 0, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.right.middle",
+    "loc": [24, 3, 8, 8],
+    "offset": [0, 0]
+  },
+  {
+    "id": "menu.right.bottom",
+    "loc": [24, 8, 8, 8],
+    "offset": [0, 0]
+  },
+
+  {
+    "id": "cursor.1",
+    "loc": [33, 4, 7, 4],
+    "offset": [-4, 0]
+  },
+  {
+    "id": "cursor.2",
+    "loc": [41, 4, 7, 4],
+    "offset": [-4, 0]
+  },
+  {
+    "id": "cursor.3",
+    "loc": [47, 4, 7, 4],
+    "offset": [-4, 0]
+  }
+]

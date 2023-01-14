@@ -32,13 +32,13 @@ export class FpsController extends Component {
     this.delayCounter += dt;
     if (this.delayCounter >= this.displayInterval) {
       //console.debug('ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2));
-      this.eng.scene.textManager.setTextBlock({
+      this.eng.textManager.setTextBlock({
         id: 'FPS',
         text: 'ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2),
         position: new vec2([250, 600]),
         color: new vec4([0.1, 0.5, 0.3, 1.0]),
         depth: -1,
-        scale: 0.5,
+        scale: 0.2,
       });
       this.delayCounter = 0;
     }
