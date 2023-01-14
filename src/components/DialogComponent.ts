@@ -23,10 +23,10 @@ export class DialogComponent extends Component {
     this.eng.textManager.setTextBlock({
       id: 'Dialog1',
       text: 'Welcome to Earth Quest!',
-      position: new vec2(textPos.x, params.height - textPos.y),
+      position: new vec2(textPos.x, textPos.y),
       color: new vec4([0.9, 0.9, 1.0, 1.0]),
       depth: -1,
-      scale: 0.5,
+      scale: 1.0,
     });
   }
 

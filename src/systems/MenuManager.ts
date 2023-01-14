@@ -36,8 +36,8 @@ export class MenuManager extends Component {
       minHeight: 20,
       textHeight: 50,
       textWidth: 300,
-      textOffsetX: 0,
-      textOffsetY: 0,
+      textOffsetX: 20,
+      textOffsetY: 50,
     });
 
     this.createDialog(0, 0, 400, 200);

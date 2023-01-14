@@ -127,12 +127,7 @@ export class TextManager extends Component {
       this.texts.set(textModel.id, controller);
     }
 
-    controller.initialize(
-      textModel,
-      this.maxHeightOfCharacters,
-      this.gl.canvas.width,
-      this.gl.canvas.height
-    );
+    controller.initialize(textModel, this.maxHeightOfCharacters);
   }
 
   /**

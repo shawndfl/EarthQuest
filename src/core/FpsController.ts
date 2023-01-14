@@ -34,11 +34,11 @@ export class FpsController extends Component {
       //console.debug('ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2));
       this.eng.textManager.setTextBlock({
         id: 'FPS',
-        text: 'ms ' + dt.toFixed(2) + ' FPS: ' + this.fps.toFixed(2),
-        position: new vec2([250, 600]),
-        color: new vec4([0.1, 0.5, 0.3, 1.0]),
+        text: 'FPS: ' + this.fps.toFixed(2),
+        position: new vec2([700, 580]),
+        color: new vec4([0.1, 0.5, 0.8, 1.0]),
         depth: -1,
-        scale: 0.2,
+        scale: 0.5,
       });
       this.delayCounter = 0;
     }

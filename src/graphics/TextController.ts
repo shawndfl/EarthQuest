@@ -20,14 +20,12 @@ export class TextController extends Component {
    * @param block Text properties
    * @param lineHeight The height of the tallest character in pixels
    */
-  initialize(
-    block: ITextModel,
-    lineHeight: number,
-    screenWidth: number,
-    screenHeight: number
-  ) {
-    const originX = block.position.x / this.eng.width - 1;
-    const originY = (block.position.y - lineHeight) / this.eng.height - 1;
+  initialize(block: ITextModel, lineHeight: number) {
+    const screenHeight = this.eng.height;
+    const screenWidth = this.eng.width;
+
+    const originX = block.position.x;
+    const originY = this.eng.height - block.position.y;
     let offsetX = originX;
     let offsetY = originY;
     let xpos1 = offsetX;
@@ -77,8 +75,16 @@ export class TextController extends Component {
       const tv2 = 1 - font.v1;
 
       const quad: IQuadModel = {
-        min: [xpos1 / screenWidth, ypos1 / screenHeight, zpos],
-        max: [xpos2 / screenWidth, ypos2 / screenHeight, zpos],
+        min: [
+          (xpos1 / screenWidth) * 2 - 1.0,
+          (ypos1 / screenHeight) * 2 - 1.0,
+          zpos,
+        ],
+        max: [
+          (xpos2 / screenWidth) * 2 - 1.0,
+          (ypos2 / screenHeight) * 2 - 1.0,
+          zpos,
+        ],
         minTex: [tu1, tv2],
         maxTex: [tu2, tv1],
       };
