@@ -12,6 +12,16 @@ export interface IDialogParams {
   xPos: number;
   yPos: number;
 
+  /** Used in animating value to xpos */
+  activeX: number;
+  /** Used in animating value to ypos */
+  activeY: number;
+  /** Used in animating value to width */
+  activeWidth: number;
+  /** Used in animating value to height */
+  activeHeight: number;
+
+  /** width of the dialog in pixels left to right */
   width: number;
   height: number;
 

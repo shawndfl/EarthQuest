@@ -68,6 +68,10 @@ export class PlayerController extends TileComponent {
     return this._slopVector;
   }
 
+  get moveDirection(): MoveDirection {
+    return this._walkDirection;
+  }
+
   constructor(eng: Engine) {
     super(eng);
     this._walkDirection = MoveDirection.S;
@@ -130,6 +134,10 @@ export class PlayerController extends TileComponent {
       this._walking = true;
     }
 
+    if ((action & UserAction.ActionPressed) > 0) {
+      this.eng.scene.ground.raisePlayerAction(this);
+    }
+
     // We are now walking start the animations
     if (!wasWalking && this._walking) {
       this._walkAnimation.start(true);
@@ -151,34 +159,22 @@ export class PlayerController extends TileComponent {
     const dir = new vec2([0, 0]);
 
     // check multiple angle movements first so the else statements work correctly
-    if (
-      (direction & MoveDirection.S) > 0 &&
-      (direction & MoveDirection.W) > 0
-    ) {
+    if ((direction & MoveDirection.S) > 0 && (direction & MoveDirection.W) > 0) {
       this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
       this._spriteFlip = false;
       dir.x = -1;
       dir.y = -1;
-    } else if (
-      (direction & MoveDirection.S) > 0 &&
-      (direction & MoveDirection.E) > 0
-    ) {
+    } else if ((direction & MoveDirection.S) > 0 && (direction & MoveDirection.E) > 0) {
       this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
       this._spriteFlip = true;
       dir.x = 1;
       dir.y = -1;
-    } else if (
-      (direction & MoveDirection.N) > 0 &&
-      (direction & MoveDirection.W) > 0
-    ) {
+    } else if ((direction & MoveDirection.N) > 0 && (direction & MoveDirection.W) > 0) {
       this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
       this._spriteFlip = false;
       dir.x = -1;
       dir.y = 1;
-    } else if (
-      (direction & MoveDirection.N) > 0 &&
-      (direction & MoveDirection.E) > 0
-    ) {
+    } else if ((direction & MoveDirection.N) > 0 && (direction & MoveDirection.E) > 0) {
       this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
       this._spriteFlip = true;
       dir.x = 1;
@@ -213,40 +209,27 @@ export class PlayerController extends TileComponent {
       );
 
       // convert movement vector from screen space to tile space
-      const tileVector =
-        this.eng.tileHelper.screenVectorToTileSpace(moveVector);
+      const tileVector = this.eng.tileHelper.screenVectorToTileSpace(moveVector);
 
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
       // move up and down on stairs and slops
-      this.OffsetTilePosition(
-        tileVector.x,
-        tileVector.y,
-        vec2.dot(dir, this._slopVector)
-      );
+      this.OffsetTilePosition(tileVector.x, tileVector.y, vec2.dot(dir, this._slopVector));
     }
 
     // toggle and animation. This can happen when not walking too.
     if (this._walkAnimation.getValue() == 0) {
-      this._spriteController.flip(
-        this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
-      );
+      this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
       this._spriteController.setSprite(this._sprites[0], true);
     } else if (this._walkAnimation.getValue() == 1) {
-      this._spriteController.flip(
-        this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
-      );
+      this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
       this._spriteController.setSprite(this._sprites[1], true);
     }
   }
 
   protected updateSpritePosition() {
     // Get the screen depth using the tile index not position of this tile
-    const screenDepth = this.eng.tileHelper.toScreenLoc(
-      this._tileIndex.x,
-      this._tileIndex.y,
-      this._tileIndex.z
-    );
+    const screenDepth = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z);
 
     // Get the screen position of this tile using the position
     const screenPosition = this.eng.tileHelper.toScreenLoc(
@@ -256,20 +239,12 @@ export class PlayerController extends TileComponent {
     );
 
     // update the view manger with the player new position
-    this.eng.viewManager.setTarget(
-      screenPosition.x - this.eng.width * 0.5,
-      -this.eng.height * 0.5 + screenPosition.y
-    );
+    this.eng.viewManager.setTarget(screenPosition.x - this.eng.width * 0.5, -this.eng.height * 0.5 + screenPosition.y);
 
     // move the sprite if there is one. some tiles like empty
     // don't need sprite controllers
     if (this.spriteController) {
-      this.spriteController.setSpritePosition(
-        screenPosition.x,
-        screenPosition.y,
-        screenDepth.z,
-        true
-      );
+      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z, true);
     }
   }
 }

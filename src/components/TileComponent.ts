@@ -3,6 +3,7 @@ import { SpritBaseController } from '../graphics/SpriteBaseController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
 import { Component } from './Component';
+import { MoveDirection } from './PlayerController';
 
 /**
  * A tile component is a component that controls a single tile.
@@ -130,6 +131,14 @@ export abstract class TileComponent extends Component {
   }
 
   /**
+   * Called when the player hits the action button
+   * @param tileComponent
+   */
+  onPlayerAction(tileComponent: TileComponent) {
+    //NOP
+  }
+
+  /**
    * Called when a tile tries to enter this tile. This happens after canAccessTile returns true
    * @param tileComponent
    */
@@ -244,11 +253,7 @@ export abstract class TileComponent extends Component {
 
     // check if the player can access this tile
     if (dir.length() > 0) {
-      this.moveToTilePosition(
-        this._tilePosition.x + dir.x,
-        this._tilePosition.y + dir.y,
-        this._tilePosition.z + dir.z
-      );
+      this.moveToTilePosition(this._tilePosition.x + dir.x, this._tilePosition.y + dir.y, this._tilePosition.z + dir.z);
     }
   }
 
@@ -268,12 +273,7 @@ export abstract class TileComponent extends Component {
 
     // we moved off the last tile call on exit
     if (this._tileIndex.x != tileX || this._tileIndex.y != tileY) {
-      this.eng.scene.ground.onExit(
-        this,
-        this._tileIndex.x,
-        this._tileIndex.y,
-        floor
-      );
+      this.eng.scene.ground.onExit(this, this._tileIndex.x, this._tileIndex.y, floor);
     }
 
     const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
@@ -289,11 +289,7 @@ export abstract class TileComponent extends Component {
    */
   protected updateSpritePosition() {
     // Get the screen depth using the tile index not position of this tile
-    const screenDepth = this.eng.tileHelper.toScreenLoc(
-      this._tileIndex.x,
-      this._tileIndex.y,
-      this._tileIndex.z
-    );
+    const screenDepth = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z);
 
     // Get the screen position of this tile using the position
     const screenPosition = this.eng.tileHelper.toScreenLoc(
@@ -305,12 +301,7 @@ export abstract class TileComponent extends Component {
     // move the sprite if there is one. some tiles like empty
     // don't need sprite controllers
     if (this.spriteController) {
-      this.spriteController.setSpritePosition(
-        screenPosition.x,
-        screenPosition.y,
-        screenDepth.z,
-        true
-      );
+      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z, true);
     }
   }
 }

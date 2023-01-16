@@ -6,7 +6,7 @@ import { TileHelper } from '../utilities/TileHelper';
 import { UserAction } from './UserAction';
 import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
-import { MenuManager } from '../systems/MenuManager';
+import { DialogManager } from '../systems/DialogManager';
 import { TextManager } from '../systems/TextManager';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
@@ -24,7 +24,7 @@ export class Engine {
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
   readonly textManager: TextManager;
-  readonly menuManager: MenuManager;
+  readonly dialogManager: DialogManager;
 
   /**
    * Tile scale for the game
@@ -51,12 +51,9 @@ export class Engine {
     this.tileHelper = new TileHelper(this);
     this.soundManager = new SoundManager();
     this.viewManager = new ViewManager(this);
-    this.menuManager = new MenuManager(this);
+    this.dialogManager = new DialogManager(this);
     this.textManager = new TextManager(this);
-    this.spritePerspectiveShader = new SpritePerspectiveShader(
-      this.gl,
-      'spritePerspectiveShader'
-    );
+    this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
   /**
@@ -80,7 +77,7 @@ export class Engine {
 
     await this.textManager.initialize(FontImage, FontData);
     await this.scene.initialize();
-    await this.menuManager.initialize();
+    await this.dialogManager.initialize();
   }
 
   update(dt: number) {
@@ -97,7 +94,7 @@ export class Engine {
     this.scene.update(dt);
 
     // update the menu manager
-    this.menuManager.update(dt);
+    this.dialogManager.update(dt);
 
     // update text manager
     this.textManager.update(dt);

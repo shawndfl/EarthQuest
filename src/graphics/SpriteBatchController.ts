@@ -11,10 +11,7 @@ import { SpritBaseController } from './SpriteBaseController';
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritBatchController
-  extends SpritBaseController
-  implements ISpriteController
-{
+export class SpritBatchController extends SpritBaseController implements ISpriteController {
   private _sprites: Map<string, Sprite>;
   private _activeSprite: string;
 
@@ -40,11 +37,7 @@ export class SpritBatchController
    * @param texture
    * @param spriteData
    */
-  initialize(
-    texture: Texture,
-    spriteData: ISpriteData[],
-    defaultSprite?: string | number
-  ) {
+  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
     super.initialize(texture, spriteData, defaultSprite);
   }
 

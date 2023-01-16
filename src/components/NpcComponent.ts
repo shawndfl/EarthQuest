@@ -38,13 +38,7 @@ export class NpcComponent extends TileComponent {
     return 'npc.poo';
   }
 
-  constructor(
-    eng: Engine,
-    typeAndSprite: string,
-    i: number,
-    j: number,
-    k: number
-  ) {
+  constructor(eng: Engine, typeAndSprite: string, i: number, j: number, k: number) {
     super(eng);
     const parts = typeAndSprite.split('|');
     this._type = parts[0];
@@ -52,10 +46,7 @@ export class NpcComponent extends TileComponent {
     this._tileId = TileFactory.createStaticID(i, j, k);
 
     this._spriteController = new SpritController(eng);
-    this._spriteController.initialize(
-      this.eng.scene.spriteSheetTexture,
-      CharacterData
-    );
+    this._spriteController.initialize(this.eng.scene.spriteSheetTexture, CharacterData);
 
     this._spriteController.scale(this.eng.tileScale);
     this._spriteController.setSprite('poo.down.step');
@@ -71,6 +62,17 @@ export class NpcComponent extends TileComponent {
       ])
       .repeat(-1);
     this._idleAnimation.start(true);
+  }
+
+  /**
+   * Called when the player hits the action button
+   * @param tileComponent
+   */
+  onPlayerAction(tileComponent: TileComponent) {
+    console.debug('What up');
+    this.eng.dialogManager.showDialog('Welcome to Earth Quest!', { x: 20, y: 40, width: 400, height: 200 });
+
+    //TODO raise event on dialog box
   }
 
   update(dt: number) {
@@ -89,9 +91,7 @@ export class NpcComponent extends TileComponent {
       this._spriteFlip = false;
     }
 
-    this._spriteController.flip(
-      this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
-    );
+    this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index], true);
   }
 }

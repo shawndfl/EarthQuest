@@ -5,21 +5,17 @@ import { ISpriteData } from './ISpriteData';
 import { Sprite, SpriteFlip } from './Sprite';
 import { Texture } from './Texture';
 import mat4 from '../math/mat4';
-import vec4 from '../math/vec4';
 import { ISpriteController } from './ISprintController';
 import vec2 from '../math/vec2';
-import { ViewManager } from '../systems/ViewManager';
 
 /**
  * This class controls a sprite's position and scale
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export abstract class SpritBaseController
-  extends Component
-  implements ISpriteController
-{
+export abstract class SpritBaseController extends Component implements ISpriteController {
   protected _spriteData: ISpriteData[];
+  private _indexLookup: Map<string, number>;
   protected _spriteTexture: Texture;
   protected _buffer: GlBuffer;
   protected _selectedSpriteIndex: number;
@@ -52,6 +48,7 @@ export abstract class SpritBaseController
   constructor(eng: Engine) {
     super(eng);
     this._spriteData = [];
+    this._indexLookup = new Map<string, number>();
     this._selectedSpriteIndex = 0;
   }
 
@@ -60,13 +57,15 @@ export abstract class SpritBaseController
    * @param texture
    * @param spriteData
    */
-  initialize(
-    texture: Texture,
-    spriteData: ISpriteData[],
-    defaultSprite?: string | number
-  ) {
+  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
     // save the data
     this._spriteData = spriteData;
+
+    // cache the indices
+    this._indexLookup.clear();
+    this._spriteData.forEach((val, i) => {
+      this._indexLookup.set(val.id, i);
+    });
 
     // create the gl buffers for this sprite
     this._buffer = new GlBuffer(this.gl);
@@ -92,12 +91,7 @@ export abstract class SpritBaseController
    * @param scale multiplied by the sprite width and height
    * @param depth is depth buffer space (-1 to 1) 1 is far -1 is near
    */
-  setSpritePosition(
-    x: number,
-    y: number,
-    depth?: number,
-    commitToBuffer?: boolean
-  ) {
+  setSpritePosition(x: number, y: number, depth?: number, commitToBuffer?: boolean) {
     this.sprite.setPosition(x, y, depth);
     if (commitToBuffer) {
       this.commitToBuffer();
@@ -161,45 +155,37 @@ export abstract class SpritBaseController
   setSprite(id?: string | number, commitToBuffer?: boolean) {
     // find the sprite of a given id
 
-    // if id is an number clamp the rang
+    let index = 0;
+
+    // number or look up
     if (typeof id === 'number') {
-      if (id >= this._spriteData.length) {
-        id = this._spriteData.length - 1;
-      } else if (id < 0) {
-        id = 0;
-      }
+      index = id;
+    } else {
+      index = this._indexLookup.get(id);
     }
-    let found: boolean = false;
 
-    for (let i = 0; i < this._spriteData.length; i++) {
-      const sprite = this._spriteData[i];
-
+    const sprite = this._spriteData[index ?? 0];
+    if (sprite) {
       // does the id match or if the id is null just pick the first one or if id is a
       // number does the index match
-      if (!id || sprite.id === id || i === id) {
-        this._selectedSpriteIndex = i;
-        this._selectedSpriteId = sprite.id;
+      this._selectedSpriteIndex = index;
+      this._selectedSpriteId = sprite.id;
 
-        const xOffset = sprite.offset ? sprite.offset[0] : 0;
-        const yOffset = sprite.offset ? sprite.offset[1] : 0;
+      const xOffset = sprite.offset ? sprite.offset[0] : 0;
+      const yOffset = sprite.offset ? sprite.offset[1] : 0;
 
-        this.sprite.setSpritePositionOffset(xOffset, yOffset);
+      this.sprite.setSpritePositionOffset(xOffset, yOffset);
 
-        this.sprite.setSprite({
-          pixelXOffset: sprite.loc[0],
-          pixelYOffset: sprite.loc[1],
-          spriteWidth: sprite.loc[2],
-          spriteHeight: sprite.loc[3],
-        });
-        if (commitToBuffer) {
-          this.commitToBuffer();
-        }
-        found = true;
-        break;
+      this.sprite.setSprite({
+        pixelXOffset: sprite.loc[0],
+        pixelYOffset: sprite.loc[1],
+        spriteWidth: sprite.loc[2],
+        spriteHeight: sprite.loc[3],
+      });
+      if (commitToBuffer) {
+        this.commitToBuffer();
       }
-    }
-
-    if (!found) {
+    } else {
       console.error('cannot find sprite ' + id);
     }
   }

@@ -78,11 +78,7 @@ export class Scene extends Component {
     //console.debug('user action ', action);
     // handle main menu, pause menu, battles menu, dialog menu, environment
 
-    return (
-      this.dialog.handleUserAction(action) ||
-      //this.spriteDebugger.handleUserAction(action) ||
-      this.player.handleUserAction(action)
-    );
+    return this.eng.dialogManager.handleUserAction(action) || this.player.handleUserAction(action);
   }
 
   /**

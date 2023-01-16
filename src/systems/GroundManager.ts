@@ -8,6 +8,7 @@ import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import vec2 from '../math/vec2';
 import { TileFactory } from './TileFactory';
+import { MoveDirection } from '../components/PlayerController';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -62,12 +63,7 @@ export class GroundManager extends Component {
           // get the type and sprite id
           const tileTypeAndSprite = this.getCellTypeAndSprite(i, j, k);
 
-          const newTile = this._tileFactory.createStaticTile(
-            tileTypeAndSprite,
-            i,
-            j,
-            k
-          );
+          const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, k);
           // add the new tile
           this._tiles[k][j].push(newTile);
 
@@ -91,6 +87,27 @@ export class GroundManager extends Component {
    */
   isEmpty(i: number, j: number, k: number): boolean {
     return this.getTile(i, j, k).type == 'empty';
+  }
+
+  /**
+   *
+   * @param tileComponent
+   * @param moveDirection
+   */
+  raisePlayerAction(tileComponent: TileComponent) {
+    const i = tileComponent.tileIndex.x;
+    const j = tileComponent.tileIndex.y;
+    const k = tileComponent.tileIndex.z;
+
+    // Check all tiles around this tile component
+    this.getTile(i - 1, j + 1, k).onPlayerAction(tileComponent);
+    this.getTile(i + 0, j + 1, k).onPlayerAction(tileComponent);
+    this.getTile(i + 1, j + 1, k).onPlayerAction(tileComponent);
+    this.getTile(i + 1, j + 0, k).onPlayerAction(tileComponent);
+    this.getTile(i + 1, j - 1, k).onPlayerAction(tileComponent);
+    this.getTile(i + 0, j - 1, k).onPlayerAction(tileComponent);
+    this.getTile(i - 1, j - 1, k).onPlayerAction(tileComponent);
+    this.getTile(i - 1, j + 0, k).onPlayerAction(tileComponent);
   }
 
   /**
@@ -167,12 +184,7 @@ export class GroundManager extends Component {
    * @param z screen space
    * @returns true if the player can access this cell
    */
-  canAccessTile(
-    tileComponent: TileComponent,
-    i: number,
-    j: number,
-    k: number
-  ): boolean {
+  canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number): boolean {
     let tile = this.getTile(i, j, k);
     return tile.canAccessTile(tileComponent);
   }

@@ -118,6 +118,14 @@ export class TextManager extends Component {
     });
   }
 
+  /**
+   * Hide a text
+   * @param id
+   */
+  hideText(id: string) {
+    this.texts.delete(id);
+  }
+
   setTextBlock(textModel: ITextModel) {
     let controller = this.texts.get(textModel.id);
 
