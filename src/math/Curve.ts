@@ -1,3 +1,5 @@
+import * as MathConst from '../math/constants';
+
 export enum CurveType {
   discreet,
   linear,
@@ -18,6 +20,9 @@ export class Curve {
   private _pingPong: boolean;
   private _repeat: number;
   private _isDone: boolean;
+
+  onDone: (curve: Curve) => void;
+  onUpdate: (value: number, curve: Curve) => void;
 
   isRunning() {
     return this._running;
@@ -46,11 +51,17 @@ export class Curve {
     this._isDone = false;
   }
 
-  start(restart?: boolean): Curve {
+  start(restart?: boolean, onDone?: (curve: Curve) => void, onUpdate?: (value: number, curve: Curve) => void): Curve {
     if (restart) {
       this._time = 0;
       this._position = 0;
       this._isDone = false;
+      if (onDone) {
+        this.onDone = onDone;
+      }
+      if (onUpdate) {
+        this.onUpdate = onUpdate;
+      }
 
       // if there are points use them
       if (this._points.length > 0) {
@@ -129,8 +140,7 @@ export class Curve {
       this._point0 = this.findClosetTimeIndex(this._time);
 
       const lastPointOrFirst =
-        (this._reverse && this._point0 == 0) ||
-        (!this._reverse && this._point0 >= this._points.length - 1);
+        (this._reverse && this._point0 == 0) || (!this._reverse && this._point0 >= this._points.length - 1);
 
       // if there are still more points or are we done
       if (!lastPointOrFirst) {
@@ -139,6 +149,11 @@ export class Curve {
         // set the position. We only have one point
         // so this is easy.
         this._position = this._points[this._point0].p;
+
+        // handle update
+        if (this.onUpdate) {
+          this.onUpdate(this._position, this);
+        }
 
         // handle the repeat and ping pong
         if (this._repeat > 0 || this._repeat == -1) {
@@ -156,6 +171,11 @@ export class Curve {
         } else {
           // we are done. Set flag.
           this._isDone = true;
+
+          // raise event as needed
+          if (this.onDone) {
+            this.onDone(this);
+          }
         }
 
         // no more calculations we hit the last point
@@ -167,11 +187,17 @@ export class Curve {
 
       // calculate the position
       if (this._type == CurveType.linear) {
-        const t = this._time - this._points[this._point0].t;
+        const t0 = this._points[this._point0].t;
+        const t1 = this._points[this._point1].t;
+        const t = MathConst.Clamp((this._time - t0) / (t1 - t0), 0, 1.0);
 
         this._position = p0 + t * (p1 - p0);
       } else if (this._type == CurveType.discreet) {
         this._position = p0;
+      }
+
+      if (this.onUpdate) {
+        this.onUpdate(this._position, this);
       }
     }
   }

@@ -200,10 +200,13 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    * @returns
    */
   calculateProjection(offset: vec2, scale: number = 1.0) {
+    const adjustX = offset.x + (this.eng.width - this.eng.width * scale);
+    const adjustY = offset.y + (this.eng.height - this.eng.height * scale);
+
     return mat4.orthographic(
-      offset.x,
+      adjustX,
       this.eng.width * scale + offset.x,
-      offset.y,
+      adjustY,
       this.eng.height * scale + offset.y,
       1,
       -1

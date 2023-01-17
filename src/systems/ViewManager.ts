@@ -49,18 +49,16 @@ export class ViewManager extends Component {
 
     this._screenX = 0;
     this._screenY = 0;
+
+    this.scale = 1.0;
   }
 
   setTarget(x: number, y: number) {
     this._targetX = x;
     this._targetY = y;
 
-    this._screenX = Math.floor(
-      MathConst.Clamp(this._targetX, this.minX, this.maxX)
-    );
-    this._screenY = Math.floor(
-      MathConst.Clamp(this._targetY, this.minY, this.maxY)
-    );
+    this._screenX = Math.floor(MathConst.Clamp(this._targetX, this.minX, this.maxX));
+    this._screenY = Math.floor(MathConst.Clamp(this._targetY, this.minY, this.maxY));
     //console.debug('screen   ' + this._screenX + ', ' + this._screenY);
     //this._screenY = this._screenY & 0xfffffffc;
     //this._screenX = this._screenX & 0xfffffffe;

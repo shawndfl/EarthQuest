@@ -10,6 +10,7 @@ import { DialogManager } from '../systems/DialogManager';
 import { TextManager } from '../systems/TextManager';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
+import { BattleManager } from '../systems/BattleManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -25,6 +26,7 @@ export class Engine {
   readonly viewManager: ViewManager;
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
+  readonly battleManager: BattleManager;
 
   /**
    * Tile scale for the game
@@ -53,6 +55,7 @@ export class Engine {
     this.viewManager = new ViewManager(this);
     this.dialogManager = new DialogManager(this);
     this.textManager = new TextManager(this);
+    this.battleManager = new BattleManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
@@ -78,6 +81,7 @@ export class Engine {
     await this.textManager.initialize(FontImage, FontData);
     await this.scene.initialize();
     await this.dialogManager.initialize();
+    await this.battleManager.initialize();
   }
 
   update(dt: number) {
@@ -89,6 +93,8 @@ export class Engine {
       this.soundManager.UserReady();
       this.scene.handleUserAction(this.input.action);
     }
+
+    this.battleManager.update(dt);
 
     // update most of the game components
     this.scene.update(dt);

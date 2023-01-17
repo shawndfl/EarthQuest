@@ -4,16 +4,19 @@ import { Engine } from '../core/Engine';
 import MenuImage from '../assets/menu.png';
 import MenuImageData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
-import vec2 from '../math/vec2';
 import { DialogComponent } from '../components/DialogComponent';
 import { UserAction } from '../core/UserAction';
 import { IDialogParams } from '../menus/IDialogParams';
 import { DefaultDialogParams } from '../menus/DefaultDialogParams';
 
+/**
+ * Manages dialog boxes
+ */
 export class DialogManager extends Component {
   protected _spriteController: SpritBatchController;
   protected _dialog: DialogComponent;
   protected _defaultDialogParams: IDialogParams;
+  onHide: (dialog: DialogComponent) => boolean;
 
   constructor(eng: Engine) {
     super(eng);
@@ -30,19 +33,42 @@ export class DialogManager extends Component {
     this._spriteController.commitToBuffer();
   }
 
+  /**
+   * Handles user actions for the menu
+   * @param action
+   * @returns
+   */
   handleUserAction(action: UserAction): boolean {
     const active = this._dialog.visible;
-    if ((action & UserAction.ActionPressed) > 0) {
-      this._dialog.hide();
+    if (active && (action & UserAction.ActionPressed) > 0) {
+      let canHide = true;
+
+      // if there is an onHide event fire that
+      if (this.onHide) {
+        canHide = this.onHide(this._dialog);
+      }
+
+      if (canHide) {
+        this._dialog.hide();
+      }
     }
 
     return active;
   }
 
+  /**
+   * Shows a dialog box
+   * @param text
+   * @param loc
+   */
   showDialog(text: string, loc: { x: number; y: number; width: number; height: number }) {
     this._dialog.show(text, loc);
   }
 
+  /**
+   * Updates the dialog box
+   * @param dt
+   */
   update(dt: number) {
     this._spriteController.update(dt);
   }
