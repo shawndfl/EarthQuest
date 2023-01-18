@@ -6,7 +6,6 @@ import TileData from '../assets/IsometricTile.json';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
-import vec2 from '../math/vec2';
 import { TileFactory } from './TileFactory';
 import { MoveDirection } from '../components/PlayerController';
 
@@ -27,15 +26,15 @@ export class GroundManager extends Component {
   /** tiles that require an update */
   protected _updateTiles: TileComponent[];
 
-  constructor(eng: Engine, levelData: ILevelData) {
+  constructor(eng: Engine) {
     super(eng);
-    this._levelData = levelData;
 
     this._spriteController = new SpritBatchController(eng);
     this._tileFactory = new TileFactory(eng, this._spriteController);
   }
 
-  async initialize() {
+  async initialize(levelData: ILevelData) {
+    this._levelData = levelData;
     const texture = new Texture(this.gl);
     await texture.loadImage(TileImg);
     this._spriteController.initialize(texture, TileData);

@@ -27,11 +27,7 @@ export class TileHelper extends Component {
 
     const xAxis = new vec3([halfCell, -halfCell, 0]);
     const yAxis = new vec3([-quarterCell, -quarterCell, halfCell]);
-    const zAxis = new vec3([
-      (-quarterCell / screenHeight) * 2,
-      (-quarterCell / screenHeight) * 2,
-      0,
-    ]);
+    const zAxis = new vec3([(-quarterCell / screenHeight) * 2, (-quarterCell / screenHeight) * 2, 0]);
 
     // translation part
     const halfWidth = screenWidth * 0.5;
@@ -75,23 +71,22 @@ export class TileHelper extends Component {
     return new vec3(x, y, 0);
   }
 
-  toTileLoc(
-    x: number,
-    y: number,
-    z: number
-  ): { i: number; j: number; k: number } {
+  toTileLoc(x: number, y: number, z: number): { i: number; j: number; k: number } {
     const screen = new vec3([x, y, z]);
     let cell = this._toTile.multiplyVec3(screen);
     return { i: cell.x, j: cell.y, k: cell.z };
   }
 
-  toScreenLoc(
-    i: number,
-    j: number,
-    k: number
-  ): { x: number; y: number; z: number } {
-    const screen = new vec3([i, j, k]);
+  toScreenLoc(i: number, j: number, k: number): { x: number; y: number; z: number } {
+    this.eng.viewManager.screenX;
+    const cell = new vec3([i, j, k]);
 
-    return this._toScreen.multiplyVec3(screen);
+    //TODO calculate k so that i stays with in the limits of the screen.
+
+    const visibleCellsWidth = this.eng.viewManager.screenX;
+    const screenLimits = this._toScreen.multiplyVec3(new vec3(this.eng.viewManager.screenX));
+    const screen = this._toScreen.multiplyVec3(cell);
+
+    return screen;
   }
 }

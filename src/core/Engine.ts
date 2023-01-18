@@ -1,4 +1,4 @@
-import { Scene } from '../components/Scene';
+import { WorldScene } from '../environment/WorldScene';
 import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
@@ -11,13 +11,17 @@ import { TextManager } from '../systems/TextManager';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import { BattleManager } from '../systems/BattleManager';
+import { SceneComponent } from '../components/SceneComponent';
+
+import Level1 from '../assets/level1.json';
+import { FpsController } from './FpsController';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
  * the scene, sound manager, and game play, etc.
  */
 export class Engine {
-  readonly scene: Scene;
+  readonly scene: SceneComponent;
   readonly input: InputHandler;
   private _editor: Editor;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
@@ -27,6 +31,7 @@ export class Engine {
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
   readonly battleManager: BattleManager;
+  readonly fps: FpsController;
 
   /**
    * Tile scale for the game
@@ -48,7 +53,7 @@ export class Engine {
   }
 
   constructor(readonly gl: WebGL2RenderingContext) {
-    this.scene = new Scene(this);
+    this.scene = new WorldScene(this);
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper(this);
     this.soundManager = new SoundManager();
@@ -56,9 +61,11 @@ export class Engine {
     this.dialogManager = new DialogManager(this);
     this.textManager = new TextManager(this);
     this.battleManager = new BattleManager(this);
+    this.fps = new FpsController(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
+  changeScene() {}
   /**
    * Create the editor
    * @param parentContainer
@@ -79,20 +86,36 @@ export class Engine {
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
     await this.textManager.initialize(FontImage, FontData);
-    await this.scene.initialize();
+    await this.scene.initialize({ level: Level1 });
     await this.dialogManager.initialize();
     await this.battleManager.initialize();
+
+    // some gl setup
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.cullFace(this.gl.BACK);
+
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
+    this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
   }
 
   update(dt: number) {
     // handle gamepad polling
     this.input.preUpdate(dt);
 
+    // update the fps
+    this.fps.update(dt);
+
     // handle input
     if (this.input.action != UserAction.None) {
       this.soundManager.UserReady();
       this.scene.handleUserAction(this.input.action);
     }
+
+    // clear the buffers
+    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
+    this.gl.clearDepth(1.0); // Clear everything
 
     this.battleManager.update(dt);
 

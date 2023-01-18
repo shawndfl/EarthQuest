@@ -34,8 +34,8 @@ void main() {
       discard;
     } 
     // uncomment to show depth
-    //gl_FragColor = vec4(depth.xyz, 1.0);
-    gl_FragColor = color;
+    gl_FragColor = vec4(depth.xyz, 1.0);
+    //gl_FragColor = color;
 }
 `;
 

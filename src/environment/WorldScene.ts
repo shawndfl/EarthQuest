@@ -1,32 +1,38 @@
-import { FpsController } from '../core/FpsController';
 import { Texture } from '../graphics/Texture';
-import grassImage from '../assets/grass.png';
 import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';
-import vec2 from '../math/vec2';
-import vec4 from '../math/vec4';
 import { GroundManager } from '../systems/GroundManager';
-import { PlayerController } from './PlayerController';
+import { PlayerController } from '../components/PlayerController';
 import { Engine } from '../core/Engine';
-import { Component } from './Component';
 import { UserAction } from '../core/UserAction';
 import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
 import { DialogMenu } from '../menus/DialogMenu';
-import { SpriteDebugger } from './SpriteDebugger';
-import Level1 from '../assets/level1.json';
+import { SceneComponent } from '../components/SceneComponent';
+import { ILevelData } from './ILevelData';
 
 /**
- * Sample scene
+ * The main scene for walking around in the world. The player can
+ * walk around talk to NPC pick up items and fight enemies.
+ *
  */
-export class Scene extends Component {
-  readonly fps: FpsController;
-  readonly spriteSheetTexture: Texture;
-  readonly ground: GroundManager;
-  readonly player: PlayerController;
+export class WorldScene extends SceneComponent {
+  private _spriteSheetTexture: Texture;
+  private _ground: GroundManager;
+  private _player: PlayerController;
+  private _dialog: DialogMenu;
 
-  readonly dialog: DialogMenu;
-
-  //readonly spriteDebugger: SpriteDebugger;
+  get spriteSheetTexture(): Texture {
+    return this._spriteSheetTexture;
+  }
+  get ground(): GroundManager {
+    return this._ground;
+  }
+  get player(): PlayerController {
+    return this._player;
+  }
+  get dialog(): DialogMenu {
+    return this._dialog;
+  }
 
   /**
    * Constructor
@@ -35,32 +41,21 @@ export class Scene extends Component {
   constructor(eng: Engine) {
     super(eng);
 
-    this.fps = new FpsController(eng);
-
-    this.spriteSheetTexture = new Texture(this.gl);
-    this.ground = new GroundManager(eng, Level1);
-
-    this.player = new PlayerController(eng);
-    //this.spriteDebugger = new SpriteDebugger(eng);
-
-    this.dialog = new DialogMenu(eng);
+    this._spriteSheetTexture = new Texture(this.gl);
+    this._ground = new GroundManager(eng);
+    this._player = new PlayerController(eng);
+    this._dialog = new DialogMenu(eng);
   }
 
   /**
    * Sets up the scene
    */
-  async initialize() {
-    console.log('init scene');
-
+  async initialize(options: { level: ILevelData }) {
     CreateSimpleAnimationClip.create(CharacterData);
-
-    this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.BACK);
-
     await this.spriteSheetTexture.loadImage(CharacterImage);
-    this.ground.initialize();
+
+    this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, CharacterData);
-    //this.spriteDebugger.initialize(this.spriteSheetTexture, CharacterData);
 
     await this.dialog.initialize();
   }
@@ -86,16 +81,6 @@ export class Scene extends Component {
    * @param {float} dt delta time from the last frame
    */
   update(dt: number) {
-    this.fps.update(dt);
-
-    this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-
-    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
-    this.gl.clearDepth(1.0); // Clear everything
-    this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
-    this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
-
     // Clear the canvas before we start drawing on it.
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

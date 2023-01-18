@@ -4,6 +4,10 @@ import { ISpriteData } from '../graphics/ISpriteData';
  * This will create a animation clip that can be modified manually after it is copied from the console window.
  */
 export class CreateSimpleAnimationClip {
+  /**
+   * Creates an animation clip by dumping the json of the clip object
+   * @param spriteData
+   */
   static create(spriteData: ISpriteData[]) {
     let clip: { id: string; frame: number }[] = [];
     let frame = 0;
