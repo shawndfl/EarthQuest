@@ -39,6 +39,7 @@ export class BattleManager extends Component {
     this._curve.points([
       { p: 1, t: 0 },
       { p: 0.55, t: 500 },
+      { p: 1, t: 1000 },
     ]);
     this._curve.curve(CurveType.linear);
     this._curve.pause();

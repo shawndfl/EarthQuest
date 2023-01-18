@@ -237,6 +237,7 @@ export class PlayerController extends TileComponent {
       this._tilePosition.y,
       this._tilePosition.z
     );
+    console.debug('pos ' + screenPosition.x, screenPosition.y, screenDepth.z);
 
     // update the view manger with the player new position
     this.eng.viewManager.setTarget(screenPosition.x - this.eng.width * 0.5, -this.eng.height * 0.5 + screenPosition.y);

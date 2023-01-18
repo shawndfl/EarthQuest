@@ -9,9 +9,11 @@ import { Engine } from '../core/Engine';
 export class TileHelper extends Component {
   protected _toScreen: mat4;
   protected _toTile: mat4;
+  depthScale: number;
 
   constructor(eng: Engine) {
     super(eng);
+    this.depthScale = 50;
     this.calculateTransform();
   }
 
@@ -27,7 +29,11 @@ export class TileHelper extends Component {
 
     const xAxis = new vec3([halfCell, -halfCell, 0]);
     const yAxis = new vec3([-quarterCell, -quarterCell, halfCell]);
-    const zAxis = new vec3([(-quarterCell / screenHeight) * 2, (-quarterCell / screenHeight) * 2, 0]);
+    const zAxis = new vec3([
+      (-quarterCell / (screenHeight * this.depthScale)) * 2,
+      (-quarterCell / (screenHeight * this.depthScale)) * 2,
+      0,
+    ]);
 
     // translation part
     const halfWidth = screenWidth * 0.5;
@@ -81,11 +87,10 @@ export class TileHelper extends Component {
     this.eng.viewManager.screenX;
     const cell = new vec3([i, j, k]);
 
-    //TODO calculate k so that i stays with in the limits of the screen.
-
-    const visibleCellsWidth = this.eng.viewManager.screenX;
-    const screenLimits = this._toScreen.multiplyVec3(new vec3(this.eng.viewManager.screenX));
     const screen = this._toScreen.multiplyVec3(cell);
+
+    const v = this.eng.viewManager;
+    screen.z -= 0.001;
 
     return screen;
   }

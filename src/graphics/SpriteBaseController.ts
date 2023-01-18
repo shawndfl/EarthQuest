@@ -196,24 +196,6 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   abstract commitToBuffer(): void;
 
   /**
-   * Calculates a projection
-   * @returns
-   */
-  calculateProjection(offset: vec2, scale: number = 1.0) {
-    const adjustX = offset.x + (this.eng.width - this.eng.width * scale);
-    const adjustY = offset.y + (this.eng.height - this.eng.height * scale);
-
-    return mat4.orthographic(
-      adjustX,
-      this.eng.width * scale + offset.x,
-      adjustY,
-      this.eng.height * scale + offset.y,
-      1,
-      -1
-    );
-  }
-
-  /**
    * Draw the sprite
    * @param dt
    */
@@ -226,14 +208,14 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
       this.eng.spritePerspectiveShader.enable();
 
       const view = this.eng.viewManager;
-      const offset = this._viewOffset ?? new vec2([view.screenX, view.screenY]);
-      const scale = this._viewScale ?? view.scale;
+
+      let projection = view.projection;
+      if (this._viewOffset && this._viewScale) {
+        projection = view.calculateProjection(this._viewOffset, this._viewScale);
+      }
 
       // set the project
-      this.eng.spritePerspectiveShader.setProj(
-        // calculate the project
-        this.calculateProjection(offset, scale)
-      );
+      this.eng.spritePerspectiveShader.setProj(projection);
 
       this.render();
     }
