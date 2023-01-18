@@ -15,6 +15,7 @@ import { SceneComponent } from '../components/SceneComponent';
 
 import Level1 from '../assets/level1.json';
 import { FpsController } from './FpsController';
+import { Random } from '../utilities/Random';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -32,6 +33,7 @@ export class Engine {
   readonly dialogManager: DialogManager;
   readonly battleManager: BattleManager;
   readonly fps: FpsController;
+  readonly random: Random;
 
   /**
    * Tile scale for the game
@@ -53,6 +55,7 @@ export class Engine {
   }
 
   constructor(readonly gl: WebGL2RenderingContext) {
+    this.random = new Random(1001);
     this.scene = new WorldScene(this);
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper(this);

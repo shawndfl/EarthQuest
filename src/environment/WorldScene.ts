@@ -9,6 +9,7 @@ import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationCli
 import { DialogMenu } from '../menus/DialogMenu';
 import { SceneComponent } from '../components/SceneComponent';
 import { ILevelData } from './ILevelData';
+import { LevelGenerator } from './LevelGenerator';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -53,6 +54,10 @@ export class WorldScene extends SceneComponent {
   async initialize(options: { level: ILevelData }) {
     CreateSimpleAnimationClip.create(CharacterData);
     await this.spriteSheetTexture.loadImage(CharacterImage);
+
+    // generate a level
+    const generator = new LevelGenerator(this.eng);
+    generator.Generate({ width: 100, length: 100, height: 2 });
 
     this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, CharacterData);
