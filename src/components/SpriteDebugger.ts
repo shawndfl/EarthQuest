@@ -3,6 +3,7 @@ import { ISpriteData } from '../graphics/ISpriteData';
 import { Texture } from '../graphics/Texture';
 import { UserAction } from '../core/UserAction';
 import { PlayerController } from './PlayerController';
+import { InputState } from '../core/InputHandler';
 
 /**
  * Controls the player sprite.
@@ -25,13 +26,13 @@ export class SpriteDebugger extends PlayerController {
    * @param action the action from keyboard or gamepad
    * @returns True if the action was handled else false
    */
-  handleUserAction(action: UserAction): boolean {
-    if ((action & UserAction.ActionPressed) == UserAction.ActionPressed) {
+  handleUserAction(state: InputState): boolean {
+    if ((state.action & UserAction.ActionPressed) == UserAction.ActionPressed) {
       this._spriteController.rotate(this._spriteController.rotation + 10);
       this._spriteController.commitToBuffer();
     }
 
-    if ((action & UserAction.LeftPressed) == UserAction.LeftPressed) {
+    if ((state.action & UserAction.LeftPressed) == UserAction.LeftPressed) {
       let index = this._spriteController.selectedSpriteIndex - 1;
       if (index < 0) {
         index = this._spriteController.spriteCount - 1;
@@ -41,7 +42,7 @@ export class SpriteDebugger extends PlayerController {
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Left;
-    } else if (action & UserAction.RightPressed) {
+    } else if (state.action & UserAction.RightPressed) {
       let index = this._spriteController.selectedSpriteIndex + 1;
       if (index >= this._spriteController.spriteCount) {
         index = 0;
@@ -51,9 +52,9 @@ export class SpriteDebugger extends PlayerController {
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Right;
-    } else if (action == UserAction.UpPressed) {
-    } else if (action == UserAction.DownPressed) {
-    } else if (action == UserAction.ActionPressed) {
+    } else if (state.action == UserAction.UpPressed) {
+    } else if (state.action == UserAction.DownPressed) {
+    } else if (state.action == UserAction.ActionPressed) {
     }
 
     return false;

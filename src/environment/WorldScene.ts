@@ -10,6 +10,7 @@ import { DialogMenu } from '../menus/DialogMenu';
 import { SceneComponent } from '../components/SceneComponent';
 import { ILevelData } from './ILevelData';
 import { LevelGenerator } from './LevelGenerator';
+import { InputState } from '../core/InputHandler';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -70,11 +71,11 @@ export class WorldScene extends SceneComponent {
    * @param action the action from keyboard or gamepad
    * @returns True if the action was handled else false
    */
-  handleUserAction(action: UserAction): boolean {
+  handleUserAction(state: InputState): boolean {
     //console.debug('user action ', action);
     // handle main menu, pause menu, battles menu, dialog menu, environment
 
-    return this.eng.dialogManager.handleUserAction(action) || this.player.handleUserAction(action);
+    return this.eng.dialogManager.handleUserAction(state) || this.player.handleUserAction(state);
   }
 
   /**

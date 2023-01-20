@@ -83,14 +83,11 @@ export class TileHelper extends Component {
     return { i: cell.x, j: cell.y, k: cell.z };
   }
 
-  toScreenLoc(i: number, j: number, k: number): { x: number; y: number; z: number } {
+  toScreenLoc(i: number, j: number, k: number): vec3 {
     this.eng.viewManager.screenX;
     const cell = new vec3([i, j, k]);
 
     const screen = this._toScreen.multiplyVec3(cell);
-
-    const v = this.eng.viewManager;
-    screen.z -= 0.001;
 
     return screen;
   }

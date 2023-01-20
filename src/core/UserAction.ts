@@ -27,4 +27,6 @@ export enum UserAction {
   MenuPressed = 0x0800,
   ActionPressed = 0x1000,
   CancelPressed = 0x2000,
+
+  Tap = 0x4000,
 }

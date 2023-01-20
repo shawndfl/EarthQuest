@@ -113,7 +113,7 @@ export class Engine {
     // handle input
     if (this.input.action != UserAction.None) {
       this.soundManager.UserReady();
-      this.scene.handleUserAction(this.input.action);
+      this.scene.handleUserAction({ action: this.input.action, touchPoint: this.input.touchPoint });
     }
 
     // clear the buffers

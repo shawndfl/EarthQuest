@@ -23,6 +23,12 @@ export abstract class TileComponent extends Component {
   protected _tileIndex: vec3;
 
   /**
+   * This the is world location of the tile. z component
+   * is the depth which is between 1 and -1
+   */
+  private _screenPosition: vec3;
+
+  /**
    * This is the tile height index. Subtract one because
    * the tile is one level above the cell it is on.
    */
@@ -35,6 +41,13 @@ export abstract class TileComponent extends Component {
    */
   get tileIndex(): vec3 {
     return this._tileIndex;
+  }
+
+  /**
+   * get the screen location of the tile
+   */
+  get screenPosition(): vec3 {
+    return this._screenPosition;
   }
 
   /**
@@ -292,7 +305,7 @@ export abstract class TileComponent extends Component {
     const screenDepth = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z);
 
     // Get the screen position of this tile using the position
-    const screenPosition = this.eng.tileHelper.toScreenLoc(
+    this._screenPosition = this.eng.tileHelper.toScreenLoc(
       this._tilePosition.x,
       this._tilePosition.y,
       this._tilePosition.z
@@ -301,7 +314,7 @@ export abstract class TileComponent extends Component {
     // move the sprite if there is one. some tiles like empty
     // don't need sprite controllers
     if (this.spriteController) {
-      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z);
+      this.spriteController.setSpritePosition(this.screenPosition.x, this.screenPosition.y, screenDepth.z);
     }
   }
 }

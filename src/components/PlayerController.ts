@@ -8,6 +8,7 @@ import { SpritController } from '../graphics/SpriteController';
 import vec2 from '../math/vec2';
 import { TileComponent } from './TileComponent';
 import vec3 from '../math/vec3';
+import { InputState } from '../core/InputHandler';
 
 export enum MoveDirection {
   None = 0x00,
@@ -34,6 +35,9 @@ export class PlayerController extends TileComponent {
   private _spriteFlip: boolean;
   /** the slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
+
+  /** the target the character should move to */
+  private _moveTarget: vec2;
 
   /** The sprite controller for the player */
   protected _spriteController: SpritController;
@@ -111,30 +115,42 @@ export class PlayerController extends TileComponent {
    * @param action the action from keyboard or gamepad
    * @returns True if the action was handled else false
    */
-  handleUserAction(action: UserAction): boolean {
+  handleUserAction(state: InputState): boolean {
     const wasWalking = this._walking;
 
     //console.debug('action ' + action + ' was walking ' + wasWalking);
     this._walkDirection = MoveDirection.None;
     this._walking = false;
-    if ((action & UserAction.Left) > 0) {
-      this._walkDirection = this._walkDirection | MoveDirection.W;
-      this._walking = true;
-    }
-    if ((action & UserAction.Right) > 0) {
-      this._walkDirection = this._walkDirection | MoveDirection.E;
-      this._walking = true;
-    }
-    if ((action & UserAction.Up) > 0) {
-      this._walkDirection = this._walkDirection | MoveDirection.N;
-      this._walking = true;
-    }
-    if ((action & UserAction.Down) > 0) {
-      this._walkDirection = this._walkDirection | MoveDirection.S;
-      this._walking = true;
+    this._moveTarget = null;
+
+    // if the user tapped or clicked on the screen
+    if ((state.action & UserAction.Tap) > 0) {
+      const pos = new vec2();
+      pos.x = this.screenPosition.x - this.eng.viewManager.screenX;
+      pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
+      this._moveTarget = state.touchPoint.subtract(pos);
+      console.debug('target ' + this._moveTarget.toString());
+    } else {
+      // use arrow keys or d-pad on a game controller
+      if ((state.action & UserAction.Left) > 0) {
+        this._walkDirection = this._walkDirection | MoveDirection.W;
+        this._walking = true;
+      }
+      if ((state.action & UserAction.Right) > 0) {
+        this._walkDirection = this._walkDirection | MoveDirection.E;
+        this._walking = true;
+      }
+      if ((state.action & UserAction.Up) > 0) {
+        this._walkDirection = this._walkDirection | MoveDirection.N;
+        this._walking = true;
+      }
+      if ((state.action & UserAction.Down) > 0) {
+        this._walkDirection = this._walkDirection | MoveDirection.S;
+        this._walking = true;
+      }
     }
 
-    if ((action & UserAction.ActionPressed) > 0) {
+    if ((state.action & UserAction.ActionPressed) > 0) {
       this.eng.scene.ground.raisePlayerAction(this);
     }
 
@@ -228,24 +244,14 @@ export class PlayerController extends TileComponent {
   }
 
   protected updateSpritePosition() {
-    // Get the screen depth using the tile index not position of this tile
-    const screenDepth = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z);
+    super.updateSpritePosition();
 
-    // Get the screen position of this tile using the position
-    const screenPosition = this.eng.tileHelper.toScreenLoc(
-      this._tilePosition.x,
-      this._tilePosition.y,
-      this._tilePosition.z
-    );
-    console.debug('pos ' + screenPosition.x, screenPosition.y, screenDepth.z);
+    console.debug('pos ' + this.screenPosition.toString());
 
     // update the view manger with the player new position
-    this.eng.viewManager.setTarget(screenPosition.x - this.eng.width * 0.5, -this.eng.height * 0.5 + screenPosition.y);
-
-    // move the sprite if there is one. some tiles like empty
-    // don't need sprite controllers
-    if (this.spriteController) {
-      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z, true);
-    }
+    this.eng.viewManager.setTarget(
+      this.screenPosition.x - this.eng.width * 0.5,
+      -this.eng.height * 0.5 + this.screenPosition.y
+    );
   }
 }

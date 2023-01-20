@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { InputState } from '../core/InputHandler';
 import { UserAction } from '../core/UserAction';
 import { ILevelData } from '../environment/ILevelData';
 import { Texture } from '../graphics/Texture';
@@ -55,7 +56,7 @@ export abstract class SceneComponent extends Component {
    * @param action the action from keyboard or gamepad
    * @returns True if the action was handled else false
    */
-  abstract handleUserAction(action: UserAction): boolean;
+  abstract handleUserAction(action: InputState): boolean;
 
   /**
    * Called every frame

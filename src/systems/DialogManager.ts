@@ -8,6 +8,7 @@ import { DialogComponent } from '../components/DialogComponent';
 import { UserAction } from '../core/UserAction';
 import { IDialogParams } from '../menus/IDialogParams';
 import { DefaultDialogParams } from '../menus/DefaultDialogParams';
+import { InputState } from '../core/InputHandler';
 
 /**
  * Manages dialog boxes
@@ -38,9 +39,9 @@ export class DialogManager extends Component {
    * @param action
    * @returns
    */
-  handleUserAction(action: UserAction): boolean {
+  handleUserAction(state: InputState): boolean {
     const active = this._dialog.visible;
-    if (active && (action & UserAction.ActionPressed) > 0) {
+    if (active && (state.action & UserAction.ActionPressed) > 0) {
       let canHide = true;
 
       // if there is an onHide event fire that

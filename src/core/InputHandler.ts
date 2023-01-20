@@ -1,20 +1,31 @@
 import { Component } from '../components/Component';
+import vec2 from '../math/vec2';
 import { Engine } from './Engine';
 import { UserAction } from './UserAction';
+
+/**
+ * Used to pass input state to other classes.
+ */
+export interface InputState {
+  action: UserAction;
+  touchPoint: vec2;
+}
+
 /**
  * Translates keyboard and gamepad events to game actions
  */
 export class InputHandler extends Component {
   hasGamePad: boolean;
   action: UserAction;
+  touchPoint: vec2;
 
   constructor(eng: Engine) {
     super(eng);
     this.action = UserAction.None;
     this.hasGamePad = 'getGamepads' in navigator;
-
+    console.debug('initializing input:');
     if (this.hasGamePad) {
-      console.debug('Gamepad supported');
+      console.debug(' gamepad supported');
 
       window.addEventListener('gamepadconnected', (e) => {
         this.connectGamepad(e);
@@ -33,11 +44,30 @@ export class InputHandler extends Component {
     window.addEventListener('keyup', (e) => {
       this.keyup(e);
     });
-    window.addEventListener('mousedown', (e) => {
-      console.debug(
-        'mouse ' + e.offsetX + ', ' + ((e.target as any).height - e.offsetY)
-      );
-    });
+
+    if (!this.isTouchEnabled()) {
+      console.debug(' mouse enabled');
+      window.addEventListener('mouseup', (e) => {
+        this.action = this.action | UserAction.Tap;
+        this.touchPoint = new vec2(e.offsetX, (e.target as any).height - e.offsetY);
+        console.debug('mouse ' + this.touchPoint.x + ', ' + this.touchPoint.y);
+      });
+    } else {
+      console.debug(' touch enabled');
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0 && e.touches[0].target === eng.gl.canvas) {
+          this.action = this.action | UserAction.Tap;
+          const t = e.touches[0].target as HTMLCanvasElement;
+
+          this.touchPoint = new vec2(e.touches[0].pageX - t.clientTop, t.height - e.touches[0].screenY);
+          console.debug('touch ' + this.touchPoint.x + ', ' + this.touchPoint.y, e);
+        }
+      });
+    }
+  }
+
+  isTouchEnabled() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
   keydown(e: KeyboardEvent) {
@@ -133,6 +163,9 @@ export class InputHandler extends Component {
     this.action = this.action & ~UserAction.ActionPressed;
     this.action = this.action & ~UserAction.CancelPressed;
     this.action = this.action & ~UserAction.MenuPressed;
+
+    // reset tap
+    this.action = this.action & ~UserAction.Tap;
   }
 
   connectGamepad(e: GamepadEvent) {

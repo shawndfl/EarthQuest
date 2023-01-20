@@ -9,6 +9,7 @@ import { DialogMenu } from '../menus/DialogMenu';
 import { GroundManager } from '../systems/GroundManager';
 import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';
+import { InputState } from '../core/InputHandler';
 
 /**
  * This is the scene for the battle
@@ -44,7 +45,7 @@ export class BattleScene extends SceneComponent {
    * Handle user input
    * @param action
    */
-  handleUserAction(action: UserAction): boolean {
+  handleUserAction(state: InputState): boolean {
     return true;
   }
 
