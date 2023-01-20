@@ -8,6 +8,7 @@ import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import { TileFactory } from './TileFactory';
 import { MoveDirection } from '../components/PlayerController';
+import { LevelGenerator } from '../environment/LevelGenerator';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -40,7 +41,12 @@ export class GroundManager extends Component {
     this._spriteController.initialize(texture, TileData);
     console.debug('sprite list: ', this._spriteController.getSpriteList());
 
-    this.buildLevel();
+    // generate a level
+    const generator = new LevelGenerator(this.eng, this._tileFactory);
+    this._tiles = generator.Generate({ seed: 500, width: 60, length: 60, height: 7 });
+
+    this._updateTiles = [];
+    //this.buildLevel();
   }
 
   /**

@@ -301,7 +301,7 @@ export abstract class TileComponent extends Component {
     // move the sprite if there is one. some tiles like empty
     // don't need sprite controllers
     if (this.spriteController) {
-      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z, true);
+      this.spriteController.setSpritePosition(screenPosition.x, screenPosition.y, screenDepth.z);
     }
   }
 }

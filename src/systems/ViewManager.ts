@@ -68,10 +68,6 @@ export class ViewManager extends Component {
 
   constructor(eng: Engine) {
     super(eng);
-    this.minX = -1000;
-    this.maxX = 1000;
-    this.minY = -1000;
-    this.maxY = 1000;
 
     this._targetX = 0;
     this._targetY = 0;
@@ -121,8 +117,15 @@ export class ViewManager extends Component {
   }
 
   updateProjection() {
-    this._screenX = Math.floor(MathConst.Clamp(this._targetX, this.minX, this.maxX));
-    this._screenY = Math.floor(MathConst.Clamp(this._targetY, this.minY, this.maxY));
+    this._screenX = Math.floor(this._targetX);
+    if (this.minX && this.maxX) {
+      this._screenX = MathConst.Clamp(this._targetX, this.minX, this.maxX);
+    }
+
+    this._screenY = Math.floor(this._targetY);
+    if (this.minY && this.maxY) {
+      this._screenY = MathConst.Clamp(this._targetY, this.minY, this.maxY);
+    }
 
     this._left = this._screenX + (this.eng.width - this.eng.width * this._scale);
     this._bottom = this._screenY + (this.eng.height - this.eng.height * this._scale);

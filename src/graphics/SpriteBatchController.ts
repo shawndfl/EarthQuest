@@ -103,6 +103,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    */
   commitToBuffer() {
     const quads: IQuadModel[] = [];
+    console.debug('Committing ' + this._sprites.size);
     this._sprites.forEach((sprite) => {
       quads.push(sprite.quad);
     });

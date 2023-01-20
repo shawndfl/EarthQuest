@@ -23,7 +23,7 @@ export class CanvasController {
       }
     });
 
-    if (true) {
+    if (false) {
       /** @type {WebGL2RenderingContext} render context from this canvas*/
       // @ts-ignore
       this.gl = (WebGLDebugUtils as any).makeDebugContext(
@@ -36,9 +36,7 @@ export class CanvasController {
     }
     // Only continue if WebGL is available and working
     if (this.gl === null) {
-      console.error(
-        'Unable to initialize WebGL2. Your browser or machine may not support it.'
-      );
+      console.error('Unable to initialize WebGL2. Your browser or machine may not support it.');
       return;
     }
   }

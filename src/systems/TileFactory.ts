@@ -44,13 +44,8 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  createStaticTile(
-    type: string,
-    i: number,
-    j: number,
-    k: number
-  ): TileComponent {
-    if (type == '---' || type == 'empty') {
+  createStaticTile(type: string, i: number, j: number, k: number): TileComponent {
+    if (!type || type == '---' || type == 'empty') {
       return new EmptyTile(this.eng, i, j, k);
     } else if (type.includes('slop')) {
       return new SlopTileComponent(this.eng, this.spriteBatch, type, i, j, k);
@@ -64,19 +59,17 @@ export class TileFactory extends Component {
     } else if (type.startsWith('npc')) {
       return new NpcComponent(this.eng, type, i, j, k);
     } else if (type.startsWith('collide')) {
-      return new CollideTileComponent(
-        this.eng,
-        this.spriteBatch,
-        type,
-        i,
-        j,
-        k
-      );
+      return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else {
-      console.warn(
-        ' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')'
-      );
+      console.warn(' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);
     }
+  }
+
+  /**
+   * Commit the changes made from calling createStaticTile() over and over again.
+   */
+  commitSpriteBatchChanges() {
+    this.spriteBatch.commitToBuffer();
   }
 }

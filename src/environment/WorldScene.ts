@@ -55,10 +55,6 @@ export class WorldScene extends SceneComponent {
     CreateSimpleAnimationClip.create(CharacterData);
     await this.spriteSheetTexture.loadImage(CharacterImage);
 
-    // generate a level
-    const generator = new LevelGenerator(this.eng);
-    generator.Generate({ width: 100, length: 100, height: 2 });
-
     this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, CharacterData);
 
