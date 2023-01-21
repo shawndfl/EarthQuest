@@ -1,5 +1,6 @@
 import { Component } from '../components/Component';
 import { TileComponent } from '../components/TileComponent';
+import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
 import vec2 from '../math/vec2';
 import { TileFactory } from '../systems/TileFactory';
@@ -34,6 +35,9 @@ export class LevelGeneratorState {
   houseCount: number;
 }
 
+/**
+ * This class is used to generate levels
+ */
 export class LevelGenerator extends Component {
   private _levelState: LevelGeneratorState;
   private _creationParams: LevelConstructionParams;
@@ -77,6 +81,7 @@ export class LevelGenerator extends Component {
     const tiles = this._tiles;
 
     this.generateGround();
+    this.generateTrees();
 
     this._tileFactory.commitSpriteBatchChanges();
     console.debug('built level in ' + timer.elapsed.toFixed(2) + 'ms');
@@ -119,15 +124,25 @@ export class LevelGenerator extends Component {
     height: number;
   }): boolean {
     const tiles = this._tiles;
-    for (let k = opt.startK; k < opt.height; k++) {
-      for (let j = opt.startJ; k < opt.length; j++) {
-        for (let i = opt.startI; k < opt.width; i++) {
+    for (let k = opt.startK; k < opt.height && k < tiles.length; k++) {
+      if (k >= tiles.length || k < 0) {
+        return false;
+      }
+      for (let j = opt.startJ; j < opt.length; j++) {
+        if (j >= tiles[k].length || j < 0) {
+          return false;
+        }
+        for (let i = opt.startI; i < opt.width; i++) {
+          if (i < tiles[k][j].length || i < 0) {
+            return false;
+          }
           if (!tiles[k][j][i].empty) {
             return false;
           }
         }
       }
     }
+    return true;
   }
 
   /**
@@ -150,6 +165,29 @@ export class LevelGenerator extends Component {
         const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, groundIndex);
         // add the new tile
         tiles[groundIndex][j][i] = newTile;
+      }
+    }
+  }
+
+  generateTrees() {
+    const tiles = this._tiles;
+    const baseLevel = 1;
+
+    const param = this._creationParams;
+
+    for (let j = 0; j < param.length; j += 5) {
+      for (let i = 0; i < param.width; i += 5) {
+        const option = Math.floor(this.ran * 100);
+
+        let tileTypeAndSprite = EmptyTileId;
+        if (option > 60) {
+          if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
+            tileTypeAndSprite = this.getCollision();
+          }
+        }
+        const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, baseLevel);
+        // add the new tile
+        tiles[baseLevel][j][i] = newTile;
       }
     }
   }
