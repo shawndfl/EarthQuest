@@ -1,7 +1,10 @@
 import { IBattleData } from '../battle/IBattleData';
 import { Component } from '../components/Component';
+import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
+import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve, CurveType } from '../math/Curve';
+import { TileFactory } from './TileFactory';
 
 export enum BattleState {
   None,
@@ -27,6 +30,13 @@ export enum BattleState {
  * Manages the active battle
  */
 export class BattleManager extends Component {
+  /** Used to render all the tiles */
+  protected _spriteController: SpritBatchController;
+  /** used to crate the tiles from the model data */
+  protected _tileFactory: TileFactory;
+  /** tiles that require an update */
+  protected _updateTiles: TileComponent[];
+
   protected _active: boolean;
   private _ready: boolean;
   private _curve: Curve;
@@ -48,12 +58,18 @@ export class BattleManager extends Component {
     };
 
     this._battleState = BattleState.None;
+
+    this._spriteController = new SpritBatchController(this.eng);
   }
 
   /**
    * Initialize the battle
    */
-  async initialize() {}
+  async initialize() {
+    //todo
+    //this._spriteController.initialize();
+    this._tileFactory = new TileFactory(this.eng, this._spriteController);
+  }
 
   startBattle(battleData: IBattleData) {
     // TODO show transition
@@ -77,5 +93,8 @@ export class BattleManager extends Component {
 
   update(dt: number) {
     this._curve.update(dt);
+
+    if (this._ready) {
+    }
   }
 }

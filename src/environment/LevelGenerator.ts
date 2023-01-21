@@ -38,7 +38,7 @@ export class LevelGenerator extends Component {
   private _levelState: LevelGeneratorState;
   private _creationParams: LevelConstructionParams;
   private _random: Random;
-
+  protected _tiles: TileComponent[][][];
   /**
    * Get the next random number
    */
@@ -48,6 +48,7 @@ export class LevelGenerator extends Component {
 
   constructor(eng: Engine, protected _tileFactory: TileFactory) {
     super(eng);
+    this._tiles = [[[]]];
   }
 
   /**
@@ -59,65 +60,105 @@ export class LevelGenerator extends Component {
     this._creationParams = param;
     this._random = new Random(this._creationParams.seed);
 
-    const tiles: TileComponent[][][] = [[[]]];
+    // allocate empty scene
+    this.createEmpty();
 
-    const characterPos = this.getCharacterPosition();
+    // position the character
+    const characterPos = this.getRandomPoint();
+    const player = this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
+    this._tiles[1][characterPos.y][characterPos.x] = player;
+
+    const npcPos = new vec2(10, 10); //this.getRandomPoint();
+    const npc = this._tileFactory.createStaticTile('npc|poo.down.step', npcPos.x, npcPos.y, 1);
+    this._tiles[1][npcPos.y][npcPos.x] = npc;
 
     const timer = new Timer();
     console.debug('creation params', param);
-    //return [[[]]];
-    // k is the height layer of the level
-    for (let k = 0; k < param.height; k++) {
-      // j is the columns that run from top right to bottom left
+    const tiles = this._tiles;
 
+    this.generateGround();
+
+    this._tileFactory.commitSpriteBatchChanges();
+    console.debug('built level in ' + timer.elapsed.toFixed(2) + 'ms');
+    return tiles;
+  }
+
+  placePlayer() {}
+
+  /**
+   * Create an empty world
+   */
+  createEmpty() {
+    const param = this._creationParams;
+    const tiles = this._tiles;
+
+    for (let k = 0; k < param.height; k++) {
       tiles.push([]);
       for (let j = 0; j < param.length; j++) {
         // i is the rows that run from top left to bottom right
         tiles[k].push([]);
+
         for (let i = 0; i < param.width; i++) {
-          const option = Math.floor(this.ran * 50);
-
-          // get the type and sprite id
-          let tileTypeAndSprite;
-          if (k == 1) {
-            if (characterPos.x == i && characterPos.y == j) {
-              tileTypeAndSprite = 'player|';
-            } else {
-              if (option == 1) {
-                tileTypeAndSprite = this.getFloorTile();
-              }
-            }
-          } else if (k == 0) {
-            if (option == 3) {
-              tileTypeAndSprite = this.getCollision();
-            } else {
-              tileTypeAndSprite = this.getFloorTile();
-            }
-          } else {
-          }
-          const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, k);
-          // add the new tile
-          tiles[k][j].push(newTile);
-
-          //TODO figure out how to register tiles that need update or other events
-          //if (newTile.requiresUpdate) {
-          //  this._updateTiles.push(newTile);
-          // }
+          tiles[k][j].push(this._tileFactory.empty);
         }
       }
     }
+  }
 
-    this._tileFactory.commitSpriteBatchChanges();
+  /**
+   * Check if there is space at the location and size
+   * @param opt
+   * @returns
+   */
+  HasSpace(opt: {
+    startI: number;
+    startJ: number;
+    startK: number;
+    width: number;
+    length: number;
+    height: number;
+  }): boolean {
+    const tiles = this._tiles;
+    for (let k = opt.startK; k < opt.height; k++) {
+      for (let j = opt.startJ; k < opt.length; j++) {
+        for (let i = opt.startI; k < opt.width; i++) {
+          if (!tiles[k][j][i].empty) {
+            return false;
+          }
+        }
+      }
+    }
+  }
 
-    console.debug('built level in ' + timer.elapsed.toFixed(2) + 'ms');
-    return tiles;
+  /**
+   * Create ground
+   */
+  generateGround() {
+    const tiles = this._tiles;
+    const groundIndex = 0;
+
+    const param = this._creationParams;
+
+    for (let j = 0; j < param.length; j++) {
+      for (let i = 0; i < param.width; i++) {
+        const option = Math.floor(this.ran * 50);
+
+        // get the type and sprite id
+        let tileTypeAndSprite;
+
+        tileTypeAndSprite = this.getFloorTile();
+        const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, groundIndex);
+        // add the new tile
+        tiles[groundIndex][j][i] = newTile;
+      }
+    }
   }
 
   /**
    * Get a random position for the character
    * @returns
    */
-  getCharacterPosition(): vec2 {
+  getRandomPoint(): vec2 {
     const pos = new vec2();
     const p = this._creationParams;
 
@@ -132,7 +173,14 @@ export class LevelGenerator extends Component {
    * @returns
    */
   getFloorTile() {
-    return 'open|block';
+    const option = Math.floor(this.ran * 50);
+    if (option == 2) {
+      return 'open|block.grass.dirt';
+    } else if (option == 3) {
+      return 'open|block.grass.patch';
+    } else {
+      return 'open|block.grass';
+    }
   }
 
   getCollision() {

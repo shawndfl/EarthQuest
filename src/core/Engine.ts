@@ -8,7 +8,6 @@ import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
 import { DialogManager } from '../systems/DialogManager';
 import { TextManager } from '../systems/TextManager';
-import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 import { BattleManager } from '../systems/BattleManager';
 import { SceneComponent } from '../components/SceneComponent';
@@ -16,6 +15,7 @@ import { SceneComponent } from '../components/SceneComponent';
 import Level1 from '../assets/level1.json';
 import { FpsController } from './FpsController';
 import { Random } from '../utilities/Random';
+import { AssetManager } from '../systems/AssetManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -34,6 +34,7 @@ export class Engine {
   readonly battleManager: BattleManager;
   readonly fps: FpsController;
   readonly random: Random;
+  readonly assetManager: AssetManager;
 
   /**
    * Tile scale for the game
@@ -65,6 +66,7 @@ export class Engine {
     this.textManager = new TextManager(this);
     this.battleManager = new BattleManager(this);
     this.fps = new FpsController(this);
+    this.assetManager = new AssetManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
@@ -88,7 +90,9 @@ export class Engine {
     // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    await this.textManager.initialize(FontImage, FontData);
+    await this.assetManager.initialize();
+
+    await this.textManager.initialize(FontData);
     await this.scene.initialize({ level: Level1 });
     await this.dialogManager.initialize();
     await this.battleManager.initialize();

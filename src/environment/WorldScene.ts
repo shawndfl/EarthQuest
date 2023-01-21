@@ -1,5 +1,4 @@
 import { Texture } from '../graphics/Texture';
-import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';
 import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
@@ -43,7 +42,6 @@ export class WorldScene extends SceneComponent {
   constructor(eng: Engine) {
     super(eng);
 
-    this._spriteSheetTexture = new Texture(this.gl);
     this._ground = new GroundManager(eng);
     this._player = new PlayerController(eng);
     this._dialog = new DialogMenu(eng);
@@ -54,7 +52,7 @@ export class WorldScene extends SceneComponent {
    */
   async initialize(options: { level: ILevelData }) {
     CreateSimpleAnimationClip.create(CharacterData);
-    await this.spriteSheetTexture.loadImage(CharacterImage);
+    this._spriteSheetTexture = this.eng.assetManager.character;
 
     this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, CharacterData);

@@ -1,7 +1,6 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { SpritController } from '../graphics/SpriteController';
-import MenuImage from '../assets/menu.png';
 import { ISpriteData } from '../graphics/ISpriteData';
 import { UserAction } from '../core/UserAction';
 import { Texture } from '../graphics/Texture';
@@ -76,8 +75,7 @@ export class SpriteBatchTest extends Component {
         loc: [27, 6, 12, 9],
       },
     ];
-    const texture = new Texture(this.gl);
-    await texture.loadImage(MenuImage);
+    const texture = this.eng.assetManager.menu;
 
     if (this._useSpriteBatch) {
       this._spriteBatch.initialize(texture, spriteData);

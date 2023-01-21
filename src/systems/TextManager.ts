@@ -46,7 +46,6 @@ const FontFS = `
 export class TextManager extends Component {
   texts: Map<string, TextController>;
   fontData: IFontData[];
-  fontImage: string;
   maxHeightOfCharacters: number;
   shader: ShaderController;
   fontTexture: Texture;
@@ -60,7 +59,6 @@ export class TextManager extends Component {
     super(eng);
     this.texts = new Map<string, TextController>();
     this.shader = new ShaderController(this.gl, 'fontShader');
-    this.fontTexture = new Texture(this.gl);
 
     /** Shader info for this shader */
     this.shaderInfo = {
@@ -75,11 +73,10 @@ export class TextManager extends Component {
    * @param {} fontImage
    * @param {FontData} fontData
    */
-  async initialize(fontImage: string, fontData: IFontData[]): Promise<void> {
-    this.fontImage = fontImage;
+  async initialize(fontData: IFontData[]): Promise<void> {
     this.fontData = fontData;
 
-    await this.fontTexture.loadImage(fontImage);
+    this.fontTexture = this.eng.assetManager.font;
 
     this.shader.initShaderProgram(FontVS, FontFS);
     this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');

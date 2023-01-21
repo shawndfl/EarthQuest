@@ -50,6 +50,7 @@ export class NpcComponent extends TileComponent {
 
     this._spriteController.scale(this.eng.tileScale);
     this._spriteController.setSprite('poo.down.step');
+    this._spriteController.commitToBuffer();
 
     this.setTilePosition(i + 0.5, j + 0.5, k);
 
@@ -62,6 +63,9 @@ export class NpcComponent extends TileComponent {
       ])
       .repeat(-1);
     this._idleAnimation.start(true);
+
+    // this tile will be animated
+    this.groundManager.registerForUpdate(this);
   }
 
   /**

@@ -21,11 +21,7 @@ export class OpenTileComponent extends TileComponent {
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
-    const height = this.ground.getCellHeight(
-      this.tileIndex.x,
-      this.tileIndex.y,
-      this.tileIndex.z
-    );
+    const height = this.groundManager.getCellHeight(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z);
     return tileComponent.tileHeightIndex == height;
   }
 

@@ -1,3 +1,4 @@
+import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
@@ -26,13 +27,13 @@ export class EmptyTile extends TileComponent {
 
   constructor(eng: Engine, i?: number, j?: number, k?: number) {
     super(eng);
-    this._type = 'empty';
-    this._spriteId = 'empty';
+    this._type = EmptyTileId;
+    this._spriteId = EmptyTileId;
     if (i && j && k) {
       this._tileId = TileFactory.createStaticID(i, j, k);
       this.setTilePosition(i, j, k);
     } else {
-      this._tileId = 'empty';
+      this._tileId = EmptyTileId;
     }
   }
 }

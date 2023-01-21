@@ -1,13 +1,10 @@
-import { Texture } from '../graphics/Texture';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
-import TileImg from '../assets/IsometricTile.png';
-import TileData from '../assets/IsometricTile.json';
+import TileData from '../assets/isometricTile.json';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import { TileFactory } from './TileFactory';
-import { MoveDirection } from '../components/PlayerController';
 import { LevelGenerator } from '../environment/LevelGenerator';
 
 /**
@@ -36,8 +33,11 @@ export class GroundManager extends Component {
 
   async initialize(levelData: ILevelData) {
     this._levelData = levelData;
-    const texture = new Texture(this.gl);
-    await texture.loadImage(TileImg);
+
+    // reset tiles that need updates
+    this._updateTiles = [];
+
+    const texture = this.eng.assetManager.tile;
     this._spriteController.initialize(texture, TileData);
     console.debug('sprite list: ', this._spriteController.getSpriteList());
 
@@ -45,8 +45,15 @@ export class GroundManager extends Component {
     const generator = new LevelGenerator(this.eng, this._tileFactory);
     this._tiles = generator.Generate({ seed: 500, width: 60, length: 60, height: 7 });
 
-    this._updateTiles = [];
     //this.buildLevel();
+  }
+
+  /**
+   * Register a tile for update
+   * @param tile
+   */
+  registerForUpdate(tile: TileComponent) {
+    this._updateTiles.push(tile);
   }
 
   /**

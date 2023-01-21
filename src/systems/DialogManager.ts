@@ -1,7 +1,6 @@
 import { Component } from '../components/Component';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Engine } from '../core/Engine';
-import MenuImage from '../assets/menu.png';
 import MenuImageData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
 import { DialogComponent } from '../components/DialogComponent';
@@ -27,8 +26,7 @@ export class DialogManager extends Component {
   }
 
   async initialize() {
-    const texture = new Texture(this.gl);
-    await texture.loadImage(MenuImage);
+    const texture = this.eng.assetManager.menu;
     this._spriteController.initialize(texture, MenuImageData);
     this._dialog.initialize(this._spriteController, this._defaultDialogParams);
     this._spriteController.commitToBuffer();

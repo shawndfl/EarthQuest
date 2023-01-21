@@ -1,3 +1,4 @@
+import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import vec3 from '../math/vec3';
@@ -37,6 +38,13 @@ export abstract class TileComponent extends Component {
   }
 
   /**
+   * Is this tile empty
+   */
+  get empty() {
+    return this.type == EmptyTileId;
+  }
+
+  /**
    * Get the tile index
    */
   get tileIndex(): vec3 {
@@ -53,7 +61,7 @@ export abstract class TileComponent extends Component {
   /**
    * Easy access to ground
    */
-  get ground(): GroundManager {
+  get groundManager(): GroundManager {
     return this.eng.scene.ground;
   }
 

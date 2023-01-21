@@ -7,7 +7,6 @@ import { ILevelData } from '../environment/ILevelData';
 import { Texture } from '../graphics/Texture';
 import { DialogMenu } from '../menus/DialogMenu';
 import { GroundManager } from '../systems/GroundManager';
-import CharacterImage from '../assets/characters.png';
 import CharacterData from '../assets/characters.json';
 import { InputState } from '../core/InputHandler';
 
@@ -54,7 +53,7 @@ export class BattleScene extends SceneComponent {
    * @param options
    */
   async initialize(options: { level: ILevelData }) {
-    await this.spriteSheetTexture.loadImage(CharacterImage);
+    this._spriteSheetTexture = this.eng.assetManager.character;
 
     this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, CharacterData);
