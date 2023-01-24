@@ -37,15 +37,60 @@ export class GroundManager extends Component {
     // reset tiles that need updates
     this._updateTiles = [];
 
-    const texture = this.eng.assetManager.tile;
-    this._spriteController.initialize(texture, TileData);
+    const texture = this.eng.assetManager.tile.texture;
+    const data = this.eng.assetManager.tile.data;
+    this._spriteController.initialize(texture, data);
     console.debug('sprite list: ', this._spriteController.getSpriteList());
 
     // generate a level
     const generator = new LevelGenerator(this.eng, this._tileFactory);
-    this._tiles = generator.Generate({ seed: 500, width: 60, length: 60, height: 7 });
+    this._tiles = generator.Generate({ seed: 605, width: 60, length: 60, height: 7 });
 
     //this.buildLevel();
+  }
+
+  buildBattleScene() {
+    const playerPos = this.eng.scene.player.tileIndex;
+
+    const startI = playerPos.x - 5;
+    const startJ = playerPos.y - 5;
+    const k = playerPos.z - 1;
+    const width = 10;
+    const length = 10;
+    const tiles = this._tiles;
+
+    // create the floor
+    const jStart = startJ < 0 ? 0 : startJ;
+    for (let j = jStart; j < length + jStart; j++) {
+      const iStart = startI < 0 ? 0 : startI;
+      for (let i = iStart; i < width + iStart; i++) {
+        tiles[k][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k);
+      }
+    }
+
+    // create the border around the ring
+    for (let j = jStart; j < length + jStart; j++) {
+      const i = startI;
+      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
+    }
+
+    for (let j = jStart; j < length + jStart; j++) {
+      const i = startI + width;
+      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
+    }
+
+    for (let i = startI; i <= width + startI; i++) {
+      const j = startJ + length;
+      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
+    }
+
+    for (let i = startI; i <= width + startI; i++) {
+      const j = startJ;
+      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
+    }
+
+    this._tileFactory.commitSpriteBatchChanges();
+    return true;
   }
 
   /**

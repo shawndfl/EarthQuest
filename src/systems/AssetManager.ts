@@ -1,10 +1,16 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import FontImage from '../assets/font.png';
+import FontData from '../assets/font.json';
 import CharacterImage from '../assets/characters.png';
+import CharacterData from '../assets/characters.json';
 import TileImage from '../assets/isometricTile.png';
+import TileData from '../assets/isometricTile.json';
 import MenuImage from '../assets/menu.png';
+import MenuData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
+import { IFontData } from '../graphics/IFontData';
+import { ISpriteData } from '../graphics/ISpriteData';
 
 /**
  * Manages texture assets
@@ -15,20 +21,20 @@ export class AssetManager extends Component {
   private _tile: Texture;
   private _menu: Texture;
 
-  get font() {
-    return this._font;
+  get font(): { texture: Texture; data: IFontData[] } {
+    return { texture: this._font, data: FontData };
   }
 
-  get character() {
-    return this._character;
+  get character(): { texture: Texture; data: ISpriteData[] } {
+    return { texture: this._character, data: CharacterData };
   }
 
-  get tile() {
-    return this._tile;
+  get tile(): { texture: Texture; data: ISpriteData[] } {
+    return { texture: this._tile, data: TileData };
   }
 
-  get menu() {
-    return this._menu;
+  get menu(): { texture: Texture; data: ISpriteData[] } {
+    return { texture: this._menu, data: MenuData };
   }
 
   constructor(eng: Engine) {

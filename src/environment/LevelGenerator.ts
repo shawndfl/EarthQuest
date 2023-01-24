@@ -72,15 +72,17 @@ export class LevelGenerator extends Component {
     const player = this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
     this._tiles[1][characterPos.y][characterPos.x] = player;
 
-    const npcPos = new vec2(10, 10); //this.getRandomPoint();
-    const npc = this._tileFactory.createStaticTile('npc|poo.down.step', npcPos.x, npcPos.y, 1);
-    this._tiles[1][npcPos.y][npcPos.x] = npc;
-
     const timer = new Timer();
     console.debug('creation params', param);
     const tiles = this._tiles;
 
     this.generateGround();
+
+    const npcPos = this.getRandomPoint();
+    const npc = this._tileFactory.createStaticTile('npc|poo', npcPos.x, npcPos.y, 1);
+    this._tiles[1][npcPos.y][npcPos.x] = npc;
+    console.debug('poos position ' + npcPos.toString());
+
     this.generateTrees();
 
     this._tileFactory.commitSpriteBatchChanges();
@@ -187,7 +189,9 @@ export class LevelGenerator extends Component {
         }
         const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, baseLevel);
         // add the new tile
-        tiles[baseLevel][j][i] = newTile;
+        if (tiles[baseLevel][j][i].empty) {
+          tiles[baseLevel][j][i] = newTile;
+        }
       }
     }
   }

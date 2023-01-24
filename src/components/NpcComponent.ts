@@ -38,6 +38,10 @@ export class NpcComponent extends TileComponent {
     return 'npc.poo';
   }
 
+  canAccessTile(tileComponent: TileComponent): boolean {
+    return false;
+  }
+
   constructor(eng: Engine, typeAndSprite: string, i: number, j: number, k: number) {
     super(eng);
     const parts = typeAndSprite.split('|');
@@ -50,9 +54,10 @@ export class NpcComponent extends TileComponent {
 
     this._spriteController.scale(this.eng.tileScale);
     this._spriteController.setSprite('poo.down.step');
-    this._spriteController.commitToBuffer();
 
+    // offset by half so he stands in the middle of the tile
     this.setTilePosition(i + 0.5, j + 0.5, k);
+    this._spriteController.commitToBuffer();
 
     this._idleAnimation = new Curve();
     this._idleAnimation
@@ -73,7 +78,6 @@ export class NpcComponent extends TileComponent {
    * @param tileComponent
    */
   onPlayerAction(tileComponent: TileComponent) {
-    console.debug('What up');
     this.eng.dialogManager.showDialog('Welcome to Earth Quest!', { x: 20, y: 40, width: 400, height: 200 });
     this.eng.dialogManager.onHide = (dialog) => {
       // start a battle

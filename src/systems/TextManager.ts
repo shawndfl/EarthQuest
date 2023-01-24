@@ -73,10 +73,9 @@ export class TextManager extends Component {
    * @param {} fontImage
    * @param {FontData} fontData
    */
-  async initialize(fontData: IFontData[]): Promise<void> {
-    this.fontData = fontData;
-
-    this.fontTexture = this.eng.assetManager.font;
+  async initialize(): Promise<void> {
+    this.fontData = this.eng.assetManager.font.data;
+    this.fontTexture = this.eng.assetManager.font.texture;
 
     this.shader.initShaderProgram(FontVS, FontFS);
     this.shaderInfo.attr.aPos = this.shader.getAttribute('aPos');
@@ -86,7 +85,7 @@ export class TextManager extends Component {
 
     // find the tallest character. This will be used when calculating new lines
     this.maxHeightOfCharacters = 0;
-    fontData.forEach((value) => {
+    this.fontData.forEach((value) => {
       if (value.sizeY > this.maxHeightOfCharacters) {
         this.maxHeightOfCharacters = value.sizeY;
       }

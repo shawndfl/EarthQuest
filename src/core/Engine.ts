@@ -92,7 +92,7 @@ export class Engine {
 
     await this.assetManager.initialize();
 
-    await this.textManager.initialize(FontData);
+    await this.textManager.initialize();
     await this.scene.initialize({ level: Level1 });
     await this.dialogManager.initialize();
     await this.battleManager.initialize();

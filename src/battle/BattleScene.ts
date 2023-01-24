@@ -53,10 +53,10 @@ export class BattleScene extends SceneComponent {
    * @param options
    */
   async initialize(options: { level: ILevelData }) {
-    this._spriteSheetTexture = this.eng.assetManager.character;
+    this._spriteSheetTexture = this.eng.assetManager.character.texture;
 
     this.ground.initialize(options.level);
-    this.player.initialize(this.spriteSheetTexture, CharacterData);
+    this.player.initialize(this.spriteSheetTexture, this.eng.assetManager.character.data);
 
     await this.dialog.initialize();
   }

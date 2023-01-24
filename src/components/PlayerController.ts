@@ -130,6 +130,11 @@ export class PlayerController extends TileComponent {
       pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
       this._moveTarget = state.touchPoint.subtract(pos);
       console.debug('target ' + this._moveTarget.toString());
+    } else if ((state.action & UserAction.ActionPressed) > 0) {
+      // action event
+      this.eng.scene.ground.raisePlayerAction(this);
+    } else if ((state.action & UserAction.MenuPressed) > 0) {
+      this.eng.dialogManager.showDialog;
     } else {
       // use arrow keys or d-pad on a game controller
       if ((state.action & UserAction.Left) > 0) {
@@ -148,10 +153,6 @@ export class PlayerController extends TileComponent {
         this._walkDirection = this._walkDirection | MoveDirection.S;
         this._walking = true;
       }
-    }
-
-    if ((state.action & UserAction.ActionPressed) > 0) {
-      this.eng.scene.ground.raisePlayerAction(this);
     }
 
     // We are now walking start the animations
@@ -246,7 +247,7 @@ export class PlayerController extends TileComponent {
   protected updateSpritePosition() {
     super.updateSpritePosition();
 
-    console.debug('pos ' + this.screenPosition.toString());
+    console.debug('tile pos ' + this.tilePosition.toString());
 
     // update the view manger with the player new position
     this.eng.viewManager.setTarget(

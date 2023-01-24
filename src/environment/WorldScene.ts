@@ -1,14 +1,10 @@
 import { Texture } from '../graphics/Texture';
-import CharacterData from '../assets/characters.json';
 import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
 import { Engine } from '../core/Engine';
-import { UserAction } from '../core/UserAction';
-import { CreateSimpleAnimationClip } from '../utilities/CreateSimpleAnimationClip';
 import { DialogMenu } from '../menus/DialogMenu';
 import { SceneComponent } from '../components/SceneComponent';
 import { ILevelData } from './ILevelData';
-import { LevelGenerator } from './LevelGenerator';
 import { InputState } from '../core/InputHandler';
 
 /**
@@ -51,11 +47,11 @@ export class WorldScene extends SceneComponent {
    * Sets up the scene
    */
   async initialize(options: { level: ILevelData }) {
-    CreateSimpleAnimationClip.create(CharacterData);
-    this._spriteSheetTexture = this.eng.assetManager.character;
+    this._spriteSheetTexture = this.eng.assetManager.character.texture;
+    const data = this.eng.assetManager.character.data;
 
+    this.player.initialize(this.spriteSheetTexture, data);
     this.ground.initialize(options.level);
-    this.player.initialize(this.spriteSheetTexture, CharacterData);
 
     await this.dialog.initialize();
   }

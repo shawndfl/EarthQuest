@@ -2,7 +2,6 @@ import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { ISpriteData } from '../graphics/ISpriteData';
 import { UserAction } from '../core/UserAction';
-import { Texture } from '../graphics/Texture';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 
 /**
@@ -59,9 +58,9 @@ export class DialogMenu extends Component {
         loc: [27, 6, 12, 9],
       },
     ];
-    const texture = this.eng.assetManager.menu;
-
-    this._spriteBatch.initialize(texture, spriteData);
+    const texture = this.eng.assetManager.menu.texture;
+    const data = this.eng.assetManager.menu.data;
+    this._spriteBatch.initialize(texture, data);
     let step = 0;
 
     //TODO add the menu parts to the sprite batch

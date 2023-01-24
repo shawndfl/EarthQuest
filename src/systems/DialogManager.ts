@@ -1,13 +1,11 @@
 import { Component } from '../components/Component';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Engine } from '../core/Engine';
-import MenuImageData from '../assets/menu.json';
-import { Texture } from '../graphics/Texture';
-import { DialogComponent } from '../components/DialogComponent';
+import { DialogComponent } from '../menus/DialogComponent';
 import { UserAction } from '../core/UserAction';
-import { IDialogParams } from '../menus/IDialogParams';
-import { DefaultDialogParams } from '../menus/DefaultDialogParams';
 import { InputState } from '../core/InputHandler';
+import { MenuComponent } from '../menus/MenuComponent';
+import { DialogBuilder } from '../menus/DialogBuilder';
 
 /**
  * Manages dialog boxes
@@ -15,20 +13,26 @@ import { InputState } from '../core/InputHandler';
 export class DialogManager extends Component {
   protected _spriteController: SpritBatchController;
   protected _dialog: DialogComponent;
-  protected _defaultDialogParams: IDialogParams;
+  protected _menu: MenuComponent;
+  protected _dialogBuild: DialogBuilder;
+
   onHide: (dialog: DialogComponent) => boolean;
 
   constructor(eng: Engine) {
     super(eng);
+
+    this._dialogBuild = new DialogBuilder(eng);
     this._spriteController = new SpritBatchController(eng);
-    this._dialog = new DialogComponent(this.eng);
-    this._defaultDialogParams = new DefaultDialogParams(this.eng);
+    this._dialog = new DialogComponent(this.eng, this._dialogBuild);
+    this._menu = new MenuComponent(this.eng);
   }
 
   async initialize() {
-    const texture = this.eng.assetManager.menu;
-    this._spriteController.initialize(texture, MenuImageData);
-    this._dialog.initialize(this._spriteController, this._defaultDialogParams);
+    const texture = this.eng.assetManager.menu.texture;
+    const data = this.eng.assetManager.menu.data;
+    this._spriteController.initialize(texture, data);
+    this._dialog.initialize(this._spriteController);
+    this._menu.initialize(this._spriteController);
     this._spriteController.commitToBuffer();
   }
 
@@ -60,9 +64,14 @@ export class DialogManager extends Component {
    * @param text
    * @param loc
    */
-  showDialog(text: string, loc: { x: number; y: number; width: number; height: number }) {
-    this._dialog.show(text, loc);
+  showDialog(text: string, loc: { x: number; y: number; width: number; height: number }, options?: {}[]) {
+    this._dialog.setPosition(loc.x, loc.y);
+    this._dialog.setSize(loc.width, loc.height);
+    this._dialog.setText(text);
+    this._dialog.show();
   }
+
+  showGameMenu() {}
 
   /**
    * Updates the dialog box

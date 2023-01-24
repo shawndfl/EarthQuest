@@ -58,7 +58,6 @@ export class BattleManager extends Component {
     };
 
     this._battleState = BattleState.None;
-
     this._spriteController = new SpritBatchController(this.eng);
   }
 
@@ -66,12 +65,17 @@ export class BattleManager extends Component {
    * Initialize the battle
    */
   async initialize() {
-    //todo
-    //this._spriteController.initialize();
+    const texture = this.eng.assetManager.tile.texture;
+    const data = this.eng.assetManager.tile.data;
+    this._spriteController.initialize(texture, data);
     this._tileFactory = new TileFactory(this.eng, this._spriteController);
   }
 
   startBattle(battleData: IBattleData) {
+    if (this._active) {
+      console.warn('already in a battle');
+      return;
+    }
     // TODO show transition
     // load battle scene
     // show enemies
@@ -84,6 +88,11 @@ export class BattleManager extends Component {
       true,
       () => {
         this._ready = true;
+
+        //TODO build battle scene
+        this.eng.scene.ground.buildBattleScene();
+        this.eng.dialogManager.showDialog('Start Fighting', { x: 200, y: 20, width: 600, height: 200 });
+        //this.eng.soundManager.
       },
       (value) => {
         this.eng.viewManager.scale = this._curve.getValue();
