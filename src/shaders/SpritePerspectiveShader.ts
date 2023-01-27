@@ -30,12 +30,14 @@ uniform sampler2D uSampler;
 
 void main() {
   mediump vec4 color = texture2D(uSampler, vTex);
-    if(color.a < .10) {
+    if(color.a < .30) {
       discard;
     } 
+
     // uncomment to show depth
     //gl_FragColor = vec4(depth.xyz, 1.0);
     gl_FragColor = color;
+  
 }
 `;
 

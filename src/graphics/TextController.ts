@@ -37,6 +37,12 @@ export class TextController extends Component {
     const zpos = block.depth;
     let charCount = 0;
     const text = block.text;
+
+    // if the text is empty there is nothing to do
+    if (!text) {
+      return;
+    }
+
     const quads: IQuadModel[] = [];
 
     // loop over all the characters in the text block
@@ -75,16 +81,8 @@ export class TextController extends Component {
       const tv2 = 1 - font.v1;
 
       const quad: IQuadModel = {
-        min: [
-          (xpos1 / screenWidth) * 2 - 1.0,
-          (ypos1 / screenHeight) * 2 - 1.0,
-          zpos,
-        ],
-        max: [
-          (xpos2 / screenWidth) * 2 - 1.0,
-          (ypos2 / screenHeight) * 2 - 1.0,
-          zpos,
-        ],
+        min: [(xpos1 / screenWidth) * 2 - 1.0, (ypos1 / screenHeight) * 2 - 1.0, zpos],
+        max: [(xpos2 / screenWidth) * 2 - 1.0, (ypos2 / screenHeight) * 2 - 1.0, zpos],
         minTex: [tu1, tv2],
         maxTex: [tu2, tv1],
       };
@@ -102,14 +100,16 @@ export class TextController extends Component {
    * @param {float} dt Delta time in ms
    */
   update(dt: number) {
-    // enable the buffer
-    this.buffer.enable();
+    if (this.buffer.buffersCreated) {
+      // enable the buffer
+      this.buffer.enable();
 
-    {
-      const vertexCount = this.buffer.indexCount;
-      const type = this.gl.UNSIGNED_SHORT;
-      const offset = 0;
-      this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      {
+        const vertexCount = this.buffer.indexCount;
+        const type = this.gl.UNSIGNED_SHORT;
+        const offset = 0;
+        this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+      }
     }
   }
 }

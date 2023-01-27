@@ -134,7 +134,7 @@ export class PlayerController extends TileComponent {
       // action event
       this.eng.scene.ground.raisePlayerAction(this);
     } else if ((state.action & UserAction.MenuPressed) > 0) {
-      this.eng.dialogManager.showDialog;
+      this.eng.dialogManager.showGameMenu();
     } else {
       // use arrow keys or d-pad on a game controller
       if ((state.action & UserAction.Left) > 0) {

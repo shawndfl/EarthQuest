@@ -1,13 +1,16 @@
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { Curve, CurveType } from '../math/Curve';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
-import { DialogBuilder } from './DialogBuilder';
-import { IDialogParams } from './IDialogParams';
 import { Component } from '../components/Component';
+import { GameMenuBuilder } from './GameMenuBuilder';
+import { InputState } from '../core/InputHandler';
+import { UserAction } from '../core/UserAction';
 
-export class PanelComponent extends Component {
+/**
+ * The game menu. The player can equip, use items and see stats
+ */
+export class GameMenuComponent extends Component {
   protected _id: string;
   protected _spriteController: SpritBatchController;
   protected _visible: boolean;
@@ -17,6 +20,8 @@ export class PanelComponent extends Component {
   protected _textOffset: vec2;
   protected _dirty: boolean;
 
+  onHide: (dialog: GameMenuComponent) => boolean;
+
   get id(): string {
     return this._id;
   }
@@ -25,7 +30,7 @@ export class PanelComponent extends Component {
     return this._visible;
   }
 
-  constructor(eng: Engine, id: string, protected _dialogBuild: DialogBuilder) {
+  constructor(eng: Engine, id: string, protected _dialogBuild: GameMenuBuilder) {
     super(eng);
     this._id = id;
     this._visible = false;
@@ -46,21 +51,6 @@ export class PanelComponent extends Component {
     this._dirty = true;
   }
 
-  /**
-   * Sets the text for this panel
-   * @param text
-   */
-  setText(text: string) {
-    this._text = text;
-    this._dirty = true;
-  }
-
-  setSize(width: number, height: number) {
-    this._size.x = width;
-    this._size.y = height;
-    this._dirty = true;
-  }
-
   show() {
     this._visible = true;
     this._dirty = true;
@@ -71,14 +61,36 @@ export class PanelComponent extends Component {
     this._dirty = true;
   }
 
+  /**
+   * Handle user interaction with the dialog
+   * @param state
+   * @returns
+   */
+  handleUserAction(state: InputState): boolean {
+    const active = this.visible;
+    if (active && (state.action & UserAction.MenuPressed) > 0) {
+      let canHide = true;
+
+      // if there is an onHide event fire that
+      if (this.onHide) {
+        canHide = this.onHide(this);
+      }
+
+      if (canHide) {
+        this.hide();
+      }
+    }
+
+    return active;
+  }
+
   redraw() {
     if (this.visible) {
-      const p: IDialogParams = { x: this._pos.x, y: this._pos.y, width: this._size.x, height: this._size.y };
-      this._dialogBuild.buildDialog(this.id, p);
+      this._dialogBuild.show();
 
       this._spriteController.commitToBuffer();
 
-      const textPos = new vec2(this._pos.x + this._textOffset.x, p.y + this._textOffset.y);
+      const textPos = new vec2(this._pos.x + this._textOffset.x, this._pos.y + this._textOffset.y);
       this.eng.textManager.setTextBlock({
         id: this.id,
         text: this._text,
@@ -89,7 +101,7 @@ export class PanelComponent extends Component {
       });
     } else {
       this.eng.textManager.hideText(this.id);
-      this._dialogBuild.hideDialog(this.id);
+      this._dialogBuild.hide();
     }
   }
   update(dt: number) {

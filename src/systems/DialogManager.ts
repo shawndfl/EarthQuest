@@ -4,8 +4,9 @@ import { Engine } from '../core/Engine';
 import { DialogComponent } from '../menus/DialogComponent';
 import { UserAction } from '../core/UserAction';
 import { InputState } from '../core/InputHandler';
-import { MenuComponent } from '../menus/MenuComponent';
+import { GameMenuComponent } from '../menus/GameMenuComponent';
 import { DialogBuilder } from '../menus/DialogBuilder';
+import { GameMenuBuilder } from '../menus/GameMenuBuilder';
 
 /**
  * Manages dialog boxes
@@ -13,18 +14,32 @@ import { DialogBuilder } from '../menus/DialogBuilder';
 export class DialogManager extends Component {
   protected _spriteController: SpritBatchController;
   protected _dialog: DialogComponent;
-  protected _menu: MenuComponent;
+  protected _gameMenu: GameMenuComponent;
   protected _dialogBuild: DialogBuilder;
+  protected _gameMenuBuilder: GameMenuBuilder;
 
-  onHide: (dialog: DialogComponent) => boolean;
+  /**
+   * Get the game menu
+   */
+  get gameMenu() {
+    return this._gameMenu;
+  }
+
+  /**
+   * Get the dialog menu
+   */
+  get dialog() {
+    return this._dialog;
+  }
 
   constructor(eng: Engine) {
     super(eng);
 
     this._dialogBuild = new DialogBuilder(eng);
+    this._gameMenuBuilder = new GameMenuBuilder(eng);
     this._spriteController = new SpritBatchController(eng);
     this._dialog = new DialogComponent(this.eng, this._dialogBuild);
-    this._menu = new MenuComponent(this.eng);
+    this._gameMenu = new GameMenuComponent(this.eng, 'gameMenu', this._gameMenuBuilder);
   }
 
   async initialize() {
@@ -32,7 +47,7 @@ export class DialogManager extends Component {
     const data = this.eng.assetManager.menu.data;
     this._spriteController.initialize(texture, data);
     this._dialog.initialize(this._spriteController);
-    this._menu.initialize(this._spriteController);
+    this._gameMenu.initialize(this._spriteController);
     this._spriteController.commitToBuffer();
   }
 
@@ -42,21 +57,7 @@ export class DialogManager extends Component {
    * @returns
    */
   handleUserAction(state: InputState): boolean {
-    const active = this._dialog.visible;
-    if (active && (state.action & UserAction.ActionPressed) > 0) {
-      let canHide = true;
-
-      // if there is an onHide event fire that
-      if (this.onHide) {
-        canHide = this.onHide(this._dialog);
-      }
-
-      if (canHide) {
-        this._dialog.hide();
-      }
-    }
-
-    return active;
+    return this._dialog.handleUserAction(state) || this._gameMenu.handleUserAction(state);
   }
 
   /**
@@ -64,20 +65,31 @@ export class DialogManager extends Component {
    * @param text
    * @param loc
    */
-  showDialog(text: string, loc: { x: number; y: number; width: number; height: number }, options?: {}[]) {
+  showDialog(
+    text: string,
+    loc: { x: number; y: number; width: number; height: number },
+    onHide?: (dialog: DialogComponent) => boolean,
+    options?: {}[]
+  ) {
     this._dialog.setPosition(loc.x, loc.y);
     this._dialog.setSize(loc.width, loc.height);
     this._dialog.setText(text);
+    this._dialog.onHide = onHide;
     this._dialog.show();
   }
 
-  showGameMenu() {}
+  showGameMenu(onHide?: (dialog: GameMenuComponent) => boolean) {
+    this._gameMenu.onHide = onHide;
+    this._gameMenu.show();
+  }
 
   /**
    * Updates the dialog box
    * @param dt
    */
   update(dt: number) {
+    this._dialog.update(dt);
+    this._gameMenu.update(dt);
     this._spriteController.update(dt);
   }
 }

@@ -1,16 +1,19 @@
 import { Engine } from '../core/Engine';
-import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve, CurveType } from '../math/Curve';
-import vec2 from '../math/vec2';
-import vec4 from '../math/vec4';
 import { DialogBuilder } from './DialogBuilder';
-import { IDialogParams } from './IDialogParams';
-import { Component } from '../components/Component';
 import { PanelComponent } from './PanelComponent';
+import { InputState } from '../core/InputHandler';
+import { UserAction } from '../core/UserAction';
 
+/**
+ * A dialog component that can be sized and display text in the game.
+ * There is also an onHide event to handle user input
+ */
 export class DialogComponent extends PanelComponent {
   private _ready: boolean;
   private _expandAnimation: Curve;
+
+  onHide: (dialog: DialogComponent) => boolean;
 
   get id(): string {
     return this._id;
@@ -31,8 +34,27 @@ export class DialogComponent extends PanelComponent {
     ]);
   }
 
-  initialize(spriteController: SpritBatchController) {
-    this._spriteController = spriteController;
+  /**
+   * Handle user interaction with the dialog
+   * @param state
+   * @returns
+   */
+  handleUserAction(state: InputState): boolean {
+    const active = this.visible;
+    if (active && (state.action & UserAction.ActionPressed) > 0) {
+      let canHide = true;
+
+      // if there is an onHide event fire that
+      if (this.onHide) {
+        canHide = this.onHide(this);
+      }
+
+      if (canHide) {
+        this.hide();
+      }
+    }
+
+    return active;
   }
 
   show() {
@@ -44,6 +66,7 @@ export class DialogComponent extends PanelComponent {
   }
 
   update(dt: number) {
+    super.update(dt);
     this._expandAnimation.update(dt);
   }
 }

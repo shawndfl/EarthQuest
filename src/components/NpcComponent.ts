@@ -78,12 +78,15 @@ export class NpcComponent extends TileComponent {
    * @param tileComponent
    */
   onPlayerAction(tileComponent: TileComponent) {
-    this.eng.dialogManager.showDialog('Welcome to Earth Quest!', { x: 20, y: 40, width: 400, height: 200 });
-    this.eng.dialogManager.onHide = (dialog) => {
-      // start a battle
-      this.eng.battleManager.startBattle({});
-      return true;
-    };
+    this.eng.dialogManager.showDialog(
+      'Welcome to Earth Quest!',
+      { x: 20, y: 40, width: 400, height: 200 },
+      (dialog) => {
+        // start a battle
+        this.eng.battleManager.startBattle({});
+        return true;
+      }
+    );
   }
 
   update(dt: number) {
