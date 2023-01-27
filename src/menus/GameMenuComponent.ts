@@ -6,6 +6,7 @@ import { Component } from '../components/Component';
 import { GameMenuBuilder } from './GameMenuBuilder';
 import { InputState } from '../core/InputHandler';
 import { UserAction } from '../core/UserAction';
+import { DialogCursor } from './DialogCursor';
 
 /**
  * The game menu. The player can equip, use items and see stats
@@ -19,6 +20,7 @@ export class GameMenuComponent extends Component {
   protected _text: string;
   protected _textOffset: vec2;
   protected _dirty: boolean;
+  protected _cursor: DialogCursor;
 
   onHide: (dialog: GameMenuComponent) => boolean;
 
@@ -38,11 +40,13 @@ export class GameMenuComponent extends Component {
     this._size = new vec2(300, 200);
     this._textOffset = new vec2(50, 60);
     this._dirty = false;
+    this._cursor = new DialogCursor(eng);
   }
 
   initialize(spriteController: SpritBatchController) {
     this._spriteController = spriteController;
     this._dialogBuild.initialize(this._spriteController);
+    this._cursor.initialize('cursor.1', this._spriteController, [new vec2(50, 480), new vec2(50, 460)]);
   }
 
   setPosition(x: number, y: number) {
@@ -54,6 +58,7 @@ export class GameMenuComponent extends Component {
   show() {
     this._visible = true;
     this._dirty = true;
+    this._cursor.show();
   }
 
   hide() {
@@ -102,6 +107,7 @@ export class GameMenuComponent extends Component {
     } else {
       this.eng.textManager.hideText(this.id);
       this._dialogBuild.hide();
+      this._cursor.hide();
     }
   }
   update(dt: number) {
@@ -109,5 +115,7 @@ export class GameMenuComponent extends Component {
       this.redraw();
       this._dirty = false;
     }
+
+    this._cursor.update(dt);
   }
 }

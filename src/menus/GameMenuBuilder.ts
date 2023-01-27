@@ -1,13 +1,26 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
+import { Curve } from '../math/Curve';
 import vec2 from '../math/vec2';
 
 export class GameMenuBuilder extends Component {
   protected _spriteController: SpritBatchController;
+  protected _cursorCurve: Curve;
 
   constructor(eng: Engine) {
     super(eng);
+    this._cursorCurve = new Curve();
+    this._cursorCurve.points([
+      {
+        p: 0,
+        t: 0,
+      },
+      {
+        p: 10,
+        t: 500,
+      },
+    ]);
   }
 
   /**
