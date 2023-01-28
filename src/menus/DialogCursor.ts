@@ -18,8 +18,12 @@ export class DialogCursor extends Component {
   private _activeIndex: number;
   /** animation curve */
   protected _cursorCurve: Curve; // used for animations
-
+  private _dirty: boolean;
   private _cursorId: string;
+  private _visible: boolean;
+
+  /** On select event */
+  private _onSelect: (index: number, cursor: DialogCursor) => void;
 
   get index() {
     return this._activeIndex;
@@ -27,6 +31,23 @@ export class DialogCursor extends Component {
 
   get position(): vec2 {
     return this._activePosition;
+  }
+
+  set index(value: number) {
+    this._activeIndex = value;
+    this._dirty = true;
+
+    // let the user handle the select change
+    if (this._onSelect) {
+      this._onSelect(this._activeIndex, this);
+    }
+  }
+
+  /**
+   * Number of positions this cursor can have
+   */
+  get indexCount() {
+    return this._positions.length;
   }
 
   constructor(eng: Engine) {
@@ -51,32 +72,34 @@ export class DialogCursor extends Component {
     ]);
     this._cursorCurve.curve(CurveType.linear);
     this._cursorCurve.repeat(-1);
+    this._dirty = true;
+    this._visible = false;
   }
 
-  initialize(id: string, spriteController: SpritBatchController, positions: vec2[]) {
+  initialize(
+    id: string,
+    spriteController: SpritBatchController,
+    positions: vec2[],
+    onSelect?: (index: number, cursor: DialogCursor) => void
+  ) {
     this._spriteController = spriteController;
     this._positions = positions;
     this._cursorId = id;
+    this._onSelect = onSelect;
   }
 
-  show() {
-    this._spriteController.activeSprite(this._cursorId);
-    this._spriteController.scale(0.9);
-    this._spriteController.viewOffset(new vec2(0, 0));
-    this._spriteController.viewScale(1.0);
-    this._spriteController.setSprite('cursor');
-    this._spriteController.setSpritePosition(80, 490, -0.3);
-
-    this._cursorCurve.start(true, undefined, (val) => {
-      this._spriteController.activeSprite(this._cursorId);
-      this._spriteController.setSpritePosition(80 + val, 490, -0.3, true);
-    });
+  show(index?: number) {
+    if (index != undefined) {
+      this._activeIndex = index;
+    }
+    this._visible = true;
+    this._dirty = true;
   }
 
   /**
-   * Cause the cursor to stop moving as the player selected somthing
+   * Cause the cursor to stop moving as the player selected something
    */
-  select() {
+  lock() {
     this._cursorCurve.pause(0);
   }
 
@@ -84,7 +107,30 @@ export class DialogCursor extends Component {
    * Hide the cursor
    */
   hide() {
-    this._spriteController.removeSprite(this._cursorId);
+    this._visible = false;
+    this._dirty = true;
+  }
+
+  redraw() {
+    if (this._visible) {
+      const position = this._positions[this._activeIndex];
+      if (position) {
+        this._activePosition = position;
+        this._spriteController.activeSprite(this._cursorId);
+        this._spriteController.scale(0.9);
+        this._spriteController.viewOffset(new vec2(0, 0));
+        this._spriteController.viewScale(1.0);
+        this._spriteController.setSprite('cursor');
+        this._spriteController.setSpritePosition(position.x, position.y, -0.3);
+
+        this._cursorCurve.start(true, undefined, (val) => {
+          this._spriteController.activeSprite(this._cursorId);
+          this._spriteController.setSpritePosition(position.x + val, position.y, -0.3);
+        });
+      }
+    } else {
+      this._spriteController.removeSprite(this._cursorId);
+    }
   }
 
   /**
@@ -93,5 +139,10 @@ export class DialogCursor extends Component {
    */
   update(dt: number) {
     this._cursorCurve.update(dt);
+
+    if (this._dirty) {
+      this.redraw();
+      this._dirty = false;
+    }
   }
 }

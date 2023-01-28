@@ -83,9 +83,8 @@ export class LevelGenerator extends Component {
     this._tiles[1][npcPos.y][npcPos.x] = npc;
     console.debug('poos position ' + npcPos.toString());
 
-    this.generateTrees();
+    this.generateLevel1();
 
-    this._tileFactory.commitSpriteBatchChanges();
     console.debug('built level in ' + timer.elapsed.toFixed(2) + 'ms');
     return tiles;
   }
@@ -171,7 +170,7 @@ export class LevelGenerator extends Component {
     }
   }
 
-  generateTrees() {
+  generateLevel1() {
     const tiles = this._tiles;
     const baseLevel = 1;
 
@@ -182,9 +181,13 @@ export class LevelGenerator extends Component {
         const option = Math.floor(this.ran * 100);
 
         let tileTypeAndSprite = EmptyTileId;
-        if (option > 60) {
+        if (option > 60 && option < 80) {
           if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
             tileTypeAndSprite = this.getCollision();
+          }
+        } else if (option >= 80) {
+          if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
+            tileTypeAndSprite = this.getCoin();
           }
         }
         const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, baseLevel);
@@ -225,6 +228,9 @@ export class LevelGenerator extends Component {
     }
   }
 
+  getCoin() {
+    return 'coin|coin.1';
+  }
   getCollision() {
     return 'collide|tree';
   }

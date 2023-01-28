@@ -33,7 +33,7 @@ export class GameMenuBuilder extends Component {
 
   show() {
     this._spriteController.activeSprite('gameMenu');
-    this._spriteController.scale(0.9);
+    this._spriteController.scale(1);
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
     this._spriteController.setSprite('gameMenu');

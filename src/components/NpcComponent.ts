@@ -20,13 +20,6 @@ export class NpcComponent extends TileComponent {
   /** Should the sprites be flipped */
   private _spriteFlip: boolean;
 
-  /**
-   * This does require update
-   */
-  get requiresUpdate(): boolean {
-    return true;
-  }
-
   get spriteController(): SpritBaseController {
     return this._spriteController;
   }
@@ -39,6 +32,7 @@ export class NpcComponent extends TileComponent {
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
+    console.warn('npc component');
     return false;
   }
 
@@ -106,6 +100,6 @@ export class NpcComponent extends TileComponent {
     }
 
     this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
-    this._spriteController.setSprite(this._sprites[index], true);
+    this._spriteController.setSprite(this._sprites[index]);
   }
 }

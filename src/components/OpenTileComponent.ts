@@ -20,9 +20,16 @@ export class OpenTileComponent extends TileComponent {
     return this._type;
   }
 
+  /**
+   * Check if the tile component (or player) can access this tile.
+   * For open tiles we need to check the tile on top of it.
+   * @param tileComponent
+   * @returns
+   */
   canAccessTile(tileComponent: TileComponent): boolean {
-    const height = this.groundManager.getCellHeight(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z);
-    return tileComponent.tileHeightIndex == height;
+    const tileAbove = this.groundManager.getTile(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z + 1);
+
+    return tileAbove.empty || tileAbove.canAccessTile(tileComponent);
   }
 
   get spriteController(): SpritBaseController {

@@ -76,8 +76,6 @@ export class PanelComponent extends Component {
       const p: IDialogParams = { x: this._pos.x, y: this._pos.y, width: this._size.x, height: this._size.y };
       this._dialogBuild.buildDialog(this.id, p);
 
-      this._spriteController.commitToBuffer();
-
       const textPos = new vec2(this._pos.x + this._textOffset.x, p.y + this._textOffset.y);
       this.eng.textManager.setTextBlock({
         id: this.id,

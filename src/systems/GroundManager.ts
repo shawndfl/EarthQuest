@@ -89,7 +89,6 @@ export class GroundManager extends Component {
       tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
     }
 
-    this._tileFactory.commitSpriteBatchChanges();
     return true;
   }
 
@@ -99,40 +98,6 @@ export class GroundManager extends Component {
    */
   registerForUpdate(tile: TileComponent) {
     this._updateTiles.push(tile);
-  }
-
-  /**
-   * build the level from the level data
-   */
-  buildLevel() {
-    this._tiles = [];
-    this._updateTiles = [];
-
-    // k is the height layer of the level
-    for (let k = 0; k < this._levelData.cells.length; k++) {
-      // j is the columns that run from top right to bottom left
-
-      this._tiles.push([]);
-      for (let j = 0; j < this._levelData.cells[k].length; j++) {
-        // i is the rows that run from top left to bottom right
-        this._tiles[k].push([]);
-        for (let i = 0; i < this._levelData.cells[k][j].length; i++) {
-          // get the type and sprite id
-          const tileTypeAndSprite = this.getCellTypeAndSprite(i, j, k);
-
-          const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, k);
-          // add the new tile
-          this._tiles[k][j].push(newTile);
-
-          if (newTile.requiresUpdate) {
-            this._updateTiles.push(newTile);
-          }
-        }
-      }
-    }
-
-    // commit all the sprites to the buffer to be drawn
-    this._spriteController.commitToBuffer();
   }
 
   /**

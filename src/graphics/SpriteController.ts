@@ -10,10 +10,7 @@ import { SpritBaseController } from './SpriteBaseController';
  * given a sprite sheet and some json data that holds the
  * sprite offset and size in pixels.
  */
-export class SpritController
-  extends SpritBaseController
-  implements ISpriteController
-{
+export class SpritController extends SpritBaseController implements ISpriteController {
   private _sprite: Sprite;
 
   get sprite(): Sprite {
@@ -30,11 +27,7 @@ export class SpritController
    * @param texture
    * @param spriteData
    */
-  initialize(
-    texture: Texture,
-    spriteData: ISpriteData[],
-    defaultSprite?: string | number
-  ) {
+  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
     super.initialize(texture, spriteData, defaultSprite);
 
     // set up the sprite
@@ -49,7 +42,6 @@ export class SpritController
 
     // set the position of the sprite on the screen
     this.sprite.setPosition(0, 0, 0);
-    this.commitToBuffer();
   }
 
   commitToBuffer() {

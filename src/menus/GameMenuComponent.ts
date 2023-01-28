@@ -46,7 +46,14 @@ export class GameMenuComponent extends Component {
   initialize(spriteController: SpritBatchController) {
     this._spriteController = spriteController;
     this._dialogBuild.initialize(this._spriteController);
-    this._cursor.initialize('cursor.1', this._spriteController, [new vec2(50, 480), new vec2(50, 460)]);
+    this._cursor.initialize(
+      'cursor.1',
+      this._spriteController,
+      [new vec2(75, 490), new vec2(75, 440), new vec2(75, 390), new vec2(75, 340)],
+      (index) => {
+        console.debug('selecting index ' + index);
+      }
+    );
   }
 
   setPosition(x: number, y: number) {
@@ -58,7 +65,7 @@ export class GameMenuComponent extends Component {
   show() {
     this._visible = true;
     this._dirty = true;
-    this._cursor.show();
+    this._cursor.show(0);
   }
 
   hide() {
@@ -73,16 +80,35 @@ export class GameMenuComponent extends Component {
    */
   handleUserAction(state: InputState): boolean {
     const active = this.visible;
-    if (active && (state.action & UserAction.MenuPressed) > 0) {
-      let canHide = true;
+    if (active) {
+      if ((state.action & UserAction.MenuPressed) > 0) {
+        let canHide = true;
 
-      // if there is an onHide event fire that
-      if (this.onHide) {
-        canHide = this.onHide(this);
+        // if there is an onHide event fire that
+        if (this.onHide) {
+          canHide = this.onHide(this);
+        }
+
+        if (canHide) {
+          this.hide();
+        }
       }
 
-      if (canHide) {
-        this.hide();
+      // select next option
+      if ((state.action & UserAction.DownPressed) > 0) {
+        if (this._cursor.index < this._cursor.indexCount - 1) {
+          this._cursor.index++;
+        } else {
+          this._cursor.index = 0;
+        }
+      }
+      // select previous option
+      if ((state.action & UserAction.UpPressed) > 0) {
+        if (this._cursor.index > 0) {
+          this._cursor.index--;
+        } else {
+          this._cursor.index = this._cursor.indexCount - 1;
+        }
       }
     }
 

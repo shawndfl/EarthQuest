@@ -80,13 +80,6 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * Does this component require an update
-   */
-  get requiresUpdate(): boolean {
-    return false;
-  }
-
-  /**
    * Sprite for this tile
    */
   abstract get spriteController(): SpritBaseController;
@@ -134,6 +127,11 @@ export abstract class TileComponent extends Component {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent): boolean {
+    if (this.empty) {
+      console.warn('empty component');
+    } else {
+      console.warn(' default component');
+    }
     return false;
   }
 
@@ -218,14 +216,14 @@ export abstract class TileComponent extends Component {
       }
     }
 
-    // down
+    // up
     if (dir.y < 0 && fractionJ < 0.25) {
       // cancel y movement
       if (!ground.canAccessTile(this, tileX, tileY - 1, floorHeight)) {
         dir.y = 0;
       }
     }
-    // up
+    // down
     else if (dir.y > 0 && fractionJ > 0.75) {
       // cancel y movement
       if (!ground.canAccessTile(this, tileX, tileY + 1, floorHeight)) {
@@ -294,13 +292,20 @@ export abstract class TileComponent extends Component {
 
     // we moved off the last tile call on exit
     if (this._tileIndex.x != tileX || this._tileIndex.y != tileY) {
+      // exit the ground tile
       this.eng.scene.ground.onExit(this, this._tileIndex.x, this._tileIndex.y, floor);
+
+      // exit the tile at eye level
+      this.eng.scene.ground.onExit(this, this._tileIndex.x, this._tileIndex.y, floor + 1);
     }
 
     const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
 
-    // enter a new tile
+    // enter the tile on the ground
     this.eng.scene.ground.onEnter(this, tileX, tileY, floor);
+
+    // enter the tile in front of the player
+    this.eng.scene.ground.onEnter(this, tileX, tileY, floor + 1);
 
     this.setTilePosition(i, j, k);
   }

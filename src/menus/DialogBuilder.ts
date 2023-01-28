@@ -43,8 +43,6 @@ export class DialogBuilder extends Component {
     this._spriteController.removeSprite(dialogId + 'menu.left.middle');
     this._spriteController.removeSprite(dialogId + 'menu.right.middle');
     this._spriteController.removeSprite(dialogId + 'menu.center.middle');
-
-    this._spriteController.commitToBuffer();
   }
 
   /**

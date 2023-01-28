@@ -78,6 +78,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    */
   clearAllSprites() {
     this._sprites.clear();
+    this._dirty = true;
   }
 
   /**
@@ -95,6 +96,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    * @returns
    */
   removeSprite(spriteId: string): boolean {
+    this._dirty = true;
     return this._sprites.delete(spriteId);
   }
 
@@ -103,7 +105,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    */
   commitToBuffer() {
     const quads: IQuadModel[] = [];
-    console.debug('Committing ' + this._sprites.size);
+    //console.debug('Committing ' + this._sprites.size);
     this._sprites.forEach((sprite) => {
       quads.push(sprite.quad);
     });

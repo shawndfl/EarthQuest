@@ -38,7 +38,7 @@ export class SpriteDebugger extends PlayerController {
         index = this._spriteController.spriteCount - 1;
       }
 
-      this._spriteController.setSprite(index, true);
+      this._spriteController.setSprite(index);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Left;
@@ -48,7 +48,7 @@ export class SpriteDebugger extends PlayerController {
         index = 0;
       }
 
-      this._spriteController.setSprite(index, true);
+      this._spriteController.setSprite(index);
 
       console.debug('Showing ' + this._spriteController.selectedSpriteId);
       //this._direction = SpriteDirection.Right;

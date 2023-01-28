@@ -96,8 +96,6 @@ export class PlayerController extends TileComponent {
     // set the position of the sprite in the center of the screen
     this.setTilePosition(4, 5, 1);
 
-    this._spriteController.commitToBuffer();
-
     this._walkAnimation = new Curve();
     this._walkAnimation
       .points([
@@ -237,10 +235,10 @@ export class PlayerController extends TileComponent {
     // toggle and animation. This can happen when not walking too.
     if (this._walkAnimation.getValue() == 0) {
       this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
-      this._spriteController.setSprite(this._sprites[0], true);
+      this._spriteController.setSprite(this._sprites[0]);
     } else if (this._walkAnimation.getValue() == 1) {
       this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
-      this._spriteController.setSprite(this._sprites[1], true);
+      this._spriteController.setSprite(this._sprites[1]);
     }
   }
 

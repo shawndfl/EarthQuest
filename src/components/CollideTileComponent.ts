@@ -21,6 +21,7 @@ export class CollideTileComponent extends TileComponent {
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
+    console.warn('collision component ');
     return false;
   }
 
@@ -42,8 +43,7 @@ export class CollideTileComponent extends TileComponent {
     this._type = parts[0];
     this._spriteId = parts[1];
     this._tileId = TileFactory.createStaticID(i, j, k);
-    this._spriteController.activeSprite(TileFactory.createStaticID(i, j, k));
-
+    this._spriteController.activeSprite(this._tileId);
     this._spriteController.setSprite(this._spriteId);
     this._spriteController.scale(this.eng.tileScale);
 

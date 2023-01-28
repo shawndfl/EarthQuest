@@ -22,6 +22,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   protected _selectedSpriteId: string;
   protected _viewOffset: vec2;
   protected _viewScale: number;
+  protected _dirty: boolean;
 
   abstract get sprite(): Sprite;
 
@@ -50,6 +51,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
     this._spriteData = [];
     this._indexLookup = new Map<string, number>();
     this._selectedSpriteIndex = 0;
+    this._dirty = true;
   }
 
   /**
@@ -72,6 +74,9 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
 
     // setup the shader for the sprite
     this._spriteTexture = texture;
+
+    // needs to be committed to buffer when update is called
+    this._dirty = true;
   }
 
   /**
@@ -91,11 +96,9 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    * @param scale multiplied by the sprite width and height
    * @param depth is depth buffer space (-1 to 1) 1 is far -1 is near
    */
-  setSpritePosition(x: number, y: number, depth?: number, commitToBuffer?: boolean) {
+  setSpritePosition(x: number, y: number, depth?: number) {
     this.sprite.setPosition(x, y, depth);
-    if (commitToBuffer) {
-      this.commitToBuffer();
-    }
+    this._dirty = true;
   }
 
   spriteWidth() {
@@ -112,6 +115,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   scale(scale: number | { x: number; y: number }) {
     this.sprite.setSpriteScale(scale);
+    this._dirty = true;
   }
 
   /**
@@ -120,6 +124,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   flip(flipDirection: SpriteFlip): void {
     this.sprite.setSpriteFlip(flipDirection);
+    this._dirty = true;
   }
 
   /**
@@ -128,6 +133,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   rotate(angle: number): void {
     this.sprite.setSpriteRotate(angle);
+    this._dirty = true;
   }
 
   /**
@@ -137,6 +143,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   viewOffset(offset?: vec2) {
     this._viewOffset = offset;
+    this._dirty = true;
   }
 
   /**
@@ -146,13 +153,14 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   viewScale(scale?: number) {
     this._viewScale = scale;
+    this._dirty = true;
   }
 
   /**
    * Select a sprite
    * @param id the id in the sprite sheet
    */
-  setSprite(id?: string | number, commitToBuffer?: boolean) {
+  setSprite(id?: string | number) {
     // find the sprite of a given id
 
     let index = 0;
@@ -182,9 +190,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
         spriteWidth: sprite.loc[2],
         spriteHeight: sprite.loc[3],
       });
-      if (commitToBuffer) {
-        this.commitToBuffer();
-      }
+      this._dirty = true;
     } else {
       console.error('cannot find sprite ' + id);
     }
@@ -200,6 +206,12 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    * @param dt
    */
   update(dt: number) {
+    // only commit to buffer if something changed
+    if (this._dirty) {
+      this.commitToBuffer();
+      this._dirty = false;
+    }
+
     if (!this._buffer.buffersCreated) {
       console.error('buffers are not created. Call commitToBuffers() first.');
     } else {
