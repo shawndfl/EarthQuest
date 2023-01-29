@@ -1,10 +1,10 @@
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { CollideTileComponent } from '../components/CollideTileComponent';
+import { CollideTileComponent } from './CollideTileComponent';
 import { TileComponent } from './TileComponent';
 import { Curve, CurveType } from '../math/Curve';
 
-export class CoinComponents extends CollideTileComponent {
+export class GoldComponents extends CollideTileComponent {
   private _collected: boolean;
   private _idleCurve: Curve;
   /** The name of the sprite without the .1, .2, etc. */

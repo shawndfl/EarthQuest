@@ -1,4 +1,4 @@
-import { CoinComponents } from '../components/CoinComponent';
+import { GoldComponents } from '../components/GoldComponent';
 import { CollideTileComponent } from '../components/CollideTileComponent';
 import { Component } from '../components/Component';
 import { EmptyTile } from '../components/EmptyTile';
@@ -59,8 +59,8 @@ export class TileFactory extends Component {
       return player;
     } else if (type.startsWith('npc')) {
       return new NpcComponent(this.eng, type, i, j, k);
-    } else if (type.startsWith('coin')) {
-      return new CoinComponents(this.eng, this.spriteBatch, type, i, j, k);
+    } else if (type.startsWith('gold')) {
+      return new GoldComponents(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('collide')) {
       return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else {

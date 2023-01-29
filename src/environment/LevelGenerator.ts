@@ -229,7 +229,7 @@ export class LevelGenerator extends Component {
   }
 
   getCoin() {
-    return 'coin|coin.1';
+    return 'gold|coin.1';
   }
   getCollision() {
     return 'collide|tree';

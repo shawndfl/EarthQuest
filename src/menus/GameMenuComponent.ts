@@ -22,6 +22,8 @@ export class GameMenuComponent extends Component {
   protected _dirty: boolean;
   protected _cursor: DialogCursor;
 
+  private _formattedTime: string;
+
   onHide: (dialog: GameMenuComponent) => boolean;
 
   get id(): string {
@@ -46,14 +48,35 @@ export class GameMenuComponent extends Component {
   initialize(spriteController: SpritBatchController) {
     this._spriteController = spriteController;
     this._dialogBuild.initialize(this._spriteController);
-    this._cursor.initialize(
-      'cursor.1',
-      this._spriteController,
-      [new vec2(75, 490), new vec2(75, 440), new vec2(75, 390), new vec2(75, 340)],
-      (index) => {
-        console.debug('selecting index ' + index);
+
+    // menu options positions
+    const items = new vec2(30, 540);
+    const status = new vec2(30, 480);
+    const equip = new vec2(30, 430);
+    const map = new vec2(30, 370);
+    const save = new vec2(30, 320);
+
+    this._cursor.initialize('cursor.1', this._spriteController, [items, status, equip, map, save], (index) => {
+      switch (index) {
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        case 4:
+          this.save();
+          break;
       }
-    );
+
+      console.debug('selecting index ' + index);
+    });
+  }
+
+  save() {
+    this.eng.gameManager.save();
   }
 
   setPosition(x: number, y: number) {
@@ -66,6 +89,14 @@ export class GameMenuComponent extends Component {
     this._visible = true;
     this._dirty = true;
     this._cursor.show(0);
+  }
+
+  getFormattedTime(): string {
+    const t = this.eng.gameManager.data.player.timePlayed;
+    let time = t.h.toString().padStart(2, '0');
+    time += ':' + t.m.toString().padStart(2, '0');
+    time += ':' + t.s.toString().padStart(2, '0');
+    return time;
   }
 
   hide() {
@@ -121,25 +152,42 @@ export class GameMenuComponent extends Component {
 
       this._spriteController.commitToBuffer();
 
-      const textPos = new vec2(this._pos.x + this._textOffset.x, this._pos.y + this._textOffset.y);
+      const gold = this.eng.gameManager.data.player.gold.toString();
       this.eng.textManager.setTextBlock({
-        id: this.id,
-        text: this._text,
-        position: textPos,
-        color: new vec4([0.9, 0.9, 1.0, 1.0]),
+        id: 'menu.gold',
+        text: gold.padStart(7, '0'),
+        position: new vec2([90, 370]),
+        color: new vec4([0.0, 0.0, 0.0, 1.0]),
         depth: -1,
         scale: 1.0,
       });
     } else {
-      this.eng.textManager.hideText(this.id);
       this._dialogBuild.hide();
       this._cursor.hide();
+      this.eng.textManager.hideText('menu.gold');
+      this.eng.textManager.hideText('menu.time');
     }
   }
+
   update(dt: number) {
     if (this._dirty) {
       this.redraw();
       this._dirty = false;
+    }
+
+    // show the time updates
+    if (this.visible) {
+      if (this._formattedTime != this.getFormattedTime()) {
+        this._formattedTime = this.getFormattedTime();
+        this.eng.textManager.setTextBlock({
+          id: 'menu.time',
+          text: this._formattedTime,
+          position: new vec2([90, 430]),
+          color: new vec4([0.0, 0.0, 0.0, 1.0]),
+          depth: -1,
+          scale: 1.0,
+        });
+      }
     }
 
     this._cursor.update(dt);

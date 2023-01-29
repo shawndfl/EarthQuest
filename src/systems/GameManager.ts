@@ -10,9 +10,11 @@ const localStorageKey = 'EarthQuest';
  */
 export class GameManager extends Component {
   data: GameData;
+  private _timeCounter: number;
 
   constructor(eng: Engine) {
     super(eng);
+    this._timeCounter = 0;
   }
 
   /**
@@ -20,7 +22,7 @@ export class GameManager extends Component {
    */
   initialize() {
     if (localStorage.getItem(localStorageKey)) {
-      this.data = localStorage[localStorageKey];
+      this.data = JSON.parse(localStorage[localStorageKey]);
     } else {
       this.data = new GameData();
     }
@@ -39,15 +41,19 @@ export class GameManager extends Component {
    */
   update(dt: number) {
     const t = this.data.player.timePlayed;
-    t.s += Math.floor(dt / 1000);
-    if (t.s >= 60) {
-      t.s -= 60;
-      t.m++;
-    }
+    this._timeCounter += dt;
+    if (this._timeCounter > 1000) {
+      t.s++;
+      this._timeCounter = this._timeCounter % 1000;
+      if (t.s >= 60) {
+        t.s -= 60;
+        t.m++;
+      }
 
-    if (t.m >= 60) {
-      t.m -= 60;
-      t.h++;
+      if (t.m >= 60) {
+        t.m -= 60;
+        t.h++;
+      }
     }
   }
 }
