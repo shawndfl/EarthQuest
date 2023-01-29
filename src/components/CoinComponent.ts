@@ -19,6 +19,11 @@ export class CoinComponents extends CollideTileComponent {
       console.debug('collect coin');
 
       this._spriteController.removeSprite(this._tileId);
+      // keep track of the gold created
+      this.eng.gameManager.data.player.gold++;
+
+      console.debug('gold collected ' + this.eng.gameManager.data.player.gold);
+
       this._collected = true;
     }
   }
@@ -42,11 +47,11 @@ export class CoinComponents extends CollideTileComponent {
       },
       {
         p: 1,
-        t: 500,
+        t: 1000,
       },
       {
         p: 2,
-        t: 1000,
+        t: 1200,
       },
       {
         p: 0,
@@ -54,6 +59,7 @@ export class CoinComponents extends CollideTileComponent {
       },
     ]);
     this._idleCurve.repeat(-1);
+    //this._idleCurve.pingPong(true);
     this._idleCurve.start(true, undefined, (val) => {
       if (!this._collected) {
         this._spriteController.activeSprite(this._tileId);
@@ -63,6 +69,9 @@ export class CoinComponents extends CollideTileComponent {
     });
     // we have animations so register for updates
     this.groundManager.registerForUpdate(this);
+
+    // keep track of the gold created
+    this.eng.gameManager.data.environment.gold++;
   }
 
   update(dt: number) {

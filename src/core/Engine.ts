@@ -16,6 +16,7 @@ import Level1 from '../assets/level1.json';
 import { FpsController } from './FpsController';
 import { Random } from '../utilities/Random';
 import { AssetManager } from '../systems/AssetManager';
+import { GameManager } from '../systems/GameManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -32,6 +33,7 @@ export class Engine {
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
   readonly battleManager: BattleManager;
+  readonly gameManager: GameManager;
   readonly fps: FpsController;
   readonly random: Random;
   readonly assetManager: AssetManager;
@@ -57,6 +59,7 @@ export class Engine {
 
   constructor(readonly gl: WebGL2RenderingContext) {
     this.random = new Random(1001);
+    this.gameManager = new GameManager(this);
     this.scene = new WorldScene(this);
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper(this);
@@ -90,6 +93,7 @@ export class Engine {
     // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
+    await this.gameManager.initialize();
     await this.assetManager.initialize();
 
     await this.textManager.initialize();
@@ -125,6 +129,9 @@ export class Engine {
     // clear the buffers
     this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
+
+    // update time for game manager
+    this.gameManager.update(dt);
 
     this.battleManager.update(dt);
 
