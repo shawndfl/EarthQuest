@@ -47,11 +47,7 @@ export default class vec3 {
     this.values[2] = values[2];
   }
 
-  constructor(
-    values?: [number, number, number] | number,
-    y?: number,
-    z?: number
-  ) {
+  constructor(values?: [number, number, number] | number, y?: number, z?: number) {
     if (values !== undefined) {
       if (typeof values === 'number') {
         this.values[0] = values;
@@ -68,7 +64,7 @@ export default class vec3 {
     }
   }
 
-  private values = new Float32Array(3);
+  values = new Float32Array(3);
 
   static readonly zero = new vec3([0, 0, 0]);
   static readonly one = new vec3([1, 1, 1]);
@@ -389,8 +385,6 @@ export default class vec3 {
   }
 
   toString() {
-    return (
-      this.x.toFixed(5) + ', ' + this.y.toFixed(5) + ', ' + this.z.toFixed(5)
-    );
+    return this.x.toFixed(5) + ', ' + this.y.toFixed(5) + ', ' + this.z.toFixed(5);
   }
 }

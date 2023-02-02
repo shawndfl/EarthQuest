@@ -128,7 +128,7 @@ export abstract class TileComponent extends Component {
    */
   canAccessTile(tileComponent: TileComponent): boolean {
     if (this.empty) {
-      console.warn('empty component');
+      //console.warn('empty component');
     } else {
       console.warn(' default component');
     }

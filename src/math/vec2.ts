@@ -44,7 +44,7 @@ export default class vec2 {
     }
   }
 
-  private values = new Float32Array(2);
+  values = new Float32Array(2);
 
   static readonly zero = new vec2([0, 0]);
   static readonly one = new vec2([1, 1]);

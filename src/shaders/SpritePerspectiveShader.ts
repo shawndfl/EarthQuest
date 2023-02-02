@@ -30,7 +30,7 @@ uniform sampler2D uSampler;
 
 void main() {
   mediump vec4 color = texture2D(uSampler, vTex);
-    if(color.a < .30) {
+    if(color.a < .001) {
       discard;
     } 
 

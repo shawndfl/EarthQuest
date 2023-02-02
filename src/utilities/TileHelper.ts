@@ -2,6 +2,7 @@ import { Component } from '../components/Component';
 import mat4 from '../math/mat4';
 import vec3 from '../math/vec3';
 import { Engine } from '../core/Engine';
+import vec2 from '../math/vec2';
 
 /**
  * This class is used to convert tile and screen coordinates
@@ -9,7 +10,7 @@ import { Engine } from '../core/Engine';
 export class TileHelper extends Component {
   protected _toScreen: mat4;
   protected _toTile: mat4;
-  depthScale: number;
+  readonly depthScale: number;
 
   constructor(eng: Engine) {
     super(eng);
@@ -64,27 +65,32 @@ export class TileHelper extends Component {
     this._toTile.inverse();
   }
 
-  screenVectorToTileSpace(screenVector: vec3): vec3 {
-    const xAxis = this._toTile.col(0);
-    const yAxis = this._toTile.col(1);
+  /**
+   * Rotates a vector in the xy plane to a ~45 degree isometric plane
+   * @param tileVector
+   * @returns
+   */
+  rotateToTileSpace(tileVector: vec3 | vec2): vec3 {
+    let world = new vec3(tileVector.x, tileVector.y, (tileVector as any).z ?? 0);
 
     const right = new vec3(0.5, -0.5, 0);
     const up = new vec3(-0.5, -0.5, 0);
 
-    const x = vec3.dot(screenVector, right.normalize());
-    const y = vec3.dot(screenVector, up.normalize());
-
+    const x = vec3.dot(world, right.normalize());
+    const y = vec3.dot(world, up.normalize());
     return new vec3(x, y, 0);
   }
 
-  toTileLoc(x: number, y: number, z: number): { i: number; j: number; k: number } {
-    const screen = new vec3([x, y, z]);
-    let cell = this._toTile.multiplyVec3(screen);
-    return { i: cell.x, j: cell.y, k: cell.z };
+  toTileLoc(screenPixels: vec3, proj?: mat4): vec3 {
+    const noTranslation = this._toTile.copy();
+    noTranslation.translate(vec3.zero);
+    //screenPixels.z = 2 * (screenPixels.y / (this.eng.height * this.depthScale)) - 1;
+
+    let cell = this._toTile.multiplyVec3(screenPixels);
+    return cell;
   }
 
   toScreenLoc(i: number, j: number, k: number): vec3 {
-    this.eng.viewManager.screenX;
     const cell = new vec3([i, j, k]);
 
     const screen = this._toScreen.multiplyVec3(cell);

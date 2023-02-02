@@ -68,7 +68,7 @@ export class LevelGenerator extends Component {
     this.createEmpty();
 
     // position the character
-    const characterPos = this.getRandomPoint();
+    const characterPos = new vec2(0, 0); //this.getRandomPoint();
     const player = this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
     this._tiles[1][characterPos.y][characterPos.x] = player;
 

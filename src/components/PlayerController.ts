@@ -42,9 +42,6 @@ export class PlayerController extends TileComponent {
   /** The sprite controller for the player */
   protected _spriteController: SpritController;
 
-  /** the height above sea level of the player */
-  private _playerHeight: number;
-
   /**
    * Get the sprite controller
    */
@@ -60,8 +57,8 @@ export class PlayerController extends TileComponent {
     return 'player';
   }
 
-  get height(): number {
-    return this._playerHeight;
+  get heightIndex(): number {
+    return this._tileIndex.z;
   }
 
   set slopVector(val: vec2) {
@@ -83,7 +80,6 @@ export class PlayerController extends TileComponent {
     this._speed = 3.0; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
-    this._playerHeight = 0;
     this._slopVector = new vec2([0, 0]);
   }
 
@@ -123,11 +119,7 @@ export class PlayerController extends TileComponent {
 
     // if the user tapped or clicked on the screen
     if ((state.action & UserAction.Tap) > 0) {
-      const pos = new vec2();
-      pos.x = this.screenPosition.x - this.eng.viewManager.screenX;
-      pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
-      this._moveTarget = state.touchPoint.subtract(pos);
-      console.debug('target ' + this._moveTarget.toString());
+      this.handleTap(state);
     } else if ((state.action & UserAction.ActionPressed) > 0) {
       // action event
       this.eng.scene.ground.raisePlayerAction(this);
@@ -161,6 +153,84 @@ export class PlayerController extends TileComponent {
     }
 
     return true;
+  }
+
+  /**
+   * Handle the tap event. This will allow the player to touch a point on the screen
+   * and the character will walk towards that point. If the character can not get there in 2
+   * seconds the character will stop moving. When the character gets to the destination the action
+   * event will be raised automatically.
+   * @param state
+   */
+  handleTap(state: InputState) {
+    let touch = state.touchPoint;
+    const scaleHeight = this.eng.height * this.eng.tileHelper.depthScale;
+
+    const screen = new vec3();
+
+    // x and y screen points are offset by the projection offset.
+    screen.x = touch.x + this.eng.viewManager.screenX;
+    screen.y = touch.y + this.eng.viewManager.screenY;
+
+    // this is offset based on the players height index
+    const yOffset = screen.y + 8 * this.heightIndex;
+
+    // the depth range is from 1 to -1, back to front. Calculate the z depth
+    screen.z = (yOffset / scaleHeight - this.eng.height / scaleHeight) * 2 + 1;
+
+    const touchTile = this.eng.tileHelper.toTileLoc(
+      new vec3(screen.x, screen.y, screen.z),
+      this.eng.viewManager.projection
+    );
+
+    // get the touch index of the tile. we want the center so add .5 to i and j
+    const touchIndex = new vec3(Math.floor(touchTile.x) + 0.5, Math.floor(touchTile.y) + 0.5, Math.floor(touchTile.z));
+
+    console.debug('tapped: ' + screen.toString() + '\n: ' + touchIndex.toString());
+
+    const pos = new vec2();
+    pos.x = this.screenPosition.x - this.eng.viewManager.screenX;
+    pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
+
+    // get the direction of the movement based on the mouse cursor or touch point
+    this._moveTarget = state.touchPoint.subtract(pos);
+
+    return;
+
+    this._moveTarget;
+    const length = this._moveTarget.length();
+    const actionLength = 32; // if we touch within 32 pixels of the center of the character
+
+    if (length < actionLength) {
+      // action event
+      this.eng.scene.ground.raisePlayerAction(this);
+    } else {
+      this._moveTarget.normalize();
+      const deadZone = 0.3;
+
+      // move left
+      if (this._moveTarget.x < -deadZone) {
+        this._walkDirection = this._walkDirection | MoveDirection.W;
+        this._walking = true;
+      }
+      // move right
+      if (this._moveTarget.x > deadZone) {
+        this._walkDirection = this._walkDirection | MoveDirection.E;
+        this._walking = true;
+      }
+      // move down
+      if (this._moveTarget.y < -deadZone) {
+        this._walkDirection = this._walkDirection | MoveDirection.S;
+        this._walking = true;
+      }
+      // move up
+      if (this._moveTarget.y > deadZone) {
+        this._walkDirection = this._walkDirection | MoveDirection.N;
+        this._walking = true;
+      }
+    }
+
+    console.debug('target ' + this._moveTarget.toString());
   }
 
   update(dt: number) {
@@ -224,7 +294,7 @@ export class PlayerController extends TileComponent {
       );
 
       // convert movement vector from screen space to tile space
-      const tileVector = this.eng.tileHelper.screenVectorToTileSpace(moveVector);
+      const tileVector = this.eng.tileHelper.rotateToTileSpace(moveVector);
 
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
@@ -245,7 +315,7 @@ export class PlayerController extends TileComponent {
   protected updateSpritePosition() {
     super.updateSpritePosition();
 
-    console.debug('tile pos ' + this.tilePosition.toString());
+    console.debug('pos ' + this.tilePosition.toString() + '\n  : ' + this.screenPosition.toString());
 
     // update the view manger with the player new position
     this.eng.viewManager.setTarget(

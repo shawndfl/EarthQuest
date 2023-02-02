@@ -27,9 +27,14 @@ export class OpenTileComponent extends TileComponent {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent): boolean {
-    const tileAbove = this.groundManager.getTile(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z + 1);
+    // can not access this tile if the player is on top of it
+    if (tileComponent.tileIndex.z - 1 !== this.tileIndex.z) {
+      return false;
+    }
 
-    return tileAbove.empty || tileAbove.canAccessTile(tileComponent);
+    // see if we can access the tile on top of this tile
+    const tileAboveGround = this.groundManager.getTile(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z + 1);
+    return tileAboveGround.empty || tileAboveGround.canAccessTile(tileComponent);
   }
 
   get spriteController(): SpritBaseController {
