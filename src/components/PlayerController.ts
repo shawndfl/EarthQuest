@@ -36,9 +36,6 @@ export class PlayerController extends TileComponent {
   /** the slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
 
-  /** the target the character should move to */
-  private _moveTarget: vec2;
-
   /** The sprite controller for the player */
   protected _spriteController: SpritController;
 
@@ -172,6 +169,8 @@ export class PlayerController extends TileComponent {
     screen.x = touch.x + this.eng.viewManager.screenX;
     screen.y = touch.y + this.eng.viewManager.screenY;
 
+    console.debug('touch point ' + screen.toString());
+
     // this is offset based on the players height index
     const yOffset = screen.y + 8 * this.heightIndex;
 
@@ -183,53 +182,13 @@ export class PlayerController extends TileComponent {
       this.eng.viewManager.projection
     );
 
-    // get the touch index of the tile. we want the center so add .5 to i and j
-    const touchIndex = new vec3(Math.floor(touchTile.x) + 0.5, Math.floor(touchTile.y) + 0.5, Math.floor(touchTile.z));
-
-    console.debug('tapped: ' + screen.toString() + '\n: ' + touchIndex.toString());
-
     const pos = new vec2();
     pos.x = this.screenPosition.x - this.eng.viewManager.screenX;
     pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
 
     // get the direction of the movement based on the mouse cursor or touch point
-    this._moveTarget = state.touchPoint.subtract(pos);
-
-    return;
-
-    this._moveTarget;
-    const length = this._moveTarget.length();
-    const actionLength = 32; // if we touch within 32 pixels of the center of the character
-
-    if (length < actionLength) {
-      // action event
-      this.eng.scene.ground.raisePlayerAction(this);
-    } else {
-      this._moveTarget.normalize();
-      const deadZone = 0.3;
-
-      // move left
-      if (this._moveTarget.x < -deadZone) {
-        this._walkDirection = this._walkDirection | MoveDirection.W;
-        this._walking = true;
-      }
-      // move right
-      if (this._moveTarget.x > deadZone) {
-        this._walkDirection = this._walkDirection | MoveDirection.E;
-        this._walking = true;
-      }
-      // move down
-      if (this._moveTarget.y < -deadZone) {
-        this._walkDirection = this._walkDirection | MoveDirection.S;
-        this._walking = true;
-      }
-      // move up
-      if (this._moveTarget.y > deadZone) {
-        this._walkDirection = this._walkDirection | MoveDirection.N;
-        this._walking = true;
-      }
-    }
-
+    this._moveTarget = new vec3(screen.x, screen.y, 0); //touchTile;
+    this._movingToTargetTimer = 0;
     console.debug('target ' + this._moveTarget.toString());
   }
 
@@ -237,7 +196,83 @@ export class PlayerController extends TileComponent {
     this._spriteController.update(dt);
     this._walkAnimation.update(dt);
 
+    this.walkToTarget(dt);
+
     this.walkAnimation(dt, this._walkDirection);
+  }
+
+  private _movingToTargetTimer: number;
+  /** the target the character should move to */
+  private _moveTarget: vec3;
+  private _moveDirection: vec3;
+
+  walkToTarget(dt: number) {
+    const wasWalking = this._walking;
+
+    if (this._moveTarget) {
+      // reset direction and walking
+      this._walkDirection = MoveDirection.None;
+      this._walking = false;
+
+      // increment timer
+      this._movingToTargetTimer += dt;
+
+      // get movement direction
+      const playerScreen = this.screenPosition;
+      const direction = this._moveTarget.copy().subtract(playerScreen);
+
+      // did the player make it to the target or did the time expire
+      if (direction.length() > 20.0 && this._movingToTargetTimer < 3000) {
+        const dir = direction.copy();
+        dir.normalize();
+
+        const deadZone = 0.8;
+        console.debug('t-> pos ' + playerScreen);
+        console.debug('t-> target ' + this._moveTarget);
+        console.debug('t-> direction ' + dir, direction.length().toFixed(3));
+
+        // move left
+        if (dir.x < -deadZone) {
+          this._walkDirection = this._walkDirection | MoveDirection.W;
+          this._walking = true;
+          console.debug('t->  moving left ');
+        }
+        // move right
+        else if (dir.x > deadZone) {
+          this._walkDirection = this._walkDirection | MoveDirection.E;
+          this._walking = true;
+          console.debug('t->  moving right ');
+        }
+
+        // move down
+        if (dir.y < -deadZone) {
+          this._walkDirection = this._walkDirection | MoveDirection.S;
+          this._walking = true;
+          console.debug('t->  moving down ');
+        }
+        // move up
+        else if (dir.y > deadZone) {
+          this._walkDirection = this._walkDirection | MoveDirection.N;
+          this._walking = true;
+          console.debug('t->  moving up ');
+        }
+
+        // We are now walking start the animations
+        if (!wasWalking && this._walking) {
+          this._walkAnimation.start(true);
+        } else if (!this._walking) {
+          this._walkAnimation.pause(0);
+        }
+      } else {
+        console.debug('done!!');
+        // we are done moving so reset everything
+        this._walking = false;
+        this._walkDirection = MoveDirection.None;
+        this._moveTarget = undefined;
+        this._movingToTargetTimer = 0;
+        this._walkAnimation.pause(0);
+      }
+    }
   }
 
   walkAnimation(dt: number, direction: MoveDirection) {

@@ -81,6 +81,18 @@ export class TileHelper extends Component {
     return new vec3(x, y, 0);
   }
 
+  rotateFromTileSpace(screenVector: vec3 | vec2): vec3 {
+    let world = new vec3(screenVector.x, screenVector.y, (screenVector as any).z ?? 0);
+
+    const d = 1.0 / (-0.25 - 0.25);
+    const right = new vec3(d * -0.5, d * 0.5, 0);
+    const up = new vec3(d * 0.5, d * 0.5, 0);
+
+    const x = vec3.dot(world, right.normalize());
+    const y = vec3.dot(world, up.normalize());
+    return new vec3(x, y, 0);
+  }
+
   toTileLoc(screenPixels: vec3, proj?: mat4): vec3 {
     const noTranslation = this._toTile.copy();
     noTranslation.translate(vec3.zero);
