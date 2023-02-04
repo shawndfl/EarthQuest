@@ -9,6 +9,7 @@ import vec2 from '../math/vec2';
 import { TileComponent } from './TileComponent';
 import vec3 from '../math/vec3';
 import { InputState } from '../core/InputHandler';
+import { AutoMoveController } from './AutoMoveController';
 
 export enum MoveDirection {
   None = 0x00,
@@ -25,6 +26,8 @@ export class PlayerController extends TileComponent {
   protected _walkDirection: MoveDirection;
   /** is the player walking */
   private _walking: boolean;
+  /** was the player walking last frame */
+  private _wasWalking: boolean;
   /** the walk animation. This is just two frames */
   protected _walkAnimation: Curve;
   /** The speed the player can walk at */
@@ -35,6 +38,9 @@ export class PlayerController extends TileComponent {
   private _spriteFlip: boolean;
   /** the slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
+
+  /** used to move the player when screen is tapped */
+  private _moveController: AutoMoveController;
 
   /** The sprite controller for the player */
   protected _spriteController: SpritController;
@@ -78,6 +84,7 @@ export class PlayerController extends TileComponent {
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     this._spriteFlip = false;
     this._slopVector = new vec2([0, 0]);
+    this._moveController = new AutoMoveController(this.eng);
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
@@ -107,12 +114,12 @@ export class PlayerController extends TileComponent {
    * @returns True if the action was handled else false
    */
   handleUserAction(state: InputState): boolean {
-    const wasWalking = this._walking;
+    // the player is taking over now
+    this._moveController.cancelMove();
 
     //console.debug('action ' + action + ' was walking ' + wasWalking);
     this._walkDirection = MoveDirection.None;
     this._walking = false;
-    this._moveTarget = null;
 
     // if the user tapped or clicked on the screen
     if ((state.action & UserAction.Tap) > 0) {
@@ -143,7 +150,7 @@ export class PlayerController extends TileComponent {
     }
 
     // We are now walking start the animations
-    if (!wasWalking && this._walking) {
+    if (!this._wasWalking && this._walking) {
       this._walkAnimation.start(true);
     } else if (!this._walking) {
       this._walkAnimation.pause(0);
@@ -161,9 +168,7 @@ export class PlayerController extends TileComponent {
    */
   handleTap(state: InputState) {
     let touch = state.touchPoint;
-    const scaleHeight = this.eng.height * this.eng.tileHelper.depthScale;
-
-    const screen = new vec3();
+    const screen = new vec2();
 
     // x and y screen points are offset by the projection offset.
     screen.x = touch.x + this.eng.viewManager.screenX;
@@ -171,64 +176,21 @@ export class PlayerController extends TileComponent {
 
     console.debug('touch point ' + screen.toString());
 
-    // this is offset based on the players height index
-    const yOffset = screen.y + 8 * this.heightIndex;
-
-    // the depth range is from 1 to -1, back to front. Calculate the z depth
-    screen.z = (yOffset / scaleHeight - this.eng.height / scaleHeight) * 2 + 1;
-
-    const touchTile = this.eng.tileHelper.toTileLoc(
-      new vec3(screen.x, screen.y, screen.z),
-      this.eng.viewManager.projection
-    );
-
-    const pos = new vec2();
-    pos.x = this.screenPosition.x - this.eng.viewManager.screenX;
-    pos.y = this.screenPosition.y - this.eng.viewManager.screenY;
-
-    // get the direction of the movement based on the mouse cursor or touch point
-    this._moveTarget = new vec3(screen.x, screen.y, 0); //touchTile;
-    this._movingToTargetTimer = 0;
-    console.debug('target ' + this._moveTarget.toString());
-  }
-
-  update(dt: number) {
-    this._spriteController.update(dt);
-    this._walkAnimation.update(dt);
-
-    this.walkToTarget(dt);
-
-    this.walkAnimation(dt, this._walkDirection);
-  }
-
-  private _movingToTargetTimer: number;
-  /** the target the character should move to */
-  private _moveTarget: vec3;
-  private _moveDirection: vec3;
-
-  walkToTarget(dt: number) {
-    const wasWalking = this._walking;
-
-    if (this._moveTarget) {
-      // reset direction and walking
-      this._walkDirection = MoveDirection.None;
-      this._walking = false;
-
-      // increment timer
-      this._movingToTargetTimer += dt;
-
-      // get movement direction
-      const playerScreen = this.screenPosition;
-      const direction = this._moveTarget.copy().subtract(playerScreen);
-
-      // did the player make it to the target or did the time expire
-      if (direction.length() > 20.0 && this._movingToTargetTimer < 3000) {
+    this._moveController.startMove(
+      screen,
+      this,
+      () => {
+        // reset direction and walking
+        this._walkDirection = MoveDirection.None;
+        this._walking = false;
+      },
+      (direction: vec2) => {
         const dir = direction.copy();
         dir.normalize();
 
-        const deadZone = 0.8;
-        console.debug('t-> pos ' + playerScreen);
-        console.debug('t-> target ' + this._moveTarget);
+        const deadZone = 0.5;
+        console.debug('t-> pos ' + this.screenPosition);
+        console.debug('t-> target ' + this._moveController.target);
         console.debug('t-> direction ' + dir, direction.length().toFixed(3));
 
         // move left
@@ -258,21 +220,31 @@ export class PlayerController extends TileComponent {
         }
 
         // We are now walking start the animations
-        if (!wasWalking && this._walking) {
+        if (!this._wasWalking && this._walking) {
           this._walkAnimation.start(true);
         } else if (!this._walking) {
           this._walkAnimation.pause(0);
         }
-      } else {
-        console.debug('done!!');
+      },
+      (timeOut: boolean) => {
+        if (!timeOut) {
+          // action event
+          this.eng.scene.ground.raisePlayerAction(this);
+        }
         // we are done moving so reset everything
         this._walking = false;
         this._walkDirection = MoveDirection.None;
-        this._moveTarget = undefined;
-        this._movingToTargetTimer = 0;
         this._walkAnimation.pause(0);
       }
-    }
+    );
+  }
+
+  update(dt: number) {
+    this._spriteController.update(dt);
+    this._walkAnimation.update(dt);
+    this._moveController.update(dt);
+
+    this.walkAnimation(dt, this._walkDirection);
   }
 
   walkAnimation(dt: number, direction: MoveDirection) {
@@ -345,6 +317,8 @@ export class PlayerController extends TileComponent {
       this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
       this._spriteController.setSprite(this._sprites[1]);
     }
+
+    this._wasWalking = this._walking;
   }
 
   protected updateSpritePosition() {

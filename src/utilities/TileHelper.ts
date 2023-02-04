@@ -93,6 +93,35 @@ export class TileHelper extends Component {
     return new vec3(x, y, 0);
   }
 
+  /**
+   * Converts a touch point in pixels to a tile location given a tile height index.
+   * @param touchPoint
+   * @param heightIndex 0 is floor level. The higher the index the higher the y pos
+   * @returns
+   */
+  screenTouchToTile(touchPoint: vec2, heightIndex: number) {
+    const scaleHeight = this.eng.height * this.eng.tileHelper.depthScale;
+
+    const screen = new vec3();
+
+    // x and y screen points are offset by the projection offset.
+    screen.x = touchPoint.x + this.eng.viewManager.screenX;
+    screen.y = touchPoint.y + this.eng.viewManager.screenY;
+
+    // this is offset based on the height index of the tile you are hitting
+    const yOffset = screen.y + 8 * heightIndex;
+
+    // the depth range is from 1 to -1, back to front. Calculate the z depth
+    screen.z = (yOffset / scaleHeight - this.eng.height / scaleHeight) * 2 + 1;
+
+    const touchTile = this.eng.tileHelper.toTileLoc(
+      new vec3(screen.x, screen.y, screen.z),
+      this.eng.viewManager.projection
+    );
+
+    return touchTile;
+  }
+
   toTileLoc(screenPixels: vec3, proj?: mat4): vec3 {
     const noTranslation = this._toTile.copy();
     noTranslation.translate(vec3.zero);
