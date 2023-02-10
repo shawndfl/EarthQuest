@@ -68,7 +68,7 @@ export class LevelGenerator extends Component {
     this.createEmpty();
 
     // position the character
-    const characterPos = new vec2(0, 0); //this.getRandomPoint();
+    const characterPos = this.getRandomPoint();
     const player = this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
     this._tiles[1][characterPos.y][characterPos.x] = player;
 
@@ -155,18 +155,32 @@ export class LevelGenerator extends Component {
 
     const param = this._creationParams;
 
-    for (let j = 0; j < param.length; j++) {
-      for (let i = 0; i < param.width; i++) {
+    // when creating the ground add padding so we can add in portals
+    for (let j = 1; j < param.length - 1; j++) {
+      for (let i = 1; i < param.width - 1; i++) {
         const option = Math.floor(this.ran * 50);
 
         // get the type and sprite id
-        let tileTypeAndSprite;
-
-        tileTypeAndSprite = this.getFloorTile();
+        let tileTypeAndSprite = this.getFloorTile();
         const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, groundIndex);
         // add the new tile
         tiles[groundIndex][j][i] = newTile;
       }
+    }
+
+    {
+      const portalLoc = this.getRandomPoint(new vec2(param.width - 1, 1), new vec2(0, param.length - 2));
+      const i = portalLoc.x;
+      const j = portalLoc.y;
+
+      // add portal
+      const tilePortalSprite = this.getFloorTile();
+
+      const tilePortal1 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 0, groundIndex);
+      const tilePortal2 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 1, groundIndex);
+      // add the new tile
+      tiles[groundIndex][j + 0][i] = tilePortal1;
+      tiles[groundIndex][j + 1][i] = tilePortal2;
     }
   }
 
@@ -203,12 +217,17 @@ export class LevelGenerator extends Component {
    * Get a random position for the character
    * @returns
    */
-  getRandomPoint(): vec2 {
+  getRandomPoint(offset?: vec2, scale?: vec2): vec2 {
     const pos = new vec2();
     const p = this._creationParams;
-
-    pos.x = Math.floor(this.ran * p.width);
-    pos.y = Math.floor(this.ran * p.length);
+    if (!offset) {
+      offset = new vec2(0, 0);
+    }
+    if (!scale) {
+      scale = new vec2(p.width, p.length);
+    }
+    pos.x = Math.floor(this.ran * scale.x + offset.x);
+    pos.y = Math.floor(this.ran * scale.y + offset.y);
 
     return pos;
   }

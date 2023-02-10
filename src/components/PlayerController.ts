@@ -82,6 +82,7 @@ export class PlayerController extends TileComponent {
     this._walking = false;
     this._speed = 3.0; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
+    //this._sprites = ['mario.down.step', 'mario.down.step'];
     this._spriteFlip = false;
     this._slopVector = new vec2([0, 0]);
     this._moveController = new AutoMoveController(this.eng);
@@ -282,6 +283,7 @@ export class PlayerController extends TileComponent {
     } else if ((direction & MoveDirection.S) > 0) {
       this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
       this._spriteFlip = false;
+
       dir.y = -1;
     } else if ((direction & MoveDirection.N) > 0) {
       this._sprites = ['ness.up.step', 'ness.up.step'];
