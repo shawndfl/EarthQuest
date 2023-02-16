@@ -50,7 +50,7 @@ export class InputHandler extends Component {
       window.addEventListener('mouseup', (e) => {
         this.action = this.action | UserAction.Tap;
         this.touchPoint = new vec2(e.offsetX, (e.target as any).height - e.offsetY);
-        //console.debug('mouse ' + this.touchPoint.x + ', ' + this.touchPoint.y);
+        console.debug('mouse ' + this.touchPoint.x + ', ' + this.touchPoint.y);
       });
     } else {
       console.debug(' touch enabled');
@@ -60,7 +60,7 @@ export class InputHandler extends Component {
           const t = e.touches[0].target as HTMLCanvasElement;
 
           this.touchPoint = new vec2(e.touches[0].pageX - t.clientTop, t.height - e.touches[0].screenY);
-          //console.debug('touch ' + this.touchPoint.x + ', ' + this.touchPoint.y, e);
+          console.debug('touch ' + this.touchPoint.x + ', ' + this.touchPoint.y, e);
         }
       });
     }

@@ -63,6 +63,8 @@ export class TileFactory extends Component {
       return new GoldComponents(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('collide')) {
       return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
+    } else if (type.startsWith('portal')) {
+      return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else {
       console.warn(' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);

@@ -6,34 +6,8 @@ import vec2 from '../math/vec2';
 import { TileFactory } from '../systems/TileFactory';
 import { Random } from '../utilities/Random';
 import { Timer } from '../utilities/Timer';
-
-export class LevelConstructionParams {
-  /** seed for generating the level */
-  seed: number;
-
-  /** size of the level */
-  width: number;
-  length: number;
-  height: number;
-
-  maxItems?: number;
-
-  maxEnemies?: number;
-}
-
-export class LevelGeneratorState {
-  /** current i,j,k cell locations */
-  i: number;
-  j: number;
-  k: number;
-
-  /** was the player placed */
-  playerPlaced: boolean;
-
-  itemCount: number;
-
-  houseCount: number;
-}
+import { LevelConstructionParams } from './LevelConstructionParams';
+import { LevelGeneratorState } from './LevelGeneratorState';
 
 /**
  * This class is used to generate levels
@@ -43,6 +17,18 @@ export class LevelGenerator extends Component {
   private _creationParams: LevelConstructionParams;
   private _random: Random;
   protected _tiles: TileComponent[][][];
+
+  /**
+   * Get the state of the level generation
+   */
+  get levelState(): LevelGeneratorState {
+    return this._levelState;
+  }
+
+  get creationParams(): LevelConstructionParams {
+    return this._creationParams;
+  }
+
   /**
    * Get the next random number
    */
@@ -169,6 +155,7 @@ export class LevelGenerator extends Component {
     }
 
     {
+      // create a portal
       const portalLoc = this.getRandomPoint(new vec2(param.width - 1, 1), new vec2(0, param.length - 2));
       const i = portalLoc.x;
       const j = portalLoc.y;
@@ -244,6 +231,17 @@ export class LevelGenerator extends Component {
       return 'open|block.grass.patch';
     } else {
       return 'open|block.grass';
+    }
+  }
+
+  getPortalTile() {
+    const option = Math.floor(this.ran * 50);
+    if (option == 2) {
+      return 'portal|block.grass.dirt|town1';
+    } else if (option == 3) {
+      return 'portal|block.grass.patch|town1';
+    } else {
+      return 'portal|block.grass|town1';
     }
   }
 

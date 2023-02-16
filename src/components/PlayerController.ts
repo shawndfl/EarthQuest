@@ -11,7 +11,7 @@ import vec3 from '../math/vec3';
 import { InputState } from '../core/InputHandler';
 import { AutoMoveController } from './AutoMoveController';
 
-export enum MoveDirection {
+export enum PointingDirection {
   None = 0x00,
   N = 0x01,
   E = 0x02,
@@ -23,7 +23,7 @@ export enum MoveDirection {
  */
 export class PlayerController extends TileComponent {
   /** The direction the player is facing */
-  protected _walkDirection: MoveDirection;
+  protected _facingDirection: PointingDirection;
   /** is the player walking */
   private _walking: boolean;
   /** was the player walking last frame */
@@ -36,8 +36,11 @@ export class PlayerController extends TileComponent {
   private _sprites: string[];
   /** Should the sprites be flipped */
   private _spriteFlip: boolean;
-  /** the slop vector for moving up or down in height. This is set from the environment */
+  /** The slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
+
+  /** The direction the player is walking */
+  private _walkingDirection: vec3;
 
   /** used to move the player when screen is tapped */
   private _moveController: AutoMoveController;
@@ -72,18 +75,19 @@ export class PlayerController extends TileComponent {
     return this._slopVector;
   }
 
-  get moveDirection(): MoveDirection {
-    return this._walkDirection;
+  get facingDirection(): PointingDirection {
+    return this._facingDirection;
   }
 
   constructor(eng: Engine) {
     super(eng);
-    this._walkDirection = MoveDirection.S;
+    this._facingDirection = PointingDirection.S;
     this._walking = false;
     this._speed = 3.0; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     //this._sprites = ['mario.down.step', 'mario.down.step'];
     this._spriteFlip = false;
+    this._walkingDirection = new vec3([0, 0, 0]);
     this._slopVector = new vec2([0, 0]);
     this._moveController = new AutoMoveController(this.eng);
   }
@@ -119,7 +123,7 @@ export class PlayerController extends TileComponent {
     this._moveController.cancelMove();
 
     //console.debug('action ' + action + ' was walking ' + wasWalking);
-    this._walkDirection = MoveDirection.None;
+    this._facingDirection = PointingDirection.None;
     this._walking = false;
 
     // if the user tapped or clicked on the screen
@@ -131,23 +135,35 @@ export class PlayerController extends TileComponent {
     } else if ((state.action & UserAction.MenuPressed) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {
+      const screenDirection = new vec2();
       // use arrow keys or d-pad on a game controller
       if ((state.action & UserAction.Left) > 0) {
-        this._walkDirection = this._walkDirection | MoveDirection.W;
+        this._facingDirection = this._facingDirection | PointingDirection.W;
+        screenDirection.x -= 1;
         this._walking = true;
       }
       if ((state.action & UserAction.Right) > 0) {
-        this._walkDirection = this._walkDirection | MoveDirection.E;
+        this._facingDirection = this._facingDirection | PointingDirection.E;
+        screenDirection.x += 1;
         this._walking = true;
       }
       if ((state.action & UserAction.Up) > 0) {
-        this._walkDirection = this._walkDirection | MoveDirection.N;
+        this._facingDirection = this._facingDirection | PointingDirection.N;
+        screenDirection.y += 1;
         this._walking = true;
       }
       if ((state.action & UserAction.Down) > 0) {
-        this._walkDirection = this._walkDirection | MoveDirection.S;
+        this._facingDirection = this._facingDirection | PointingDirection.S;
+        screenDirection.y -= 1;
         this._walking = true;
       }
+
+      this._walkingDirection.x = screenDirection.x * this._speed;
+      this._walkingDirection.y = screenDirection.y * this._speed;
+      this._walkingDirection.z = vec2.dot(screenDirection, this._slopVector);
+
+      // convert movement vector from screen space to tile space
+      this._walkingDirection = this.eng.tileHelper.rotateToTileSpace(this._walkingDirection);
     }
 
     // We are now walking start the animations
@@ -172,8 +188,8 @@ export class PlayerController extends TileComponent {
     const screen = new vec2();
 
     // x and y screen points are offset by the projection offset.
-    screen.x = touch.x + this.eng.viewManager.screenX;
-    screen.y = touch.y + this.eng.viewManager.screenY;
+    screen.x = touch.x;
+    screen.y = touch.y;
 
     console.debug('touch point ' + screen.toString());
 
@@ -182,7 +198,7 @@ export class PlayerController extends TileComponent {
       this,
       () => {
         // reset direction and walking
-        this._walkDirection = MoveDirection.None;
+        this._facingDirection = PointingDirection.None;
         this._walking = false;
       },
       (direction: vec2) => {
@@ -196,26 +212,26 @@ export class PlayerController extends TileComponent {
 
         // move left
         if (dir.x < -deadZone) {
-          this._walkDirection = this._walkDirection | MoveDirection.W;
+          this._facingDirection = this._facingDirection | PointingDirection.W;
           this._walking = true;
           console.debug('t->  moving left ');
         }
         // move right
         else if (dir.x > deadZone) {
-          this._walkDirection = this._walkDirection | MoveDirection.E;
+          this._facingDirection = this._facingDirection | PointingDirection.E;
           this._walking = true;
           console.debug('t->  moving right ');
         }
 
         // move down
         if (dir.y < -deadZone) {
-          this._walkDirection = this._walkDirection | MoveDirection.S;
+          this._facingDirection = this._facingDirection | PointingDirection.S;
           this._walking = true;
           console.debug('t->  moving down ');
         }
         // move up
         else if (dir.y > deadZone) {
-          this._walkDirection = this._walkDirection | MoveDirection.N;
+          this._facingDirection = this._facingDirection | PointingDirection.N;
           this._walking = true;
           console.debug('t->  moving up ');
         }
@@ -227,15 +243,18 @@ export class PlayerController extends TileComponent {
           this._walkAnimation.pause(0);
         }
       },
-      (timeOut: boolean) => {
+      (target: vec2, timeOut: boolean) => {
         if (!timeOut) {
           // action event
           this.eng.scene.ground.raisePlayerAction(this);
         }
         // we are done moving so reset everything
         this._walking = false;
-        this._walkDirection = MoveDirection.None;
+        this._facingDirection = PointingDirection.None;
         this._walkAnimation.pause(0);
+        // TODO move the the target position
+        //const tile = this.eng.tileHelper.toTileLoc(target, 1);
+        //this.moveToTilePosition(tile.x, tile.y);
       }
     );
   }
@@ -245,70 +264,48 @@ export class PlayerController extends TileComponent {
     this._walkAnimation.update(dt);
     this._moveController.update(dt);
 
-    this.walkAnimation(dt, this._walkDirection);
+    this.walkAnimation(dt, this._facingDirection);
   }
 
-  walkAnimation(dt: number, direction: MoveDirection) {
-    const dir = new vec2([0, 0]);
-
+  walkAnimation(dt: number, direction: PointingDirection) {
     // check multiple angle movements first so the else statements work correctly
-    if ((direction & MoveDirection.S) > 0 && (direction & MoveDirection.W) > 0) {
+    if ((direction & PointingDirection.S) > 0 && (direction & PointingDirection.W) > 0) {
       this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
       this._spriteFlip = false;
-      dir.x = -1;
-      dir.y = -1;
-    } else if ((direction & MoveDirection.S) > 0 && (direction & MoveDirection.E) > 0) {
+    } else if ((direction & PointingDirection.S) > 0 && (direction & PointingDirection.E) > 0) {
       this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
       this._spriteFlip = true;
-      dir.x = 1;
-      dir.y = -1;
-    } else if ((direction & MoveDirection.N) > 0 && (direction & MoveDirection.W) > 0) {
+    } else if ((direction & PointingDirection.N) > 0 && (direction & PointingDirection.W) > 0) {
       this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
       this._spriteFlip = false;
-      dir.x = -1;
-      dir.y = 1;
-    } else if ((direction & MoveDirection.N) > 0 && (direction & MoveDirection.E) > 0) {
+    } else if ((direction & PointingDirection.N) > 0 && (direction & PointingDirection.E) > 0) {
       this._sprites = ['ness.up.left.stand', 'ness.up.left.step'];
       this._spriteFlip = true;
-      dir.x = 1;
-      dir.y = 1;
-    } else if ((direction & MoveDirection.E) > 0) {
+    } else if ((direction & PointingDirection.E) > 0) {
       this._sprites = ['ness.left.stand', 'ness.left.step'];
       this._spriteFlip = true;
-      dir.x = 1;
-    } else if ((direction & MoveDirection.W) > 0) {
+    } else if ((direction & PointingDirection.W) > 0) {
       this._sprites = ['ness.left.stand', 'ness.left.step'];
       this._spriteFlip = false;
-      dir.x = -1;
-    } else if ((direction & MoveDirection.S) > 0) {
+    } else if ((direction & PointingDirection.S) > 0) {
       this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
       this._spriteFlip = false;
-
-      dir.y = -1;
-    } else if ((direction & MoveDirection.N) > 0) {
+    } else if ((direction & PointingDirection.N) > 0) {
       this._sprites = ['ness.up.step', 'ness.up.step'];
       this._spriteFlip = false;
       if (this._walkAnimation.getValue() == 0) {
         this._spriteFlip = true;
       }
-      dir.y = 1;
     }
 
     // only move if we are walking
     if (this._walking) {
-      const moveVector = new vec3(
-        dir.x * (dt / 1000.0) * this._speed,
-        dir.y * (dt / 1000.0) * this._speed,
-        vec2.dot(dir, this._slopVector)
-      );
-
-      // convert movement vector from screen space to tile space
-      const tileVector = this.eng.tileHelper.rotateToTileSpace(moveVector);
+      const moveVector = this._walkingDirection.scale(dt / 1000.0);
 
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
       // move up and down on stairs and slops
-      this.OffsetTilePosition(tileVector.x, tileVector.y, vec2.dot(dir, this._slopVector));
+      this.OffsetTilePosition(moveVector.x, moveVector.y, moveVector.z);
     }
 
     // toggle and animation. This can happen when not walking too.

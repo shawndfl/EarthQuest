@@ -105,8 +105,8 @@ export class TileHelper extends Component {
     const screen = new vec3();
 
     // x and y screen points are offset by the projection offset.
-    screen.x = touchPoint.x + this.eng.viewManager.screenX;
-    screen.y = touchPoint.y + this.eng.viewManager.screenY;
+    screen.x = touchPoint.x;
+    screen.y = touchPoint.y;
 
     // this is offset based on the height index of the tile you are hitting
     const yOffset = screen.y + 8 * heightIndex;
@@ -123,17 +123,12 @@ export class TileHelper extends Component {
   }
 
   toTileLoc(screenPixels: vec3, proj?: mat4): vec3 {
-    const noTranslation = this._toTile.copy();
-    noTranslation.translate(vec3.zero);
-    //screenPixels.z = 2 * (screenPixels.y / (this.eng.height * this.depthScale)) - 1;
-
     let cell = this._toTile.multiplyVec3(screenPixels);
     return cell;
   }
 
   toScreenLoc(i: number, j: number, k: number): vec3 {
     const cell = new vec3([i, j, k]);
-
     const screen = this._toScreen.multiplyVec3(cell);
 
     return screen;

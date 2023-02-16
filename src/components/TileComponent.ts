@@ -4,7 +4,6 @@ import { SpritBaseController } from '../graphics/SpriteBaseController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
 import { Component } from './Component';
-import { MoveDirection } from './PlayerController';
 
 /**
  * A tile component is a component that controls a single tile.
@@ -282,7 +281,11 @@ export abstract class TileComponent extends Component {
    * @param j
    * @param k
    */
-  moveToTilePosition(i: number, j: number, k: number) {
+  moveToTilePosition(i: number, j: number, k?: number) {
+    if (k === undefined) {
+      k = this._tilePosition.z;
+    }
+
     // we need this to be an int to lookup the tiles
     const tileX = Math.floor(i);
     const tileY = Math.floor(j);
