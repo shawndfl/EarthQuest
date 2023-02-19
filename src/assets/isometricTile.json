@@ -70,6 +70,21 @@
     "offset": [-32, -48]
   },
   {
+    "id": "block.grass.edge.left",
+    "loc": [32, 96, 32, 32],
+    "offset": [-32, -48]
+  },
+  {
+    "id": "block.grass.edge.right",
+    "loc": [64, 96, 32, 32],
+    "offset": [-32, -48]
+  },
+  {
+    "id": "block.grass.edge.both",
+    "loc": [160, 64, 32, 32],
+    "offset": [-32, -48]
+  },
+  {
     "id": "coin.0",
     "loc": [96, 96, 32, 32],
     "offset": [-32, -48]

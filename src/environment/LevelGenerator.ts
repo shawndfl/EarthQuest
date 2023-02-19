@@ -6,6 +6,7 @@ import vec2 from '../math/vec2';
 import { TileFactory } from '../systems/TileFactory';
 import { Random } from '../utilities/Random';
 import { Timer } from '../utilities/Timer';
+import { HillGenerator } from './HillGenerator';
 import { LevelConstructionParams } from './LevelConstructionParams';
 import { LevelGeneratorState } from './LevelGeneratorState';
 
@@ -16,6 +17,7 @@ export class LevelGenerator extends Component {
   private _levelState: LevelGeneratorState;
   private _creationParams: LevelConstructionParams;
   private _random: Random;
+  private _hillGenerator: HillGenerator;
   protected _tiles: TileComponent[][][];
 
   /**
@@ -39,6 +41,7 @@ export class LevelGenerator extends Component {
   constructor(eng: Engine, protected _tileFactory: TileFactory) {
     super(eng);
     this._tiles = [[[]]];
+    this._hillGenerator = new HillGenerator(eng);
   }
 
   /**
@@ -62,7 +65,14 @@ export class LevelGenerator extends Component {
     console.debug('creation params', param);
     const tiles = this._tiles;
 
+    // set up your component generators
+    this._hillGenerator.initialize(this);
+
+    // generate ground
     this.generateGround();
+
+    // create a hill
+    this._hillGenerator.generate();
 
     const npcPos = this.getRandomPoint();
     const npc = this._tileFactory.createStaticTile('npc|poo', npcPos.x, npcPos.y, 1);
@@ -111,20 +121,37 @@ export class LevelGenerator extends Component {
     height: number;
   }): boolean {
     const tiles = this._tiles;
-    for (let k = opt.startK; k < opt.height && k < tiles.length; k++) {
+    for (let k = opt.startK; k < opt.startK + opt.height && k < tiles.length; k++) {
+      // check range
       if (k >= tiles.length || k < 0) {
         return false;
       }
-      for (let j = opt.startJ; j < opt.length; j++) {
+      for (let j = opt.startJ; j < opt.startJ + opt.length; j++) {
+        // check range
         if (j >= tiles[k].length || j < 0) {
           return false;
         }
-        for (let i = opt.startI; i < opt.width; i++) {
-          if (i < tiles[k][j].length || i < 0) {
+        for (let i = opt.startI; i < opt.startI + opt.width; i++) {
+          // check range
+          if (i >= tiles[k][j].length || i < 0) {
             return false;
           }
+
+          // finally check if the tile is empty
           if (!tiles[k][j][i].empty) {
             return false;
+          }
+
+          // check if there is something below the space we are checking
+          if (opt.startK > 0 && k == opt.startK) {
+            // if it's empty we don't want to put something there
+            if (tiles[k - 1][j][i].empty) {
+              return false;
+            }
+
+            if (i == 0) {
+              console.debug('i == 0 ');
+            }
           }
         }
       }
@@ -171,6 +198,21 @@ export class LevelGenerator extends Component {
     }
   }
 
+  /**
+   * Sets a tile to a given location and type type
+   * @param tileType string in the format of <type|sprite|...>
+   * @param i lower left
+   * @param j lower right
+   * @param k height
+   */
+  createTile(tileType: string, i: number, j: number, k: number) {
+    const tile = this._tileFactory.createStaticTile(tileType, i, j, k);
+    this._tiles[k][j][i] = tile;
+  }
+
+  /**
+   * Create stuff above the ground
+   */
   generateLevel1() {
     const tiles = this._tiles;
     const baseLevel = 1;
@@ -182,11 +224,11 @@ export class LevelGenerator extends Component {
         const option = Math.floor(this.ran * 100);
 
         let tileTypeAndSprite = EmptyTileId;
-        if (option > 60 && option < 80) {
+        if (option > 0 && option < 50) {
           if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
             tileTypeAndSprite = this.getCollision();
           }
-        } else if (option >= 80) {
+        } else if (option >= 50) {
           if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
             tileTypeAndSprite = this.getCoin();
           }
@@ -232,6 +274,16 @@ export class LevelGenerator extends Component {
     } else {
       return 'open|block.grass';
     }
+  }
+
+  getFloorTileEdgeLeft() {
+    return 'open|block.grass.edge.left';
+  }
+  getFloorTileEdgeRight() {
+    return 'open|block.grass.edge.right';
+  }
+  getFloorTileEdgeBoth() {
+    return 'open|block.grass.edge.both';
   }
 
   getPortalTile() {

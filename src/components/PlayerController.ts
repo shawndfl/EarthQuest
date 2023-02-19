@@ -36,6 +36,8 @@ export class PlayerController extends TileComponent {
   private _sprites: string[];
   /** Should the sprites be flipped */
   private _spriteFlip: boolean;
+  /** Gives us more control over the animations */
+  private _resetFlip: boolean;
   /** The slop vector for moving up or down in height. This is set from the environment */
   private _slopVector: vec2;
 
@@ -87,6 +89,7 @@ export class PlayerController extends TileComponent {
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
     //this._sprites = ['mario.down.step', 'mario.down.step'];
     this._spriteFlip = false;
+    this._resetFlip = false;
     this._walkingDirection = new vec3([0, 0, 0]);
     this._slopVector = new vec2([0, 0]);
     this._moveController = new AutoMoveController(this.eng);
@@ -160,7 +163,7 @@ export class PlayerController extends TileComponent {
 
       this._walkingDirection.x = screenDirection.x * this._speed;
       this._walkingDirection.y = screenDirection.y * this._speed;
-      this._walkingDirection.z = vec2.dot(screenDirection, this._slopVector);
+      this._walkingDirection.z = vec2.dot(screenDirection, this._slopVector) * this._speed;
 
       // convert movement vector from screen space to tile space
       this._walkingDirection = this.eng.tileHelper.rotateToTileSpace(this._walkingDirection);
@@ -171,6 +174,13 @@ export class PlayerController extends TileComponent {
       this._walkAnimation.start(true);
     } else if (!this._walking) {
       this._walkAnimation.pause(0);
+      // this is needed for resetting the walk
+      // animation when facing north.
+      // we do not want to reset flip when the
+      // player is facing right or left
+      if (this._resetFlip) {
+        this._spriteFlip = false;
+      }
     }
 
     return true;
@@ -268,6 +278,8 @@ export class PlayerController extends TileComponent {
   }
 
   walkAnimation(dt: number, direction: PointingDirection) {
+    this._resetFlip = false;
+
     // check multiple angle movements first so the else statements work correctly
     if ((direction & PointingDirection.S) > 0 && (direction & PointingDirection.W) > 0) {
       this._sprites = ['ness.down.left.stand', 'ness.down.left.step'];
@@ -293,13 +305,15 @@ export class PlayerController extends TileComponent {
     } else if ((direction & PointingDirection.N) > 0) {
       this._sprites = ['ness.up.step', 'ness.up.step'];
       this._spriteFlip = false;
-      if (this._walkAnimation.getValue() == 0) {
+      this._resetFlip = true;
+      if (this._walkAnimation.getValue() == 1) {
         this._spriteFlip = true;
       }
     }
 
     // only move if we are walking
     if (this._walking) {
+      // scale velocity by time
       const moveVector = this._walkingDirection.scale(dt / 1000.0);
 
       // screen space converted to tile space for x and y position (ground plane)

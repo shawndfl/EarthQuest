@@ -76,6 +76,7 @@ export class BattleManager extends Component {
       console.warn('already in a battle');
       return;
     }
+
     // TODO show transition
     // load battle scene
     // show enemies

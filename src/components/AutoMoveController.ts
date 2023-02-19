@@ -14,7 +14,7 @@ export class AutoMoveController extends Component {
   private _tileComponent: TileComponent;
 
   /** the target the character should move to */
-  private _touchTarget: vec2;
+  private _moveTarget: vec2;
   private _resetTarget: () => void;
   private _move: (direction: vec2) => void;
   private _done: (target: vec2, timedOut: boolean) => void;
@@ -26,7 +26,7 @@ export class AutoMoveController extends Component {
 
   /** Where the tile needs to move to */
   get target(): vec2 {
-    return this._touchTarget;
+    return this._moveTarget;
   }
 
   constructor(eng: Engine) {
@@ -53,7 +53,7 @@ export class AutoMoveController extends Component {
     this._resetTarget = resetTarget;
     this._move = move;
     this._done = done;
-    this._touchTarget = target;
+    this._moveTarget = target;
     this._tileComponent = tileComponent;
 
     // get the direction of the movement based on the mouse cursor or touch point
@@ -62,7 +62,7 @@ export class AutoMoveController extends Component {
 
   /** cancel the move */
   cancelMove() {
-    this._touchTarget = undefined;
+    this._moveTarget = undefined;
   }
 
   /**
@@ -70,7 +70,7 @@ export class AutoMoveController extends Component {
    * @param dt
    */
   update(dt: number) {
-    if (this._touchTarget) {
+    if (this._moveTarget) {
       // reset direction and walking
       this._resetTarget();
 
@@ -78,24 +78,24 @@ export class AutoMoveController extends Component {
       this._movingToTargetTimer += dt;
 
       // get movement direction
-      const currentPos = this._tileComponent.tilePosition;
-      const targetPos = this.eng.tileHelper.screenTouchToTile(this._touchTarget, 0);
-      const direction = targetPos.copy().subtract(currentPos);
+      const screenPos = this._tileComponent.screenPosition;
+      const pos2 = new vec2(screenPos.xy);
+      const direction = this._moveTarget.copy().subtract(pos2);
 
       // did the player make it to the target or did the time expire
       if (this._movingToTargetTimer < this.timeOutLimit) {
         if (direction.length() > this.distanceLimit) {
-          //this._move(direction);
+          this._move(direction);
         } else {
           // done hit out target
-          //this._done(this._moveTarget, false);
-          //this._moveTarget = undefined;
-          //this._movingToTargetTimer = 0;
+          this._done(this._moveTarget, false);
+          this._moveTarget = undefined;
+          this._movingToTargetTimer = 0;
         }
       } else {
         // done timed out
-        //this._done(this._moveTarget, true);
-        //this._moveTarget = undefined;
+        this._done(this._moveTarget, true);
+        this._moveTarget = undefined;
         this._movingToTargetTimer = 0;
       }
     }

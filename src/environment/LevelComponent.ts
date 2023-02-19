@@ -1,4 +1,5 @@
 import { Component } from '../components/Component';
+import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
 import { LevelConstructionParams } from './LevelConstructionParams';
 import { LevelGenerator } from './LevelGenerator';
@@ -29,5 +30,5 @@ export abstract class LevelComponent extends Component {
     this._levelGenerator = levelGenerator;
   }
 
-  abstract generate(): void;
+  abstract generate(tiles: TileComponent[][][]): void;
 }
