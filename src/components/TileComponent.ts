@@ -108,6 +108,9 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   setTilePosition(i: number, j: number, k: number) {
+    if (this.type == 'player') {
+      console.error('setting player position ', i, j, k);
+    }
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;
@@ -304,13 +307,14 @@ export abstract class TileComponent extends Component {
 
     const screen = this.eng.tileHelper.toScreenLoc(i, j, k);
 
+    // set the tile position first. This will allow onEnter to change the position if needed.
+    this.setTilePosition(i, j, k);
+
     // enter the tile on the ground
     this.eng.scene.ground.onEnter(this, tileX, tileY, floor);
 
     // enter the tile in front of the player
     this.eng.scene.ground.onEnter(this, tileX, tileY, floor + 1);
-
-    this.setTilePosition(i, j, k);
   }
 
   /**

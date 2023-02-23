@@ -50,6 +50,23 @@ export class PlayerController extends TileComponent {
   /** The sprite controller for the player */
   protected _spriteController: SpritController;
 
+  /** Can the player walk */
+  protected _canWalk: boolean;
+
+  get canWalk(): boolean {
+    return this._canWalk;
+  }
+
+  /** */
+  set canWalk(value: boolean) {
+    this._canWalk = value;
+    // stop the player from walking and animating
+    if (!value) {
+      this._walking = false;
+      this._walkAnimation.pause(0);
+    }
+  }
+
   /**
    * Get the sprite controller
    */
@@ -93,6 +110,7 @@ export class PlayerController extends TileComponent {
     this._walkingDirection = new vec3([0, 0, 0]);
     this._slopVector = new vec2([0, 0]);
     this._moveController = new AutoMoveController(this.eng);
+    this._canWalk = true;
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
@@ -128,6 +146,11 @@ export class PlayerController extends TileComponent {
     //console.debug('action ' + action + ' was walking ' + wasWalking);
     this._facingDirection = PointingDirection.None;
     this._walking = false;
+
+    // if the player cannot walk don;t let them
+    if (!this.canWalk) {
+      return true;
+    }
 
     // if the user tapped or clicked on the screen
     if ((state.action & UserAction.Tap) > 0) {

@@ -9,6 +9,7 @@ import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
+import { PortalTileComponent } from '../components/PortalTileComponent';
 
 export class TileFactory extends Component {
   /**
@@ -64,10 +65,15 @@ export class TileFactory extends Component {
     } else if (type.startsWith('collide')) {
       return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('portal')) {
-      return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
+      return new PortalTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else {
       console.warn(' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);
     }
+  }
+
+  /**Clear all sprites */
+  clearSpriteBatch() {
+    this.spriteBatch.clearAllSprites();
   }
 }

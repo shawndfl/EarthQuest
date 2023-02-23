@@ -57,9 +57,12 @@ export class LevelGenerator extends Component {
     this.createEmpty();
 
     // position the character
-    const characterPos = this.getRandomPoint();
-    const player = this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
-    this._tiles[1][characterPos.y][characterPos.x] = player;
+    let characterPos = param.playerPos;
+    if (!characterPos) {
+      characterPos = this.getRandomPoint();
+    }
+    // this will just set the player's position
+    this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
 
     const timer = new Timer();
     console.debug('creation params', param);
@@ -74,7 +77,7 @@ export class LevelGenerator extends Component {
     // create a hill
     this._hillGenerator.generate();
 
-    const npcPos = this.getRandomPoint();
+    const npcPos = this.getRandomPoint(new vec2(1, 1), new vec2(param.width - 2, param.length - 2));
     const npc = this._tileFactory.createStaticTile('npc|poo', npcPos.x, npcPos.y, 1);
     this._tiles[1][npcPos.y][npcPos.x] = npc;
     console.debug('poos position ' + npcPos.toString());
@@ -85,15 +88,18 @@ export class LevelGenerator extends Component {
     return tiles;
   }
 
-  placePlayer() {}
-
   /**
    * Create an empty world
    */
   createEmpty() {
     const param = this._creationParams;
+    this._tiles = [[[]]];
     const tiles = this._tiles;
 
+    // clear all sprites
+    this._tileFactory.clearSpriteBatch();
+
+    // clear all tiles
     for (let k = 0; k < param.height; k++) {
       tiles.push([]);
       for (let j = 0; j < param.length; j++) {
@@ -188,7 +194,7 @@ export class LevelGenerator extends Component {
       const j = portalLoc.y;
 
       // add portal
-      const tilePortalSprite = this.getFloorTile();
+      const tilePortalSprite = this.getPortalTile();
 
       const tilePortal1 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 0, groundIndex);
       const tilePortal2 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 1, groundIndex);

@@ -1,6 +1,7 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
+import vec2 from '../math/vec2';
 import { TileFactory } from '../systems/TileFactory';
 import { TileComponent } from './TileComponent';
 
@@ -39,6 +40,10 @@ export class PortalTileComponent extends TileComponent {
 
   onEnter(tileComponent: TileComponent): void {
     if (tileComponent.type == 'player') {
+      const player = this.eng.scene.player;
+      player.canWalk = false;
+      this.eng.scene.ground.buildLevel({ seed: 2003, length: 50, width: 40, height: 10, playerPos: new vec2(1, 1) });
+      player.canWalk = true;
     }
   }
 

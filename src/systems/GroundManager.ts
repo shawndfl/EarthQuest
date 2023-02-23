@@ -6,6 +6,7 @@ import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import { TileFactory } from './TileFactory';
 import { LevelGenerator } from '../environment/LevelGenerator';
+import { LevelConstructionParams } from '../environment/LevelConstructionParams';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -24,6 +25,9 @@ export class GroundManager extends Component {
   /** tiles that require an update */
   protected _updateTiles: TileComponent[];
 
+  /** used to generate the levels */
+  protected _levelGenerator: LevelGenerator;
+
   constructor(eng: Engine) {
     super(eng);
 
@@ -31,6 +35,10 @@ export class GroundManager extends Component {
     this._tileFactory = new TileFactory(eng, this._spriteController);
   }
 
+  /**
+   * Initialize a level
+   * @param levelData
+   */
   async initialize(levelData: ILevelData) {
     this._levelData = levelData;
 
@@ -43,10 +51,18 @@ export class GroundManager extends Component {
     console.debug('sprite list: ', this._spriteController.getSpriteList());
 
     // generate a level
-    const generator = new LevelGenerator(this.eng, this._tileFactory);
-    this._tiles = generator.Generate({ seed: 605, width: 60, length: 60, height: 7 });
+    this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
 
-    //this.buildLevel();
+    // create the initial level
+    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7 });
+  }
+
+  /**
+   * Build an auto generated level
+   * @param params
+   */
+  buildLevel(params: LevelConstructionParams) {
+    this._tiles = this._levelGenerator.Generate(params);
   }
 
   buildBattleScene() {
