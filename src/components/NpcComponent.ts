@@ -44,7 +44,7 @@ export class NpcComponent extends TileComponent {
     this._tileId = TileFactory.createStaticID(i, j, k);
 
     this._spriteController = new SpritController(eng);
-    this._spriteController.initialize(this.eng.scene.spriteSheetTexture, CharacterData);
+    this._spriteController.initialize(this.eng.assetManager.character.texture, CharacterData);
 
     this._spriteController.scale(this.eng.tileScale);
     this._spriteController.setSprite('poo.down.step');

@@ -13,11 +13,6 @@ import { PlayerController } from './PlayerController';
  */
 export abstract class SceneComponent extends Component {
   /**
-   * This is a sprite sheet of characters for this scene
-   */
-  abstract get spriteSheetTexture(): Texture;
-
-  /**
    * This manages the ground tiles for the level
    */
   abstract get ground(): GroundManager;
