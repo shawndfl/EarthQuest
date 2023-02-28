@@ -7,6 +7,8 @@ import { TileComponent } from '../components/TileComponent';
 import { TileFactory } from './TileFactory';
 import { LevelGenerator } from '../environment/LevelGenerator';
 import { LevelConstructionParams } from '../environment/LevelConstructionParams';
+import vec2 from '../math/vec2';
+import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -213,6 +215,15 @@ export class GroundManager extends Component {
       //NOP we will just return empty
     }
     return type;
+  }
+
+  /**
+   * Perform hit test
+   * @param touchPoint
+   */
+  hitTest(e: TouchSurfaceEvent) {
+    console.debug('touch event ' + e.touchPoint);
+    //TODO do hit test on the tiles
   }
 
   /**

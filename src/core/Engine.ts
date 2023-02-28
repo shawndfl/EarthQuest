@@ -17,6 +17,7 @@ import { FpsController } from './FpsController';
 import { Random } from '../utilities/Random';
 import { AssetManager } from '../systems/AssetManager';
 import { GameManager } from '../systems/GameManager';
+import { TouchManager } from '../systems/TouchManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -36,6 +37,7 @@ export class Engine {
   readonly gameManager: GameManager;
   readonly fps: FpsController;
   readonly random: Random;
+  readonly touchManager: TouchManager;
   readonly assetManager: AssetManager;
 
   /**
@@ -70,6 +72,7 @@ export class Engine {
     this.battleManager = new BattleManager(this);
     this.fps = new FpsController(this);
     this.assetManager = new AssetManager(this);
+    this.touchManager = new TouchManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
@@ -116,6 +119,9 @@ export class Engine {
   update(dt: number) {
     // handle gamepad polling
     this.input.preUpdate(dt);
+
+    // update the touch manager
+    this.touchManager.update(dt);
 
     // update the fps
     this.fps.update(dt);

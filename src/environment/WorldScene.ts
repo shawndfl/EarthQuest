@@ -66,10 +66,13 @@ export class WorldScene extends SceneComponent {
    * @returns True if the action was handled else false
    */
   handleUserAction(state: InputState): boolean {
-    //console.debug('user action ', action);
     // handle main menu, pause menu, battles menu, dialog menu, environment
 
-    return this.eng.dialogManager.handleUserAction(state) || this.player.handleUserAction(state);
+    return (
+      this.eng.touchManager.handleUserAction(state) ||
+      this.eng.dialogManager.handleUserAction(state) ||
+      this.player.handleUserAction(state)
+    );
   }
 
   /**

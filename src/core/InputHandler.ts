@@ -49,7 +49,8 @@ export class InputHandler extends Component {
       console.debug(' mouse enabled');
       window.addEventListener('mouseup', (e) => {
         this.action = this.action | UserAction.Tap;
-        this.touchPoint = new vec2(e.offsetX, (e.target as any).height - e.offsetY);
+
+        this.touchPoint = new vec2(e.offsetX, e.offsetY);
         console.debug('mouse ' + this.touchPoint.x + ', ' + this.touchPoint.y);
       });
     } else {
@@ -59,7 +60,7 @@ export class InputHandler extends Component {
           this.action = this.action | UserAction.Tap;
           const t = e.touches[0].target as HTMLCanvasElement;
 
-          this.touchPoint = new vec2(e.touches[0].pageX - t.clientTop, t.height - e.touches[0].screenY);
+          this.touchPoint = new vec2(e.touches[0].pageX - t.clientTop, e.touches[0].screenY);
           console.debug('touch ' + this.touchPoint.x + ', ' + this.touchPoint.y, e);
         }
       });

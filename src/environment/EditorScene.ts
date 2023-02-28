@@ -37,10 +37,6 @@ export class EditorScene extends SceneComponent {
    */
   constructor(eng: Engine) {
     super(eng);
-
-    this._ground = new GroundManager(eng);
-    this._player = new PlayerController(eng);
-    this._dialog = new DialogMenu(eng);
   }
 
   /**

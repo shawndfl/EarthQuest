@@ -154,7 +154,7 @@ export class PlayerController extends TileComponent {
 
     // if the user tapped or clicked on the screen
     if ((state.action & UserAction.Tap) > 0) {
-      this.handleTap(state);
+      //this.handleTap(state);
     } else if ((state.action & UserAction.ActionPressed) > 0) {
       // action event
       this.eng.scene.ground.raisePlayerAction(this);
