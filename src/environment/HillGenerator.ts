@@ -51,6 +51,8 @@ export class HillGenerator extends LevelComponent {
           this._levelGenerator.createTile(tileName, i, j, startK);
         }
       }
+
+      this._levelGenerator.createTile(this._levelGenerator.getSlopTileLeft(), startI, endJ, startK);
     } else {
       console.debug('no space for a hill');
     }

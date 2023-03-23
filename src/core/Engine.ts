@@ -18,6 +18,7 @@ import { Random } from '../utilities/Random';
 import { AssetManager } from '../systems/AssetManager';
 import { GameManager } from '../systems/GameManager';
 import { TouchManager } from '../systems/TouchManager';
+import { CanvasController } from './CanvasController';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -26,7 +27,6 @@ import { TouchManager } from '../systems/TouchManager';
 export class Engine {
   readonly scene: SceneComponent;
   readonly input: InputHandler;
-  private _editor: Editor;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
   readonly tileHelper: TileHelper;
   readonly soundManager: SoundManager;
@@ -39,6 +39,15 @@ export class Engine {
   readonly random: Random;
   readonly touchManager: TouchManager;
   readonly assetManager: AssetManager;
+  readonly editor: Editor;
+  readonly rootElement: HTMLElement;
+  readonly canvasController: CanvasController;
+
+  private _gl: WebGL2RenderingContext;
+
+  get gl(): WebGL2RenderingContext {
+    return this._gl;
+  }
 
   /**
    * Tile scale for the game
@@ -55,11 +64,12 @@ export class Engine {
     return this.gl.canvas.height;
   }
 
-  get editor(): Editor {
-    return this._editor;
-  }
+  constructor() {
+    this.canvasController = new CanvasController(this);
 
-  constructor(readonly gl: WebGL2RenderingContext) {
+    // get the gl context so everything downstream can now use it
+    this._gl = this.canvasController.gl;
+
     this.random = new Random(1001);
     this.gameManager = new GameManager(this);
     this.scene = new WorldScene(this);
@@ -74,18 +84,14 @@ export class Engine {
     this.assetManager = new AssetManager(this);
     this.touchManager = new TouchManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
+    this.editor = new Editor(this);
   }
 
   changeScene() {}
-  /**
-   * Create the editor
-   * @param parentContainer
-   */
-  createEditor(parentContainer: HTMLElement) {
-    this._editor = new Editor(this, parentContainer);
-  }
 
-  async initialize() {
+  async initialize(rootElement: HTMLElement) {
+    this.canvasController.initialize(rootElement);
+
     // Browsers copy pixels from the loaded image in top-to-bottom order —
     // from the top-left corner; but WebGL wants the pixels in bottom-to-top
     // order — starting from the bottom-left corner. So in order to prevent

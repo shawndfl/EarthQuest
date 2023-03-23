@@ -5,17 +5,7 @@ import './css/canvas.css';
 /**
  * Create the only instance of a canvas controller
  */
-const canvas = new CanvasController(onResize);
-const engine = new Engine(canvas.gl);
-
-/**
- * Handle resize
- * @param width
- * @param height
- */
-function onResize(width: number, height: number) {
-  engine.resize(width, height);
-}
+const engine = new Engine();
 
 /** time tracking variables */
 let previousTimeStamp: number;
@@ -41,7 +31,7 @@ function step(timestamp: number) {
  * Start the engine then request and animation frame
  */
 engine
-  .initialize()
+  .initialize(document.getElementById('rootContainer'))
   .then(() => {
     // request the first frame
     window.requestAnimationFrame(step);
@@ -49,6 +39,3 @@ engine
   .catch((e) => {
     console.error('Error initializing ', e);
   });
-
-// add the canvas to the body
-document.body.appendChild(canvas.element());

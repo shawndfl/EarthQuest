@@ -19,8 +19,8 @@ export class SoundManager {
 
   UserReady() {
     if (!this.userInteraction) {
-      this.audio.play();
-      this.audio.loop = true;
+      //this.audio.play();
+      //this.audio.loop = true;
       this.userInteraction = true;
     }
   }
