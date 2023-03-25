@@ -1,7 +1,7 @@
 body {
     margin: 0px;
     padding: 10px;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 .canvas-container {
     width: 100%;

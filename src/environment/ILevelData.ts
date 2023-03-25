@@ -1,3 +1,5 @@
+import { LevelConstructionParams } from './LevelConstructionParams';
+
 /**
  * These are cell properties that are used by the Ground class
  * to make interesting levels.
@@ -15,4 +17,7 @@ export interface ILevelData {
   typesAndSprites: string[];
   /** the index returned by the cells is offset by 10 to make it easier to align number in the json */
   cells: number[][][];
+
+  /** used to build the auto generated parts of the level */
+  levelConstruction: LevelConstructionParams;
 }

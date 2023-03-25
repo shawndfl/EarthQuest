@@ -19,6 +19,7 @@ import { AssetManager } from '../systems/AssetManager';
 import { GameManager } from '../systems/GameManager';
 import { TouchManager } from '../systems/TouchManager';
 import { CanvasController } from './CanvasController';
+import { ILevelData } from '../environment/ILevelData';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -43,10 +44,8 @@ export class Engine {
   readonly rootElement: HTMLElement;
   readonly canvasController: CanvasController;
 
-  private _gl: WebGL2RenderingContext;
-
   get gl(): WebGL2RenderingContext {
-    return this._gl;
+    return this.canvasController.gl;
   }
 
   /**
@@ -65,10 +64,8 @@ export class Engine {
   }
 
   constructor() {
+    // create the canvas with the gl context so everything downstream can now use it
     this.canvasController = new CanvasController(this);
-
-    // get the gl context so everything downstream can now use it
-    this._gl = this.canvasController.gl;
 
     this.random = new Random(1001);
     this.gameManager = new GameManager(this);
@@ -87,7 +84,9 @@ export class Engine {
     this.editor = new Editor(this);
   }
 
-  changeScene() {}
+  changeScene(level: ILevelData) {
+    //TODO load a new scene
+  }
 
   async initialize(rootElement: HTMLElement) {
     this.canvasController.initialize(rootElement);
@@ -102,6 +101,8 @@ export class Engine {
     // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
+    const canvasContainer = rootElement.getElementsByClassName('canvas-container')[0] as HTMLElement;
+    await this.editor.initialize(canvasContainer);
     await this.gameManager.initialize();
     await this.assetManager.initialize();
 
