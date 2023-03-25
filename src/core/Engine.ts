@@ -40,7 +40,6 @@ export class Engine {
   readonly random: Random;
   readonly touchManager: TouchManager;
   readonly assetManager: AssetManager;
-  readonly editor: Editor;
   readonly rootElement: HTMLElement;
   readonly canvasController: CanvasController;
 
@@ -81,7 +80,6 @@ export class Engine {
     this.assetManager = new AssetManager(this);
     this.touchManager = new TouchManager(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
-    this.editor = new Editor(this);
   }
 
   changeScene(level: ILevelData) {
@@ -101,8 +99,6 @@ export class Engine {
     // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    const canvasContainer = rootElement.getElementsByClassName('canvas-container')[0] as HTMLElement;
-    await this.editor.initialize(canvasContainer);
     await this.gameManager.initialize();
     await this.assetManager.initialize();
 

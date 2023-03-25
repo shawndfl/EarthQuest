@@ -4,15 +4,15 @@ import { EntityBrowser } from './EntityBrowser';
 import { ToolbarView } from './ToolbarView';
 import '../css/Editor.scss';
 import { EntityProperties } from './EntityProperties';
+import File from '../assets/editor/file.svg';
 
-export class Editor extends Component {
+export class Editor {
   private _parent: HTMLElement;
   private _toolbarView: ToolbarView;
   private _entityBrowser: EntityBrowser;
   private _entityProperties: EntityProperties;
 
-  constructor(eng: Engine) {
-    super(eng);
+  constructor() {
     this._toolbarView = new ToolbarView();
     this._entityBrowser = new EntityBrowser();
     this._entityProperties = new EntityProperties();
@@ -27,11 +27,7 @@ export class Editor extends Component {
   buildHtml() {
     const main = document.createElement('div');
     main.classList.add('editor-main');
-    const canvas = this._parent.getElementsByTagName('canvas')[0];
-
-    if (canvas) {
-      canvas.remove();
-    }
+    const canvas = document.createElement('canvas');
 
     this._parent.append(this._toolbarView.buildHtml());
 
@@ -73,7 +69,7 @@ export class Editor extends Component {
   }
 
   buildToolbar() {
-    this._toolbarView.addButton('new', 'New Scene', () => {
+    this._toolbarView.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
     });
   }
