@@ -5,29 +5,32 @@ import { ToolbarView } from './ToolbarView';
 import '../css/Editor.scss';
 import { EntityProperties } from './EntityProperties';
 import File from '../assets/editor/file.svg';
+import { EditorCanvas } from './EditorCanvas';
 
 export class Editor {
   private _parent: HTMLElement;
   private _toolbarView: ToolbarView;
   private _entityBrowser: EntityBrowser;
   private _entityProperties: EntityProperties;
+  private _editorCanvas: EditorCanvas;
 
   constructor() {
     this._toolbarView = new ToolbarView();
     this._entityBrowser = new EntityBrowser();
     this._entityProperties = new EntityProperties();
+    this._editorCanvas = new EditorCanvas();
   }
 
   initialize(parentContainer: HTMLElement) {
     this._parent = parentContainer;
     this.buildHtml();
     this.buildToolbar();
+    this._editorCanvas.render();
   }
 
   buildHtml() {
     const main = document.createElement('div');
     main.classList.add('editor-main');
-    const canvas = document.createElement('canvas');
 
     this._parent.append(this._toolbarView.buildHtml());
 
@@ -63,7 +66,7 @@ export class Editor {
     });
     resizable.classList.add('editor-h-resize');
 
-    main.append(entityContainer, resizable, canvas);
+    main.append(entityContainer, resizable, this._editorCanvas.buildHtml());
 
     this._parent.append(main);
   }
