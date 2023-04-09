@@ -189,7 +189,7 @@ export class Curve {
       if (this._type == CurveType.linear) {
         const t0 = this._points[this._point0].t;
         const t1 = this._points[this._point1].t;
-        const t = MathConst.Clamp((this._time - t0) / (t1 - t0), 0, 1.0);
+        const t = MathConst.clamp((this._time - t0) / (t1 - t0), 0, 1.0);
 
         this._position = p0 + t * (p1 - p0);
       } else if (this._type == CurveType.discreet) {

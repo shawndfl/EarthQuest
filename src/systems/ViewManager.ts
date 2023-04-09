@@ -119,12 +119,12 @@ export class ViewManager extends Component {
   updateProjection() {
     this._screenX = Math.floor(this._targetX);
     if (this.minX && this.maxX) {
-      this._screenX = MathConst.Clamp(this._targetX, this.minX, this.maxX);
+      this._screenX = MathConst.clamp(this._targetX, this.minX, this.maxX);
     }
 
     this._screenY = Math.floor(this._targetY);
     if (this.minY && this.maxY) {
-      this._screenY = MathConst.Clamp(this._targetY, this.minY, this.maxY);
+      this._screenY = MathConst.clamp(this._targetY, this.minY, this.maxY);
     }
 
     this._left = this._screenX + (this.eng.width - this.eng.width * this._scale);
