@@ -1,4 +1,5 @@
 import '../css/EditorCanvas.scss';
+import vec2 from '../math/vec2';
 import { CanvasRenderer } from './CanvasRenderer';
 
 export class EditorCanvas {
@@ -6,6 +7,8 @@ export class EditorCanvas {
   context: CanvasRenderingContext2D;
   canvasRenderer: CanvasRenderer;
   scaleStep: number;
+  isPanning: boolean;
+  lastPos: vec2;
 
   buildHtml(): HTMLCanvasElement {
     this.canvasRenderer = new CanvasRenderer();
@@ -15,6 +18,7 @@ export class EditorCanvas {
     this.canvas.height = 600;
     this.context = this.canvas.getContext('2d');
     this.context.imageSmoothingEnabled = false;
+    this.isPanning = false;
 
     this.scaleStep = 20;
 
@@ -39,18 +43,25 @@ export class EditorCanvas {
   }
   mouseUp(e: MouseEvent) {
     console.debug('up', e);
+    this.lastPos = undefined;
   }
   mouseWheel(e: WheelEvent) {
     const scale = this.canvasRenderer.scale + 2.0 / (e.deltaY > 0 ? -this.scaleStep : this.scaleStep);
-
     this.canvasRenderer.setScale(scale);
-    //console.debug('wheel', e);
-    this.render();
   }
   mouseMove(e: MouseEvent) {
     // right click
     if (e.ctrlKey && e.buttons == 1) {
-      console.debug('move', e);
+      const scale = 0.5;
+      if (!this.lastPos) {
+        this.lastPos = new vec2(e.offsetX, e.offsetY);
+      }
+      const delta = new vec2(e.offsetX, e.offsetY).subtract(this.lastPos);
+      const offset = this.canvasRenderer.offset.add(delta.scale(scale));
+      console.debug('delta ' + delta + ' offset ' + offset);
+      this.canvasRenderer.setOffset(offset);
+      this.lastPos.x = e.offsetX;
+      this.lastPos.y = e.offsetY;
     }
   }
 

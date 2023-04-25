@@ -55,6 +55,8 @@ export function equals(a: number, b: number): boolean {
  * @param max
  * @returns
  */
+
 export function clamp(num: number, min: number, max: number): number {
-  return Math.min(Math.max(num, min), max);
+  let val = num < min ? min : num > max ? max : num;
+  return val;
 }

@@ -22,7 +22,7 @@ export default class rect {
   }
 
   get bottom(): number {
-    return this.top - this.height;
+    return this.top + this.height;
   }
 
   set left(value: number) {

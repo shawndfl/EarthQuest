@@ -21,10 +21,14 @@ export class Editor {
     this._editorCanvas = new EditorCanvas();
   }
 
-  initialize(parentContainer: HTMLElement) {
+  async initialize(parentContainer: HTMLElement) {
     this._parent = parentContainer;
     this.buildHtml();
     this.buildToolbar();
+    this._editorCanvas.render();
+  }
+
+  update(dt: number) {
     this._editorCanvas.render();
   }
 
@@ -64,6 +68,7 @@ export class Editor {
     resizable.addEventListener('mouseup', (e) => {
       mouseDown = false;
     });
+
     resizable.classList.add('editor-h-resize');
 
     main.append(entityContainer, resizable, this._editorCanvas.buildHtml());
