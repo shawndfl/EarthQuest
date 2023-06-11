@@ -7,7 +7,6 @@ import { OpenTileComponent } from '../components/OpenTileComponent';
 import { SlopTileComponent } from '../components/SlopTileComponent';
 import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
-import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { PortalTileComponent } from '../components/PortalTileComponent';
 

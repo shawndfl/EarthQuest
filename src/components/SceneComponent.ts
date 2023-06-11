@@ -28,6 +28,11 @@ export abstract class SceneComponent extends Component {
   abstract get dialog(): DialogMenu;
 
   /**
+   * Get the scene type
+   */
+  abstract get type(): string;
+
+  /**
    * constructor
    * @param eng
    */
@@ -58,6 +63,16 @@ export abstract class SceneComponent extends Component {
    * @param dt
    */
   update(dt: number) {}
+
+  /**
+   * Show scene is called when a SceneManager changes to a new scene.
+   */
+  ShowScene() {}
+
+  /**
+   * Hide scene is called when a SceneManager changes to a new scene.
+   */
+  HideScene() {}
 
   /**
    * When the window is resized

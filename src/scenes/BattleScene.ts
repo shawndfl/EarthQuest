@@ -32,6 +32,10 @@ export class BattleScene extends SceneComponent {
     return this._dialog;
   }
 
+  get type(): string {
+    return 'battle';
+  }
+
   constructor(eng: Engine) {
     super(eng);
     this._spriteSheetTexture = new Texture(this.gl);

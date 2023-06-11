@@ -1,4 +1,4 @@
-import { WorldScene } from '../environment/WorldScene';
+import { WorldScene } from '../scenes/WorldScene';
 import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';

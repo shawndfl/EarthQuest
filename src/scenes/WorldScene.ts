@@ -4,7 +4,7 @@ import { PlayerController } from '../components/PlayerController';
 import { Engine } from '../core/Engine';
 import { DialogMenu } from '../menus/DialogMenu';
 import { SceneComponent } from '../components/SceneComponent';
-import { ILevelData } from './ILevelData';
+import { ILevelData } from '../environment/ILevelData';
 import { InputState } from '../core/InputHandler';
 
 /**
@@ -29,6 +29,10 @@ export class WorldScene extends SceneComponent {
   }
   get dialog(): DialogMenu {
     return this._dialog;
+  }
+
+  get type(): string {
+    return 'world1.1';
   }
 
   /**
