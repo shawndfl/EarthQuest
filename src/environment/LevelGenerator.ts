@@ -283,7 +283,7 @@ export class LevelGenerator extends Component {
   }
 
   getSlopTileLeft() {
-    return 'slop|slop.left';
+    return 'slop.left|slop.left';
   }
   getFloorTileEdgeLeft() {
     return 'open|block.grass.edge.left';

@@ -29,11 +29,14 @@ export abstract class TileComponent extends Component {
   private _screenPosition: vec3;
 
   /**
-   * This is the tile height index. Subtract one because
-   * the tile is one level above the cell it is on.
+   * Gets the tile's height at a given i and j position.
+   * This is used to slops and stairs.
+   * @param i
+   * @param j
+   * @returns returns the tile height as a float
    */
-  get tileHeightIndex(): number {
-    return this._tileIndex.z - 1;
+  getTileHeight(i: number, j: number): number {
+    return this.tileHeight;
   }
 
   /**
@@ -163,7 +166,7 @@ export abstract class TileComponent extends Component {
    * Called when a tile tries to enter this tile. This happens after canAccessTile returns true
    * @param tileComponent
    */
-  onEnter(tileComponent: TileComponent) {
+  onEnter(tileComponent: TileComponent): void {
     //NOP
   }
 
@@ -171,7 +174,7 @@ export abstract class TileComponent extends Component {
    * Exit a this tile
    * @param tileComponent
    */
-  onExit(tileComponent: TileComponent) {
+  onExit(tileComponent: TileComponent): void {
     //NOP
   }
 
@@ -180,7 +183,7 @@ export abstract class TileComponent extends Component {
    * this object is created. This is called form GroundManager
    * @param dt
    */
-  update(dt: number) {
+  update(dt: number): void {
     //NOP
   }
 
@@ -190,7 +193,7 @@ export abstract class TileComponent extends Component {
    * @param j
    * @param k
    */
-  OffsetTilePosition(i: number, j: number, k: number) {
+  OffsetTilePosition(i: number, j: number, k: number): void {
     const tileX = Math.floor(this._tilePosition.x);
     const tileY = Math.floor(this._tilePosition.y);
     const tileZ = Math.floor(this._tilePosition.z);
@@ -284,7 +287,7 @@ export abstract class TileComponent extends Component {
    * @param j
    * @param k
    */
-  moveToTilePosition(i: number, j: number, k?: number) {
+  moveToTilePosition(i: number, j: number, k?: number): void {
     if (k === undefined) {
       k = this._tilePosition.z;
     }

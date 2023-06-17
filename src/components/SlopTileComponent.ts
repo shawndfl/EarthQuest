@@ -10,6 +10,7 @@ export class SlopTileComponent extends TileComponent {
   protected _tileId: string;
   protected _spriteId: string;
   protected _type: string;
+  protected _lastK: number;
 
   get id(): string {
     return this._tileId;
@@ -24,24 +25,52 @@ export class SlopTileComponent extends TileComponent {
     return this._spriteController;
   }
 
+  /**
+   * Gets the tile's height at a given i and j position.
+   * This is used to slops and stairs.
+   * @param i
+   * @param j
+   * @returns
+   */
+  getTileHeight(i: number, j: number) {
+    const slopHeight = j - this.tileIndex.y;
+    return this.tileHeight;
+  }
+
+  onExit(tileComponent: TileComponent): void {
+    this._lastK = undefined;
+  }
+
   onEnter(tileComponent: TileComponent): void {
-    // TODO set the tile component to the correct direction
+    const pos = tileComponent.tilePosition;
+    if (this._lastK === undefined) {
+      this._lastK = tileComponent.tileIndex.z;
+    }
+
+    const delta = pos.y - tileComponent.tileIndex.y;
+    const z = this._lastK + delta;
+    tileComponent.setTilePosition(pos.x, pos.y, z);
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
     // TODO check if the tile is
     // accessing from the correct location
-    return false;
+
+    console.debug(
+      'CanAccess slop from pos ' + tileComponent.tileIndex.toString() + ' tile pos ' + this.tileIndex.toString()
+    );
+
     // if slop is to the left the tile component
     // needs to be entering from the left i-1
     if (this.type.includes('left')) {
-      if (
-        tileComponent.tileIndex.x == this.tileIndex.x - 1 &&
-        tileComponent.tileIndex.y == this.tileIndex.y
-      ) {
-        //tileComponent.
+      if (tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y + 1) {
+        return true;
+      } else if (tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y - 1) {
+        return true;
       }
     }
+
+    return false;
   }
 
   constructor(

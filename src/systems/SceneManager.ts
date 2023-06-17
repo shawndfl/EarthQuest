@@ -8,13 +8,17 @@ export class SceneManager extends Component {
   private _lastScene: SceneComponent;
   private _sceneFactory: SceneFactory;
 
-  get Scene(): SceneComponent {
+  get scene(): SceneComponent {
     return this._activeScene;
   }
 
   constructor(eng: Engine) {
     super(eng);
     this._sceneFactory = new SceneFactory(eng);
+  }
+
+  initialize() {
+    this.changeScene('world1');
   }
 
   /**
@@ -33,6 +37,26 @@ export class SceneManager extends Component {
     }
 
     this._lastScene = this._activeScene;
+    this._activeScene = newScene;
+
+    this._activeScene.ShowScene();
+  }
+
+  /**
+   * Restore last scene
+   * @returns
+   */
+  restoreLastScene() {
+    if (!this._lastScene) {
+      return;
+    }
+    const newScene = this._lastScene;
+
+    if (this._activeScene) {
+      this._activeScene.HideScene();
+    }
+
+    this._lastScene = null;
     this._activeScene = newScene;
 
     this._activeScene.ShowScene();

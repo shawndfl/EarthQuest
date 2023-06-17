@@ -27,7 +27,7 @@ export class OpenTileComponent extends TileComponent {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent): boolean {
-    // can not access this tile if the player is on top of it
+    // can not access this tile if the player is on higher than the tile.
     if (tileComponent.tileIndex.z - 1 !== this.tileIndex.z) {
       return false;
     }

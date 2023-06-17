@@ -8,7 +8,6 @@ import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
 import { DialogManager } from '../systems/DialogManager';
 import { TextManager } from '../systems/TextManager';
-import FontData from '../assets/font.json';
 import { BattleManager } from '../systems/BattleManager';
 import { SceneComponent } from '../components/SceneComponent';
 
@@ -20,13 +19,13 @@ import { GameManager } from '../systems/GameManager';
 import { TouchManager } from '../systems/TouchManager';
 import { CanvasController } from './CanvasController';
 import { ILevelData } from '../environment/ILevelData';
+import { SceneManager } from '../systems/SceneManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
  * the scene, sound manager, and game play, etc.
  */
 export class Engine {
-  readonly scene: SceneComponent;
   readonly input: InputHandler;
   readonly spritePerspectiveShader: SpritePerspectiveShader;
   readonly tileHelper: TileHelper;
@@ -42,6 +41,7 @@ export class Engine {
   readonly assetManager: AssetManager;
   readonly rootElement: HTMLElement;
   readonly canvasController: CanvasController;
+  readonly sceneManager: SceneManager;
 
   get gl(): WebGL2RenderingContext {
     return this.canvasController.gl;
@@ -62,13 +62,17 @@ export class Engine {
     return this.gl.canvas.height;
   }
 
+  get scene(): SceneComponent {
+    return this.sceneManager.scene;
+  }
+
   constructor() {
     // create the canvas with the gl context so everything downstream can now use it
     this.canvasController = new CanvasController(this);
 
     this.random = new Random(1001);
     this.gameManager = new GameManager(this);
-    this.scene = new WorldScene(this);
+    this.sceneManager = new SceneManager(this);
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper(this);
     this.soundManager = new SoundManager();
@@ -101,7 +105,7 @@ export class Engine {
 
     await this.gameManager.initialize();
     await this.assetManager.initialize();
-
+    await this.sceneManager.initialize();
     await this.textManager.initialize();
     await this.scene.initialize({ level: Level1 });
     await this.dialogManager.initialize();

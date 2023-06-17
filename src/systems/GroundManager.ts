@@ -56,7 +56,7 @@ export class GroundManager extends Component {
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
 
     // create the initial level
-    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7 });
+    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([11, 22]) });
   }
 
   /**
@@ -157,7 +157,7 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  getCellHeight(i: number, j: number, k: number) {
+  getHeightAt(i: number, j: number, k: number) {
     let height = k;
     try {
       // if it is empty search down to zero
@@ -170,6 +170,10 @@ export class GroundManager extends Component {
         while (!this.isEmpty(i, j, ++k)) {
           height = k;
         }
+      }
+
+      const tile = this.getTile(i, j, k);
+      if (tile) {
       }
     } catch (e) {
       //NOP
@@ -246,9 +250,9 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  onEnter(tileComponent: TileComponent, i: number, j: number, k: number) {
+  onEnter(tileComponent: TileComponent, i: number, j: number, k: number): void {
     let tile = this.getTile(i, j, k);
-    return tile.onEnter(tileComponent);
+    tile.onEnter(tileComponent);
   }
 
   /**
@@ -257,7 +261,7 @@ export class GroundManager extends Component {
    * @param y
    * @param z
    */
-  onExit(tileComponent: TileComponent, i: number, j: number, k: number) {
+  onExit(tileComponent: TileComponent, i: number, j: number, k: number): void {
     let tile = this.getTile(i, j, k);
     return tile.onExit(tileComponent);
   }
@@ -266,7 +270,7 @@ export class GroundManager extends Component {
    * Update the sprite controller and actions
    * @param dt
    */
-  update(dt: number) {
+  update(dt: number): void {
     this._spriteController.update(dt);
     for (const tile of this._updateTiles) {
       tile.update(dt);
