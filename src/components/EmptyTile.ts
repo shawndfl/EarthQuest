@@ -1,7 +1,6 @@
 import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
-import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
 import { TileComponent } from './TileComponent';
 

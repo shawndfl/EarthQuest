@@ -5,6 +5,7 @@ import { SpritController } from '../graphics/SpriteController';
 import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
 import { TileComponent } from './TileComponent';
+import { TileContext } from './TileContext';
 
 export class SlopTileComponent extends TileComponent {
   protected _tileId: string;
@@ -34,38 +35,41 @@ export class SlopTileComponent extends TileComponent {
    */
   getTileHeight(i: number, j: number) {
     const slopHeight = j - this.tileIndex.y;
-    return this.tileHeight;
+    return this.tileHeight + slopHeight;
   }
 
-  onExit(tileComponent: TileComponent): void {
+  onExit(tileComponent: TileComponent, tileContext: TileContext): void {
     this._lastK = undefined;
   }
 
-  onEnter(tileComponent: TileComponent): void {
+  onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
     const pos = tileComponent.tilePosition;
-    if (this._lastK === undefined) {
-      this._lastK = tileComponent.tileIndex.z;
+    //const z = tileComponent.tileIndex.z + (this.tileIndex.y - this.tilePosition.y); // this.getTileHeight(this.tilePosition.x, this.tilePosition.y);
+    // todo check slop direction
+    if (tileContext.direction.y < 0) {
+      tileComponent.setTilePosition(pos.x, pos.y, pos.z + 1);
+    } else if (tileContext.direction.y > 0) {
+      tileComponent.setTilePosition(pos.x, pos.y, pos.z - 1);
     }
 
-    const delta = pos.y - tileComponent.tileIndex.y;
-    const z = this._lastK + delta;
-    tileComponent.setTilePosition(pos.x, pos.y, z);
+    const tileBelow = tileComponent.getTileBelow();
+    console.debug(' should be ' + this.type + ': ' + tileBelow.type + ' context ' + tileContext.direction);
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
-    // TODO check if the tile is
-    // accessing from the correct location
-
-    console.debug(
-      'CanAccess slop from pos ' + tileComponent.tileIndex.toString() + ' tile pos ' + this.tileIndex.toString()
-    );
-
     // if slop is to the left the tile component
     // needs to be entering from the left i-1
+    const sameHeight = tileComponent.tileIndex.z == this.tileIndex.z;
+    const oneBelow = tileComponent.tileIndex.z - 1 == this.tileIndex.z;
+    const enterFromLeft =
+      tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y + 1;
+    const enterFromRight =
+      tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y - 1;
+
     if (this.type.includes('left')) {
-      if (tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y + 1) {
+      if (oneBelow && enterFromRight) {
         return true;
-      } else if (tileComponent.tileIndex.x == this.tileIndex.x && tileComponent.tileIndex.y == this.tileIndex.y - 1) {
+      } else if (sameHeight && enterFromLeft) {
         return true;
       }
     }

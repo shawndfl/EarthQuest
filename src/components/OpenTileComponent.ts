@@ -2,6 +2,7 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
+import { TileAccessOptions } from './TileAccessOptions';
 import { TileComponent } from './TileComponent';
 
 /**
@@ -26,15 +27,37 @@ export class OpenTileComponent extends TileComponent {
    * @param tileComponent
    * @returns
    */
-  canAccessTile(tileComponent: TileComponent): boolean {
-    // can not access this tile if the player is on higher than the tile.
-    if (tileComponent.tileIndex.z - 1 !== this.tileIndex.z) {
-      return false;
+  canAccessTile(tileComponent: TileComponent, options: TileAccessOptions): boolean {
+    const tileBelow = options.tileBelow;
+
+    // the component is coming from a tile that is one step below this tile
+    // check for a slop
+    if (tileBelow.tileIndex.z == this.tileIndex.z - 1) {
+      // accessing the tile from the left
+      if (tileBelow.type.includes('slop.left') && tileBelow.tileIndex.y < this.tileIndex.y) {
+        return true;
+      }
+
+      // accessing the tile from the right
+      if (tileBelow.type.includes('slop.right') && tileBelow.tileIndex.y > this.tileIndex.y) {
+        return true;
+      }
+
+      // accessing the tile from the top
+      if (tileBelow.type.includes('slop.top') && tileBelow.tileIndex.x < this.tileIndex.x) {
+        return true;
+      }
+
+      // accessing the tile from the bottom
+      if (tileBelow.type.includes('slop.bottom') && tileBelow.tileIndex.x > this.tileIndex.x) {
+        return true;
+      }
+    } else if (tileBelow.tileIndex.z == this.tileIndex.z) {
+      // tiles are on the same level
+      return true;
     }
 
-    // see if we can access the tile on top of this tile
-    const tileAboveGround = this.groundManager.getTile(this.tileIndex.x, this.tileIndex.y, this.tileIndex.z + 1);
-    return tileAboveGround.empty || tileAboveGround.canAccessTile(tileComponent);
+    return false;
   }
 
   get spriteController(): SpritBaseController {

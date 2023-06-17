@@ -9,6 +9,9 @@ import { LevelGenerator } from '../environment/LevelGenerator';
 import { LevelConstructionParams } from '../environment/LevelConstructionParams';
 import vec2 from '../math/vec2';
 import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
+import { TileAccessOptions } from '../components/TileAccessOptions';
+import vec3 from '../math/vec3';
+import { TileContext } from '../components/TileContext';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -237,9 +240,9 @@ export class GroundManager extends Component {
    * @param z screen space
    * @returns true if the player can access this cell
    */
-  canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number): boolean {
+  canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number, options: TileAccessOptions): boolean {
     let tile = this.getTile(i, j, k);
-    return tile.canAccessTile(tileComponent);
+    return tile.canAccessTile(tileComponent, options);
   }
 
   /**
@@ -250,9 +253,9 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  onEnter(tileComponent: TileComponent, i: number, j: number, k: number): void {
+  onEnter(tileComponent: TileComponent, i: number, j: number, k: number, tileContext: TileContext): void {
     let tile = this.getTile(i, j, k);
-    tile.onEnter(tileComponent);
+    tile.onEnter(tileComponent, tileContext);
   }
 
   /**
@@ -261,9 +264,9 @@ export class GroundManager extends Component {
    * @param y
    * @param z
    */
-  onExit(tileComponent: TileComponent, i: number, j: number, k: number): void {
+  onExit(tileComponent: TileComponent, i: number, j: number, k: number, tileContext: TileContext): void {
     let tile = this.getTile(i, j, k);
-    return tile.onExit(tileComponent);
+    return tile.onExit(tileComponent, tileContext);
   }
 
   /**

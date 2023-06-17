@@ -3,6 +3,7 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { CollideTileComponent } from './CollideTileComponent';
 import { TileComponent } from './TileComponent';
 import { Curve, CurveType } from '../math/Curve';
+import { TileContext } from './TileContext';
 
 export class GoldComponents extends CollideTileComponent {
   private _collected: boolean;
@@ -14,7 +15,7 @@ export class GoldComponents extends CollideTileComponent {
     return true;
   }
 
-  onEnter(tileComponent: TileComponent) {
+  onEnter(tileComponent: TileComponent, tileContext: TileContext) {
     if (!this._collected) {
       console.debug('collect coin');
 
