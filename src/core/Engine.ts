@@ -136,7 +136,9 @@ export class Engine {
     // handle input
     if (this.input.action != UserAction.None) {
       this.soundManager.UserReady();
-      this.scene.handleUserAction({ action: this.input.action, touchPoint: this.input.touchPoint });
+      const inputState = { action: this.input.action, touchPoint: this.input.touchPoint };
+      // handle dialog input first
+      this.dialogManager.handleUserAction(inputState) || this.scene.handleUserAction(inputState);
     }
 
     // clear the buffers

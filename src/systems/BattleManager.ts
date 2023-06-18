@@ -89,10 +89,13 @@ export class BattleManager extends Component {
       true,
       () => {
         this._ready = true;
+        this.eng.sceneManager.changeScene('battle');
 
-        //TODO build battle scene
-        this.eng.scene.ground.buildBattleScene();
-        this.eng.dialogManager.showDialog('Start Fighting', { x: 200, y: 20, width: 600, height: 200 });
+        this.eng.dialogManager.showDialog('Start Fighting', { x: 200, y: 20, width: 600, height: 200 }, (d) => {
+          this._active = false;
+          this.eng.sceneManager.restoreLastScene();
+          return true;
+        });
         //this.eng.soundManager.
       },
       (value) => {
