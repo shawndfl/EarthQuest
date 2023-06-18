@@ -5,5 +5,4 @@ import { TileComponent } from './TileComponent';
  */
 export interface TileAccessOptions {
   ignoreEmpty: boolean;
-  tileBelow: TileComponent;
 }

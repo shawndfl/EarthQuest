@@ -2,7 +2,6 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
-import { TileAccessOptions } from './TileAccessOptions';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
 
@@ -28,7 +27,7 @@ export class OpenTileComponent extends TileComponent {
    * @param tileComponent
    * @returns
    */
-  canAccessTile(tileComponent: TileComponent, options: TileAccessOptions): boolean {
+  canAccessTile(tileComponent: TileComponent): boolean {
     // cannot move higher than a half of a step
     const canAccess = Math.abs(tileComponent.tilePosition.z - 1 - this.tileHeight) < 1;
     if (canAccess) {

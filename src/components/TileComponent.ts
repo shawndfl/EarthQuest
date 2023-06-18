@@ -178,15 +178,6 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * This is called every time an tile moves on another tile
-   * @param tileComponent
-   * @param tileContext
-   */
-  onTile(tileComponent: TileComponent, tileContext: TileContext): void {
-    //NOP
-  }
-
-  /**
    * This is only called if require update returns true when
    * this object is created. This is called form GroundManager
    * @param dt
@@ -213,12 +204,9 @@ export abstract class TileComponent extends Component {
 
     const ground = this.groundManager;
 
-    const tileBelow = this.getTileBelow();
-
     // check the current floor height and the level above
     for (let height = floorHeight; height < floorHeight + 2; height++) {
       const options: TileAccessOptions = {
-        tileBelow: tileBelow,
         ignoreEmpty: height != floorHeight,
       };
 
@@ -340,8 +328,6 @@ export abstract class TileComponent extends Component {
       // enter the tile in front of the player
       this.groundManager.onEnter(this, tileX, tileY, floor + 1, tileContext);
     }
-
-    this.groundManager.onTile(this, tileX, tileY, floor + 1, tileContext);
   }
 
   /**
