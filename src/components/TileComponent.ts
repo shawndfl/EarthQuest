@@ -31,19 +31,13 @@ export abstract class TileComponent extends Component {
   private _screenPosition: vec3;
 
   /**
-   * Gets the tile's height at a given i and j position.
-   * This is used to slops and stairs.
-   * @param i
-   * @param j
-   * @returns returns the tile height as a float
+   * Gets the tile below this tile
+   * @returns
    */
-  getTileHeight(i: number, j: number): number {
-    return this.tileHeight;
-  }
-
   getTileBelow(): TileComponent {
     return this.groundManager.getTile(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z - 1);
   }
+
   /**
    * Is this tile empty
    */
@@ -180,6 +174,15 @@ export abstract class TileComponent extends Component {
    * @param tileComponent
    */
   onExit(tileComponent: TileComponent, tileContext: TileContext): void {
+    //NOP
+  }
+
+  /**
+   * This is called every time an tile moves on another tile
+   * @param tileComponent
+   * @param tileContext
+   */
+  onTile(tileComponent: TileComponent, tileContext: TileContext): void {
     //NOP
   }
 
@@ -326,17 +329,19 @@ export abstract class TileComponent extends Component {
     // we moved off the last tile call on exit
     if (changedTiles) {
       // exit the ground tile
-      this.eng.scene.ground.onExit(this, this._tileIndex.x, this._tileIndex.y, floor, tileContext);
+      this.groundManager.onExit(this, this._tileIndex.x, this._tileIndex.y, floor, tileContext);
 
       // exit the tile at eye level
-      this.eng.scene.ground.onExit(this, this._tileIndex.x, this._tileIndex.y, floor + 1, tileContext);
+      this.groundManager.onExit(this, this._tileIndex.x, this._tileIndex.y, floor + 1, tileContext);
 
       // enter the tile on the ground
-      this.eng.scene.ground.onEnter(this, tileX, tileY, floor, tileContext);
+      this.groundManager.onEnter(this, tileX, tileY, floor, tileContext);
 
       // enter the tile in front of the player
-      this.eng.scene.ground.onEnter(this, tileX, tileY, floor + 1, tileContext);
+      this.groundManager.onEnter(this, tileX, tileY, floor + 1, tileContext);
     }
+
+    this.groundManager.onTile(this, tileX, tileY, floor + 1, tileContext);
   }
 
   /**

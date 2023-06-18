@@ -4,6 +4,7 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
 import { TileAccessOptions } from './TileAccessOptions';
 import { TileComponent } from './TileComponent';
+import { TileContext } from './TileContext';
 
 /**
  * This is any thing that the player or some NPC can walk on
@@ -28,36 +29,18 @@ export class OpenTileComponent extends TileComponent {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent, options: TileAccessOptions): boolean {
-    const tileBelow = options.tileBelow;
-
-    // the component is coming from a tile that is one step below this tile
-    // check for a slop
-    if (tileBelow.tileIndex.z == this.tileIndex.z - 1) {
-      // accessing the tile from the left
-      if (tileBelow.type.includes('slop.left') && tileBelow.tileIndex.y < this.tileIndex.y) {
-        return true;
-      }
-
-      // accessing the tile from the right
-      if (tileBelow.type.includes('slop.right') && tileBelow.tileIndex.y > this.tileIndex.y) {
-        return true;
-      }
-
-      // accessing the tile from the top
-      if (tileBelow.type.includes('slop.top') && tileBelow.tileIndex.x < this.tileIndex.x) {
-        return true;
-      }
-
-      // accessing the tile from the bottom
-      if (tileBelow.type.includes('slop.bottom') && tileBelow.tileIndex.x > this.tileIndex.x) {
-        return true;
-      }
-    } else if (tileBelow.tileIndex.z == this.tileIndex.z) {
-      // tiles are on the same level
+    // cannot move higher than a half of a step
+    const canAccess = Math.abs(tileComponent.tilePosition.z - 1 - this.tileHeight) < 1;
+    if (canAccess) {
       return true;
+    } else {
+      return false;
     }
+  }
 
-    return false;
+  onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
+    const pos = tileComponent.tilePosition;
+    tileComponent.setTilePosition(pos.x, pos.y, this.tileHeight + 1);
   }
 
   get spriteController(): SpritBaseController {

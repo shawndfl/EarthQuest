@@ -4,11 +4,11 @@ import { Component } from '../components/Component';
 import { EmptyTile } from '../components/EmptyTile';
 import { NpcComponent } from '../components/NpcComponent';
 import { OpenTileComponent } from '../components/OpenTileComponent';
-import { SlopTileComponent } from '../components/SlopTileComponent';
 import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { PortalTileComponent } from '../components/PortalTileComponent';
+import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
 
 export class TileFactory extends Component {
   /**
@@ -48,8 +48,8 @@ export class TileFactory extends Component {
   createStaticTile(type: string, i: number, j: number, k: number): TileComponent {
     if (!type || type == '---' || type == 'empty') {
       return new EmptyTile(this.eng, i, j, k);
-    } else if (type.includes('slop')) {
-      return new SlopTileComponent(this.eng, this.spriteBatch, type, i, j, k);
+    } else if (type.includes('block.half')) {
+      return new HalfStepTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('open')) {
       return new OpenTileComponent(this.eng, this.spriteBatch, type, i, j, k);
     } else if (type.startsWith('player')) {

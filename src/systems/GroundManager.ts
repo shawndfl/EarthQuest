@@ -259,6 +259,20 @@ export class GroundManager extends Component {
   }
 
   /**
+   *
+   * @param tileComponent
+   * @param i
+   * @param j
+   * @param k
+   * @param tileContext
+   * @returns
+   */
+  onTile(tileComponent: TileComponent, i: number, j: number, k: number, tileContext: TileContext): void {
+    let tile = this.getTile(i, j, k);
+    return tile.onTile(tileComponent, tileContext);
+  }
+
+  /**
    * Fired when a tile exits a cell
    * @param x
    * @param y
