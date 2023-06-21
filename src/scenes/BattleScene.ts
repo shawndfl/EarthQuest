@@ -60,20 +60,22 @@ export class BattleScene extends SceneComponent {
    * @param options
    */
   async initialize(options: { level: ILevelData }) {
-    this._spriteSheetTexture = this.eng.assetManager.character.texture;
-
-    this.player.initialize(this.spriteSheetTexture, this.eng.assetManager.character.data);
-
     await this.dialog.initialize();
   }
 
   ShowScene(): void {
-    this._background.initialize({ file: 'none' });
+    this._background.initialize({ image: this.eng.assetManager.battle01.texture });
   }
 
   /**
    * Update
    * @param dt
    */
-  update(dt: number) {}
+  update(dt: number) {
+    // Clear the canvas before we start drawing on it.
+    //this.gl.disable(this.gl.CULL_FACE);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+    this._background.update(dt);
+  }
 }

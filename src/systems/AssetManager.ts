@@ -7,6 +7,7 @@ import CharacterData from '../assets/characters.json';
 import TileImage from '../assets/isometricTile.png';
 import TileData from '../assets/isometricTile.json';
 import MenuImage from '../assets/menu.png';
+import BattleBg1 from '../assets/backgrounds/battleBg1.png';
 import MenuData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
 import { IFontData } from '../graphics/IFontData';
@@ -20,6 +21,7 @@ export class AssetManager extends Component {
   private _character: Texture;
   private _tile: Texture;
   private _menu: Texture;
+  private _battleBg1: Texture;
 
   get font(): { texture: Texture; data: IFontData[] } {
     return { texture: this._font, data: FontData };
@@ -35,6 +37,10 @@ export class AssetManager extends Component {
 
   get menu(): { texture: Texture; data: ISpriteData[] } {
     return { texture: this._menu, data: MenuData };
+  }
+
+  get battle01(): { texture: Texture } {
+    return { texture: this._battleBg1 };
   }
 
   constructor(eng: Engine) {
@@ -53,5 +59,8 @@ export class AssetManager extends Component {
 
     this._menu = new Texture(this.gl);
     await this._menu.loadImage(MenuImage);
+
+    this._battleBg1 = new Texture(this.gl);
+    await this._battleBg1.loadImage(BattleBg1);
   }
 }

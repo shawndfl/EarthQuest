@@ -14,10 +14,14 @@ export class PlanePrimitive extends Component {
   }
 
   initialize() {
-    this.buffer.setBuffers([{ min: [-1, -1, 0], max: [1, 1, 0], minTex: [0, 0], maxTex: [1, 1] }]);
+    this.buffer.setBuffers([{ min: [-1, -1, 0], max: [1, 1, 0], minTex: [0, 1], maxTex: [1, 0] }]);
   }
 
-  update(dt: number) {
+  draw() {
     this.buffer.enable();
+    const vertexCount = this.buffer.indexCount;
+    const type = this.gl.UNSIGNED_SHORT;
+    const offset = 0;
+    this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
   }
 }

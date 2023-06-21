@@ -38,8 +38,6 @@ export class PlayerController extends TileComponent {
   private _spriteFlip: boolean;
   /** Gives us more control over the animations */
   private _resetFlip: boolean;
-  /** The slop vector for moving up or down in height. This is set from the environment */
-  private _slopVector: vec2;
 
   /** The direction the player is walking */
   private _walkingDirection: vec3;
@@ -86,14 +84,6 @@ export class PlayerController extends TileComponent {
     return this._tileIndex.z;
   }
 
-  set slopVector(val: vec2) {
-    this._slopVector = val;
-  }
-
-  get slopVector(): vec2 {
-    return this._slopVector;
-  }
-
   get facingDirection(): PointingDirection {
     return this._facingDirection;
   }
@@ -108,7 +98,6 @@ export class PlayerController extends TileComponent {
     this._spriteFlip = false;
     this._resetFlip = false;
     this._walkingDirection = new vec3([0, 0, 0]);
-    this._slopVector = new vec2([0, 0]);
     this._moveController = new AutoMoveController(this.eng);
     this._canWalk = true;
   }
@@ -186,7 +175,7 @@ export class PlayerController extends TileComponent {
 
       this._walkingDirection.x = screenDirection.x * this._speed;
       this._walkingDirection.y = screenDirection.y * this._speed;
-      this._walkingDirection.z = vec2.dot(screenDirection, this._slopVector) * this._speed;
+      this._walkingDirection.z = 0;
 
       // convert movement vector from screen space to tile space
       this._walkingDirection = this.eng.tileHelper.rotateToTileSpace(this._walkingDirection);

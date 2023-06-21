@@ -1,3 +1,5 @@
+import { Texture } from '../graphics/Texture';
+
 export interface BackgroundData {
-  file: string;
+  image: Texture;
 }
