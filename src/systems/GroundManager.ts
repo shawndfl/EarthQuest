@@ -59,7 +59,7 @@ export class GroundManager extends Component {
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
 
     // create the initial level
-    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([11, 22]) });
+    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
   }
 
   /**

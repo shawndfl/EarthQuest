@@ -9,6 +9,7 @@ import { DialogMenu } from '../menus/DialogMenu';
 import { GroundManager } from '../systems/GroundManager';
 import CharacterData from '../assets/characters.json';
 import { InputState } from '../core/InputHandler';
+import { BackgroundComponent } from '../components/BackgroundComponent';
 
 /**
  * This is the scene for the battle
@@ -18,6 +19,7 @@ export class BattleScene extends SceneComponent {
   private _ground: GroundManager;
   private _player: PlayerController;
   private _dialog: DialogMenu;
+  private _background: BackgroundComponent;
 
   get spriteSheetTexture(): Texture {
     return this._spriteSheetTexture;
@@ -38,6 +40,7 @@ export class BattleScene extends SceneComponent {
 
   constructor(eng: Engine) {
     super(eng);
+    this._background = new BackgroundComponent(eng);
     this._spriteSheetTexture = new Texture(this.gl);
     this._ground = new GroundManager(eng);
     this._player = new PlayerController(eng);
@@ -59,10 +62,13 @@ export class BattleScene extends SceneComponent {
   async initialize(options: { level: ILevelData }) {
     this._spriteSheetTexture = this.eng.assetManager.character.texture;
 
-    this.ground.initialize(options.level);
     this.player.initialize(this.spriteSheetTexture, this.eng.assetManager.character.data);
 
     await this.dialog.initialize();
+  }
+
+  ShowScene(): void {
+    this._background.initialize({ file: 'none' });
   }
 
   /**

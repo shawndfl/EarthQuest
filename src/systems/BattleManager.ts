@@ -49,7 +49,6 @@ export class BattleManager extends Component {
     this._curve.points([
       { p: 1, t: 0 },
       { p: 0.55, t: 500 },
-      { p: 1, t: 1000 },
     ]);
     this._curve.curve(CurveType.linear);
     this._curve.pause();
@@ -85,21 +84,41 @@ export class BattleManager extends Component {
     // show stats
     this._ready = false;
     this._active = true;
-    this._curve.start(
+
+    this._curve.reverse(false).start(
       true,
+      // on done
       () => {
         this._ready = true;
         this.eng.sceneManager.changeScene('battle');
 
         this.eng.dialogManager.showDialog('Start Fighting', { x: 200, y: 20, width: 600, height: 200 }, (d) => {
-          this._active = false;
-          this.eng.sceneManager.restoreLastScene();
+          this.exitBattle();
           return true;
         });
+
         //this.eng.soundManager.
       },
+      // on update
       (value) => {
-        this.eng.viewManager.scale = this._curve.getValue();
+        this.eng.viewManager.scale = value;
+      }
+    );
+  }
+
+  /**
+   * Exit the battle scene
+   */
+  exitBattle() {
+    this._active = false;
+    // go to the last scene
+    this.eng.sceneManager.restoreLastScene();
+    this._curve.reverse(true).start(
+      true,
+      // on done
+      () => {},
+      (value) => {
+        this.eng.viewManager.scale = value;
       }
     );
   }

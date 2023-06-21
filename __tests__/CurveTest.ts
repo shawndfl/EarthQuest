@@ -141,3 +141,33 @@ test('curveSetPosition', () => {
 
   expect(curve.isDone()).toBe(true);
 });
+
+test('curveReverse', () => {
+  const curve = new Curve();
+
+  curve.points([
+    { p: 0, t: 0 },
+    { p: 100, t: 100 },
+  ]);
+
+  // setup ping pong. It will only work if you repeat the action at least once.
+  curve.curve(CurveType.linear).reverse(true).start(true);
+  expect(curve.getValue()).toBe(100);
+
+  curve.update(20);
+  expect(curve.getValue()).toBe(80);
+
+  curve.update(20);
+  expect(curve.getTime()).toBe(60);
+
+  curve.update(20);
+  expect(curve.getValue()).toBe(40);
+
+  curve.update(20);
+  expect(curve.getValue()).toBe(20);
+
+  curve.update(20);
+  expect(curve.getValue()).toBe(0);
+
+  expect(curve.isDone()).toBe(true);
+});

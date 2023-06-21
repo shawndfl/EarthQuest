@@ -10,8 +10,6 @@ export enum CurveType {
  */
 export class Curve {
   private _points: { p: number; t: number }[];
-  private _point0: number;
-  private _point1: number;
   private _position: number;
   private _time: number;
   private _running: boolean;
@@ -41,8 +39,6 @@ export class Curve {
 
   constructor() {
     this._points = [];
-    this._point0 = 0;
-    this._point1 = 1;
     this._position = 0;
     this._time = 0;
     this._reverse = false;
@@ -129,7 +125,7 @@ export class Curve {
     // if it is running and not done calculate
     // a new position
     if (this._running && !this._isDone) {
-      // update time.
+      // update time first.
       if (this._reverse) {
         this._time -= dt;
       } else {
@@ -137,18 +133,16 @@ export class Curve {
       }
 
       // find the closest point
-      this._point0 = this.findClosetTimeIndex(this._time);
+      const indices = this.findClosetTimeIndices(this._time);
 
-      const lastPointOrFirst =
-        (this._reverse && this._point0 == 0) || (!this._reverse && this._point0 >= this._points.length - 1);
+      const isDone =
+        (this._reverse && this._time <= 0) || (!this._reverse && this._time >= this._points[this._points.length - 1].t);
 
-      // if there are still more points or are we done
-      if (!lastPointOrFirst) {
-        this._point1 = this._point0 + 1;
-      } else {
+      if (isDone) {
+        // if there are still more points or are we done
         // set the position. We only have one point
         // so this is easy.
-        this._position = this._points[this._point0].p;
+        this._position = this._points[indices[0]].p;
 
         // handle update
         if (this.onUpdate) {
@@ -182,13 +176,16 @@ export class Curve {
         return;
       }
 
-      let p0 = this._points[this._point0].p;
-      let p1 = this._points[this._point1].p;
+      if (indices[0] < 0 || indices[0] > this._points.length - 1) {
+        console.debug('noooo');
+      }
+      let p0 = this._points[indices[0]].p;
+      let p1 = this._points[indices[1]].p;
 
       // calculate the position
       if (this._type == CurveType.linear) {
-        const t0 = this._points[this._point0].t;
-        const t1 = this._points[this._point1].t;
+        const t0 = this._points[indices[0]].t;
+        const t1 = this._points[indices[1]].t;
         const t = MathConst.clamp((this._time - t0) / (t1 - t0), 0, 1.0);
 
         this._position = p0 + t * (p1 - p0);
@@ -207,7 +204,7 @@ export class Curve {
    * @param time
    * @returns
    */
-  private findClosetTimeIndex(time: number): number {
+  private findClosetTimeIndices(time: number): [number, number] {
     let startIndex = 0;
     const clip = this._points;
 
@@ -218,9 +215,9 @@ export class Curve {
 
     // check time bounds
     if (time <= startTime) {
-      return startIndex;
+      return [startIndex, startIndex];
     } else if (time >= lastTime) {
-      return endIndex;
+      return [endIndex, endIndex];
     }
 
     while (true) {
@@ -228,7 +225,11 @@ export class Curve {
       // or the startIndex is one less then endIndex
       // then we are done.
       if (time == startTime || startIndex >= endIndex - 1) {
-        return startIndex;
+        if (startIndex < endIndex) {
+          return [startIndex, startIndex + 1];
+        } else {
+          return [startIndex, startIndex];
+        }
       }
 
       const midIndex = Math.floor((startIndex + endIndex) / 2.0);
@@ -239,7 +240,11 @@ export class Curve {
         endIndex = midIndex;
       } else {
         // found it in the middle
-        return midIndex;
+        if (this._reverse) {
+          return [midIndex, midIndex - 1];
+        } else {
+          return [midIndex, midIndex + 1];
+        }
       }
     }
   }
