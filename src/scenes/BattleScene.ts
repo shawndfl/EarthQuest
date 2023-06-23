@@ -73,7 +73,6 @@ export class BattleScene extends SceneComponent {
    */
   update(dt: number) {
     // Clear the canvas before we start drawing on it.
-    //this.gl.disable(this.gl.CULL_FACE);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     this._background.update(dt);
