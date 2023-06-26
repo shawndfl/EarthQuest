@@ -1,46 +1,51 @@
-import { Component } from '../components/Component';
-import { Engine } from '../core/Engine';
-import { EntityBrowser } from './EntityBrowser';
+import { TileBrowser } from './TileBrowser';
 import { ToolbarView } from './ToolbarView';
 import '../css/Editor.scss';
-import { EntityProperties } from './EntityProperties';
 import File from '../assets/editor/file.svg';
 import { EditorCanvas } from './EditorCanvas';
+import { IEditor } from './IEditor';
 
-export class Editor {
+/**
+ * Editor class manages all the components of the editor
+ */
+export class Editor implements IEditor {
   private _parent: HTMLElement;
-  private _toolbarView: ToolbarView;
-  private _entityBrowser: EntityBrowser;
-  private _entityProperties: EntityProperties;
-  private _editorCanvas: EditorCanvas;
+  readonly toolbarView: ToolbarView;
+  readonly tileBrowser: TileBrowser;
+  readonly editorCanvas: EditorCanvas;
+
+  readonly zoomStep: number = 0.1;
+
+  public get parent(): HTMLElement {
+    return this._parent;
+  }
 
   constructor() {
-    this._toolbarView = new ToolbarView();
-    this._entityBrowser = new EntityBrowser();
-    this._entityProperties = new EntityProperties();
-    this._editorCanvas = new EditorCanvas();
+    this.toolbarView = new ToolbarView();
+    this.tileBrowser = new TileBrowser(this);
+    this.editorCanvas = new EditorCanvas();
   }
 
   async initialize(parentContainer: HTMLElement) {
     this._parent = parentContainer;
     this.buildHtml();
     this.buildToolbar();
-    this._editorCanvas.render();
+    this.editorCanvas.render();
   }
 
   update(dt: number) {
-    this._editorCanvas.render();
+    this.editorCanvas.render();
   }
 
   buildHtml() {
     const main = document.createElement('div');
     main.classList.add('editor-main');
 
-    this._parent.append(this._toolbarView.buildHtml());
+    this._parent.append(this.toolbarView.buildHtml());
 
     const entityContainer = document.createElement('div');
     entityContainer.classList.add('editor-entity-container');
-    entityContainer.append(this._entityBrowser.buildHtml(), this._entityProperties.buildHtml());
+    entityContainer.append(this.tileBrowser.buildHtml());
 
     let lastX = 0;
     let mouseDown = false;
@@ -71,14 +76,24 @@ export class Editor {
 
     resizable.classList.add('editor-h-resize');
 
-    main.append(entityContainer, resizable, this._editorCanvas.buildHtml());
+    main.append(entityContainer, resizable, this.editorCanvas.buildHtml());
 
     this._parent.append(main);
   }
 
   buildToolbar() {
-    this._toolbarView.addButton('new', File, 'New Scene', () => {
+    this.toolbarView.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
+    });
+
+    this.toolbarView.addButton('zoomIn', File, 'Zoom In', () => {
+      const scale = this.editorCanvas.canvasRenderer.scale;
+      this.editorCanvas.canvasRenderer.setScale(scale + this.zoomStep);
+    });
+
+    this.toolbarView.addButton('zoomOut', File, 'Zoom Out', () => {
+      const scale = this.editorCanvas.canvasRenderer.scale;
+      this.editorCanvas.canvasRenderer.setScale(scale - this.zoomStep);
     });
   }
 }

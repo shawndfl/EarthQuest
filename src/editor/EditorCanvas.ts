@@ -47,11 +47,15 @@ export class EditorCanvas {
   }
   mouseWheel(e: WheelEvent) {
     const scale = this.canvasRenderer.scale + 2.0 / (e.deltaY > 0 ? -this.scaleStep : this.scaleStep);
+    this.zoom(scale);
+  }
+
+  zoom(scale: number): void {
     this.canvasRenderer.setScale(scale);
   }
   mouseMove(e: MouseEvent) {
     // right click
-    if (e.ctrlKey && e.buttons == 1) {
+    if (e.buttons == 1) {
       const scale = 0.5;
       if (!this.lastPos) {
         this.lastPos = new vec2(e.offsetX, e.offsetY);

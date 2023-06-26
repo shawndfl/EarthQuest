@@ -9,18 +9,21 @@ export class CanvasRenderer {
   ctx: CanvasRenderingContext2D;
   maxScale: number;
   minScale: number;
-  scale: number;
+  private _scale: number;
   private _offset: vec2;
   offsetBounds: rect;
   private dirty: boolean;
 
+  get scale(): number {
+    return this._scale;
+  }
   get offset() {
     return this._offset.copy();
   }
 
   constructor() {
     this.offsetBounds = new rect([-200, 4000, -2000, 4000]);
-    this.scale = 1.5;
+    this._scale = 1.5;
     this.minScale = 0.3;
     this.maxScale = 4;
     this._offset = new vec2(400, 300); // 600, 450
@@ -46,7 +49,7 @@ export class CanvasRenderer {
 
   setScale(value: number) {
     const currentScale = this.scale;
-    this.scale = MathConst.clamp(value, this.minScale, this.maxScale);
+    this._scale = MathConst.clamp(value, this.minScale, this.maxScale);
     const scaleDelta = this.scale - currentScale;
     const offset = new vec2(this.ctx.canvas.width, this.ctx.canvas.height).scale(scaleDelta);
     const newOffset = this.offset.add(offset);
