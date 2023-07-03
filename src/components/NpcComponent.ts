@@ -2,10 +2,10 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritController } from '../graphics/SpriteController';
 import { TileComponent } from './TileComponent';
-import CharacterData from '../assets/characters.json';
 import { TileFactory } from '../systems/TileFactory';
 import { Curve } from '../math/Curve';
 import { SpriteFlip } from '../graphics/Sprite';
+import { AssetManager } from '../systems/AssetManager';
 
 export class NpcComponent extends TileComponent {
   protected _spriteController: SpritController;
@@ -44,7 +44,8 @@ export class NpcComponent extends TileComponent {
     this._tileId = TileFactory.createStaticID(i, j, k);
 
     this._spriteController = new SpritController(eng);
-    this._spriteController.initialize(this.eng.assetManager.character.texture, CharacterData);
+    const character = eng.assetManager.character;
+    this._spriteController.initialize(character.texture, character.data);
 
     this._spriteController.scale(this.eng.tileScale);
     this._spriteController.setSprite('poo.down.step');

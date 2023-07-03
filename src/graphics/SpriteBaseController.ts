@@ -4,7 +4,6 @@ import { GlBuffer, IQuadModel } from './GlBuffer';
 import { ISpriteData } from './ISpriteData';
 import { Sprite, SpriteFlip } from './Sprite';
 import { Texture } from './Texture';
-import mat4 from '../math/mat4';
 import { ISpriteController } from './ISprintController';
 import vec2 from '../math/vec2';
 
@@ -14,7 +13,7 @@ import vec2 from '../math/vec2';
  * sprite offset and size in pixels.
  */
 export abstract class SpritBaseController extends Component implements ISpriteController {
-  protected _spriteData: ISpriteData[];
+  protected _spriteData: ISpriteData;
   private _indexLookup: Map<string, number>;
   protected _spriteTexture: Texture;
   protected _buffer: GlBuffer;
@@ -43,12 +42,12 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   }
 
   get spriteCount(): number {
-    return this._spriteData.length;
+    return this._spriteData.tiles.length;
   }
 
   constructor(eng: Engine) {
     super(eng);
-    this._spriteData = [];
+    this._spriteData;
     this._indexLookup = new Map<string, number>();
     this._selectedSpriteIndex = 0;
     this._dirty = true;
@@ -59,13 +58,13 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    * @param texture
    * @param spriteData
    */
-  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
+  initialize(texture: Texture, spriteData: ISpriteData, defaultSprite?: string | number) {
     // save the data
     this._spriteData = spriteData;
 
     // cache the indices
     this._indexLookup.clear();
-    this._spriteData.forEach((val, i) => {
+    this._spriteData.tiles.forEach((val, i) => {
       this._indexLookup.set(val.id, i);
     });
 
@@ -85,7 +84,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    */
   getSpriteList(): string[] {
     const idList: string[] = [];
-    this._spriteData.forEach((sprite) => idList.push(sprite.id));
+    this._spriteData.tiles.forEach((sprite) => idList.push(sprite.id));
     return idList;
   }
 
@@ -172,7 +171,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
       index = this._indexLookup.get(id);
     }
 
-    const sprite = this._spriteData[index ?? 0];
+    const sprite = this._spriteData.tiles[index ?? 0];
     if (sprite) {
       // does the id match or if the id is null just pick the first one or if id is a
       // number does the index match
@@ -184,12 +183,26 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
 
       this.sprite.setSpritePositionOffset(xOffset, yOffset);
 
-      this.sprite.setSprite({
-        pixelXOffset: sprite.loc[0],
-        pixelYOffset: sprite.loc[1],
-        spriteWidth: sprite.loc[2],
-        spriteHeight: sprite.loc[3],
-      });
+      // use sprite loc
+      if (sprite.loc) {
+        this.sprite.setSprite({
+          pixelXOffset: sprite.loc[0],
+          pixelYOffset: sprite.loc[1],
+          spriteWidth: sprite.loc[2],
+          spriteHeight: sprite.loc[3],
+        });
+      } else {
+        // use index
+        const pixelX = this._spriteData.tileWidth * sprite.index[0];
+        const pixelY = this._spriteData.tileHeight * sprite.index[1];
+
+        this.sprite.setSprite({
+          pixelXOffset: pixelX,
+          pixelYOffset: pixelY,
+          spriteWidth: this._spriteData.tileWidth,
+          spriteHeight: this._spriteData.tileHeight,
+        });
+      }
       this._dirty = true;
     } else {
       console.error('cannot find sprite ' + id);

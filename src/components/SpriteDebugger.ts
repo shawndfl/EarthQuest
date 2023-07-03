@@ -13,7 +13,7 @@ export class SpriteDebugger extends PlayerController {
     super(eng);
   }
 
-  initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
+  initialize(spriteSheet: Texture, characterData: ISpriteData) {
     super.initialize(spriteSheet, characterData);
 
     this._spriteController.setSpritePosition(10, 300, 0);

@@ -1,9 +1,13 @@
 import { EditorCanvas } from './EditorCanvas';
+import { MenuBar } from './MenuBar';
+import { StatusBar } from './StatusBar';
 import { TileBrowser } from './TileBrowser';
-import { ToolbarView } from './ToolbarView';
+import { Toolbar } from './Toolbar';
 
 export interface IEditor {
-  readonly toolbarView: ToolbarView;
+  readonly toolbarView: Toolbar;
   readonly tileBrowser: TileBrowser;
   readonly editorCanvas: EditorCanvas;
+  readonly menuBar: MenuBar;
+  readonly statusBar: StatusBar;
 }

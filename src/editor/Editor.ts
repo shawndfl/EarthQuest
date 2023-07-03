@@ -1,18 +1,22 @@
 import { TileBrowser } from './TileBrowser';
-import { ToolbarView } from './ToolbarView';
+import { Toolbar } from './Toolbar';
 import '../css/Editor.scss';
 import File from '../assets/editor/file.svg';
 import { EditorCanvas } from './EditorCanvas';
 import { IEditor } from './IEditor';
+import { StatusBar } from './StatusBar';
+import { MenuBar } from './MenuBar';
 
 /**
  * Editor class manages all the components of the editor
  */
 export class Editor implements IEditor {
   private _parent: HTMLElement;
-  readonly toolbarView: ToolbarView;
+  readonly toolbarView: Toolbar;
   readonly tileBrowser: TileBrowser;
   readonly editorCanvas: EditorCanvas;
+  readonly statusBar: StatusBar;
+  readonly menuBar: MenuBar;
 
   readonly zoomStep: number = 0.1;
 
@@ -21,8 +25,10 @@ export class Editor implements IEditor {
   }
 
   constructor() {
-    this.toolbarView = new ToolbarView();
+    this.toolbarView = new Toolbar(this);
     this.tileBrowser = new TileBrowser(this);
+    this.statusBar = new StatusBar(this);
+    this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas();
   }
 

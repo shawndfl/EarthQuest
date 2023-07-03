@@ -24,7 +24,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    * Get the number of sprites
    */
   get spriteCount(): number {
-    return this._spriteData.length;
+    return this._spriteData.tiles.length;
   }
 
   constructor(eng: Engine) {
@@ -37,7 +37,7 @@ export class SpritBatchController extends SpritBaseController implements ISprite
    * @param texture
    * @param spriteData
    */
-  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
+  initialize(texture: Texture, spriteData: ISpriteData, defaultSprite?: string | number) {
     super.initialize(texture, spriteData, defaultSprite);
   }
 

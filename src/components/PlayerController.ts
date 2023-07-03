@@ -102,7 +102,7 @@ export class PlayerController extends TileComponent {
     this._canWalk = true;
   }
 
-  initialize(spriteSheet: Texture, characterData: ISpriteData[]) {
+  initialize(spriteSheet: Texture, characterData: ISpriteData) {
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(spriteSheet, characterData);
 

@@ -20,44 +20,6 @@ export class DialogMenu extends Component {
    * Simulate some menu data
    */
   async initialize() {
-    const spriteData: ISpriteData[] = [
-      {
-        id: 'menu.top.right',
-        loc: [0, 0, 7, 7],
-      },
-      {
-        id: 'menu.top.left',
-        loc: [16, 0, 7, 7],
-      },
-      {
-        id: 'menu.bottom.left',
-        loc: [16, 13, 7, 7],
-      },
-      {
-        id: 'menu.bottom.right',
-        loc: [0, 13, 7, 7],
-      },
-      {
-        id: 'menu.bottom',
-        loc: [8, 13, 7, 7],
-      },
-      {
-        id: 'menu.right',
-        loc: [16, 7, 7, 7],
-      },
-      {
-        id: 'menu.left',
-        loc: [0, 7, 7, 7],
-      },
-      {
-        id: 'menu.top',
-        loc: [8, 0, 7, 7],
-      },
-      {
-        id: 'menu.cursor',
-        loc: [27, 6, 12, 9],
-      },
-    ];
     const texture = this.eng.assetManager.menu.texture;
     const data = this.eng.assetManager.menu.data;
     this._spriteBatch.initialize(texture, data);

@@ -1,0 +1,36 @@
+.editor-tile-browser {
+  width: calc(100% - 40px);
+  height: calc(100vh - 100px);
+  overflow: auto;
+  padding: 0px;
+  margin: 0px 10px 0px 10px;
+  display: inline-flex;
+  position: relative;
+}
+
+.editor-tile-image {
+  border: 0px;
+}
+
+.editor-tile-container {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  margin: 5px;
+}
+
+.tile-browser-button-group {
+  position: absolute;
+  right: 1px;
+  display: inline-flex;
+  bottom: 10px;
+  margin: 5px;
+  width: 50px;
+
+  .btn {
+    border: 1px solid rgba(102, 102, 102, 0.4);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3921568627);
+    height: 20px;
+    margin: 0px 3px 0px 0px;
+  }
+}

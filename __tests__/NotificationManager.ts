@@ -1,5 +1,5 @@
 import { IEditor } from '../src/editor/IEditor';
-import { NotificationManager } from '../src/editor/NotificationManager';
+import { NotificationManager } from '../src/core/NotificationManager';
 
 test('notification', () => {
   const manger = new NotificationManager({} as any as IEditor);

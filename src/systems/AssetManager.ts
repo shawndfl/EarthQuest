@@ -27,15 +27,15 @@ export class AssetManager extends Component {
     return { texture: this._font, data: FontData };
   }
 
-  get character(): { texture: Texture; data: ISpriteData[] } {
+  get character(): { texture: Texture; data: ISpriteData } {
     return { texture: this._character, data: CharacterData };
   }
 
-  get tile(): { texture: Texture; data: ISpriteData[] } {
+  get tile(): { texture: Texture; data: ISpriteData } {
     return { texture: this._tile, data: TileData };
   }
 
-  get menu(): { texture: Texture; data: ISpriteData[] } {
+  get menu(): { texture: Texture; data: ISpriteData } {
     return { texture: this._menu, data: MenuData };
   }
 

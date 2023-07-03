@@ -27,7 +27,7 @@ export class SpritController extends SpritBaseController implements ISpriteContr
    * @param texture
    * @param spriteData
    */
-  initialize(texture: Texture, spriteData: ISpriteData[], defaultSprite?: string | number) {
+  initialize(texture: Texture, spriteData: ISpriteData, defaultSprite?: string | number) {
     super.initialize(texture, spriteData, defaultSprite);
 
     // set up the sprite

@@ -7,7 +7,6 @@ import { ILevelData } from '../environment/ILevelData';
 import { Texture } from '../graphics/Texture';
 import { DialogMenu } from '../menus/DialogMenu';
 import { GroundManager } from '../systems/GroundManager';
-import CharacterData from '../assets/characters.json';
 import { InputState } from '../core/InputHandler';
 import { BackgroundComponent } from '../components/BackgroundComponent';
 

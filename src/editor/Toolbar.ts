@@ -1,9 +1,13 @@
 import '../css/ToolbarView.css';
+import { EditorComponent } from './EditorComponent';
+import { IEditor } from './IEditor';
 
-export class ToolbarView {
+export class Toolbar extends EditorComponent {
+  constructor(editor: IEditor) {
+    super(editor);
+  }
+
   container: HTMLElement;
-
-  constructor() {}
 
   buildHtml(): HTMLElement {
     this.container = document.createElement('div');

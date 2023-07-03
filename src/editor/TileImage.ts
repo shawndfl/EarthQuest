@@ -1,3 +1,3 @@
 export class TileImage {
-  constructor(image: Image) {}
+  constructor(image: HTMLImageElement) {}
 }

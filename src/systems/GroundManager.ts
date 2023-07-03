@@ -211,7 +211,7 @@ export class GroundManager extends Component {
     try {
       // subtract 10 because all the cell indices are offset by 10
       const typeIndex = this._levelData.cells[k][j][i] - 10 ?? 0;
-      type = this._levelData.typesAndSprites[typeIndex] ?? 'empty';
+      type = this._levelData.tiles[typeIndex]?.type ?? 'empty';
 
       // this is used as a separator between groups of 10 tile types.
       // it's there to make the json easier to read. It also means empty.
