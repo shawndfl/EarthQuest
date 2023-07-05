@@ -29,7 +29,7 @@ export class Editor implements IEditor {
     this.tileBrowser = new TileBrowser(this);
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
-    this.editorCanvas = new EditorCanvas();
+    this.editorCanvas = new EditorCanvas(this);
   }
 
   async initialize(parentContainer: HTMLElement) {

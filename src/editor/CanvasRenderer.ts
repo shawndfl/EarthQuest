@@ -1,18 +1,25 @@
 import rect from '../math/rect';
 import vec2 from '../math/vec2';
 import * as MathConst from '../math/constants';
+import { EditorComponent } from './EditorComponent';
+import { IEditor } from './IEditor';
+import { RenderTiles } from './TileBrowser';
 
 /**
  * Render to the canvas editor
  */
-export class CanvasRenderer {
-  ctx: CanvasRenderingContext2D;
-  maxScale: number;
-  minScale: number;
+export class CanvasRenderer extends EditorComponent {
+  private maxScale: number;
+  private minScale: number;
   private _scale: number;
   private _offset: vec2;
-  offsetBounds: rect;
+  private offsetBounds: rect;
   private dirty: boolean;
+
+  readonly MaxI = 50;
+  readonly MaxJ = 50;
+
+  private tiles: RenderTiles[][];
 
   get scale(): number {
     return this._scale;
@@ -21,18 +28,29 @@ export class CanvasRenderer {
     return this._offset.copy();
   }
 
-  constructor() {
+  constructor(editor: IEditor, private ctx: CanvasRenderingContext2D) {
+    super(editor);
+    this.ctx.imageSmoothingEnabled = false;
     this.offsetBounds = new rect([-200, 4000, -2000, 4000]);
-    this._scale = 1.5;
+    this._scale = 1.0;
     this.minScale = 0.3;
     this.maxScale = 4;
     this._offset = new vec2(400, 300); // 600, 450
     this.dirty = true;
+    this.tiles = [];
+    for (let i = 0; i < this.MaxI; i++) {
+      this.tiles.push([]);
+      for (let j = 0; j < this.MaxJ; j++) {
+        if (this.tiles[i] == undefined) {
+          this.tiles[i] = [];
+        }
+        this.tiles[i].push(undefined);
+      }
+    }
   }
 
-  render(context: CanvasRenderingContext2D) {
+  render() {
     if (this.dirty) {
-      this.ctx = context;
       this.ctx.lineWidth = 1;
 
       // reset transform
@@ -40,6 +58,14 @@ export class CanvasRenderer {
 
       // Use the identity matrix while clearing the canvas
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+      // scale
+      this.ctx.scale(this.scale, this.scale);
+
+      // translate
+      this.ctx.translate(this.offset.x, this.offset.y);
+
+      this.renderTiles();
 
       this.renderGrid();
     }
@@ -53,18 +79,7 @@ export class CanvasRenderer {
     const scaleDelta = this.scale - currentScale;
     const offset = new vec2(this.ctx.canvas.width, this.ctx.canvas.height).scale(scaleDelta);
     const newOffset = this.offset.add(offset);
-    console.debug(
-      'scale ' +
-        this.scale.toFixed(4) +
-        ' delta scale ' +
-        scaleDelta.toFixed(4) +
-        ' old offset ' +
-        this.offset +
-        ' scale offset ' +
-        offset +
-        ' new offset ' +
-        newOffset
-    );
+
     this.setOffset(newOffset);
     this.dirty = true;
   }
@@ -72,13 +87,36 @@ export class CanvasRenderer {
   setOffset(value: vec2) {
     this._offset.x = MathConst.clamp(value.x, this.offsetBounds.left, this.offsetBounds.right);
     this._offset.y = MathConst.clamp(value.y, this.offsetBounds.top, this.offsetBounds.bottom);
-    console.debug('clamp offset ' + this._offset);
+
     this.dirty = true;
   }
 
-  private renderGrid() {
-    this.ctx.scale(this.scale, this.scale);
-    this.ctx.translate(this.offset.x, this.offset.y);
+  private renderTiles(): void {
+    const stepX = 16;
+    const stepY = 16;
+    for (let i = 0; i < this.MaxI; i++) {
+      for (let j = 0; j < this.MaxJ; j++) {
+        // if there is a tile draw it
+        if (this.tiles[i][j]) {
+          //const image =
+          //this.ctx.drawImage()
+        }
+      }
+    }
+  }
+
+  public select(left: number, top: number): void {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = '#00ff00';
+    const x = left / this.scale - this.offset.x;
+    const y = top / this.scale - this.offset.y;
+    const w = 32 * this.scale;
+    const h = 32 * this.scale;
+    this.ctx.rect(x, y, w, h);
+    this.ctx.stroke();
+  }
+
+  private renderGrid(): void {
     this.ctx.beginPath();
 
     const stepX = 16;
@@ -87,7 +125,7 @@ export class CanvasRenderer {
     this.ctx.fillStyle = '#000000';
     const maxI = 50;
     const maxJ = 50;
-    for (let i = 0; i < maxI; i++) {
+    for (let i = 0; i < this.MaxI; i++) {
       const x1 = -i * stepX * 2;
       const y1 = i * stepY;
       const x2 = -i * stepX * 2 + (maxJ - 1) * stepX * 2;
@@ -97,7 +135,7 @@ export class CanvasRenderer {
       this.ctx.lineTo(x2, y2);
     }
 
-    for (let j = 0; j < maxJ; j++) {
+    for (let j = 0; j < this.MaxJ; j++) {
       const x1 = j * stepX * 2;
       const y1 = j * stepY;
       const x2 = j * stepX * 2 - (maxI - 1) * stepX * 2;

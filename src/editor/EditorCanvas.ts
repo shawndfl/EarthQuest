@@ -1,29 +1,36 @@
 import '../css/EditorCanvas.scss';
 import vec2 from '../math/vec2';
 import { CanvasRenderer } from './CanvasRenderer';
+import { EditorComponent } from './EditorComponent';
+import { IEditor } from './IEditor';
 
-export class EditorCanvas {
+export class EditorCanvas extends EditorComponent {
   canvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
   canvasRenderer: CanvasRenderer;
   scaleStep: number;
   isPanning: boolean;
   lastPos: vec2;
 
-  buildHtml(): HTMLCanvasElement {
-    this.canvasRenderer = new CanvasRenderer();
+  constructor(editor: IEditor) {
+    super(editor);
     this.canvas = document.createElement('canvas');
+    const context = this.canvas.getContext('2d');
+    this.canvasRenderer = new CanvasRenderer(this.editor, context);
+  }
+
+  buildHtml(): HTMLCanvasElement {
     this.canvas.classList.add('editor-canvas');
     this.canvas.width = 800;
     this.canvas.height = 600;
-    this.context = this.canvas.getContext('2d');
-    this.context.imageSmoothingEnabled = false;
     this.isPanning = false;
 
     this.scaleStep = 20;
 
     this.canvas.addEventListener('mousedown', (e: MouseEvent) => {
       this.mouseDown(e);
+    });
+    this.canvas.addEventListener('mouseleave', (e: MouseEvent) => {
+      this.mouseExit(e);
     });
     this.canvas.addEventListener('mouseup', (e: MouseEvent) => {
       this.mouseUp(e);
@@ -38,11 +45,20 @@ export class EditorCanvas {
     return this.canvas;
   }
 
-  mouseDown(e: MouseEvent) {
+  mouseDown(e: MouseEvent) {}
+  mouseExit(e: MouseEvent) {
+    this.lastPos = undefined;
     console.debug('down', e);
   }
   mouseUp(e: MouseEvent) {
     console.debug('up', e);
+    var rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width; // relationship bitmap vs. element for x
+    const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
+
+    const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+
+    this.canvasRenderer.select(point.x, point.y);
     this.lastPos = undefined;
   }
   mouseWheel(e: WheelEvent) {
@@ -53,6 +69,7 @@ export class EditorCanvas {
   zoom(scale: number): void {
     this.canvasRenderer.setScale(scale);
   }
+
   mouseMove(e: MouseEvent) {
     // right click
     if (e.buttons == 1) {
@@ -70,6 +87,6 @@ export class EditorCanvas {
   }
 
   render() {
-    this.canvasRenderer.render(this.context);
+    this.canvasRenderer.render();
   }
 }
