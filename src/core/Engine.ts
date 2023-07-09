@@ -74,7 +74,7 @@ export class Engine {
     this.gameManager = new GameManager(this);
     this.sceneManager = new SceneManager(this);
     this.input = new InputHandler(this);
-    this.tileHelper = new TileHelper(this);
+    this.tileHelper = new TileHelper();
     this.soundManager = new SoundManager();
     this.viewManager = new ViewManager(this);
     this.dialogManager = new DialogManager(this);
@@ -103,6 +103,7 @@ export class Engine {
     // NOTE, this must be done before any textures are loaded
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
+    this.tileHelper.calculateTransform(this.width, this.height);
     await this.gameManager.initialize();
     await this.assetManager.initialize();
     await this.sceneManager.initialize();

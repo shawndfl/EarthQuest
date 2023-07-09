@@ -6,6 +6,8 @@ import { EditorCanvas } from './EditorCanvas';
 import { IEditor } from './IEditor';
 import { StatusBar } from './StatusBar';
 import { MenuBar } from './MenuBar';
+import { JobManager } from './JobManager';
+import { TileHelper } from '../utilities/TileHelper';
 
 /**
  * Editor class manages all the components of the editor
@@ -17,6 +19,8 @@ export class Editor implements IEditor {
   readonly editorCanvas: EditorCanvas;
   readonly statusBar: StatusBar;
   readonly menuBar: MenuBar;
+  readonly jobManager: JobManager;
+  readonly tileHelper: TileHelper;
 
   readonly zoomStep: number = 0.1;
 
@@ -30,10 +34,14 @@ export class Editor implements IEditor {
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
+    this.jobManager = new JobManager(this);
+    this.tileHelper = new TileHelper();
   }
 
   async initialize(parentContainer: HTMLElement) {
     this._parent = parentContainer;
+    this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.heigh);
+
     this.buildHtml();
     this.buildToolbar();
     this.editorCanvas.render();

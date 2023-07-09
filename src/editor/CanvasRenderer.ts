@@ -4,6 +4,7 @@ import * as MathConst from '../math/constants';
 import { EditorComponent } from './EditorComponent';
 import { IEditor } from './IEditor';
 import { RenderTiles } from './TileBrowser';
+import vec3 from '../math/vec3';
 
 /**
  * Render to the canvas editor
@@ -15,6 +16,8 @@ export class CanvasRenderer extends EditorComponent {
   private _offset: vec2;
   private offsetBounds: rect;
   private dirty: boolean;
+  private selectedRow: number;
+  private selectedCol: number;
 
   readonly MaxI = 50;
   readonly MaxJ = 50;
@@ -38,6 +41,8 @@ export class CanvasRenderer extends EditorComponent {
     this._offset = new vec2(400, 300); // 600, 450
     this.dirty = true;
     this.tiles = [];
+    this.selectedRow = -1;
+    this.selectedCol = -1;
     for (let i = 0; i < this.MaxI; i++) {
       this.tiles.push([]);
       for (let j = 0; j < this.MaxJ; j++) {
@@ -114,6 +119,11 @@ export class CanvasRenderer extends EditorComponent {
     const h = 32 * this.scale;
     this.ctx.rect(x, y, w, h);
     this.ctx.stroke();
+    const tile = this.editor.tileHelper.toTileLoc(new vec3(x, y, 0));
+
+    this.selectedRow = tile.x;
+    this.selectedCol = tile.y;
+    console.debug('select ' + this.selectedCol + ', ' + this.selectedRow);
   }
 
   private renderGrid(): void {
@@ -143,6 +153,15 @@ export class CanvasRenderer extends EditorComponent {
 
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
+    }
+
+    if (this.selectedRow >= 0 && this.selectedCol >= 0) {
+      const p0 = { x: 0, y: 0 };
+      const p1 = { x: 0, y: 0 };
+      const p2 = { x: 0, y: 0 };
+      const p3 = { x: 0, y: 0 };
+      //this.ctx.moveTo(x1, y1);
+      //this.ctx.lineTo(x2, y2);
     }
 
     this.ctx.stroke();

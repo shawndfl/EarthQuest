@@ -14,7 +14,8 @@ class MockEngine {
 test('Tile', () => {
   const eng = new MockEngine();
 
-  const t = new TileHelper(eng as any);
+  const t = new TileHelper();
+  t.calculateTransform(eng.width, eng.height);
 
   const point = new vec3(400, 0, -1);
 
@@ -27,7 +28,8 @@ test('Tile', () => {
 test('Tile side of the screen', () => {
   const eng = new MockEngine();
 
-  const t = new TileHelper(eng as any);
+  const t = new TileHelper();
+  t.calculateTransform(eng.width, eng.height);
 
   const point = new vec3(0, 300, 0);
 
@@ -40,7 +42,8 @@ test('Tile side of the screen', () => {
 test('TileToScreen', () => {
   const eng = new MockEngine();
 
-  const t = new TileHelper(eng as any);
+  const t = new TileHelper();
+  t.calculateTransform(eng.width, eng.height);
 
   const point = t.toScreenLoc(0, 0, 0);
   expect(point.x).toBeCloseTo(400, 2);
@@ -56,7 +59,8 @@ test('TileToScreen', () => {
 test('TileToScreenHeight', () => {
   const eng = new MockEngine();
 
-  const t = new TileHelper(eng as any);
+  const t = new TileHelper();
+  t.calculateTransform(eng.width, eng.height);
 
   const point = t.toScreenLoc(0, 2, 1);
   console.debug('point ' + point.x + ', ' + point.y + ', ' + point.z);

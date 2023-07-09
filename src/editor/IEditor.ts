@@ -1,4 +1,6 @@
+import { TileHelper } from '../utilities/TileHelper';
 import { EditorCanvas } from './EditorCanvas';
+import { JobManager } from './JobManager';
 import { MenuBar } from './MenuBar';
 import { StatusBar } from './StatusBar';
 import { TileBrowser } from './TileBrowser';
@@ -10,4 +12,6 @@ export interface IEditor {
   readonly editorCanvas: EditorCanvas;
   readonly menuBar: MenuBar;
   readonly statusBar: StatusBar;
+  readonly jobManager: JobManager;
+  readonly tileHelper: TileHelper;
 }

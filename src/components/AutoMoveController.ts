@@ -1,7 +1,5 @@
 import { Engine } from '../core/Engine';
 import vec2 from '../math/vec2';
-import vec3 from '../math/vec3';
-import { TileHelper } from '../utilities/TileHelper';
 import { Component } from './Component';
 import { TileComponent } from './TileComponent';
 
