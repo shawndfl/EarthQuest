@@ -16,8 +16,7 @@ export class CanvasRenderer extends EditorComponent {
   private _offset: vec2;
   private offsetBounds: rect;
   private dirty: boolean;
-  private selectedRow: number;
-  private selectedCol: number;
+  private selectedTile: { i: number; j: number };
 
   readonly MaxI = 50;
   readonly MaxJ = 50;
@@ -41,8 +40,8 @@ export class CanvasRenderer extends EditorComponent {
     this._offset = new vec2(400, 300); // 600, 450
     this.dirty = true;
     this.tiles = [];
-    this.selectedRow = -1;
-    this.selectedCol = -1;
+    this.selectedTile = { i: -1, j: -1 };
+
     for (let i = 0; i < this.MaxI; i++) {
       this.tiles.push([]);
       for (let j = 0; j < this.MaxJ; j++) {
@@ -117,13 +116,17 @@ export class CanvasRenderer extends EditorComponent {
     const y = top / this.scale - this.offset.y;
     const w = 32 * this.scale;
     const h = 32 * this.scale;
-    this.ctx.rect(x, y, w, h);
-    this.ctx.stroke();
-    const tile = this.editor.tileHelper.toTileLoc(new vec3(x, y, 0));
 
-    this.selectedRow = tile.x;
-    this.selectedCol = tile.y;
-    console.debug('select ' + this.selectedCol + ', ' + this.selectedRow);
+    const width = this.editor.editorCanvas.width;
+    const height = this.editor.editorCanvas.height;
+    const tileI = (x * -1) / 64 + (y * 1) / 32;
+    const tileJ = x / 64 + (y * 1) / 32;
+
+    this.selectedTile.i = Math.floor(tileI);
+    this.selectedTile.j = Math.floor(tileJ);
+    console.debug(' tile ' + tileI.toFixed(4) + ', ' + tileJ.toFixed(4));
+    console.debug(' screen ' + screenX.toFixed(4) + ', ' + screenY.toFixed(4));
+    this.dirty = true;
   }
 
   private renderGrid(): void {
@@ -132,7 +135,7 @@ export class CanvasRenderer extends EditorComponent {
     const stepX = 16;
     const stepY = 16;
 
-    this.ctx.fillStyle = '#000000';
+    this.ctx.strokeStyle = '#000000';
     const maxI = 50;
     const maxJ = 50;
     for (let i = 0; i < this.MaxI; i++) {
@@ -155,15 +158,29 @@ export class CanvasRenderer extends EditorComponent {
       this.ctx.lineTo(x2, y2);
     }
 
-    if (this.selectedRow >= 0 && this.selectedCol >= 0) {
-      const p0 = { x: 0, y: 0 };
-      const p1 = { x: 0, y: 0 };
-      const p2 = { x: 0, y: 0 };
-      const p3 = { x: 0, y: 0 };
-      //this.ctx.moveTo(x1, y1);
-      //this.ctx.lineTo(x2, y2);
-    }
-
     this.ctx.stroke();
+
+    if (this.selectedTile.i >= 0 && this.selectedTile.j >= 0) {
+      const i = this.selectedTile.i;
+      const j = this.selectedTile.j;
+      // top
+      const p0 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY };
+      // right
+      const p1 = { x: -i * stepX * 2 + j * stepY * 2 + stepX * 2, y: i * stepX + j * stepY + stepY };
+      // left
+      const p2 = { x: -i * stepX * 2 + j * stepY * 2 - stepX * 2, y: i * stepX + j * stepY + stepY };
+      // bottom
+      const p3 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + stepY * 2 };
+
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = 'rgb(0,255,0)';
+      this.ctx.lineWidth = 2;
+      this.ctx.moveTo(p0.x, p0.y);
+      this.ctx.lineTo(p1.x, p1.y);
+      this.ctx.lineTo(p3.x, p3.y);
+      this.ctx.lineTo(p2.x, p2.y);
+      this.ctx.closePath();
+      this.ctx.stroke();
+    }
   }
 }

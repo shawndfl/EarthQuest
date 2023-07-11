@@ -40,7 +40,7 @@ export class Editor implements IEditor {
 
   async initialize(parentContainer: HTMLElement) {
     this._parent = parentContainer;
-    this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.heigh);
+    this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.height);
 
     this.buildHtml();
     this.buildToolbar();

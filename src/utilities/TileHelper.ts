@@ -11,14 +11,16 @@ export class TileHelper {
   protected _toScreen: mat4;
   protected _toTile: mat4;
   readonly depthScale: number;
+  private width: number;
+  private height: number;
 
   constructor() {
     this.depthScale = 50;
   }
 
   public calculateTransform(width: number, height: number) {
-    const screenWidth = width;
-    const screenHeight = height;
+    this.width = width;
+    this.height = height;
 
     const scale = 2.0;
     const tileSize = 32;
@@ -29,14 +31,14 @@ export class TileHelper {
     const xAxis = new vec3([halfCell, -halfCell, 0]);
     const yAxis = new vec3([-quarterCell, -quarterCell, halfCell]);
     const zAxis = new vec3([
-      (-quarterCell / (screenHeight * this.depthScale)) * 2,
-      (-quarterCell / (screenHeight * this.depthScale)) * 2,
+      (-quarterCell / (this.height * this.depthScale)) * 2,
+      (-quarterCell / (this.height * this.depthScale)) * 2,
       0,
     ]);
 
     // translation part
-    const halfWidth = screenWidth * 0.5;
-    const heightOffset = screenHeight - quarterCell;
+    const halfWidth = this.width * 0.5;
+    const heightOffset = this.height - quarterCell;
     const trans = new vec3([halfWidth, heightOffset, 1]);
 
     // create matrix
@@ -100,16 +102,12 @@ export class TileHelper {
     const depth = i + j * maxI + k * maxJ * maxI;
     const scaledDepth = depth / (maxI * maxJ * maxK + maxJ * maxI + maxI);
     const normalizedDepth = scaledDepth * 2 - 1;
-    console.info('depth raw ' + depth);
-    console.info('depth scale ' + scaledDepth);
-    console.info('depth normalized ' + normalizedDepth);
     return normalizedDepth;
   }
 
   toScreenLoc(i: number, j: number, k: number): vec3 {
     const cell = new vec3([i, j, k]);
     const screen = this._toScreen.multiplyVec3(cell);
-
     return screen;
   }
 }

@@ -11,7 +11,7 @@ export class EditorCanvas extends EditorComponent {
   isPanning: boolean;
   lastPos: vec2;
   readonly width: number = 800;
-  readonly heigh: number = 600;
+  readonly height: number = 600;
 
   constructor(editor: IEditor) {
     super(editor);
@@ -23,7 +23,7 @@ export class EditorCanvas extends EditorComponent {
   buildHtml(): HTMLCanvasElement {
     this.canvas.classList.add('editor-canvas');
     this.canvas.width = this.width;
-    this.canvas.height = this.heigh;
+    this.canvas.height = this.height;
     this.isPanning = false;
 
     this.scaleStep = 20;

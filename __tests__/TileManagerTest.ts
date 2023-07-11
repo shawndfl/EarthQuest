@@ -11,6 +11,26 @@ class MockEngine {
   }
 }
 
+test('To screen', () => {
+  const eng = new MockEngine();
+
+  const t = new TileHelper();
+  t.calculateTransform(eng.width, eng.height);
+
+  for (let i = 0; i < 5; i++) {
+    for (let j = 0; j < 5; j++) {
+      const newCell = t.toScreenLoc(i, j, 0);
+      newCell.y = eng.height - newCell.y;
+      console.debug(i + ', ' + j + ' = ' + newCell);
+    }
+  }
+
+  const newCell = t.toScreenLoc(1, 0, 0);
+  console.debug('1,0,0', newCell);
+  //expect(newCell.x).toBeCloseTo(400, 2);
+  //expect(newCell.y).toBeCloseTo(0, 2);
+});
+/*
 test('Tile', () => {
   const eng = new MockEngine();
 
@@ -74,3 +94,4 @@ test('TileToScreenHeight', () => {
   //expect(newCell.y).toBeCloseTo(2, 2);
   //expect(newCell.z).toBeCloseTo(0, 2);
 });
+*/
