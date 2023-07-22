@@ -8,13 +8,14 @@ import { StatusBar } from './StatusBar';
 import { MenuBar } from './MenuBar';
 import { JobManager } from './JobManager';
 import { TileHelper } from '../utilities/TileHelper';
+import { ToolbarOptions } from './ToolbarOptions';
 
 /**
  * Editor class manages all the components of the editor
  */
 export class Editor implements IEditor {
   private _parent: HTMLElement;
-  readonly toolbarView: Toolbar;
+  readonly toolbar: Toolbar;
   readonly tileBrowser: TileBrowser;
   readonly editorCanvas: EditorCanvas;
   readonly statusBar: StatusBar;
@@ -29,7 +30,7 @@ export class Editor implements IEditor {
   }
 
   constructor() {
-    this.toolbarView = new Toolbar(this);
+    this.toolbar = new Toolbar(this);
     this.tileBrowser = new TileBrowser(this);
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
@@ -55,7 +56,7 @@ export class Editor implements IEditor {
     const main = document.createElement('div');
     main.classList.add('editor-main');
 
-    this._parent.append(this.toolbarView.buildHtml());
+    this._parent.append(this.toolbar.buildHtml());
 
     const entityContainer = document.createElement('div');
     entityContainer.classList.add('editor-entity-container');
@@ -96,18 +97,42 @@ export class Editor implements IEditor {
   }
 
   buildToolbar() {
-    this.toolbarView.addButton('new', File, 'New Scene', () => {
+    this.toolbar.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
     });
 
-    this.toolbarView.addButton('zoomIn', File, 'Zoom In', () => {
+    this.toolbar.addButton('zoomIn', File, 'Zoom In', () => {
       const scale = this.editorCanvas.canvasRenderer.scale;
       this.editorCanvas.canvasRenderer.setScale(scale + this.zoomStep);
     });
 
-    this.toolbarView.addButton('zoomOut', File, 'Zoom Out', () => {
+    this.toolbar.addButton('zoomOut', File, 'Zoom Out', () => {
       const scale = this.editorCanvas.canvasRenderer.scale;
       this.editorCanvas.canvasRenderer.setScale(scale - this.zoomStep);
     });
+
+    this.toolbar.addButton('undo', File, 'Undo', () => {
+      this.jobManager.undo();
+    });
+
+    this.toolbar.addButton('redo', File, 'Redo', () => {
+      this.jobManager.redo();
+    });
+
+    this.toolbar.addButton('place', File, 'Place', (button: HTMLElement) => {
+      this.toolbar.selectedTool = ToolbarOptions.Place;
+
+      this.toolbar.setActive(button, true);
+
+      const pan = this.toolbar.getButton('pan');
+      this.toolbar.setActive(pan, false);
+    });
+    this.toolbar.addButton('pan', File, 'Pan', () => {
+      this.toolbar.selectedTool = ToolbarOptions.Place;
+    });
+
+    // set default
+    this.toolbar.selectedTool = ToolbarOptions.Place;
+    this.toolbar.setActive(this.toolbar.getButton('place'), true);
   }
 }

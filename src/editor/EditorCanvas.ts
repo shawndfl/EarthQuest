@@ -4,6 +4,9 @@ import { CanvasRenderer } from './CanvasRenderer';
 import { EditorComponent } from './EditorComponent';
 import { IEditor } from './IEditor';
 
+/**
+ * Manages the editor canvas event handling
+ */
 export class EditorCanvas extends EditorComponent {
   canvas: HTMLCanvasElement;
   canvasRenderer: CanvasRenderer;
@@ -12,6 +15,10 @@ export class EditorCanvas extends EditorComponent {
   lastPos: vec2;
   readonly width: number = 800;
   readonly height: number = 600;
+
+  get context(): CanvasRenderingContext2D {
+    return this.canvasRenderer.context;
+  }
 
   constructor(editor: IEditor) {
     super(editor);
@@ -48,10 +55,12 @@ export class EditorCanvas extends EditorComponent {
   }
 
   mouseDown(e: MouseEvent) {}
+
   mouseExit(e: MouseEvent) {
     this.lastPos = undefined;
     console.debug('down', e);
   }
+
   mouseUp(e: MouseEvent) {
     console.debug('up', e);
     var rect = this.canvas.getBoundingClientRect();
@@ -63,6 +72,7 @@ export class EditorCanvas extends EditorComponent {
     this.canvasRenderer.select(point.x, point.y);
     this.lastPos = undefined;
   }
+
   mouseWheel(e: WheelEvent) {
     const scale = this.canvasRenderer.scale + 2.0 / (e.deltaY > 0 ? -this.scaleStep : this.scaleStep);
     this.zoom(scale);

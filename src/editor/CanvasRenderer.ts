@@ -3,8 +3,8 @@ import vec2 from '../math/vec2';
 import * as MathConst from '../math/constants';
 import { EditorComponent } from './EditorComponent';
 import { IEditor } from './IEditor';
-import { RenderTiles } from './TileBrowser';
-import vec3 from '../math/vec3';
+import { JobPlaceTile, SelectTileBrowserData, TilePlaceLocation } from './JobPlaceTile';
+import { ToolbarOptions } from './ToolbarOptions';
 
 /**
  * Render to the canvas editor
@@ -17,17 +17,23 @@ export class CanvasRenderer extends EditorComponent {
   private offsetBounds: rect;
   private dirty: boolean;
   private selectedTile: { i: number; j: number };
+  private _activeLayer: number;
 
   readonly MaxI = 50;
   readonly MaxJ = 50;
+  readonly MaxK = 10;
 
-  private tiles: RenderTiles[][];
+  private tiles: SelectTileBrowserData[][][];
 
   get scale(): number {
     return this._scale;
   }
   get offset() {
     return this._offset.copy();
+  }
+
+  get context(): CanvasRenderingContext2D {
+    return this.ctx;
   }
 
   constructor(editor: IEditor, private ctx: CanvasRenderingContext2D) {
@@ -41,16 +47,26 @@ export class CanvasRenderer extends EditorComponent {
     this.dirty = true;
     this.tiles = [];
     this.selectedTile = { i: -1, j: -1 };
+    this._activeLayer = 0;
 
-    for (let i = 0; i < this.MaxI; i++) {
+    // allocate 3 dimensions of tiles
+    for (let k = 0; k < this.MaxK; k++) {
       this.tiles.push([]);
       for (let j = 0; j < this.MaxJ; j++) {
-        if (this.tiles[i] == undefined) {
-          this.tiles[i] = [];
+        if (this.tiles[k] == undefined) {
+          this.tiles[k] = [];
         }
-        this.tiles[i].push(undefined);
+        for (let i = 0; i < this.MaxI; i++) {
+          if (this.tiles[k][j] == undefined) {
+            this.tiles[k][j] = [];
+          }
+        }
       }
     }
+  }
+
+  setTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
+    this.tiles[k][j][i] = data;
   }
 
   render() {
@@ -98,15 +114,49 @@ export class CanvasRenderer extends EditorComponent {
   private renderTiles(): void {
     const stepX = 16;
     const stepY = 16;
-    for (let i = 0; i < this.MaxI; i++) {
+    for (let k = 0; k < this.MaxK; k++) {
       for (let j = 0; j < this.MaxJ; j++) {
-        // if there is a tile draw it
-        if (this.tiles[i][j]) {
-          //const image =
-          //this.ctx.drawImage()
+        for (let i = 0; i < this.MaxI; i++) {
+          // if there is a tile draw it
+          if (this.tiles[k][j][i]) {
+            this.drawTile(this.tiles[k][j][i], i, j, k);
+          }
         }
       }
     }
+  }
+
+  /**
+   * Draws an image onto a canvas
+   * @param canvas
+   * @param left
+   * @param top
+   */
+  drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
+    const screen = this.tileToScreen(i, j, k);
+
+    const img = this.editor.tileBrowser.images[data.srcIndex].img;
+    const x = data.sx;
+    const y = data.sy;
+    const w = data.srcWidth;
+    const h = data.srcHeight;
+
+    this.context.drawImage(img, x, y, w, h, screen.x + data.offsetX, screen.y + data.offsetY, w * 2, h * 2);
+  }
+
+  public tileToScreen(i: number, j: number, layer: number = 0): { x: number; y: number } {
+    const stepX = 16;
+    const stepY = 16;
+    const point = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + layer * stepY };
+    return point;
+  }
+
+  public screenToTile(x: number, y: number, layer: number = 0): { x: number; y: number } {
+    const stepX = 16;
+    const stepY = 16;
+    const i = x;
+    const point = { x: (-x / stepX) * 2 + (y / stepY) * 2, y: x / stepX + y / stepY + layer / stepY };
+    return point;
   }
 
   public select(left: number, top: number): void {
@@ -117,8 +167,6 @@ export class CanvasRenderer extends EditorComponent {
     const w = 32 * this.scale;
     const h = 32 * this.scale;
 
-    const width = this.editor.editorCanvas.width;
-    const height = this.editor.editorCanvas.height;
     const tileI = (x * -1) / 64 + (y * 1) / 32;
     const tileJ = x / 64 + (y * 1) / 32;
 
@@ -127,6 +175,22 @@ export class CanvasRenderer extends EditorComponent {
     console.debug(' tile ' + tileI.toFixed(4) + ', ' + tileJ.toFixed(4));
     console.debug(' screen ' + screenX.toFixed(4) + ', ' + screenY.toFixed(4));
     this.dirty = true;
+
+    const ed = this.editor;
+    if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
+      const selected: SelectTileBrowserData = {
+        sx: ed.tileBrowser.selectedTile.x,
+        sy: ed.tileBrowser.selectedTile.y,
+        srcHeight: ed.tileBrowser.selectedTile.w,
+        srcWidth: ed.tileBrowser.selectedTile.h,
+        offsetX: -32,
+        offsetY: 0,
+        srcIndex: ed.tileBrowser.activeImage,
+      };
+      const location = new TilePlaceLocation(this.selectedTile.i, this.selectedTile.j, this._activeLayer);
+      const placeJob = new JobPlaceTile(ed, selected, location);
+      ed.jobManager.execute(placeJob);
+    }
   }
 
   private renderGrid(): void {

@@ -1,6 +1,6 @@
 .editor-main {
   display: inline-flex;
-  .editor-entity-container{
+  .editor-entity-container {
     width: 200px;
     min-width: 200px;
     max-width: 700px;
@@ -17,14 +17,19 @@
   }
 }
 
+.btn.active {
+  background-color: rgb(200, 240, 240);
+  font-weight: bold;
+  border: solid 1px #666666;
+}
 .btn {
+  border: none;
   width: 120px;
   text-align: center;
   justify-items: center;
   height: 32px;
-  background-color: rgb(104, 178, 201);
+  background-color: rgb(230, 230, 230);
   border-radius: 4px;
-  box-shadow: 1px 1px 3px #c4c4c4;
   cursor: pointer;
   span {
     display: inline-flex;
@@ -42,5 +47,6 @@
 }
 
 .btn:hover {
-  background-color: rgb(255, 255, 255)
+  background-color: rgb(255, 255, 255);
+  box-shadow: 1px 1px 3px #c4c4c4;
 }

@@ -31,16 +31,6 @@ export interface TileImageElement {
   h: number;
 }
 
-/**
- * This is used to render tiles.
- * It has the source x, y as well as the tile map index
- */
-export interface RenderTiles {
-  sx: number;
-  sy: number;
-  srcIndex: number;
-}
-
 export class TileBrowser extends EditorComponent {
   container: HTMLElement;
   tileCanvas: HTMLCanvasElement;
@@ -175,21 +165,6 @@ export class TileBrowser extends EditorComponent {
     this.invCanvasScale = 1 / this.canvasScale;
   }
 
-  /**
-   * Draws what is selected onto a canvas
-   * @param canvas
-   * @param left
-   * @param top
-   */
-  drawSelection(context: CanvasRenderingContext2D, left: number, top: number): void {
-    const img = this.images[this.activeImage].img;
-    const x = this.selectedTile.x;
-    const y = this.selectedTile.y;
-    const w = this.images[this.activeImage].w;
-    const h = this.images[this.activeImage].h;
-
-    context.drawImage(img, x, y, w, h, left, top, w, h);
-  }
   /**
    * redraws the canvas with the correct image
    */

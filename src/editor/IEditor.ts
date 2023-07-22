@@ -7,7 +7,7 @@ import { TileBrowser } from './TileBrowser';
 import { Toolbar } from './Toolbar';
 
 export interface IEditor {
-  readonly toolbarView: Toolbar;
+  readonly toolbar: Toolbar;
   readonly tileBrowser: TileBrowser;
   readonly editorCanvas: EditorCanvas;
   readonly menuBar: MenuBar;
