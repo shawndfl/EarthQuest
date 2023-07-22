@@ -37,7 +37,7 @@ export class TilePlaceLocation {
  * This job will place a tile from the tile browser to a location on the canvas renderer
  */
 export class JobPlaceTile extends Job {
-  private lastTileValue: TilePlaceLocation;
+  private lastTileValue: SelectTileBrowserData;
 
   constructor(editor: IEditor, private selected: SelectTileBrowserData, private location: TilePlaceLocation) {
     super(editor);
@@ -46,16 +46,17 @@ export class JobPlaceTile extends Job {
   redo(): void {}
 
   execute(): void {
-    this.lastTileValue = this.location.clone();
+    const i = this.location.iRow;
+    const j = this.location.jCol;
+    const k = this.location.layer;
+    this.lastTileValue = this.editor.editorCanvas.canvasRenderer.getTile(i, j, k);
 
-    this.editor.editorCanvas.canvasRenderer.setTile(
-      this.selected,
-      this.location.iRow,
-      this.location.jCol,
-      this.location.layer
-    );
+    this.editor.editorCanvas.canvasRenderer.setTile(this.selected, i, j, k);
   }
   undo(): void {
-    //TODO
+    const i = this.location.iRow;
+    const j = this.location.jCol;
+    const k = this.location.layer;
+    this.editor.editorCanvas.canvasRenderer.setTile(this.lastTileValue, i, j, k);
   }
 }

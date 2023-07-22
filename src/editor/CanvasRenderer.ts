@@ -67,6 +67,11 @@ export class CanvasRenderer extends EditorComponent {
 
   setTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
     this.tiles[k][j][i] = data;
+    this.dirty = true;
+  }
+
+  getTile(i: number, j: number, k: number) {
+    return this.tiles[k][j][i];
   }
 
   render() {
