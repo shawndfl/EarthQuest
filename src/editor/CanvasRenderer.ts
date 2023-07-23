@@ -43,7 +43,7 @@ export class CanvasRenderer extends EditorComponent {
     this._scale = 1.0;
     this.minScale = 0.3;
     this.maxScale = 4;
-    this._offset = new vec2(400, 300); // 600, 450
+    this._offset = new vec2(400, 10); // 600, 450
     this.dirty = true;
     this.tiles = [];
     this.selectedTile = { i: -1, j: -1 };
@@ -102,10 +102,15 @@ export class CanvasRenderer extends EditorComponent {
     const currentScale = this.scale;
     this._scale = MathConst.clamp(value, this.minScale, this.maxScale);
     const scaleDelta = this.scale - currentScale;
-    const offset = new vec2(this.ctx.canvas.width, this.ctx.canvas.height).scale(scaleDelta);
-    const newOffset = this.offset.add(offset);
+    const baseOffsetX = this._offset.x / (this.ctx.canvas.width * currentScale);
+    const baseOffsetY = this._offset.y / (this.ctx.canvas.height * currentScale);
 
-    this.setOffset(newOffset);
+    const newOffset = new vec2(
+      baseOffsetX * this.ctx.canvas.width * this._scale,
+      baseOffsetY * this.ctx.canvas.height * this._scale
+    );
+
+    //this.setOffset(newOffset);
     this.dirty = true;
   }
 
@@ -183,15 +188,18 @@ export class CanvasRenderer extends EditorComponent {
 
     const ed = this.editor;
     if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
-      const selected: SelectTileBrowserData = {
-        sx: ed.tileBrowser.selectedTile.x,
-        sy: ed.tileBrowser.selectedTile.y,
-        srcHeight: ed.tileBrowser.selectedTile.w,
-        srcWidth: ed.tileBrowser.selectedTile.h,
-        offsetX: -32,
-        offsetY: 0,
-        srcIndex: ed.tileBrowser.activeImage,
-      };
+      let selected: SelectTileBrowserData = null;
+      if (ed.tileBrowser.selectedTile) {
+        selected = {
+          sx: ed.tileBrowser.selectedTile.x,
+          sy: ed.tileBrowser.selectedTile.y,
+          srcHeight: ed.tileBrowser.selectedTile.w,
+          srcWidth: ed.tileBrowser.selectedTile.h,
+          offsetX: -32,
+          offsetY: 0,
+          srcIndex: ed.tileBrowser.activeImage,
+        };
+      }
       const location = new TilePlaceLocation(this.selectedTile.i, this.selectedTile.j, this._activeLayer);
       const placeJob = new JobPlaceTile(ed, selected, location);
       ed.jobManager.execute(placeJob);

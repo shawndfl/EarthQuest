@@ -1,11 +1,25 @@
 .editor-toolbar {
-  width: calc(100% - 22px);
-  height: 32px;
-  box-shadow: 1px 1px 3px #666666;
-  background-color: #efefefef;
-  border-radius: 8px;
+  position: sticky;
+  left: 0px;
+  width: 100%;
+  background-color: black;
   display: inline-flex;
   align-items: center;
-  padding: 5px;
-  margin: 10px;
+  .btn.active {
+    background-color: rgb(22, 59, 59);
+    border: unset;
+    font-weight: unset;
+  }
+  .btn {
+    font-size: 12px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: unset;
+    width: unset;
+  }
+
+  .btn:hover {
+    background-color: rgb(43, 41, 41);
+  }
 }
