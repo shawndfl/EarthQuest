@@ -59,6 +59,7 @@ export class WorldScene extends SceneComponent {
 
     await this.dialog.initialize();
   }
+
   /**
    * Handles user input. The logic goes through a chain of commands
    *    1) Main menu

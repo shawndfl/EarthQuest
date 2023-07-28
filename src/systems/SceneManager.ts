@@ -2,6 +2,7 @@ import { Component } from '../components/Component';
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
 import { SceneFactory } from './SceneFactory';
+import Level1 from '../assets/level1.json';
 
 export class SceneManager extends Component {
   private _activeScene: SceneComponent;
@@ -17,8 +18,9 @@ export class SceneManager extends Component {
     this._sceneFactory = new SceneFactory(eng);
   }
 
-  initialize() {
+  async initialize() {
     this.changeScene('world1');
+    await this.scene.initialize({ level: Level1 });
   }
 
   /**

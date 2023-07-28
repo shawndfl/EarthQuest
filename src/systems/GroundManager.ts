@@ -201,30 +201,6 @@ export class GroundManager extends Component {
   }
 
   /**
-   * Get the cell type. x y and z are int cells values
-   * @param i
-   * @param j
-   * @param k
-   */
-  getCellTypeAndSprite(i: number, j: number, k: number): string {
-    let type = 'empty';
-    try {
-      // subtract 10 because all the cell indices are offset by 10
-      const typeIndex = this._levelData.cells[k][j][i] - 10 ?? 0;
-      type = this._levelData.tiles[typeIndex]?.type ?? 'empty';
-
-      // this is used as a separator between groups of 10 tile types.
-      // it's there to make the json easier to read. It also means empty.
-      if (type == '---') {
-        type = 'empty';
-      }
-    } catch (e) {
-      //NOP we will just return empty
-    }
-    return type;
-  }
-
-  /**
    * Perform hit test
    * @param touchPoint
    */

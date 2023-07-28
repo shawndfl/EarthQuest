@@ -11,7 +11,6 @@ import { TextManager } from '../systems/TextManager';
 import { BattleManager } from '../systems/BattleManager';
 import { SceneComponent } from '../components/SceneComponent';
 
-import Level1 from '../assets/level1.json';
 import { FpsController } from './FpsController';
 import { Random } from '../utilities/Random';
 import { AssetManager } from '../systems/AssetManager';
@@ -108,7 +107,6 @@ export class Engine {
     await this.assetManager.initialize();
     await this.sceneManager.initialize();
     await this.textManager.initialize();
-    await this.scene.initialize({ level: Level1 });
     await this.dialogManager.initialize();
     await this.battleManager.initialize();
 

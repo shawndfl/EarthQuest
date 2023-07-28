@@ -18,15 +18,23 @@ export interface ITileData {
    * Type of the cell this is used to the engine to create a behavior
    */
   type: string;
+
   /**
    * index into the tile image
    */
   imageIndex: number;
+
+  /**
+   * Index of the tile in the tile sheet
+   */
   tileSheetIndex: number;
+
   /** How a player can access the tiles */
   access: { tr: boolean; tl: boolean; br: boolean; bl: boolean };
+
   /** is the tile flipped horizontality  */
   flipped: boolean;
+
   /** rotate the image 0, 90, 180, 270 degrees */
   rotate: 0 | 90 | 180 | 270;
 }
