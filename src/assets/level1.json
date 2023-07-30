@@ -1,20 +1,19 @@
 {
-  "typesAndSprites": [
-    "---",
-    "open|block",
-    "slop|slop.left",
-    "slop|slop.right",
-    "jump|block.half",
-    "jump|block.half.highlight",
-    "collide|tree",
-    "slop|slop.back.right",
-    "slop|slop.back.left",
-    "open|block.highlight",
-    "---",
-    "player|",
-    "npc:poo"
+  "tiles": [
+    { "type": "---" },
+    { "type": "open|block" },
+    { "type": "slop|slop.left" },
+    { "type": "slop|slop.right" },
+    { "type": "jump|block.half" },
+    { "type": "jump|block.half.highlight" },
+    { "type": "collide|tree" },
+    { "type": "slop|slop.back.right" },
+    { "type": "slop|slop.back.left" },
+    { "type": "open|block.highlight" },
+    { "type": "---" },
+    { "type": "player|" },
+    { "type": "npc:poo" }
   ],
-  "cellHeightOffset": -2,
   "cells": [
     [
       [11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11],

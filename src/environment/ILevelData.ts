@@ -20,32 +20,15 @@ export interface ITileData {
   type: string;
 
   /**
-   * index into the tile image
+   * How a player can access the tiles
    */
-  imageIndex: number;
-
-  /**
-   * Index of the tile in the tile sheet
-   */
-  tileSheetIndex: number;
-
-  /** How a player can access the tiles */
-  access: { tr: boolean; tl: boolean; br: boolean; bl: boolean };
-
-  /** is the tile flipped horizontality  */
-  flipped: boolean;
-
-  /** rotate the image 0, 90, 180, 270 degrees */
-  rotate: 0 | 90 | 180 | 270;
+  access?: { tr: boolean; tl: boolean; br: boolean; bl: boolean };
 }
 
 /**
  * This interface is used to build levels.
  */
 export interface ILevelData {
-  /** The path to the tile sheet */
-  tileSheets: SourceTileSheet[];
-
   /**  */
   tiles: ITileData[];
 

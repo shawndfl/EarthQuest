@@ -1,6 +1,6 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
-import TileData from '../assets/isometricTile.json';
+
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
@@ -10,8 +10,8 @@ import { LevelConstructionParams } from '../environment/LevelConstructionParams'
 import vec2 from '../math/vec2';
 import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
 import { TileAccessOptions } from '../components/TileAccessOptions';
-import vec3 from '../math/vec3';
 import { TileContext } from '../components/TileContext';
+import { LevelLoader } from '../environment/LevelLoader';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -32,6 +32,9 @@ export class GroundManager extends Component {
 
   /** used to generate the levels */
   protected _levelGenerator: LevelGenerator;
+
+  /** Used to load levels from json */
+  protected _levelLoader: LevelLoader;
 
   constructor(eng: Engine) {
     super(eng);
@@ -57,9 +60,18 @@ export class GroundManager extends Component {
 
     // generate a level
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
+    this._levelLoader = new LevelLoader(this.eng, this._tileFactory);
 
     // create the initial level
-    this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
+    if (true) {
+      this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
+    } else {
+      this.loadLevel();
+    }
+  }
+
+  loadLevel() {
+    this._tiles = this._levelLoader.load(this._levelData);
   }
 
   /**
