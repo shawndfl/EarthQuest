@@ -56,8 +56,16 @@ export class WorldScene extends SceneComponent {
 
     this.player.initialize(this.spriteSheetTexture, data);
     this.ground.initialize(options.level);
-
     await this.dialog.initialize();
+
+    this.eng.dialogManager.showDialog(
+      'Welcome to Earth Quest!\nWhat should we do today?',
+      { x: 20, y: 40, width: 500, height: 240 },
+      (dialog) => {
+        console.debug('user selected ' + dialog.selectedOption);
+      },
+      ['Walk Around', 'New Game', 'Load']
+    );
   }
 
   /**

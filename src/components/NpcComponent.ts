@@ -74,16 +74,29 @@ export class NpcComponent extends TileComponent {
    */
   onPlayerAction(tileComponent: TileComponent) {
     this.eng.dialogManager.showDialog(
-      'Welcome to Earth Quest!',
+      'You want a piece of me?',
       { x: 20, y: 40, width: 400, height: 200 },
       (dialog) => {
-        console.debug('user selcted ' + dialog.selectedOption);
-        // start a battle
-        //this.eng.battleManager.startBattle({});
+        if (dialog.selectedOption == 'Fight') {
+          // start a battle
+          this.eng.battleManager.startBattle({});
+        } else {
+          this.keepTraining();
+        }
+
         return true;
       },
-      ['New', 'Load']
+      ['Fight', 'Run Away']
     );
+  }
+
+  keepTraining() {
+    this.eng.dialogManager.showDialog('You should be scared. Keep training!', {
+      x: 10,
+      y: 40,
+      width: 600,
+      height: 150,
+    });
   }
 
   update(dt: number) {

@@ -19,7 +19,9 @@ export class DialogComponent extends PanelComponent {
   protected _selectedIndex: number;
   protected _cursor: DialogCursor;
 
-  onHide: (dialog: DialogComponent) => boolean;
+  onClosing: (dialog: DialogComponent) => boolean;
+
+  onClosed: (dialog: DialogComponent) => void;
 
   get selectedOption(): string {
     return this._selectedOption;
@@ -63,82 +65,93 @@ export class DialogComponent extends PanelComponent {
     if (active && (state.action & UserAction.ActionPressed) > 0) {
       let canHide = true;
 
-      // if there is an onHide event fire that
-      if (this.onHide) {
-        canHide = this.onHide(this);
+      if (this.onClosing) {
+        canHide = this.onClosing(this);
       }
 
       this._cursor.select();
 
       if (canHide) {
         this.hide();
+
+        if (this.onClosed) {
+          this.onClosed(this);
+        }
       }
     }
 
-    // select next option
-    if ((state.action & UserAction.DownPressed) > 0) {
-      if (this._cursor.index < this._cursor.indexCount - 1) {
-        this._cursor.index++;
-      } else {
-        this._cursor.index = 0;
+    if (this._options?.length > 0) {
+      // select next option
+      if ((state.action & UserAction.DownPressed) > 0) {
+        if (this._cursor.index < this._cursor.indexCount - 1) {
+          this._cursor.index++;
+        } else {
+          this._cursor.index = 0;
+        }
+        this._cursor.select();
       }
-      this._cursor.select();
-    }
-    // select previous option
-    if ((state.action & UserAction.UpPressed) > 0) {
-      if (this._cursor.index > 0) {
-        this._cursor.index--;
-      } else {
-        this._cursor.index = this._cursor.indexCount - 1;
+      // select previous option
+      if ((state.action & UserAction.UpPressed) > 0) {
+        if (this._cursor.index > 0) {
+          this._cursor.index--;
+        } else {
+          this._cursor.index = this._cursor.indexCount - 1;
+        }
+        this._cursor.select();
       }
-      this._cursor.select();
     }
-
     return active;
   }
 
   show() {
     super.show();
-    this._cursor.show(0);
+    if (this._options?.length > 0) {
+      this._cursor.show(0);
+    }
   }
 
   hide() {
     super.hide();
+    this.eng.textManager.hideText(this.id);
+    this._dialogBuild.hideDialog(this.id);
     this._cursor.hide();
+    for (let i = 0; i < this._options?.length; i++) {
+      this.eng.textManager.hideText(this.id + '_' + this._options[i]);
+    }
   }
 
   redraw() {
     super.redraw();
     if (this.visible) {
-      const { width, height } = this.eng.textManager.getTextSize(this._text);
-
-      const optionIndent = 60;
-      const optionsHeightPadding = 20;
-      let yOffset = height + optionsHeightPadding;
-      let optionXPosition = optionIndent + this._pos.x + this._textOffset.x;
-      const optionPositions: vec2[] = [];
-
-      // add the text for all the options
-      for (let i = 0; i < this._options.length; i++) {
-        const option = this._options[i];
-        const x = optionXPosition;
-        const y = yOffset + this._textOffset.y + this._pos.y;
-        const textPos = new vec2(x, y);
-        this.eng.textManager.setTextBlock({
-          id: this.id + '_' + option,
-          text: option,
-          position: textPos,
-          color: new vec4([0.9, 0.9, 1.0, 1.0]),
-          depth: this._depth - 0.01, // set the depth just in front of this dialog box
-          scale: 1.0,
-        });
-        optionPositions.push(new vec2(x - optionIndent, y + this.eng.textManager.lineHeight * 0.5));
-
-        yOffset += this.eng.textManager.lineHeight;
-      }
-
       // add the cursor and the positions it can be placed at
-      if (this._options.length > 0) {
+      if (this._options?.length > 0) {
+        const { width, height } = this.eng.textManager.getTextSize(this._text);
+
+        const optionIndent = 60;
+        const optionsHeightPadding = 20;
+        let yOffset = height + optionsHeightPadding;
+        let optionXPosition = optionIndent + this._pos.x + this._textOffset.x;
+        const optionPositions: vec2[] = [];
+
+        // add the text for all the options
+        for (let i = 0; i < this._options.length; i++) {
+          const option = this._options[i];
+          const x = optionXPosition;
+          const y = yOffset + this._textOffset.y + this._pos.y;
+          const textPos = new vec2(x, y);
+          this.eng.textManager.setTextBlock({
+            id: this.id + '_' + option,
+            text: option,
+            position: textPos,
+            color: new vec4([0.9, 0.9, 1.0, 1.0]),
+            depth: this._depth - 0.01, // set the depth just in front of this dialog box
+            scale: 1.0,
+          });
+          optionPositions.push(new vec2(x - optionIndent, y + this.eng.textManager.lineHeight * 0.5));
+
+          yOffset += this.eng.textManager.lineHeight;
+        }
+
         // update the cursor with the latest options
         this._cursor.initialize(
           this.id + '.cursor',
@@ -155,7 +168,7 @@ export class DialogComponent extends PanelComponent {
       }
     } else {
       this._cursor.hide();
-      for (let i = 0; i < this._options.length; i++) {
+      for (let i = 0; i < this._options?.length; i++) {
         this.eng.textManager.hideText(this.id + '_' + this._options[i]);
       }
     }

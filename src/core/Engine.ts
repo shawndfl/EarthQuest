@@ -105,10 +105,10 @@ export class Engine {
     this.tileHelper.calculateTransform(this.width, this.height);
     await this.gameManager.initialize();
     await this.assetManager.initialize();
-    await this.sceneManager.initialize();
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.battleManager.initialize();
+    await this.sceneManager.initialize();
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
