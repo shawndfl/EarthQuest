@@ -77,10 +77,12 @@ export class NpcComponent extends TileComponent {
       'Welcome to Earth Quest!',
       { x: 20, y: 40, width: 400, height: 200 },
       (dialog) => {
+        console.debug('user selcted ' + dialog.selectedOption);
         // start a battle
-        this.eng.battleManager.startBattle({});
+        //this.eng.battleManager.startBattle({});
         return true;
-      }
+      },
+      ['New', 'Load']
     );
   }
 

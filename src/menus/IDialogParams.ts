@@ -10,4 +10,7 @@ export interface IDialogParams {
   /** width of the dialog in pixels left to right */
   width: number;
   height: number;
+
+  /** in screen space 1 is behind -1 is in front of everything */
+  depth: number;
 }

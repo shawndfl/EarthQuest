@@ -17,6 +17,9 @@ export class PanelComponent extends Component {
   protected _textOffset: vec2;
   protected _dirty: boolean;
 
+  /** [1 to -1]    -1 in front of everything 1 behind everything */
+  protected _depth: number;
+
   get id(): string {
     return this._id;
   }
@@ -33,6 +36,7 @@ export class PanelComponent extends Component {
     this._size = new vec2(300, 200);
     this._textOffset = new vec2(50, 60);
     this._dirty = false;
+    this._depth = -0.5;
   }
 
   initialize(spriteController: SpritBatchController) {
@@ -44,6 +48,14 @@ export class PanelComponent extends Component {
     this._pos.x = x;
     this._pos.y = y;
     this._dirty = true;
+  }
+
+  /**
+   * Range 1 to -1 in screen space
+   * @param depth
+   */
+  setDepth(depth: number) {
+    this._depth = depth;
   }
 
   /**
@@ -73,7 +85,13 @@ export class PanelComponent extends Component {
 
   redraw() {
     if (this.visible) {
-      const p: IDialogParams = { x: this._pos.x, y: this._pos.y, width: this._size.x, height: this._size.y };
+      const p: IDialogParams = {
+        x: this._pos.x,
+        y: this._pos.y,
+        width: this._size.x,
+        height: this._size.y,
+        depth: this._depth,
+      };
       this._dialogBuild.buildDialog(this.id, p);
 
       const textPos = new vec2(this._pos.x + this._textOffset.x, p.y + this._textOffset.y);
@@ -82,7 +100,7 @@ export class PanelComponent extends Component {
         text: this._text,
         position: textPos,
         color: new vec4([0.9, 0.9, 1.0, 1.0]),
-        depth: -1,
+        depth: this._depth - 0.01,
         scale: 1.0,
       });
     } else {
@@ -90,6 +108,7 @@ export class PanelComponent extends Component {
       this._dialogBuild.hideDialog(this.id);
     }
   }
+
   update(dt: number) {
     if (this._dirty) {
       this.redraw();

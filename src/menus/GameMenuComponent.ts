@@ -68,6 +68,7 @@ export class GameMenuComponent extends Component {
           break;
         case 4:
           this.save();
+          console.debug('saved!');
           break;
       }
 
@@ -140,6 +141,11 @@ export class GameMenuComponent extends Component {
         } else {
           this._cursor.index = this._cursor.indexCount - 1;
         }
+      }
+
+      // accept the option
+      if ((state.action & UserAction.ActionPressed) > 0) {
+        this._cursor.select();
       }
     }
 

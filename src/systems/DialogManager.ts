@@ -69,12 +69,15 @@ export class DialogManager extends Component {
     text: string,
     loc: { x: number; y: number; width: number; height: number },
     onHide?: (dialog: DialogComponent) => boolean,
-    options?: {}[]
+    options?: string[],
+    depth: number = -0.5
   ) {
+    this._dialog.setOptions(options);
     this._dialog.setPosition(loc.x, loc.y);
     this._dialog.setSize(loc.width, loc.height);
     this._dialog.setText(text);
     this._dialog.onHide = onHide;
+    this._dialog.setDepth(depth);
     this._dialog.show();
   }
 

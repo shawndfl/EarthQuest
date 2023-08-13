@@ -21,6 +21,7 @@ export class DialogCursor extends Component {
   private _dirty: boolean;
   private _cursorId: string;
   private _visible: boolean;
+  private _depth: number;
 
   /** On select event */
   private _onSelect: (index: number, cursor: DialogCursor) => void;
@@ -36,11 +37,6 @@ export class DialogCursor extends Component {
   set index(value: number) {
     this._activeIndex = value;
     this._dirty = true;
-
-    // let the user handle the select change
-    if (this._onSelect) {
-      this._onSelect(this._activeIndex, this);
-    }
   }
 
   /**
@@ -80,12 +76,24 @@ export class DialogCursor extends Component {
     id: string,
     spriteController: SpritBatchController,
     positions: vec2[],
-    onSelect?: (index: number, cursor: DialogCursor) => void
+    onSelect?: (index: number, cursor: DialogCursor) => void,
+    depth: number = -0.6
   ) {
     this._spriteController = spriteController;
     this._positions = positions;
     this._cursorId = id;
+    this._depth = depth;
     this._onSelect = onSelect;
+  }
+
+  /**
+   * Selects the active index
+   */
+  select(): void {
+    // let the user handle the select change
+    if (this._onSelect) {
+      this._onSelect(this._activeIndex, this);
+    }
   }
 
   show(index?: number) {
@@ -112,6 +120,10 @@ export class DialogCursor extends Component {
   }
 
   redraw() {
+    if (!this._spriteController) {
+      return;
+    }
+
     if (this._visible) {
       const position = this._positions[this._activeIndex];
       if (position) {
@@ -121,11 +133,11 @@ export class DialogCursor extends Component {
         this._spriteController.viewOffset(new vec2(0, 0));
         this._spriteController.viewScale(1.0);
         this._spriteController.setSprite('cursor');
-        this._spriteController.setSpritePosition(position.x, position.y, -0.3);
+        this._spriteController.setSpritePosition(position.x, this.eng.height - position.y, this._depth);
 
         this._cursorCurve.start(true, undefined, (val) => {
           this._spriteController.activeSprite(this._cursorId);
-          this._spriteController.setSpritePosition(position.x + val, position.y, -0.3);
+          this._spriteController.setSpritePosition(position.x + val, this.eng.height - position.y, this._depth);
         });
       }
     } else {

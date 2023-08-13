@@ -46,9 +46,13 @@ const FontFS = `
 export class TextManager extends Component {
   texts: Map<string, TextController>;
   fontData: IFontData[];
-  maxHeightOfCharacters: number;
+  private maxHeightOfCharacters: number;
   shader: ShaderController;
   fontTexture: Texture;
+
+  get lineHeight(): number {
+    return this.maxHeightOfCharacters;
+  }
 
   shaderInfo: {
     attr: { aPos: number; aTex: number };
@@ -93,6 +97,41 @@ export class TextManager extends Component {
 
     // reset the text controllers
     this.texts.clear();
+  }
+
+  /**
+   * Get text size of a given string
+   * @param text
+   * @returns
+   */
+  getTextSize(text: string): { width: number; height: number } {
+    if (!text || this.maxHeightOfCharacters == 0) {
+      return { width: 0, height: 0 };
+    }
+
+    let width = 0;
+    let offsetX = 0;
+    let height = this.maxHeightOfCharacters;
+    for (let i = 0; i < text.length; i++) {
+      let ch = text[i];
+      if (ch == '\n') {
+        offsetX = 0;
+        height += this.maxHeightOfCharacters;
+      } else if (ch < ' ' || ch > '~') {
+        ch = '?';
+      }
+
+      const font = this.fontData.find((value) => value.ch == ch);
+
+      if (!font) {
+        console.warn("Don't have data for ch: " + ch);
+        continue;
+      }
+
+      offsetX += font.advance;
+    }
+
+    return { width: offsetX, height };
   }
 
   /**

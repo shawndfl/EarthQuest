@@ -4,16 +4,26 @@ import { DialogBuilder } from './DialogBuilder';
 import { PanelComponent } from './PanelComponent';
 import { InputState } from '../core/InputHandler';
 import { UserAction } from '../core/UserAction';
+import { DialogCursor } from './DialogCursor';
+import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 
 /**
  * A dialog component that can be sized and display text in the game.
  * There is also an onHide event to handle user input
  */
 export class DialogComponent extends PanelComponent {
-  private _ready: boolean;
   private _expandAnimation: Curve;
+  protected _options: string[];
+  protected _selectedOption: string;
+  protected _selectedIndex: number;
+  protected _cursor: DialogCursor;
 
   onHide: (dialog: DialogComponent) => boolean;
+
+  get selectedOption(): string {
+    return this._selectedOption;
+  }
 
   get id(): string {
     return this._id;
@@ -32,6 +42,15 @@ export class DialogComponent extends PanelComponent {
       { t: 250, p: 1 },
       { t: 500, p: 2 },
     ]);
+    this._cursor = new DialogCursor(eng);
+  }
+
+  /**
+   * Options are use to allow the user to select something from the dialog box
+   * @param options
+   */
+  setOptions(options: string[]): void {
+    this._options = options;
   }
 
   /**
@@ -49,9 +68,30 @@ export class DialogComponent extends PanelComponent {
         canHide = this.onHide(this);
       }
 
+      this._cursor.select();
+
       if (canHide) {
         this.hide();
       }
+    }
+
+    // select next option
+    if ((state.action & UserAction.DownPressed) > 0) {
+      if (this._cursor.index < this._cursor.indexCount - 1) {
+        this._cursor.index++;
+      } else {
+        this._cursor.index = 0;
+      }
+      this._cursor.select();
+    }
+    // select previous option
+    if ((state.action & UserAction.UpPressed) > 0) {
+      if (this._cursor.index > 0) {
+        this._cursor.index--;
+      } else {
+        this._cursor.index = this._cursor.indexCount - 1;
+      }
+      this._cursor.select();
     }
 
     return active;
@@ -59,14 +99,71 @@ export class DialogComponent extends PanelComponent {
 
   show() {
     super.show();
+    this._cursor.show(0);
   }
 
   hide() {
     super.hide();
+    this._cursor.hide();
+  }
+
+  redraw() {
+    super.redraw();
+    if (this.visible) {
+      const { width, height } = this.eng.textManager.getTextSize(this._text);
+
+      const optionIndent = 60;
+      const optionsHeightPadding = 20;
+      let yOffset = height + optionsHeightPadding;
+      let optionXPosition = optionIndent + this._pos.x + this._textOffset.x;
+      const optionPositions: vec2[] = [];
+
+      // add the text for all the options
+      for (let i = 0; i < this._options.length; i++) {
+        const option = this._options[i];
+        const x = optionXPosition;
+        const y = yOffset + this._textOffset.y + this._pos.y;
+        const textPos = new vec2(x, y);
+        this.eng.textManager.setTextBlock({
+          id: this.id + '_' + option,
+          text: option,
+          position: textPos,
+          color: new vec4([0.9, 0.9, 1.0, 1.0]),
+          depth: this._depth - 0.01, // set the depth just in front of this dialog box
+          scale: 1.0,
+        });
+        optionPositions.push(new vec2(x - optionIndent, y + this.eng.textManager.lineHeight * 0.5));
+
+        yOffset += this.eng.textManager.lineHeight;
+      }
+
+      // add the cursor and the positions it can be placed at
+      if (this._options.length > 0) {
+        // update the cursor with the latest options
+        this._cursor.initialize(
+          this.id + '.cursor',
+          this._spriteController,
+          optionPositions,
+          (index) => {
+            this._selectedIndex = index;
+            this._selectedOption = this._options[this._selectedIndex];
+          },
+          this._depth - 0.01 // set the depth just in front of this dialog box
+        );
+        // select will set the _selectedOption to to the activeIndex
+        this._cursor.select();
+      }
+    } else {
+      this._cursor.hide();
+      for (let i = 0; i < this._options.length; i++) {
+        this.eng.textManager.hideText(this.id + '_' + this._options[i]);
+      }
+    }
   }
 
   update(dt: number) {
     super.update(dt);
     this._expandAnimation.update(dt);
+    this._cursor.update(dt);
   }
 }

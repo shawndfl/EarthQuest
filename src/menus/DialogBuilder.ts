@@ -76,7 +76,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale(this.iconScale);
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(p.x, this.eng.height - innerTopLeft.y, -1);
+    this._spriteController.setSpritePosition(p.x, this.eng.height - innerTopLeft.y, p.depth);
     this._spriteController.setSprite('menu.left.top');
 
     // top right corner
@@ -84,7 +84,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale(this.iconScale);
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - innerTopRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - innerTopRight.y, p.depth);
     this._spriteController.setSprite('menu.right.top');
 
     // bottom right corner
@@ -92,7 +92,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale(this.iconScale);
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - bottomRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - bottomRight.y, p.depth);
     this._spriteController.setSprite('menu.right.bottom');
 
     // bottom left corner
@@ -100,7 +100,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale(this.iconScale);
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(p.x, this.eng.height - bottomLeft.y, -1);
+    this._spriteController.setSpritePosition(p.x, this.eng.height - bottomLeft.y, p.depth);
     this._spriteController.setSprite('menu.left.bottom');
 
     // position the edges
@@ -112,7 +112,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale({ x: topEdgeScale, y: this.iconScale });
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - innerTopRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - innerTopRight.y, p.depth);
     this._spriteController.setSprite('menu.center.top');
 
     // bottom edge
@@ -120,7 +120,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale({ x: topEdgeScale, y: this.iconScale });
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - bottomRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - bottomRight.y, p.depth);
     this._spriteController.setSprite('menu.center.bottom');
 
     // left edge
@@ -128,7 +128,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale({ x: this.iconScale, y: rightEdgeScale });
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(p.x, this.eng.height - innerBottomRight.y, -1);
+    this._spriteController.setSpritePosition(p.x, this.eng.height - innerBottomRight.y, p.depth);
     this._spriteController.setSprite('menu.left.middle');
 
     // right edge
@@ -136,7 +136,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale({ x: this.iconScale, y: rightEdgeScale });
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - innerBottomRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopRight.x, this.eng.height - innerBottomRight.y, p.depth);
     this._spriteController.setSprite('menu.right.middle');
 
     // center
@@ -144,7 +144,7 @@ export class DialogBuilder extends Component {
     this._spriteController.scale({ x: topEdgeScale, y: rightEdgeScale });
     this._spriteController.viewOffset(new vec2(0, 0));
     this._spriteController.viewScale(1.0);
-    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - innerBottomRight.y, -1);
+    this._spriteController.setSpritePosition(innerTopLeft.x, this.eng.height - innerBottomRight.y, p.depth);
     this._spriteController.setSprite('menu.center.middle');
   }
 }

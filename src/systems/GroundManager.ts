@@ -63,7 +63,7 @@ export class GroundManager extends Component {
     this._levelLoader = new LevelLoader(this.eng, this._tileFactory);
 
     // create the initial level
-    if (true) {
+    if (false) {
       this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
     } else {
       this.loadLevel();
