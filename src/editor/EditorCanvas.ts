@@ -39,7 +39,7 @@ export class EditorCanvas extends EditorComponent {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
 
-    this.scaleStep = 0.02;
+    this.scaleStep = 0.005;
 
     this.canvas.addEventListener('keyup', this.keyup.bind(this));
     this.canvas.addEventListener('keydown', this.keydown.bind(this));
@@ -90,10 +90,10 @@ export class EditorCanvas extends EditorComponent {
     if (e.shiftKey) {
       // pan
       this.canvas.style.cursor = 'grab';
-      const scale = 0.5;
+      const scale = 0.9;
 
       const offset = this.canvasRenderer.offset.add(delta.scale(scale));
-      console.debug('delta ' + delta + ' offset ' + offset);
+
       this.canvasRenderer.setOffset(offset);
       this.lastPos = new vec2(e.offsetX, e.offsetY);
     } else if (e.ctrlKey) {
