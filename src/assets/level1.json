@@ -1,4 +1,6 @@
 {
+  "name": "world1",
+  "id": "",
   "tiles": [
     { "type": "---" },
     { "type": "open|block.grass" },

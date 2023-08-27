@@ -2,6 +2,7 @@ import { Component } from '../components/Component';
 import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
 import { TileFactory } from '../systems/TileFactory';
+import { Random } from '../utilities/Random';
 import { ILevelData } from './ILevelData';
 
 export class LevelLoader extends Component {
@@ -11,6 +12,9 @@ export class LevelLoader extends Component {
 
   load(levelData: ILevelData): TileComponent[][][] {
     const tileComponent: TileComponent[][][] = [[[]]];
+
+    const uuid = this.eng.random.getUuid();
+    console.debug('uuid ' + uuid);
 
     for (let k = 0; k < levelData.cells.length; k++) {
       tileComponent.push([]);

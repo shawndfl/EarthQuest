@@ -33,6 +33,8 @@ Undo/ redo or placing tiles and setting the tile type.
 
 Add an edit feature that shows an edit icon in the top right corner of the tile your mouse is over. When clicked a pop up will allow you to edit the tile's type.
 
-Set world properties that allow user to set grid size and level count. The user also needs to be able to see the world name and edit it.
+Set world properties that allow user to set grid size and level count. Add a human readable name to the worlds. A UUID will be used as a world id.
 
-Allow the user to create a new world from a `portal` type.
+Allow the user to create a new world from a `portal` type. They can also need a button for warping to worlds.
+
+Generate random levels by selecting some hard coded algorithms from a list and setting some properties limited number of properties, like seed and max enemies, trees, etc.
