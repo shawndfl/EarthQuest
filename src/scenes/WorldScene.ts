@@ -32,7 +32,7 @@ export class WorldScene extends SceneComponent {
   }
 
   get type(): string {
-    return 'world1.1';
+    return typeof this;
   }
 
   /**
@@ -50,12 +50,14 @@ export class WorldScene extends SceneComponent {
   /**
    * Sets up the scene
    */
-  async initialize(options: { level: ILevelData }) {
+  async initialize(levelData: ILevelData) {
+    super.initialize(levelData);
+
     this._spriteSheetTexture = this.eng.assetManager.character.texture;
     const data = this.eng.assetManager.character.data;
 
     this.player.initialize(this.spriteSheetTexture, data);
-    this.ground.initialize(options.level);
+    this.ground.initialize(this.levelData);
     await this.dialog.initialize();
 
     this.eng.dialogManager.showDialog(
@@ -106,7 +108,7 @@ export class WorldScene extends SceneComponent {
     this.dialog.update(dt);
   }
 
-  resize(width: number, height: number) {}
+  resize(width: number, height: number) { }
 
   dispose() {
     console.log('dispose');

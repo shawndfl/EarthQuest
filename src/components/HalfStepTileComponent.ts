@@ -1,12 +1,13 @@
 import { Engine } from '../core/Engine';
-
+import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-
 import { OpenTileComponent } from './OpenTileComponent';
-import { TileComponent } from './TileComponent';
-import { TileContext } from './TileContext';
 
+/**
+ * Half step tile so user can climb up it.
+ */
 export class HalfStepTileComponent extends OpenTileComponent {
+
   get tileHeight(): number {
     return this._tilePosition.z - 0.5;
   }
@@ -14,11 +15,8 @@ export class HalfStepTileComponent extends OpenTileComponent {
   constructor(
     eng: Engine,
     spriteController: SpritBatchController,
-    typeAndSprite: string,
-    i: number,
-    j: number,
-    k: number
+    args: ITileCreateionArgs
   ) {
-    super(eng, spriteController, typeAndSprite, i, j, k);
+    super(eng, spriteController, args);
   }
 }

@@ -9,6 +9,7 @@ import { MenuBar } from './MenuBar';
 import { JobManager } from './JobManager';
 import { TileHelper } from '../utilities/TileHelper';
 import { ToolbarOptions } from './ToolbarOptions';
+import { ILevelData } from '../environment/ILevelData';
 
 /**
  * Editor class manages all the components of the editor
@@ -25,6 +26,8 @@ export class Editor implements IEditor {
 
   readonly zoomStep: number = 0.1;
 
+  isEnabled: boolean;
+
   public get parent(): HTMLElement {
     return this._parent;
   }
@@ -37,6 +40,7 @@ export class Editor implements IEditor {
     this.editorCanvas = new EditorCanvas(this);
     this.jobManager = new JobManager(this);
     this.tileHelper = new TileHelper();
+    this.isEnabled = false;
   }
 
   async initialize(parentContainer: HTMLElement) {
@@ -46,6 +50,10 @@ export class Editor implements IEditor {
     this.buildHtml();
     this.buildToolbar();
     this.editorCanvas.render();
+  }
+
+  loadLevel(level: ILevelData): void {
+
   }
 
   update(dt: number) {
@@ -99,6 +107,15 @@ export class Editor implements IEditor {
   buildToolbar() {
     this.toolbar.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
+    });
+    this.toolbar.addButton('save', File, 'Save', () => {
+      console.debug('Saving!!');
+    });
+    this.toolbar.addButton('open', File, 'Open', () => {
+      console.debug('Open!!');
+    });
+    this.toolbar.addButton('play', File, 'Play', () => {
+      console.debug('Playing!!');
     });
 
     this.toolbar.addButton('zoomIn', File, 'Zoom In', () => {

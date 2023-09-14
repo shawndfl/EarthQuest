@@ -1,78 +1,40 @@
-import { CanvasController } from './core/CanvasController';
-import { Engine } from './core/Engine';
-import './css/canvas.css';
-import { Editor } from './editor/Editor';
+import { EarthQuestEngine } from './_game/EarthQuestEngine';
+import './css/canvas.scss';
+/**
+ * Create the only instance of a canvas controller
+ */
+const engine = new EarthQuestEngine();
 
-// check if we should be in editor mode or just run the game
-const url = new URL(window.location.href);
-if (url.searchParams.get('editor')) {
-  const editor = new Editor();
+/** time tracking variables */
+let previousTimeStamp: number;
 
-  /** time tracking variables */
-  let previousTimeStamp: number;
-
-  function step(timestamp: number) {
-    // save the start time
-    if (previousTimeStamp === undefined) {
-      previousTimeStamp = timestamp;
-    }
-
-    // calculate the elapsed
-    const elapsed = timestamp - previousTimeStamp;
-
-    // update the scene
-    editor.update(elapsed);
-
-    // request a new frame
+function step(timestamp: number) {
+  // save the start time
+  if (previousTimeStamp === undefined) {
     previousTimeStamp = timestamp;
-    window.requestAnimationFrame(step);
   }
 
-  editor
-    .initialize(document.getElementById('rootContainer'))
-    .then(() => {
-      // request the first frame
-      window.requestAnimationFrame(step);
-    })
-    .catch((e) => {
-      console.error('Error initializing ', e);
-    });
-} else {
-  /**
-   * Create the only instance of a canvas controller
-   */
-  const engine = new Engine();
+  // calculate the elapsed
+  const elapsed = timestamp - previousTimeStamp;
 
-  /** time tracking variables */
-  let previousTimeStamp: number;
+  // update the scene
+  engine.update(elapsed);
 
-  function step(timestamp: number) {
-    // save the start time
-    if (previousTimeStamp === undefined) {
-      previousTimeStamp = timestamp;
-    }
-
-    // calculate the elapsed
-    const elapsed = timestamp - previousTimeStamp;
-
-    // update the scene
-    engine.update(elapsed);
-
-    // request a new frame
-    previousTimeStamp = timestamp;
-    window.requestAnimationFrame(step);
-  }
-
-  /**
-   * Start the engine then request and animation frame
-   */
-  engine
-    .initialize(document.getElementById('rootContainer'))
-    .then(() => {
-      // request the first frame
-      window.requestAnimationFrame(step);
-    })
-    .catch((e) => {
-      console.error('Error initializing ', e);
-    });
+  // request a new frame
+  previousTimeStamp = timestamp;
+  window.requestAnimationFrame(step);
 }
+
+/**
+ * Start the engine then request and animation frame
+ */
+engine
+  .initialize(document.getElementById('rootContainer'))
+  .then(() => {
+    // request the first frame
+    window.requestAnimationFrame(step);
+  })
+  .catch((e) => {
+    console.error('Error initializing ', e);
+  });
+

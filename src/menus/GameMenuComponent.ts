@@ -50,13 +50,13 @@ export class GameMenuComponent extends Component {
     this._dialogBuild.initialize(this._spriteController);
 
     // menu options positions
-    const items = new vec2(30, 540);
-    const status = new vec2(30, 480);
-    const equip = new vec2(30, 430);
-    const map = new vec2(30, 370);
-    const save = new vec2(30, 320);
+    const items = new vec2(30, 70);
+    const status = new vec2(30, 120);
+    const map = new vec2(30, 180);
+    const config = new vec2(30, 240);
+    const save = new vec2(30, 290);
 
-    this._cursor.initialize('cursor.1', this._spriteController, [items, status, equip, map, save], (index) => {
+    this._cursor.initialize('cursor.1', this._spriteController, [items, status, map, config, save], (index) => {
       switch (index) {
         case 0:
           break;
@@ -65,6 +65,7 @@ export class GameMenuComponent extends Component {
         case 2:
           break;
         case 3:
+          this.showEditor();
           break;
         case 4:
           this.save();
@@ -74,6 +75,10 @@ export class GameMenuComponent extends Component {
 
       console.debug('selecting index ' + index);
     });
+  }
+
+  showEditor() {
+    this.eng.showEditor();
   }
 
   save() {

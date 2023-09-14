@@ -1,5 +1,3 @@
-import { WorldScene } from '../scenes/WorldScene';
-import { Editor } from '../editor/Editor';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { InputHandler } from './InputHandler';
 import { TileHelper } from '../utilities/TileHelper';
@@ -19,6 +17,8 @@ import { TouchManager } from '../systems/TouchManager';
 import { CanvasController } from './CanvasController';
 import { ILevelData } from '../environment/ILevelData';
 import { SceneManager } from '../systems/SceneManager';
+
+import { Editor } from '../editor/Editor';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -41,6 +41,7 @@ export class Engine {
   readonly rootElement: HTMLElement;
   readonly canvasController: CanvasController;
   readonly sceneManager: SceneManager;
+  readonly editor: Editor;
 
   get gl(): WebGL2RenderingContext {
     return this.canvasController.gl;
@@ -82,6 +83,7 @@ export class Engine {
     this.fps = new FpsController(this);
     this.assetManager = new AssetManager(this);
     this.touchManager = new TouchManager(this);
+    this.editor = new Editor();
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
   }
 
@@ -109,6 +111,12 @@ export class Engine {
     await this.dialogManager.initialize();
     await this.battleManager.initialize();
     await this.sceneManager.initialize();
+    await this.editor.initialize(rootElement);
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('editor')) {
+      this.showEditor();
+    }
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
@@ -120,6 +128,13 @@ export class Engine {
     this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
+  }
+
+  showEditor() {
+    this.editor.loadLevel(this.scene.levelData)
+    this.editor.isEnabled = true;
+
+    this.canvasController.showCanvas(false);
   }
 
   update(dt: number) {
@@ -154,6 +169,9 @@ export class Engine {
 
     // update the menu manager
     this.dialogManager.update(dt);
+
+    // update the editor
+    this.editor.update(dt);
 
     // update text manager
     this.textManager.update(dt);

@@ -1,8 +1,11 @@
 import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
+import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
+import { SpritBatchController } from '../graphics/SpriteBatchController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
+import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
 import { TileAccessOptions } from './TileAccessOptions';
 import { TileContext } from './TileContext';
@@ -29,6 +32,11 @@ export abstract class TileComponent extends Component {
    * is the depth which is between 1 and -1
    */
   private _screenPosition: vec3;
+
+  /** 
+   * id of the tile in the form of i,j,k
+   */
+  private _id: string;
 
   /**
    * Gets the tile below this tile
@@ -81,23 +89,44 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * Sprite for this tile
+   * Sprite for this tile. This is done to support sprite batches and single sprite
+   * controllers.
    */
   abstract get spriteController(): SpritBaseController;
 
   /**
    * Gets the id of the thing
    */
-  abstract get id(): string;
+  get id(): string {
+    return this._id;
+  }
 
   /**
    * Gets the type of the tile component
    */
-  abstract get type(): string;
+  get type(): string {
+    return this._options?.type;
+  }
 
-  constructor(eng: Engine) {
+  /**
+   * Gets the type of the tile component
+   */
+  get spriteId(): string {
+    return this._options?.sprite;
+  }
+
+  /**
+   * Gets the options used to create this tile
+   */
+  get options(): string {
+    return this._options?.options;
+  }
+
+  constructor(eng: Engine,
+    private _options?: ITileCreateionArgs) {
     super(eng);
 
+    this._id = TileFactory.createStaticID(this._options?.i, this._options?.j, this._options?.k);
     this._tileIndex = new vec3([0, 0, 0]);
     this._tilePosition = new vec3([0, 0, 0]);
   }

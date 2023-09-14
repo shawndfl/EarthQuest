@@ -34,7 +34,7 @@ export class BattleScene extends SceneComponent {
   }
 
   get type(): string {
-    return 'battle';
+    return typeof this;
   }
 
   constructor(eng: Engine) {
@@ -58,7 +58,8 @@ export class BattleScene extends SceneComponent {
    * Initialize
    * @param options
    */
-  async initialize(options: { level: ILevelData }) {
+  async initialize(level: ILevelData) {
+    super.initialize(level);
     await this.dialog.initialize();
   }
 

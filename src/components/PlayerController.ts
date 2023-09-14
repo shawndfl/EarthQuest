@@ -89,7 +89,7 @@ export class PlayerController extends TileComponent {
   }
 
   constructor(eng: Engine) {
-    super(eng);
+    super(eng, null);
     this._facingDirection = PointingDirection.S;
     this._walking = false;
     this._speed = 3.0; // tiles per second

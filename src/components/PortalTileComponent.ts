@@ -1,6 +1,7 @@
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import vec2 from '../math/vec2';
+import { ITileCreateionArgs } from './ITileCreationArgs';
 import { OpenTileComponent } from './OpenTileComponent';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
@@ -21,11 +22,8 @@ export class PortalTileComponent extends OpenTileComponent {
   constructor(
     eng: Engine,
     spriteController: SpritBatchController,
-    typeAndSprite: string,
-    i: number,
-    j: number,
-    k: number
+    args: ITileCreateionArgs
   ) {
-    super(eng, spriteController, typeAndSprite, i, j, k);
+    super(eng, spriteController, args);
   }
 }

@@ -4,6 +4,7 @@ import { CollideTileComponent } from './CollideTileComponent';
 import { TileComponent } from './TileComponent';
 import { Curve, CurveType } from '../math/Curve';
 import { TileContext } from './TileContext';
+import { ITileCreateionArgs } from './ITileCreationArgs';
 
 export class GoldComponents extends CollideTileComponent {
   private _collected: boolean;
@@ -19,7 +20,7 @@ export class GoldComponents extends CollideTileComponent {
     if (!this._collected) {
       console.debug('collect coin');
 
-      this._spriteController.removeSprite(this._tileId);
+      this._spriteController.removeSprite(this.id);
       // keep track of the gold created
       this.eng.gameManager.data.player.gold++;
 
@@ -31,14 +32,11 @@ export class GoldComponents extends CollideTileComponent {
 
   constructor(
     eng: Engine,
-    protected _spriteController: SpritBatchController,
-    typeAndSprite: string,
-    i: number,
-    j: number,
-    k: number
+    spriteController: SpritBatchController,
+    args: ITileCreateionArgs
   ) {
-    super(eng, _spriteController, typeAndSprite, i, j, k);
-    this._baseSprite = this._spriteId.split('.')[0];
+    super(eng, spriteController, args);
+    this._baseSprite = this.spriteId.split('.')[0];
     this._collected = false;
     this._idleCurve = new Curve();
     this._idleCurve.points([
@@ -63,9 +61,9 @@ export class GoldComponents extends CollideTileComponent {
     //this._idleCurve.pingPong(true);
     this._idleCurve.start(true, undefined, (val) => {
       if (!this._collected) {
-        this._spriteController.activeSprite(this._tileId);
-        this._spriteId = this._baseSprite + '.' + val;
-        this._spriteController.setSprite(this._spriteId);
+        this._spriteController.activeSprite(this.id);
+        const spriteId = this._baseSprite + '.' + val;
+        this._spriteController.setSprite(spriteId);
       }
     });
     // we have animations so register for updates

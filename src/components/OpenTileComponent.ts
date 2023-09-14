@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
@@ -9,17 +10,6 @@ import { TileContext } from './TileContext';
  * This is any thing that the player or some NPC can walk on
  */
 export class OpenTileComponent extends TileComponent {
-  protected _tileId: string;
-  protected _spriteId: string;
-  protected _type: string;
-
-  get id(): string {
-    return this._tileId;
-  }
-
-  get type(): string {
-    return this._type;
-  }
 
   /**
    * Check if the tile component (or player) can access this tile.
@@ -50,20 +40,12 @@ export class OpenTileComponent extends TileComponent {
   constructor(
     eng: Engine,
     protected _spriteController: SpritBatchController,
-    typeAndSprite: string,
-    i: number,
-    j: number,
-    k: number
+    args: ITileCreateionArgs
   ) {
-    super(eng);
-    const parts = typeAndSprite.split('|');
-    this._type = parts[0];
-    this._spriteId = parts[1];
-    this._tileId = TileFactory.createStaticID(i, j, k);
-    this._spriteController.activeSprite(TileFactory.createStaticID(i, j, k));
-
-    this._spriteController.setSprite(this._spriteId);
+    super(eng, args);
+    this._spriteController.activeSprite(this.id);
+    this._spriteController.setSprite(this.spriteId);
     this._spriteController.scale(this.eng.tileScale);
-    this.setTilePosition(i, j, k);
+    this.setTilePosition(args.i, args.j, args.k);
   }
 }

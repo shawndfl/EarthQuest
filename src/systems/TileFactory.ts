@@ -9,6 +9,7 @@ import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { PortalTileComponent } from '../components/PortalTileComponent';
 import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
+import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 
 export class TileFactory extends Component {
   /**
@@ -33,8 +34,8 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  static createStaticID(i: number, j: number, k: number) {
-    return 'tile.' + i + '.' + j + '.' + k;
+  static createStaticID(i: number, j: number, k: number): string {
+    return 'tile.' + (i ?? '_') + '.' + (j ?? '_') + '.' + (k ?? '_');
   }
 
   /**
@@ -46,27 +47,52 @@ export class TileFactory extends Component {
    * @returns
    */
   createStaticTile(type: string, i: number, j: number, k: number): TileComponent {
+
     if (!type || type == '---' || type == 'empty') {
       return new EmptyTile(this.eng, i, j, k);
-    } else if (type.includes('block.half')) {
-      return new HalfStepTileComponent(this.eng, this.spriteBatch, type, i, j, k);
-    } else if (type.startsWith('open')) {
-      return new OpenTileComponent(this.eng, this.spriteBatch, type, i, j, k);
-    } else if (type.startsWith('player')) {
+    }
+
+    const typeSpriteParams = type.split('|');
+
+    if (typeSpriteParams.length != 3) {
+      console.error('invalid tile: \'' + type + '\' @ (' + i + ', ' + j + ', ' + k + ')' +
+        ' Format should be <type>|<sprite>|<options>');
+      return new EmptyTile(this.eng, i, j, k);
+    }
+
+    const tileType = typeSpriteParams[0];
+    const sprite = typeSpriteParams[1];
+    const options = typeSpriteParams[2];
+    const args: ITileCreateionArgs = {
+      i, j, k, type: tileType, sprite, options
+    }
+
+    if (tileType == 'block.half') {
+      return new HalfStepTileComponent(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'open') {
+      return new OpenTileComponent(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'player') {
       // the player is already created. Just set his position
       const player = this.eng.scene.player;
       player.setTilePosition(i, j, k);
       return player;
-    } else if (type.startsWith('npc')) {
-      return new NpcComponent(this.eng, type, i, j, k);
-    } else if (type.startsWith('gold')) {
-      return new GoldComponents(this.eng, this.spriteBatch, type, i, j, k);
-    } else if (type.startsWith('collide')) {
-      return new CollideTileComponent(this.eng, this.spriteBatch, type, i, j, k);
-    } else if (type.startsWith('portal')) {
-      return new PortalTileComponent(this.eng, this.spriteBatch, type, i, j, k);
+
+    } else if (tileType == 'npc') {
+      return new NpcComponent(this.eng, args);
+
+    } else if (tileType == 'gold') {
+      return new GoldComponents(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'collide') {
+      return new CollideTileComponent(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'portal') {
+      return new PortalTileComponent(this.eng, this.spriteBatch, args);
+
     } else {
-      console.warn(' unknown tile type ' + type + ' @ (' + i + ', ' + j + ', ' + k + ')');
+      console.error('Unknown tile type \'' + type + '\' @ (' + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);
     }
   }

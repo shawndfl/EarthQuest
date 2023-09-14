@@ -20,7 +20,7 @@ export class SceneManager extends Component {
 
   async initialize() {
     this.changeScene('world1');
-    await this.scene.initialize({ level: Level1 });
+    await this.scene.initialize(Level1);
   }
 
   /**
@@ -68,15 +68,15 @@ export class SceneManager extends Component {
    * Called every frame
    * @param dt
    */
-  update(dt: number) {}
+  update(dt: number) { }
 
   /**
    * When the window is resized
    */
-  resize(width: number, height: number) {}
+  resize(width: number, height: number) { }
 
   /**
    * Dispose the scene
    */
-  dispose() {}
+  dispose() { }
 }

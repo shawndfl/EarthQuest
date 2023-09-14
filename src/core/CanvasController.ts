@@ -50,16 +50,20 @@ export class CanvasController extends Component {
     rootElement.append(this._container);
   }
 
+  showCanvas(show: boolean): void {
+    this._container.style.display = show ? 'inherit' : 'none';
+  }
+
   logGlError(error: string, functionName: string, args: any) {
     console.error(
       'GL error: ' +
-        error +
-        ' in gl.' +
-        functionName +
-        '(' +
-        // @ts-ignore
-        (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
-        ')'
+      error +
+      ' in gl.' +
+      functionName +
+      '(' +
+      // @ts-ignore
+      (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
+      ')'
     );
   }
 

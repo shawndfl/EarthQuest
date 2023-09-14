@@ -6,12 +6,11 @@ import { TileFactory } from '../systems/TileFactory';
 import { Curve } from '../math/Curve';
 import { SpriteFlip } from '../graphics/Sprite';
 import { AssetManager } from '../systems/AssetManager';
+import { ITileCreateionArgs } from './ITileCreationArgs';
 
 export class NpcComponent extends TileComponent {
-  protected _spriteController: SpritController;
-  protected _type;
-  protected _tileId;
-  protected _spriteId;
+
+  protected _spriteController;
 
   /** Sprite animation */
   protected _sprites: string[];
@@ -23,25 +22,18 @@ export class NpcComponent extends TileComponent {
   get spriteController(): SpritBaseController {
     return this._spriteController;
   }
-  get id(): string {
-    return this._tileId;
-  }
-
-  get type(): string {
-    return 'npc.poo';
-  }
 
   canAccessTile(tileComponent: TileComponent): boolean {
     console.warn('npc component');
     return false;
   }
 
-  constructor(eng: Engine, typeAndSprite: string, i: number, j: number, k: number) {
-    super(eng);
-    const parts = typeAndSprite.split('|');
-    this._type = parts[0];
-    this._spriteId = parts[1];
-    this._tileId = TileFactory.createStaticID(i, j, k);
+  constructor(eng: Engine, args: ITileCreateionArgs) {
+    super(eng, args);
+    this._spriteController = new SpritController(eng)
+    const i = args.i;
+    const j = args.j;
+    const k = args.k;
 
     this._spriteController = new SpritController(eng);
     const character = eng.assetManager.character;
