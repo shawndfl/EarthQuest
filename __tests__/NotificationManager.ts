@@ -1,8 +1,10 @@
 import { IEditor } from '../src/editor/IEditor';
 import { NotificationManager } from '../src/core/NotificationManager';
+import { MockEngine } from './MockEngine';
+import { Engine } from '../src/core/Engine';
 
 test('notification', () => {
-  const manger = new NotificationManager({} as any as IEditor);
+  const manger = new NotificationManager(new MockEngine() as Engine);
   let eventRaised = false;
   manger.subscribe('TestEvent', (data) => {
     console.debug('Got event ' + data.name);
@@ -15,7 +17,7 @@ test('notification', () => {
 });
 
 test('unsubscribe', () => {
-  const manger = new NotificationManager({} as any as IEditor);
+  const manger = new NotificationManager(new MockEngine() as Engine);
   let callCount = 0;
   const event = (data: any) => {
     console.debug('Got event ' + data.name);
@@ -37,7 +39,7 @@ test('unsubscribe', () => {
 });
 
 test('multiple Events', () => {
-  const manger = new NotificationManager({} as any as IEditor);
+  const manger = new NotificationManager(new MockEngine() as Engine);
   let callCount1 = 0;
   let callCount2 = 0;
   const event = (data: any) => {

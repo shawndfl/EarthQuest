@@ -125,6 +125,7 @@ export class InputHandler extends Component {
     }
 
     if (e.key == ' ') {
+      console.debug('Action Hit', UserAction.Action.toFixed())
       this.action = this.action & ~UserAction.Action;
       this.action = this.action | UserAction.ActionPressed;
     }

@@ -1,4 +1,4 @@
-export interface TileData {
+export interface ITileData {
   /**
    *  the id of the sprite data
    */
@@ -39,14 +39,14 @@ export interface ISpriteData {
   /**
    * The pixel height of a tile. Mostly 24 or 32
    */
-  tileHeight?: number;
+  tileHeight: number;
   /**
    * The pixel width of a tile. Mostly 16 or 32
    */
-  tileWidth?: number;
+  tileWidth: number;
 
   /**
    * Tile data
    */
-  tiles: TileData[];
+  tiles: ITileData[];
 }

@@ -11,7 +11,14 @@ import BattleBg1 from '../assets/backgrounds/battleBg1.png';
 import MenuData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
 import { IFontData } from '../graphics/IFontData';
-import { ISpriteData } from '../graphics/ISpriteData';
+import { ISpriteData, ITileData } from '../graphics/ISpriteData';
+
+
+export interface ISpriteDataAndImage {
+  tileData: ITileData;
+  image: HTMLImageElement;
+}
+
 
 /**
  * Manages texture assets
@@ -62,5 +69,59 @@ export class AssetManager extends Component {
 
     this._battleBg1 = new Texture(this.gl);
     await this._battleBg1.loadImage(BattleBg1);
+  }
+
+  /**
+   * Gets the image by looking up the sprite id.
+   * @param id 
+   * @returns 
+   */
+  async getImageFrom(id: string): Promise<ISpriteDataAndImage> {
+    const promise = new Promise<ISpriteDataAndImage>((resolve, reject) => {
+
+      // check the tileData
+      let tileData = (TileData as ISpriteData).tiles.find((tile) => tile.id == id);
+      if (tileData) {
+        const image = new Image();
+        image.onload = () => {
+          const data = (TileData as ISpriteData);
+          if (!tileData.loc) {
+            tileData.loc = [(tileData.index[0] + 1) * data.tileWidth, (tileData.index[1] + 1) * data.tileHeight, data.tileWidth, data.tileHeight];
+          }
+          resolve({ tileData, image });
+        };
+        image.onerror = () => {
+          resolve(null);
+        }
+        image.src = TileImage;
+      }
+
+      // if not found check the character data
+      if (!tileData) {
+        tileData = (CharacterData as ISpriteData).tiles.find((tile) => tile.id == id);
+        if (tileData) {
+          const image = new Image();
+          image.onload = () => {
+            const data = (CharacterData as ISpriteData);
+            if (!tileData.loc) {
+              tileData.loc = [tileData.index[0] * data.tileWidth, tileData.index[1] * data.tileHeight, data.tileWidth, data.tileHeight];
+            }
+
+            resolve({ tileData, image });
+          };
+          image.onerror = () => {
+            resolve(null);
+          }
+          image.src = CharacterImage;
+        }
+      }
+
+      // no where to be found
+      if (!tileData) {
+        resolve(null);
+      }
+
+    });
+    return promise;
   }
 }

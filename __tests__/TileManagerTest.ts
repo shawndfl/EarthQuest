@@ -1,15 +1,6 @@
 import vec3 from '../src/math/vec3';
 import { TileHelper } from '../src/utilities/TileHelper';
-
-class MockEngine {
-  constructor() {}
-  get height(): number {
-    return 600;
-  }
-  get width(): number {
-    return 800;
-  }
-}
+import { MockEngine } from './MockEngine';
 
 test('To screen', () => {
   const eng = new MockEngine();

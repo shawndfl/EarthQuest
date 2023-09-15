@@ -10,11 +10,13 @@ import { JobManager } from './JobManager';
 import { TileHelper } from '../utilities/TileHelper';
 import { ToolbarOptions } from './ToolbarOptions';
 import { ILevelData } from '../environment/ILevelData';
+import { Component } from '../components/Component';
+import { Engine } from '../core/Engine';
 
 /**
  * Editor class manages all the components of the editor
  */
-export class Editor implements IEditor {
+export class Editor extends Component implements IEditor {
   private _parent: HTMLElement;
   readonly toolbar: Toolbar;
   readonly tileBrowser: TileBrowser;
@@ -32,7 +34,8 @@ export class Editor implements IEditor {
     return this._parent;
   }
 
-  constructor() {
+  constructor(eng: Engine) {
+    super(eng);
     this.toolbar = new Toolbar(this);
     this.tileBrowser = new TileBrowser(this);
     this.statusBar = new StatusBar(this);
@@ -44,16 +47,41 @@ export class Editor implements IEditor {
   }
 
   async initialize(parentContainer: HTMLElement) {
-    this._parent = parentContainer;
+    this._parent = document.createElement('div');
+    this._parent.classList.add('editor');
+
+    const imgSrc = 'ness.success';
+    //const imgSrc = 'tree';
+    const tileData = await this.eng.assetManager.getImageFrom(imgSrc);
+    if (!tileData) {
+      console.debug('image not found! ' + imgSrc);
+    } else {
+      console.debug('image found! ', tileData.tileData);
+
+      const container = document.createElement('div');
+      container.classList.add('tile-preview');
+      container.style.width = tileData.tileData.loc[2].toString() + 'px';
+      container.style.height = tileData.tileData.loc[3].toString() + 'px';
+      tileData.image.style.marginLeft = '-' + tileData.tileData.loc[0].toString() + 'px';
+      tileData.image.style.marginTop = '-' + tileData.tileData.loc[1].toString() + 'px';
+      container.append(tileData.image);
+      this._parent.append(container);
+    }
+
+    parentContainer.append(this._parent);
     this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.height);
 
-    this.buildHtml();
+    await this.buildHtml();
     this.buildToolbar();
     this.editorCanvas.render();
   }
 
   loadLevel(level: ILevelData): void {
 
+  }
+
+  hide(): void {
+    this._parent.style.display = 'none';
   }
 
   update(dt: number) {
@@ -116,6 +144,7 @@ export class Editor implements IEditor {
     });
     this.toolbar.addButton('play', File, 'Play', () => {
       console.debug('Playing!!');
+      this.eng
     });
 
     this.toolbar.addButton('zoomIn', File, 'Zoom In', () => {

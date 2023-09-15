@@ -19,6 +19,7 @@ import { ILevelData } from '../environment/ILevelData';
 import { SceneManager } from '../systems/SceneManager';
 
 import { Editor } from '../editor/Editor';
+import { NotificationManager } from './NotificationManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -42,6 +43,7 @@ export class Engine {
   readonly canvasController: CanvasController;
   readonly sceneManager: SceneManager;
   readonly editor: Editor;
+  readonly notificationManager: NotificationManager;
 
   get gl(): WebGL2RenderingContext {
     return this.canvasController.gl;
@@ -83,8 +85,13 @@ export class Engine {
     this.fps = new FpsController(this);
     this.assetManager = new AssetManager(this);
     this.touchManager = new TouchManager(this);
-    this.editor = new Editor();
+    this.notificationManager = new NotificationManager(this);
+    this.editor = new Editor(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
+
+    this.notificationManager.subscribe('EditorClose', (data: any) => {
+      this.editor.hide();
+    })
   }
 
   changeScene(level: ILevelData) {
@@ -130,11 +137,19 @@ export class Engine {
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
   }
 
+  /**
+   * Show the editor 
+   */
   showEditor() {
     this.editor.loadLevel(this.scene.levelData)
     this.editor.isEnabled = true;
 
     this.canvasController.showCanvas(false);
+  }
+
+  hideEditor() {
+    this.editor.isEnabled = false;
+    this.canvasController.showCanvas(true);
   }
 
   update(dt: number) {

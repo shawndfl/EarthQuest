@@ -1,13 +1,13 @@
-import { EditorComponent } from '../editor/EditorComponent';
-import { IEditor } from '../editor/IEditor';
+import { Component } from "../components/Component";
+import { Engine } from "./Engine";
 
 /**
  * Manages notifications
  */
-export class NotificationManager extends EditorComponent {
+export class NotificationManager extends Component {
   listeners: Map<string, ((data: any) => void)[]>;
-  constructor(editor: IEditor) {
-    super(editor);
+  constructor(eng: Engine) {
+    super(eng);
     this.listeners = new Map<string, ((data: any) => void)[]>();
   }
 
