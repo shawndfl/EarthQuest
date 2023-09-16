@@ -1,10 +1,11 @@
 .editor-main {
   display: inline-flex;
   .editor-entity-container {
-    width: 200px;
+    width: 500px;
     min-width: 200px;
     max-width: 700px;
     height: calc(100vh - 85px);
+    overflow-y: auto;
   }
   .editor-h-resize {
     width: 5px;
@@ -50,10 +51,3 @@
   background-color: rgb(255, 255, 255);
   box-shadow: 1px 1px 3px #c4c4c4;
 }
-
-.tile-preview {
-  overflow: hidden;
-  border: solid;
-}
-
-.tile-preview img {}

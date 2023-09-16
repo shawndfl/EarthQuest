@@ -12,6 +12,7 @@ import { ToolbarOptions } from './ToolbarOptions';
 import { ILevelData } from '../environment/ILevelData';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
+import { TileBrowser2 } from './TileBrowser2';
 
 /**
  * Editor class manages all the components of the editor
@@ -20,6 +21,7 @@ export class Editor extends Component implements IEditor {
   private _parent: HTMLElement;
   readonly toolbar: Toolbar;
   readonly tileBrowser: TileBrowser;
+  readonly tileBrowser2: TileBrowser2;
   readonly editorCanvas: EditorCanvas;
   readonly statusBar: StatusBar;
   readonly menuBar: MenuBar;
@@ -38,6 +40,7 @@ export class Editor extends Component implements IEditor {
     super(eng);
     this.toolbar = new Toolbar(this);
     this.tileBrowser = new TileBrowser(this);
+    this.tileBrowser2 = new TileBrowser2(this);
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
@@ -50,28 +53,12 @@ export class Editor extends Component implements IEditor {
     this._parent = document.createElement('div');
     this._parent.classList.add('editor');
 
-    const imgSrc = 'ness.success';
-    //const imgSrc = 'tree';
-    const tileData = await this.eng.assetManager.getImageFrom(imgSrc);
-    if (!tileData) {
-      console.debug('image not found! ' + imgSrc);
-    } else {
-      console.debug('image found! ', tileData.tileData);
-
-      const container = document.createElement('div');
-      container.classList.add('tile-preview');
-      container.style.width = tileData.tileData.loc[2].toString() + 'px';
-      container.style.height = tileData.tileData.loc[3].toString() + 'px';
-      tileData.image.style.marginLeft = '-' + tileData.tileData.loc[0].toString() + 'px';
-      tileData.image.style.marginTop = '-' + tileData.tileData.loc[1].toString() + 'px';
-      container.append(tileData.image);
-      this._parent.append(container);
-    }
-
     parentContainer.append(this._parent);
     this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.height);
 
+    await this.tileBrowser2.initialize();
     await this.buildHtml();
+
     this.buildToolbar();
     this.editorCanvas.render();
   }
@@ -96,7 +83,8 @@ export class Editor extends Component implements IEditor {
 
     const entityContainer = document.createElement('div');
     entityContainer.classList.add('editor-entity-container');
-    entityContainer.append(this.tileBrowser.buildHtml());
+    entityContainer.append(this.tileBrowser2.container);
+    entityContainer.style.width = '300px';
 
     let lastX = 0;
     let mouseDown = false;
@@ -107,8 +95,8 @@ export class Editor extends Component implements IEditor {
       if (mouseDown) {
         const dx = e.x - lastX;
         lastX = e.x;
-        const width = parseInt(getComputedStyle(entityContainer, '').width);
-        entityContainer.style.width = width + dx + 'px';
+        const width = parseInt(entityContainer.style.width);
+        entityContainer.style.width = (width + dx) + 'px';
         e.preventDefault();
       }
     });

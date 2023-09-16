@@ -2,7 +2,7 @@ import { Component } from '../components/Component';
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
 import { SceneFactory } from './SceneFactory';
-import Level1 from '../assets/level1.json';
+import Level1 from '../assets/levels/level1.json';
 
 export class SceneManager extends Component {
   private _activeScene: SceneComponent;

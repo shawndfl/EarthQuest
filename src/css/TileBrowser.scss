@@ -34,3 +34,50 @@
     margin: 0px 3px 0px 0px;
   }
 }
+
+/** NEW */
+
+.tile-list {
+
+  .tile-item-selected {
+    background-color: aqua;
+  }
+
+  .item {
+    display: block;
+
+    .tile-item-container {
+      height: 100%;
+      width: 300px;
+      display: inline-flex;
+
+      .tile-list {}
+
+      .tile-preview {
+        margin: 5px;
+        width: 64px;
+
+        div {
+          overflow: hidden;
+        }
+      }
+
+      .tile-text {
+        display: flex;
+        align-items: center;
+        width: 200px;
+        overflow: hidden;
+      }
+
+      .item-edit {
+        display: flex;
+        margin-left: 10px;
+        width: 16px;
+        justify-content: center;
+        align-items: center;
+      }
+
+    }
+  }
+
+}

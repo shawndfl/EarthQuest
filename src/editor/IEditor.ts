@@ -1,3 +1,4 @@
+import { Engine } from '../core/Engine';
 import { TileHelper } from '../utilities/TileHelper';
 import { EditorCanvas } from './EditorCanvas';
 import { JobManager } from './JobManager';
@@ -14,4 +15,5 @@ export interface IEditor {
   readonly statusBar: StatusBar;
   readonly jobManager: JobManager;
   readonly tileHelper: TileHelper;
+  readonly eng: Engine;
 }

@@ -72,6 +72,16 @@ export class AssetManager extends Component {
   }
 
   /**
+   * Gets a list of tiles form the tile data and character data
+   * @returns 
+   */
+  getTileAssetList(): string[] {
+    const tileId = (TileData as ISpriteData).tiles.map((tile) => tile.id);
+    tileId.push(... (CharacterData as ISpriteData).tiles.map((tile) => tile.id));
+    return tileId;
+  }
+
+  /**
    * Gets the image by looking up the sprite id.
    * @param id 
    * @returns 
