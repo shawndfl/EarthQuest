@@ -26,8 +26,14 @@ export interface ISpriteDataAndImage {
 export class AssetManager extends Component {
   private _font: Texture;
   private _character: Texture;
+  private _characterImage: HTMLImageElement;
+
   private _tile: Texture;
+  private _tileImage: HTMLImageElement;
+
   private _menu: Texture;
+  private _menuImage: HTMLImageElement;
+
   private _battleBg1: Texture;
 
   get font(): { texture: Texture; data: IFontData[] } {
@@ -56,16 +62,16 @@ export class AssetManager extends Component {
 
   async initialize() {
     this._tile = new Texture(this.gl);
-    await this._tile.loadImage(TileImage);
+    this._tileImage = await this._tile.loadImage(TileImage);
 
     this._character = new Texture(this.gl);
-    await this._character.loadImage(CharacterImage);
+    this._characterImage = await this._character.loadImage(CharacterImage);
 
     this._font = new Texture(this.gl);
     await this._font.loadImage(FontImage);
 
     this._menu = new Texture(this.gl);
-    await this._menu.loadImage(MenuImage);
+    this._menuImage = await this._menu.loadImage(MenuImage);
 
     this._battleBg1 = new Texture(this.gl);
     await this._battleBg1.loadImage(BattleBg1);
@@ -86,52 +92,33 @@ export class AssetManager extends Component {
    * @param id 
    * @returns 
    */
-  async getImageFrom(id: string): Promise<ISpriteDataAndImage> {
-    const promise = new Promise<ISpriteDataAndImage>((resolve, reject) => {
+  getImageFrom(id: string): ISpriteDataAndImage {
+    // check the tileData
+    let tileData = (TileData as ISpriteData).tiles.find((tile) => tile.id == id);
+    if (tileData) {
+      const data = (TileData as ISpriteData);
+      if (!tileData.loc) {
+        tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
+      }
+      return { tileData, image: this._tileImage.cloneNode(true) as HTMLImageElement };
+    }
 
-      // check the tileData
-      let tileData = (TileData as ISpriteData).tiles.find((tile) => tile.id == id);
+    // if not found check the character data
+    if (!tileData) {
+      let tileData = (CharacterData as ISpriteData).tiles.find((tile) => tile.id == id);
       if (tileData) {
-        const image = new Image();
-        image.onload = () => {
-          const data = (TileData as ISpriteData);
-          if (!tileData.loc) {
-            tileData.loc = [(tileData.index[0] + 1) * data.tileWidth, (tileData.index[1] + 1) * data.tileHeight, data.tileWidth, data.tileHeight];
-          }
-          resolve({ tileData, image });
-        };
-        image.onerror = () => {
-          resolve(null);
+        const data = (CharacterData as ISpriteData);
+        if (!tileData.loc) {
+          tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
         }
-        image.src = TileImage;
+        return { tileData, image: this._characterImage.cloneNode(true) as HTMLImageElement };
       }
+    }
 
-      // if not found check the character data
-      if (!tileData) {
-        tileData = (CharacterData as ISpriteData).tiles.find((tile) => tile.id == id);
-        if (tileData) {
-          const image = new Image();
-          image.onload = () => {
-            const data = (CharacterData as ISpriteData);
-            if (!tileData.loc) {
-              tileData.loc = [tileData.index[0] * data.tileWidth, tileData.index[1] * data.tileHeight, data.tileWidth, data.tileHeight];
-            }
-
-            resolve({ tileData, image });
-          };
-          image.onerror = () => {
-            resolve(null);
-          }
-          image.src = CharacterImage;
-        }
-      }
-
-      // no where to be found
-      if (!tileData) {
-        resolve(null);
-      }
-
-    });
-    return promise;
+    // no where to be found
+    if (!tileData) {
+      console.error('Error sprite ' + id + ' not found.');
+      return null;
+    }
   }
 }

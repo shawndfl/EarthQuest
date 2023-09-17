@@ -66,12 +66,12 @@ export class GroundManager extends Component {
     if (false) {
       this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
     } else {
-      this.loadLevel();
+      await this.loadLevel();
     }
   }
 
-  loadLevel() {
-    this._tiles = this._levelLoader.load(this._levelData);
+  async loadLevel(): Promise<void> {
+    this._tiles = await this._levelLoader.load(this._levelData);
   }
 
   /**

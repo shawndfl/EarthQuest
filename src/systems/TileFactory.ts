@@ -11,6 +11,13 @@ import { PortalTileComponent } from '../components/PortalTileComponent';
 import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
 import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 
+export interface ITileTypeData {
+  tile: string;
+  tileType: string,
+  spriteId: string,
+  options: string[]
+}
+
 export class TileFactory extends Component {
   /**
    * a readonly empty tile
@@ -39,6 +46,33 @@ export class TileFactory extends Component {
   }
 
   /**
+   * Parses the tileType. This is an encoded string that is in the format of 
+   * <tile type>|<sprint id>|[option1,options2,...] 
+   * @param Tile
+   * @returns 
+   */
+  static parseTile(tile: string): ITileTypeData {
+
+    if (tile == '---') {
+      tile = 'empty|empty|';
+    }
+
+    const TileData: ITileTypeData = { tile, tileType: '', spriteId: '', options: null }
+
+    const typeSpriteParams = tile.split('|');
+
+    if (typeSpriteParams.length != 3) {
+      return null;
+    }
+
+    TileData.tileType = typeSpriteParams[0];
+    TileData.spriteId = typeSpriteParams[1];
+    TileData.options = typeSpriteParams[2].split(',');
+
+    return TileData;
+  }
+
+  /**
    * Create static tiles
    * @param type
    * @param i
@@ -46,25 +80,22 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  createStaticTile(type: string, i: number, j: number, k: number): TileComponent {
+  createStaticTile(tile: string, i: number, j: number, k: number): TileComponent {
 
-    if (!type || type == '---' || type == 'empty') {
+    if (!tile || tile == '---' || tile == 'empty') {
       return new EmptyTile(this.eng, i, j, k);
     }
 
-    const typeSpriteParams = type.split('|');
-
-    if (typeSpriteParams.length != 3) {
-      console.error('invalid tile: \'' + type + '\' @ (' + i + ', ' + j + ', ' + k + ')' +
-        ' Format should be <type>|<sprite>|<options>');
+    const data = TileFactory.parseTile(tile);
+    if (!data) {
+      console.error('invalid tile: \'' + tile + '\' @ (' + i + ', ' + j + ', ' + k + ')' +
+        ' Format should be <tile type>|<sprint id>|[option1,options2,...] ');
       return new EmptyTile(this.eng, i, j, k);
     }
+    const tileType = data.tileType;
 
-    const tileType = typeSpriteParams[0];
-    const sprite = typeSpriteParams[1];
-    const options = typeSpriteParams[2];
     const args: ITileCreateionArgs = {
-      i, j, k, type: tileType, sprite, options
+      i, j, k, type: data.tileType, sprite: data.spriteId, options: data.options
     }
 
     if (tileType == 'block.half') {
@@ -92,7 +123,7 @@ export class TileFactory extends Component {
       return new PortalTileComponent(this.eng, this.spriteBatch, args);
 
     } else {
-      console.error('Unknown tile type \'' + type + '\' @ (' + i + ', ' + j + ', ' + k + ')');
+      console.error('Unknown tile type \'' + tile + '\' @ (' + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);
     }
   }

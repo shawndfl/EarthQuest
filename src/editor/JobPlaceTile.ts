@@ -10,8 +10,8 @@ export interface SelectTileBrowserData {
   sx: number;
   /** Source y location for tileBrowser */
   sy: number;
-  /** index into list of tileBrowser */
-  srcIndex: number;
+  /** source image */
+  image: HTMLImageElement;
   /** width of the tile */
   srcWidth: number;
   /** height of the tile */
@@ -26,7 +26,7 @@ export interface SelectTileBrowserData {
  * Location in the CanvasRenderer to place the tile.
  */
 export class TilePlaceLocation {
-  constructor(public iRow: number, public jCol: number, public layer: number) {}
+  constructor(public iRow: number, public jCol: number, public layer: number) { }
 
   clone(): TilePlaceLocation {
     return new TilePlaceLocation(this.iRow, this.jCol, this.layer);
@@ -43,7 +43,7 @@ export class JobPlaceTile extends Job {
     super(editor);
   }
 
-  redo(): void {}
+  redo(): void { }
 
   execute(): void {
     const i = this.location.iRow;

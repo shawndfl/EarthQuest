@@ -1,4 +1,3 @@
-import { TileBrowser } from './TileBrowser';
 import { Toolbar } from './Toolbar';
 import '../css/Editor.scss';
 import File from '../assets/editor/file.svg';
@@ -13,6 +12,8 @@ import { ILevelData } from '../environment/ILevelData';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { TileBrowser2 } from './TileBrowser2';
+import { SelectTileBrowserData } from './JobPlaceTile';
+import { TileFactory } from '../systems/TileFactory';
 
 /**
  * Editor class manages all the components of the editor
@@ -20,8 +21,7 @@ import { TileBrowser2 } from './TileBrowser2';
 export class Editor extends Component implements IEditor {
   private _parent: HTMLElement;
   readonly toolbar: Toolbar;
-  readonly tileBrowser: TileBrowser;
-  readonly tileBrowser2: TileBrowser2;
+  readonly tileBrowser: TileBrowser2;
   readonly editorCanvas: EditorCanvas;
   readonly statusBar: StatusBar;
   readonly menuBar: MenuBar;
@@ -39,8 +39,7 @@ export class Editor extends Component implements IEditor {
   constructor(eng: Engine) {
     super(eng);
     this.toolbar = new Toolbar(this);
-    this.tileBrowser = new TileBrowser(this);
-    this.tileBrowser2 = new TileBrowser2(this);
+    this.tileBrowser = new TileBrowser2(this);
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
@@ -56,7 +55,7 @@ export class Editor extends Component implements IEditor {
     parentContainer.append(this._parent);
     this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.height);
 
-    await this.tileBrowser2.initialize();
+    await this.tileBrowser.initialize();
     await this.buildHtml();
 
     this.buildToolbar();
@@ -64,7 +63,42 @@ export class Editor extends Component implements IEditor {
   }
 
   loadLevel(level: ILevelData): void {
+    this.tileBrowser.refreshLevel(level);
+    for (let k = 0; k < level.cells.length; k++) {
+      for (let j = 0; j < level.cells[k].length; j++) {
+        for (let i = 0; i < level.cells[k][j].length; i++) {
+          const tileIndex = level.cells[k][j][i];
+          const tile = level.tiles[tileIndex - 10];
 
+          if (!tile) {
+            console.error('invalid index ' + i + ', ' + j + ', ' + k);
+            continue;
+          }
+
+          let tileTypeData = TileFactory.parseTile(tile);
+          if (!tileTypeData) {
+            console.warn('invalid tile: \'' + tile + '\'' +
+              ' Format should be <tile type>|<sprint id>|[option1,options2,...] ');
+            continue;
+          }
+
+          const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
+          if (spriteData) {
+            const tileData: SelectTileBrowserData = {
+              sx: spriteData.tileData.loc[0],
+              sy: spriteData.tileData.loc[1],
+              srcWidth: spriteData.tileData.loc[2],
+              srcHeight: spriteData.tileData.loc[3],
+              image: spriteData.image,
+              offsetX: spriteData.tileData.offset[0],
+              offsetY: spriteData.tileData.offset[1],
+            };
+
+            this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
+          }
+        }
+      }
+    }
   }
 
   hide(): void {
@@ -83,7 +117,7 @@ export class Editor extends Component implements IEditor {
 
     const entityContainer = document.createElement('div');
     entityContainer.classList.add('editor-entity-container');
-    entityContainer.append(this.tileBrowser2.container);
+    entityContainer.append(this.tileBrowser.container);
     entityContainer.style.width = '300px';
 
     let lastX = 0;

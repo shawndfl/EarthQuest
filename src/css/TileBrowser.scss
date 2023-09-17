@@ -40,18 +40,20 @@
 .tile-list {
 
   .tile-item-selected {
-    background-color: aqua;
+    background-color: rgb(141, 238, 238);
   }
 
   .item {
     display: block;
 
+    &.grayscale {
+      filter: grayscale(1);
+    }
+
     .tile-item-container {
       height: 100%;
       width: 300px;
       display: inline-flex;
-
-      .tile-list {}
 
       .tile-preview {
         margin: 5px;
@@ -62,11 +64,27 @@
         }
       }
 
-      .tile-text {
-        display: flex;
+      .text {
+
+        justify-content: center;
         align-items: center;
         width: 200px;
-        overflow: hidden;
+
+        .tile-text {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .sprite-text {
+          font-size: smaller;
+          color: gray;
+          text-align: right;
+          width: 100%;
+          overflow: hidden;
+          vertical-align: bottom;
+        }
       }
 
       .item-edit {

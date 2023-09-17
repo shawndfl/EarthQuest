@@ -4,12 +4,12 @@ import { EditorCanvas } from './EditorCanvas';
 import { JobManager } from './JobManager';
 import { MenuBar } from './MenuBar';
 import { StatusBar } from './StatusBar';
-import { TileBrowser } from './TileBrowser';
+import { TileBrowser2 } from './TileBrowser2';
 import { Toolbar } from './Toolbar';
 
 export interface IEditor {
   readonly toolbar: Toolbar;
-  readonly tileBrowser: TileBrowser;
+  readonly tileBrowser: TileBrowser2;
   readonly editorCanvas: EditorCanvas;
   readonly menuBar: MenuBar;
   readonly statusBar: StatusBar;

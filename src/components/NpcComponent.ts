@@ -40,7 +40,7 @@ export class NpcComponent extends TileComponent {
     this._spriteController.initialize(character.texture, character.data);
 
     this._spriteController.scale(this.eng.tileScale);
-    this._spriteController.setSprite('poo.down.step');
+    this._spriteController.setSprite(args.sprite);
 
     // offset by half so he stands in the middle of the tile
     this.setTilePosition(i + 0.5, j + 0.5, k);
@@ -98,7 +98,7 @@ export class NpcComponent extends TileComponent {
 
   runIdle(dt: number) {
     this._idleAnimation.update(dt);
-    this._sprites = ['poo.down.step', 'poo.down.step'];
+    this._sprites = [this.spriteId, this.spriteId];
 
     const index = this._idleAnimation.getValue();
     if (index == 0) {

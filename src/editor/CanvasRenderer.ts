@@ -142,10 +142,9 @@ export class CanvasRenderer extends EditorComponent {
    * @param left
    * @param top
    */
-  drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
+  private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
     const screen = this.tileToScreen(i, j, k);
-
-    const img = this.editor.tileBrowser.images[data.srcIndex].img;
+    const img = data.image;
     const x = data.sx;
     const y = data.sy;
     const w = data.srcWidth;
@@ -157,7 +156,7 @@ export class CanvasRenderer extends EditorComponent {
   public tileToScreen(i: number, j: number, layer: number = 0): { x: number; y: number } {
     const stepX = 16;
     const stepY = 16;
-    const point = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + layer * stepY };
+    const point = { x: -j * stepX * 2 + i * stepY * 2, y: j * stepX + i * stepY + layer * stepY };
     return point;
   }
 
@@ -189,15 +188,17 @@ export class CanvasRenderer extends EditorComponent {
     const ed = this.editor;
     if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
       let selected: SelectTileBrowserData = null;
-      if (ed.tileBrowser.selectedTile) {
+      const selectedTile = this.editor.tileBrowser.selectedItem.spriteData;
+
+      if (selectedTile) {
         selected = {
-          sx: ed.tileBrowser.selectedTile.x,
-          sy: ed.tileBrowser.selectedTile.y,
-          srcHeight: ed.tileBrowser.selectedTile.w,
-          srcWidth: ed.tileBrowser.selectedTile.h,
+          sx: selectedTile.tileData.loc[0],
+          sy: selectedTile.tileData.loc[1],
+          srcHeight: selectedTile.tileData.loc[2],
+          srcWidth: selectedTile.tileData.loc[3],
           offsetX: -32,
           offsetY: 0,
-          srcIndex: ed.tileBrowser.activeImage,
+          image: selectedTile.image,
         };
       }
       const location = new TilePlaceLocation(this.selectedTile.i, this.selectedTile.j, this._activeLayer);

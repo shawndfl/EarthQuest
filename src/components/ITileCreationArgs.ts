@@ -4,7 +4,7 @@
 export interface ITileCreateionArgs {
     type: string,
     sprite: string,
-    options: string,
+    options: string[],
     i: number,
     j: number,
     k: number

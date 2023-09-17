@@ -118,7 +118,7 @@ export abstract class TileComponent extends Component {
   /**
    * Gets the options used to create this tile
    */
-  get options(): string {
+  get options(): string[] {
     return this._options?.options;
   }
 

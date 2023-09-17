@@ -14,8 +14,8 @@
     "slop|slop.back.left|",
     "open|block.highlight|",
     "---",
-    "player||",
-    "npc|poo|",
+    "player|ness.down.step.right|",
+    "npc|poo.down.step|",
     "gold|coin.0|"
   ],
   
