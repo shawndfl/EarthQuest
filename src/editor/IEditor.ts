@@ -14,6 +14,5 @@ export interface IEditor {
   readonly menuBar: MenuBar;
   readonly statusBar: StatusBar;
   readonly jobManager: JobManager;
-  readonly tileHelper: TileHelper;
   readonly eng: Engine;
 }

@@ -20,6 +20,9 @@ export interface SelectTileBrowserData {
   offsetX: number;
   /** offset in pixels from the top corner. This is used when placing a tile. */
   offsetY: number;
+
+  /** Used when saving the level data */
+  tileIndex: number;
 }
 
 /**

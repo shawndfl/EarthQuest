@@ -26,10 +26,9 @@ export class Editor extends Component implements IEditor {
   readonly statusBar: StatusBar;
   readonly menuBar: MenuBar;
   readonly jobManager: JobManager;
-  readonly tileHelper: TileHelper;
 
   readonly zoomStep: number = 0.1;
-
+  levelData: ILevelData;
   isEnabled: boolean;
 
   public get parent(): HTMLElement {
@@ -44,7 +43,6 @@ export class Editor extends Component implements IEditor {
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
     this.jobManager = new JobManager(this);
-    this.tileHelper = new TileHelper();
     this.isEnabled = false;
   }
 
@@ -53,7 +51,6 @@ export class Editor extends Component implements IEditor {
     this._parent.classList.add('editor');
 
     parentContainer.append(this._parent);
-    this.tileHelper.calculateTransform(this.editorCanvas.width, this.editorCanvas.height);
 
     await this.tileBrowser.initialize();
     await this.buildHtml();
@@ -63,6 +60,7 @@ export class Editor extends Component implements IEditor {
   }
 
   loadLevel(level: ILevelData): void {
+    this.levelData = level;
     this.tileBrowser.refreshLevel(level);
     for (let k = 0; k < level.cells.length; k++) {
       for (let j = 0; j < level.cells[k].length; j++) {
@@ -92,6 +90,7 @@ export class Editor extends Component implements IEditor {
               image: spriteData.image,
               offsetX: spriteData.tileData.offset[0],
               offsetY: spriteData.tileData.offset[1],
+              tileIndex: level.cells[k][j][i]
             };
 
             this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
@@ -165,8 +164,32 @@ export class Editor extends Component implements IEditor {
       console.debug('Open!!');
     });
     this.toolbar.addButton('play', File, 'Play', () => {
-      console.debug('Playing!!');
-      this.eng
+      const maxI = this.editorCanvas.canvasRenderer.MaxI;
+      const maxJ = this.editorCanvas.canvasRenderer.MaxJ;
+      const maxK = this.editorCanvas.canvasRenderer.MaxK;
+      const tiles: number[][][] = [[[]]];
+      for (let k = 0; k < maxK; k++) {
+        tiles.push([])
+        for (let j = 0; j < maxJ; j++) {
+          if (tiles[k] == undefined) {
+            tiles[k] = [];
+          }
+          for (let i = 0; i < maxI; i++) {
+            if (tiles[k][j] == undefined) {
+              tiles[k][j] = [];
+            }
+            const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
+            if (tile) {
+              tiles[k][j].push(tile.tileIndex);
+            } else {
+              tiles[k][j].push(0);
+            }
+          }
+        }
+      }
+      this.levelData.cells = tiles;
+      this.eng.scene.initialize(this.levelData);
+      this.eng.hideEditor();
     });
 
     this.toolbar.addButton('zoomIn', File, 'Zoom In', () => {

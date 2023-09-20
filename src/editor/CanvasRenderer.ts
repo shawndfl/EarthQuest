@@ -143,29 +143,17 @@ export class CanvasRenderer extends EditorComponent {
    * @param top
    */
   private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
-    const screen = this.tileToScreen(i, j, k);
+
+    const screen = this.eng.tileHelper.toScreenLoc(i, j, k, true);
     const img = data.image;
     const x = data.sx;
     const y = data.sy;
     const w = data.srcWidth;
     const h = data.srcHeight;
 
-    this.context.drawImage(img, x, y, w, h, screen.x + data.offsetX, screen.y + data.offsetY, w * 2, h * 2);
-  }
-
-  public tileToScreen(i: number, j: number, layer: number = 0): { x: number; y: number } {
-    const stepX = 16;
-    const stepY = 16;
-    const point = { x: -j * stepX * 2 + i * stepY * 2, y: j * stepX + i * stepY + layer * stepY };
-    return point;
-  }
-
-  public screenToTile(x: number, y: number, layer: number = 0): { x: number; y: number } {
-    const stepX = 16;
-    const stepY = 16;
-    const i = x;
-    const point = { x: (-x / stepX) * 2 + (y / stepY) * 2, y: x / stepX + y / stepY + layer / stepY };
-    return point;
+    const destX = screen.x + data.offsetX;
+    const destY = screen.y - data.offsetY - h * 2;
+    this.context.drawImage(img, x, y, w, h, destX, destY, w * 2, h * 2);
   }
 
   public select(left: number, top: number): void {
@@ -196,9 +184,10 @@ export class CanvasRenderer extends EditorComponent {
           sy: selectedTile.tileData.loc[1],
           srcHeight: selectedTile.tileData.loc[2],
           srcWidth: selectedTile.tileData.loc[3],
-          offsetX: -32,
-          offsetY: 0,
+          offsetX: selectedTile.tileData.offset[0],
+          offsetY: selectedTile.tileData.offset[1],
           image: selectedTile.image,
+          tileIndex: selectedTile.tileIndex
         };
       }
       const location = new TilePlaceLocation(this.selectedTile.i, this.selectedTile.j, this._activeLayer);
@@ -218,9 +207,9 @@ export class CanvasRenderer extends EditorComponent {
     const maxJ = 50;
     for (let i = 0; i < this.MaxI; i++) {
       const x1 = -i * stepX * 2;
-      const y1 = i * stepY;
+      const y1 = i * stepY + this._activeLayer * stepY * .5;
       const x2 = -i * stepX * 2 + (maxJ - 1) * stepX * 2;
-      const y2 = (maxJ - 1) * stepX + i * stepY;
+      const y2 = (maxJ - 1) * stepX + i * stepY + this._activeLayer * stepY * .5;
 
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);

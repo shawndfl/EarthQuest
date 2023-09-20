@@ -1,0 +1,19 @@
+{
+  "name": "WorldScene",
+  "id": "level.1.1",
+  "sheet": "isometricTile.json",
+  "tiles": [
+    "---",
+    "open|block.grass|",
+    "block.half|slop.left|",
+    "block.half|slop.right|"
+  ],
+  
+  "cells": [
+    [
+      [11, 13],[12]
+    ],
+    [[11]],
+    [[11]]
+  ]
+}

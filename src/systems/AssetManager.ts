@@ -16,6 +16,8 @@ import { ISpriteData, ITileData } from '../graphics/ISpriteData';
 
 export interface ISpriteDataAndImage {
   tileData: ITileData;
+  /** The index of the tile in the list */
+  tileIndex: number;
   image: HTMLImageElement;
 }
 
@@ -94,24 +96,37 @@ export class AssetManager extends Component {
    */
   getImageFrom(id: string): ISpriteDataAndImage {
     // check the tileData
-    let tileData = (TileData as ISpriteData).tiles.find((tile) => tile.id == id);
+    let index = 0;
+    let tileData = (TileData as ISpriteData).tiles.find((tile, i) => {
+      if (tile.id == id) {
+        index = i;
+        return true;
+      }
+      return false;
+    });
     if (tileData) {
       const data = (TileData as ISpriteData);
       if (!tileData.loc) {
         tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
       }
-      return { tileData, image: this._tileImage.cloneNode(true) as HTMLImageElement };
+      return { tileData, tileIndex: index, image: this._tileImage.cloneNode(true) as HTMLImageElement };
     }
 
     // if not found check the character data
     if (!tileData) {
-      let tileData = (CharacterData as ISpriteData).tiles.find((tile) => tile.id == id);
+      let tileData = (CharacterData as ISpriteData).tiles.find((tile, i) => {
+        if (tile.id == id) {
+          index = i;
+          return true;
+        }
+        return false;
+      });
       if (tileData) {
         const data = (CharacterData as ISpriteData);
         if (!tileData.loc) {
           tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
         }
-        return { tileData, image: this._characterImage.cloneNode(true) as HTMLImageElement };
+        return { tileData, tileIndex: index, image: this._characterImage.cloneNode(true) as HTMLImageElement };
       }
     }
 

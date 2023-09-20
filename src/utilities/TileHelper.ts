@@ -9,6 +9,7 @@ import vec2 from '../math/vec2';
  */
 export class TileHelper {
   protected _toScreen: mat4;
+  protected _toScreenFlipped: mat4; // y inverted
   protected _toTile: mat4;
   readonly depthScale: number;
   private width: number;
@@ -60,6 +61,18 @@ export class TileHelper {
       trans.z,
       1.0,
     ]);
+    this._toScreenFlipped = this._toScreen.copy();
+
+    this._toScreenFlipped.getValues()[0] = -this._toScreenFlipped.getValues()[0];
+    this._toScreenFlipped.getValues()[4] = -this._toScreenFlipped.getValues()[4];
+    this._toScreenFlipped.getValues()[8] = -this._toScreenFlipped.getValues()[8];
+
+    this._toScreenFlipped.getValues()[1] = -this._toScreenFlipped.getValues()[1];
+    this._toScreenFlipped.getValues()[5] = -this._toScreenFlipped.getValues()[5];
+    this._toScreenFlipped.getValues()[9] = -this._toScreenFlipped.getValues()[9];
+    this._toScreenFlipped.getValues()[12] = 0;
+    this._toScreenFlipped.getValues()[13] = 0;
+    this._toScreenFlipped.getValues()[14] = 0;
 
     this._toTile = this._toScreen.copy();
     this._toTile.inverse();
@@ -105,9 +118,14 @@ export class TileHelper {
     return normalizedDepth;
   }
 
-  toScreenLoc(i: number, j: number, k: number): vec3 {
+  toScreenLoc(i: number, j: number, k: number, invertYAxis: boolean = false): vec3 {
     const cell = new vec3([i, j, k]);
-    const screen = this._toScreen.multiplyVec3(cell);
-    return screen;
+    if (invertYAxis) {
+      const screen = this._toScreenFlipped.multiplyVec3(cell);
+      return screen;
+    } else {
+      const screen = this._toScreen.multiplyVec3(cell);
+      return screen;
+    }
   }
 }

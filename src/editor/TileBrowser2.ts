@@ -120,8 +120,8 @@ export class TileBrowser2 extends EditorComponent {
       let tile = levelData.tiles[i];
 
       // --- is a short cut to error.
-      if (tile == '---' && !this.tileList.find((x) => x.tileTypeData.tileType == 'error')) {
-        tile = 'error|error|';
+      if (tile == '---' && !this.tileList.find((x) => x.tileTypeData.tileType == 'empty')) {
+        tile = 'empty|empty|';
       }
 
       // get the tile data
