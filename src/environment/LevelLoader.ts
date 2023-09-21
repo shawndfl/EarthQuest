@@ -23,14 +23,18 @@ export class LevelLoader extends Component {
     const uuid = this.eng.random.getUuid();
     console.debug('uuid ' + uuid);
 
-    for (let k = 0; k < levelData.cells.length; k++) {
+    for (let k = 0; k < levelData.encode.length; k++) {
       tileComponent.push([]);
-      for (let j = 0; j < levelData.cells[k].length; j++) {
+      for (let j = 0; j < levelData.encode[k].length; j++) {
         tileComponent[k].push([]);
-        for (let i = 0; i < levelData.cells[k][j].length; i++) {
-          const typeIndex = levelData.cells[k][j][i];
-          const type = levelData.tiles[typeIndex - 10];
-          const tile = this._tileFactory.createStaticTile(type, i, j, k);
+
+        const row = levelData.encode[k][j];
+        let i = 0;
+        for (let s = 0; s < row.length; s += 2) {
+          const element = row[s] + row[s + 1];
+          const index = parseInt(element, 16);
+          const type = levelData.tiles[index];
+          const tile = this._tileFactory.createStaticTile(type, i++, j, k);
           tileComponent[k][j].push(tile);
         }
       }

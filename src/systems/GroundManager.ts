@@ -56,7 +56,6 @@ export class GroundManager extends Component {
     const texture = this.eng.assetManager.tile.texture;
     const data = this.eng.assetManager.tile.data;
     this._spriteController.initialize(texture, data);
-    console.debug('sprite list: ', this._spriteController.getSpriteList());
 
     // generate a level
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);

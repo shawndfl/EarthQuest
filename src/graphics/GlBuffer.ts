@@ -217,6 +217,4 @@ export class GlBuffer {
       this.gl.deleteVertexArray(this.vertArrayBuffer);
     }
   }
-
-  draw() {}
 }

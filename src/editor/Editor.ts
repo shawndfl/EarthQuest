@@ -62,11 +62,15 @@ export class Editor extends Component implements IEditor {
   loadLevel(level: ILevelData): void {
     this.levelData = level;
     this.tileBrowser.refreshLevel(level);
-    for (let k = 0; k < level.cells.length; k++) {
-      for (let j = 0; j < level.cells[k].length; j++) {
-        for (let i = 0; i < level.cells[k][j].length; i++) {
-          const tileIndex = level.cells[k][j][i];
-          const tile = level.tiles[tileIndex - 10];
+    for (let k = 0; k < level.encode.length; k++) {
+      for (let j = 0; j < level.encode[k].length; j++) {
+
+        const row = level.encode[k][j];
+        let i = 0;
+        for (let s = 0; s < row.length; s += 2) {
+          const element = row[s] + row[s + 1];
+          const index = parseInt(element, 16);
+          const tile = level.tiles[index];
 
           if (!tile) {
             console.error('invalid index ' + i + ', ' + j + ', ' + k);
@@ -90,10 +94,11 @@ export class Editor extends Component implements IEditor {
               image: spriteData.image,
               offsetX: spriteData.tileData.offset[0],
               offsetY: spriteData.tileData.offset[1],
-              tileIndex: level.cells[k][j][i]
+              tileIndex: index
             };
 
             this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
+            i++;
           }
         }
       }
@@ -157,38 +162,50 @@ export class Editor extends Component implements IEditor {
     this.toolbar.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
     });
-    this.toolbar.addButton('save', File, 'Save', () => {
-      console.debug('Saving!!');
-    });
-    this.toolbar.addButton('open', File, 'Open', () => {
-      console.debug('Open!!');
-    });
-    this.toolbar.addButton('play', File, 'Play', () => {
+
+    const saveButton = this.toolbar.addButton('save', File, 'Save', (source: MouseEvent) => {
       const maxI = this.editorCanvas.canvasRenderer.MaxI;
       const maxJ = this.editorCanvas.canvasRenderer.MaxJ;
       const maxK = this.editorCanvas.canvasRenderer.MaxK;
-      const tiles: number[][][] = [[[]]];
+      const tiles: string[][] = [[]];
       for (let k = 0; k < maxK; k++) {
         tiles.push([])
         for (let j = 0; j < maxJ; j++) {
           if (tiles[k] == undefined) {
             tiles[k] = [];
           }
+          let row = '';
           for (let i = 0; i < maxI; i++) {
-            if (tiles[k][j] == undefined) {
-              tiles[k][j] = [];
-            }
             const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
             if (tile) {
-              tiles[k][j].push(tile.tileIndex);
+              const index = tile.tileIndex;
+              row += index.toString(16).padStart(2, '0');
             } else {
-              tiles[k][j].push(0);
+              row += '00';
             }
           }
+          tiles[k].push(row);
         }
       }
-      this.levelData.cells = tiles;
-      this.eng.scene.initialize(this.levelData);
+      this.levelData.cells = [[[]]]
+      this.levelData.encode = tiles;
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.levelData));
+      const downloadAnchorElem = document.createElement('a');
+      this._parent.append(downloadAnchorElem);
+      downloadAnchorElem.setAttribute("href", dataStr);
+      downloadAnchorElem.setAttribute("download", "scene.json");
+      downloadAnchorElem.click();
+      downloadAnchorElem.remove();
+
+    });
+    this.toolbar.addButton('open', File, 'Open', () => {
+      console.debug('Open!!');
+    });
+    this.toolbar.addButton('play', File, 'Play', () => {
+
+
+      //this.eng.scene.initialize(this.levelData);
       this.eng.hideEditor();
     });
 
@@ -210,7 +227,8 @@ export class Editor extends Component implements IEditor {
       this.jobManager.redo();
     });
 
-    this.toolbar.addButton('place', File, 'Place', (button: HTMLElement) => {
+    this.toolbar.addButton('place', File, 'Place', (e: MouseEvent) => {
+      const button = e.target as HTMLButtonElement;
       this.toolbar.selectedTool = ToolbarOptions.Place;
 
       this.toolbar.setActive(button, true);

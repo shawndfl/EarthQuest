@@ -92,7 +92,7 @@ export class CanvasRenderer extends EditorComponent {
 
       this.renderTiles();
 
-      this.renderGrid();
+      //this.renderGrid();
     }
 
     this.dirty = false;

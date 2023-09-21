@@ -26,4 +26,6 @@ export interface ILevelData {
    * The array is height, column, row and the value is an index into tiles.
    */
   cells: number[][][];
+
+  encode: string[][];
 }

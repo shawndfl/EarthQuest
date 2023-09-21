@@ -113,7 +113,7 @@ export class TileBrowser2 extends EditorComponent {
     this.list.innerHTML = '';
     this.tileList = [];
 
-    const levelData = this.eng.scene.levelData;
+    const levelData = level;
 
     // add in all the tiles form the level data
     for (let i = 0; i < levelData.tiles.length; i++) {

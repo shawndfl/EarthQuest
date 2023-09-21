@@ -17,6 +17,7 @@ export class WorldScene extends SceneComponent {
   private _ground: GroundManager;
   private _player: PlayerController;
   private _dialog: DialogMenu;
+  private _initialized: boolean;
 
   get spriteSheetTexture(): Texture {
     return this._spriteSheetTexture;
@@ -45,6 +46,7 @@ export class WorldScene extends SceneComponent {
     this._ground = new GroundManager(eng);
     this._player = new PlayerController(eng);
     this._dialog = new DialogMenu(eng);
+    this._initialized = false;
   }
 
   /**
@@ -53,12 +55,16 @@ export class WorldScene extends SceneComponent {
   async initialize(levelData: ILevelData) {
     super.initialize(levelData);
 
-    this._spriteSheetTexture = this.eng.assetManager.character.texture;
-    const data = this.eng.assetManager.character.data;
+    if (!this._initialized) {
 
-    this.player.initialize(this.spriteSheetTexture, data);
+      this._spriteSheetTexture = this.eng.assetManager.character.texture;
+      const data = this.eng.assetManager.character.data;
+
+      this.player.initialize(this.spriteSheetTexture, data);
+      await this.dialog.initialize();
+    }
+
     this.ground.initialize(this.levelData);
-    await this.dialog.initialize();
 
     this.eng.dialogManager.showDialog(
       'Welcome to Earth Quest!\nWhat should we do today?',
@@ -69,6 +75,11 @@ export class WorldScene extends SceneComponent {
       ['Walk Around', 'New Game', 'Load']
     );
   }
+
+  loadLevel() {
+
+  }
+
 
   /**
    * Handles user input. The logic goes through a chain of commands

@@ -35,13 +35,13 @@ export class Toolbar extends EditorComponent {
    * @param text
    * @param click
    */
-  addButton(id: string, icon: string, text: string, click: (source: HTMLElement) => void) {
+  addButton(id: string, icon: string, text: string, click: (e: MouseEvent) => void): HTMLElement {
     const btn = document.createElement('button');
     btn.dataset.id = id;
     btn.classList.add('btn');
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e: MouseEvent) => {
       if (click) {
-        click(btn);
+        click(e);
       }
     });
 
@@ -59,6 +59,7 @@ export class Toolbar extends EditorComponent {
 
     // save the button
     this.buttons.set(id, btn);
+    return btn;
   }
 
   /**

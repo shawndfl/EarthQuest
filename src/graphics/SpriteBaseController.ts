@@ -68,6 +68,10 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
       this._indexLookup.set(val.id, i);
     });
 
+    if (this._buffer) {
+      this._buffer.dispose();
+    }
+
     // create the gl buffers for this sprite
     this._buffer = new GlBuffer(this.gl);
 
