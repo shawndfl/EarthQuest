@@ -118,7 +118,7 @@ export class GameMenuComponent extends Component {
   handleUserAction(state: InputState): boolean {
     const active = this.visible;
     if (active) {
-      if ((state.action & UserAction.MenuPressed) > 0) {
+      if (state.isReleased(UserAction.Start)) {
         let canHide = true;
 
         // if there is an onHide event fire that
@@ -132,7 +132,7 @@ export class GameMenuComponent extends Component {
       }
 
       // select next option
-      if ((state.action & UserAction.DownPressed) > 0) {
+      if (state.isReleased(UserAction.Down)) {
         if (this._cursor.index < this._cursor.indexCount - 1) {
           this._cursor.index++;
         } else {
@@ -140,7 +140,7 @@ export class GameMenuComponent extends Component {
         }
       }
       // select previous option
-      if ((state.action & UserAction.UpPressed) > 0) {
+      if (state.isReleased(UserAction.Up)) {
         if (this._cursor.index > 0) {
           this._cursor.index--;
         } else {
@@ -149,7 +149,7 @@ export class GameMenuComponent extends Component {
       }
 
       // accept the option
-      if ((state.action & UserAction.ActionPressed) > 0) {
+      if (state.isReleased(UserAction.A)) {
         this._cursor.select();
       }
     }

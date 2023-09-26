@@ -163,7 +163,7 @@ export abstract class TileComponent extends Component {
     if (this.empty && options.ignoreEmpty) {
       return true;
     } else {
-      console.warn(' default component');
+      // default component
     }
     return false;
   }

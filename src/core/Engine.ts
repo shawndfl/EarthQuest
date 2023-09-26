@@ -13,7 +13,6 @@ import { FpsController } from './FpsController';
 import { Random } from '../utilities/Random';
 import { AssetManager } from '../systems/AssetManager';
 import { GameManager } from '../systems/GameManager';
-import { TouchManager } from '../systems/TouchManager';
 import { CanvasController } from './CanvasController';
 import { ILevelData } from '../environment/ILevelData';
 import { SceneManager } from '../systems/SceneManager';
@@ -37,7 +36,6 @@ export class Engine {
   readonly gameManager: GameManager;
   readonly fps: FpsController;
   readonly random: Random;
-  readonly touchManager: TouchManager;
   readonly assetManager: AssetManager;
   readonly rootElement: HTMLElement;
   readonly canvasController: CanvasController;
@@ -74,7 +72,7 @@ export class Engine {
 
     this.random = new Random(1001);
     this.gameManager = new GameManager(this);
-    this.sceneManager = new SceneManager(this);
+    this.sceneManager = this.createSceneManager();
     this.input = new InputHandler(this);
     this.tileHelper = new TileHelper();
     this.soundManager = new SoundManager();
@@ -84,7 +82,6 @@ export class Engine {
     this.battleManager = new BattleManager(this);
     this.fps = new FpsController(this);
     this.assetManager = new AssetManager(this);
-    this.touchManager = new TouchManager(this);
     this.notificationManager = new NotificationManager(this);
     this.editor = new Editor(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
@@ -92,6 +89,10 @@ export class Engine {
     this.notificationManager.subscribe('EditorClose', (data: any) => {
       this.editor.hide();
     })
+  }
+
+  createSceneManager() {
+    return new SceneManager(this);
   }
 
   changeScene(level: ILevelData) {
@@ -118,7 +119,7 @@ export class Engine {
     await this.dialogManager.initialize();
     await this.battleManager.initialize();
     await this.sceneManager.initialize();
-    await this.editor.initialize(rootElement);
+    //await this.editor.initialize(rootElement);
 
     const url = new URL(window.location.href);
     if (url.searchParams.get('editor')) {
@@ -141,10 +142,10 @@ export class Engine {
    * Show the editor 
    */
   showEditor() {
-    this.editor.loadLevel(this.scene.levelData)
-    this.editor.isEnabled = true;
+    //this.editor.loadLevel(this.scene.levelData)
+    //this.editor.isEnabled = true;
 
-    this.canvasController.showCanvas(false);
+    //this.canvasController.showCanvas(false);
   }
 
   hideEditor() {
@@ -156,16 +157,13 @@ export class Engine {
     // handle gamepad polling
     this.input.preUpdate(dt);
 
-    // update the touch manager
-    this.touchManager.update(dt);
-
     // update the fps
     this.fps.update(dt);
 
     // handle input
-    if (this.input.action != UserAction.None) {
+    if (this.input.buttonsDown != UserAction.None || this.input.buttonsReleased != UserAction.None) {
       this.soundManager.UserReady();
-      const inputState = { action: this.input.action, touchPoint: this.input.touchPoint };
+      const inputState = this.input.getInputState();
       // handle dialog input first
       this.dialogManager.handleUserAction(inputState) || this.scene.handleUserAction(inputState);
     }
@@ -186,7 +184,7 @@ export class Engine {
     this.dialogManager.update(dt);
 
     // update the editor
-    this.editor.update(dt);
+    //this.editor.update(dt);
 
     // update text manager
     this.textManager.update(dt);

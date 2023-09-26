@@ -142,32 +142,30 @@ export class PlayerController extends TileComponent {
     }
 
     // if the user tapped or clicked on the screen
-    if ((state.action & UserAction.Tap) > 0) {
-      //this.handleTap(state);
-    } else if ((state.action & UserAction.ActionPressed) > 0) {
+    if (state.isReleased(UserAction.A)) {
       // action event
       this.eng.scene.ground.raisePlayerAction(this);
-    } else if ((state.action & UserAction.MenuPressed) > 0) {
+    } else if ((state.buttonsReleased & UserAction.Start) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {
       const screenDirection = new vec2();
       // use arrow keys or d-pad on a game controller
-      if ((state.action & UserAction.Left) > 0) {
+      if (state.isDown(UserAction.Left)) {
         this._facingDirection = this._facingDirection | PointingDirection.W;
         screenDirection.x -= 1;
         this._walking = true;
       }
-      if ((state.action & UserAction.Right) > 0) {
+      if (state.isDown(UserAction.Right)) {
         this._facingDirection = this._facingDirection | PointingDirection.E;
         screenDirection.x += 1;
         this._walking = true;
       }
-      if ((state.action & UserAction.Up) > 0) {
+      if (state.isDown(UserAction.Up)) {
         this._facingDirection = this._facingDirection | PointingDirection.N;
         screenDirection.y += 1;
         this._walking = true;
       }
-      if ((state.action & UserAction.Down) > 0) {
+      if (state.isDown(UserAction.Down)) {
         this._facingDirection = this._facingDirection | PointingDirection.S;
         screenDirection.y -= 1;
         this._walking = true;
@@ -196,89 +194,6 @@ export class PlayerController extends TileComponent {
     }
 
     return true;
-  }
-
-  /**
-   * Handle the tap event. This will allow the player to touch a point on the screen
-   * and the character will walk towards that point. If the character can not get there in 2
-   * seconds the character will stop moving. When the character gets to the destination the action
-   * event will be raised automatically.
-   * @param state
-   */
-  handleTap(state: InputState) {
-    let touch = state.touchPoint;
-    const screen = new vec2();
-
-    // x and y screen points are offset by the projection offset.
-    screen.x = touch.x;
-    screen.y = touch.y;
-
-    console.debug('touch point ' + screen.toString());
-
-    this._moveController.startMove(
-      screen,
-      this,
-      () => {
-        // reset direction and walking
-        this._facingDirection = PointingDirection.None;
-        this._walking = false;
-      },
-      (direction: vec2) => {
-        const dir = direction.copy();
-        dir.normalize();
-
-        const deadZone = 0.5;
-        console.debug('t-> pos ' + this.screenPosition);
-        console.debug('t-> target ' + this._moveController.target);
-        console.debug('t-> direction ' + dir, direction.length().toFixed(3));
-
-        // move left
-        if (dir.x < -deadZone) {
-          this._facingDirection = this._facingDirection | PointingDirection.W;
-          this._walking = true;
-          console.debug('t->  moving left ');
-        }
-        // move right
-        else if (dir.x > deadZone) {
-          this._facingDirection = this._facingDirection | PointingDirection.E;
-          this._walking = true;
-          console.debug('t->  moving right ');
-        }
-
-        // move down
-        if (dir.y < -deadZone) {
-          this._facingDirection = this._facingDirection | PointingDirection.S;
-          this._walking = true;
-          console.debug('t->  moving down ');
-        }
-        // move up
-        else if (dir.y > deadZone) {
-          this._facingDirection = this._facingDirection | PointingDirection.N;
-          this._walking = true;
-          console.debug('t->  moving up ');
-        }
-
-        // We are now walking start the animations
-        if (!this._wasWalking && this._walking) {
-          this._walkAnimation.start(true);
-        } else if (!this._walking) {
-          this._walkAnimation.pause(0);
-        }
-      },
-      (target: vec2, timeOut: boolean) => {
-        if (!timeOut) {
-          // action event
-          this.eng.scene.ground.raisePlayerAction(this);
-        }
-        // we are done moving so reset everything
-        this._walking = false;
-        this._facingDirection = PointingDirection.None;
-        this._walkAnimation.pause(0);
-        // TODO move the the target position
-        //const tile = this.eng.tileHelper.toTileLoc(target, 1);
-        //this.moveToTilePosition(tile.x, tile.y);
-      }
-    );
   }
 
   update(dt: number) {
@@ -349,7 +264,7 @@ export class PlayerController extends TileComponent {
   protected updateSpritePosition() {
     super.updateSpritePosition();
 
-    console.debug('pos ' + this.tilePosition.toString() + '\n  : ' + this.screenPosition.toString());
+
 
     // update the view manger with the player new position
     this.eng.viewManager.setTarget(

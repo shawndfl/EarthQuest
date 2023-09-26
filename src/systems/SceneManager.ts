@@ -1,13 +1,17 @@
 import { Component } from '../components/Component';
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
-import { SceneFactory } from './SceneFactory';
 import Level1 from '../assets/levels/level1.json';
+import { ISceneFactory } from './ISceneFactory';
+import { DefaultSceneFactory } from './DefaultSceneFactory';
 
+/**
+ * Manages the active scene and switching from scene to scene. 
+ */
 export class SceneManager extends Component {
   private _activeScene: SceneComponent;
   private _lastScene: SceneComponent;
-  private _sceneFactory: SceneFactory;
+  private _sceneFactory: ISceneFactory;
 
   get scene(): SceneComponent {
     return this._activeScene;
@@ -15,7 +19,7 @@ export class SceneManager extends Component {
 
   constructor(eng: Engine) {
     super(eng);
-    this._sceneFactory = new SceneFactory(eng);
+    this._sceneFactory = this.createSceneFactory();
   }
 
   async initialize() {
@@ -23,6 +27,9 @@ export class SceneManager extends Component {
     await this.scene.initialize(Level1);
   }
 
+  createSceneFactory(): ISceneFactory {
+    return new DefaultSceneFactory(this.eng);
+  }
   /**
    * Switch to a different scene.
    * @param newScene

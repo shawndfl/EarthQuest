@@ -1,18 +1,18 @@
-import { Texture } from '../graphics/Texture';
-import { GroundManager } from '../systems/GroundManager';
-import { PlayerController } from '../components/PlayerController';
-import { Engine } from '../core/Engine';
-import { DialogMenu } from '../menus/DialogMenu';
-import { SceneComponent } from '../components/SceneComponent';
-import { ILevelData } from '../environment/ILevelData';
-import { InputState } from '../core/InputHandler';
+import { Texture } from '../../graphics/Texture';
+import { GroundManager } from '../../systems/GroundManager';
+import { PlayerController } from '../../components/PlayerController';
+import { Engine } from '../../core/Engine';
+import { DialogMenu } from '../../menus/DialogMenu';
+import { SceneComponent } from '../../components/SceneComponent';
+import { ILevelData } from '../../environment/ILevelData';
+import { InputState } from '../../core/InputHandler';
 
 /**
  * The main scene for walking around in the world. The player can
  * walk around talk to NPC pick up items and fight enemies.
  *
  */
-export class WorldScene extends SceneComponent {
+export class EditorScene extends SceneComponent {
   private _spriteSheetTexture: Texture;
   private _ground: GroundManager;
   private _player: PlayerController;
@@ -95,7 +95,6 @@ export class WorldScene extends SceneComponent {
     // handle main menu, pause menu, battles menu, dialog menu, environment
 
     return (
-      this.eng.touchManager.handleUserAction(state) ||
       this.eng.dialogManager.handleUserAction(state) ||
       this.player.handleUserAction(state)
     );
