@@ -6,7 +6,6 @@ import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
 import { DialogManager } from '../systems/DialogManager';
 import { TextManager } from '../systems/TextManager';
-import { BattleManager } from '../systems/BattleManager';
 import { SceneComponent } from '../components/SceneComponent';
 
 import { FpsController } from './FpsController';
@@ -19,6 +18,9 @@ import { SceneManager } from '../systems/SceneManager';
 
 import { Editor } from '../editor/Editor';
 import { NotificationManager } from './NotificationManager';
+import { GroundManager } from '../systems/GroundManager';
+import { PlayerController } from '../components/PlayerController';
+import Level1 from '../assets/levels/level1.json';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -32,7 +34,6 @@ export class Engine {
   readonly viewManager: ViewManager;
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
-  readonly battleManager: BattleManager;
   readonly gameManager: GameManager;
   readonly fps: FpsController;
   readonly random: Random;
@@ -42,6 +43,8 @@ export class Engine {
   readonly sceneManager: SceneManager;
   readonly editor: Editor;
   readonly notificationManager: NotificationManager;
+  readonly ground: GroundManager;
+  readonly player: PlayerController;
 
   get gl(): WebGL2RenderingContext {
     return this.canvasController.gl;
@@ -71,6 +74,7 @@ export class Engine {
     this.canvasController = new CanvasController(this);
 
     this.random = new Random(1001);
+    this.assetManager = new AssetManager(this);
     this.gameManager = new GameManager(this);
     this.sceneManager = this.createSceneManager();
     this.input = new InputHandler(this);
@@ -79,12 +83,13 @@ export class Engine {
     this.viewManager = new ViewManager(this);
     this.dialogManager = new DialogManager(this);
     this.textManager = new TextManager(this);
-    this.battleManager = new BattleManager(this);
     this.fps = new FpsController(this);
-    this.assetManager = new AssetManager(this);
     this.notificationManager = new NotificationManager(this);
     this.editor = new Editor(this);
+    this.ground = new GroundManager(this);
+    this.player = new PlayerController(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
+
 
     this.notificationManager.subscribe('EditorClose', (data: any) => {
       this.editor.hide();
@@ -95,8 +100,24 @@ export class Engine {
     return new SceneManager(this);
   }
 
-  changeScene(level: ILevelData) {
-    //TODO load a new scene
+  loadLevel(level: ILevelData) {
+    this.sceneManager.loadLevel(level);
+    this.gameManager.loadLevel(level);
+    this.ground.loadLevel(level);
+    this.player.loadLevel(level);
+    this.assetManager.loadLevel(level);
+    this.textManager.loadLevel(level);
+    this.dialogManager.loadLevel(level);
+  }
+
+  closeLevel(): void {
+    this.gameManager.closeLevel();
+    this.ground.closeLevel();
+    this.player.closeLevel();
+    this.assetManager.closeLevel();
+    this.textManager.closeLevel();
+    this.dialogManager.closeLevel();
+    this.sceneManager.closeLevel();
   }
 
   async initialize(rootElement: HTMLElement) {
@@ -113,13 +134,15 @@ export class Engine {
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
     this.tileHelper.calculateTransform(this.width, this.height);
-    await this.gameManager.initialize();
     await this.assetManager.initialize();
+    await this.gameManager.initialize();
+    await this.ground.initialize();
+    await this.player.initialize(this.assetManager.character.texture, this.assetManager.character.data);
     await this.textManager.initialize();
     await this.dialogManager.initialize();
-    await this.battleManager.initialize();
     await this.sceneManager.initialize();
-    //await this.editor.initialize(rootElement);
+
+    this.loadFirstLevel();
 
     const url = new URL(window.location.href);
     if (url.searchParams.get('editor')) {
@@ -136,6 +159,10 @@ export class Engine {
     this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
+  }
+
+  loadFirstLevel() {
+    this.loadLevel(Level1);
   }
 
   /**
@@ -165,7 +192,7 @@ export class Engine {
       this.soundManager.UserReady();
       const inputState = this.input.getInputState();
       // handle dialog input first
-      this.dialogManager.handleUserAction(inputState) || this.scene.handleUserAction(inputState);
+      this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
     }
 
     // clear the buffers
@@ -175,10 +202,12 @@ export class Engine {
     // update time for game manager
     this.gameManager.update(dt);
 
-    this.battleManager.update(dt);
-
     // update most of the game components
     this.scene.update(dt);
+
+    this.ground.update(dt);
+
+    this.player.update(dt);
 
     // update the menu manager
     this.dialogManager.update(dt);

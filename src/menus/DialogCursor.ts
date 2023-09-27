@@ -117,8 +117,11 @@ export class DialogCursor extends Component {
   hide() {
     this._visible = false;
     this._dirty = true;
-    this._spriteController.removeSprite(this._cursorId);
     this._onSelect = undefined;
+
+    if (this._spriteController) {
+      this._spriteController.removeSprite(this._cursorId);
+    }
   }
 
   redraw() {

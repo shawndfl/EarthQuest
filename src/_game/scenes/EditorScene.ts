@@ -53,27 +53,8 @@ export class EditorScene extends SceneComponent {
    * Sets up the scene
    */
   async initialize(levelData: ILevelData) {
-    super.initialize(levelData);
 
-    if (!this._initialized) {
 
-      this._spriteSheetTexture = this.eng.assetManager.character.texture;
-      const data = this.eng.assetManager.character.data;
-
-      this.player.initialize(this.spriteSheetTexture, data);
-      await this.dialog.initialize();
-    }
-
-    this.ground.initialize(this.levelData);
-
-    this.eng.dialogManager.showDialog(
-      'Welcome to Earth Quest!\nWhat should we do today?',
-      { x: 20, y: 40, width: 500, height: 240 },
-      (dialog) => {
-        console.debug('user selected ' + dialog.selectedOption);
-      },
-      ['Walk Around', 'New Game', 'Load']
-    );
   }
 
   loadLevel() {

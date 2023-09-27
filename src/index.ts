@@ -7,8 +7,11 @@ const engine = new EarthQuestEngine();
 
 /** time tracking variables */
 let previousTimeStamp: number;
+let timeCounter = 0;
 
 function step(timestamp: number) {
+  window.requestAnimationFrame(step);
+
   // save the start time
   if (previousTimeStamp === undefined) {
     previousTimeStamp = timestamp;
@@ -17,12 +20,16 @@ function step(timestamp: number) {
   // calculate the elapsed
   const elapsed = timestamp - previousTimeStamp;
 
-  // update the scene
-  engine.update(elapsed);
+  timeCounter += elapsed;
+  if (timeCounter > 20.00) {
+    // update the scene
+    engine.update(timeCounter);
+    timeCounter = 0;
+  }
 
   // request a new frame
   previousTimeStamp = timestamp;
-  window.requestAnimationFrame(step);
+
 }
 
 /**

@@ -12,9 +12,9 @@ import { TileContext } from './TileContext';
 export class PortalTileComponent extends OpenTileComponent {
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
     if (tileComponent.type == 'player') {
-      const player = this.eng.scene.player;
+      const player = this.eng.player;
       player.canWalk = false;
-      this.eng.scene.ground.buildLevel({ seed: 2003, length: 50, width: 40, height: 10, playerPos: new vec2(1, 1) });
+      this.eng.ground.buildLevel({ seed: 2003, length: 50, width: 40, height: 10, playerPos: new vec2(1, 1) });
       player.canWalk = true;
     }
   }

@@ -62,7 +62,7 @@ export class AssetManager extends Component {
     super(eng);
   }
 
-  async initialize() {
+  async initialize(): Promise<void> {
     this._tile = new Texture(this.gl);
     this._tileImage = await this._tile.loadImage(TileImage);
 

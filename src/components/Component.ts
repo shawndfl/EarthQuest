@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { ILevelData } from '../environment/ILevelData';
 
 /**
  * A component is something that is part of the game engine and has a reference
@@ -12,5 +13,50 @@ export class Component {
     return this.eng.gl;
   }
 
-  constructor(readonly eng: Engine) {}
+  constructor(readonly eng: Engine) { }
+
+  /**
+   * Called only once after all systems are created
+   * Each derived calls can have a different set of parameters
+   */
+  /*
+  async initialize(...): Promise<void> {
+
+  }
+  */
+
+  /**
+   * Loads a new level
+   * @param level 
+   */
+  loadLevel(level: ILevelData): void {
+
+  }
+
+  /**
+   * When the window is resized
+   */
+  resize(width: number, height: number) { }
+
+  /**
+   * Called every frame
+   * @param dt - delta time in ms
+   */
+  update(dt: number) {
+
+  }
+
+  /**
+   * When a scene is closed
+   */
+  closeLevel() {
+
+  }
+
+  /**
+   * Called once to destroy everything
+   */
+  dispose() {
+
+  }
 }

@@ -40,15 +40,13 @@ export class GroundManager extends Component {
     super(eng);
 
     this._spriteController = new SpritBatchController(eng);
-    this._tileFactory = new TileFactory(eng, this._spriteController);
   }
 
   /**
    * Initialize a level
    * @param levelData
    */
-  async initialize(levelData: ILevelData) {
-    this._levelData = levelData;
+  async initialize() {
 
     // reset tiles that need updates
     this._updateTiles = [];
@@ -57,20 +55,20 @@ export class GroundManager extends Component {
     const data = this.eng.assetManager.tile.data;
     this._spriteController.initialize(texture, data);
 
-    // generate a level
+    this._tileFactory = new TileFactory(this.eng, this._spriteController);
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
     this._levelLoader = new LevelLoader(this.eng, this._tileFactory);
+
 
     // create the initial level
     if (false) {
       this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
-    } else {
-      await this.loadLevel();
     }
   }
 
-  async loadLevel(): Promise<void> {
-    this._tiles = await this._levelLoader.load(this._levelData);
+  loadLevel(levelData: ILevelData): void {
+    this._levelData = levelData;
+    this._tiles = this._levelLoader.load(this._levelData);
   }
 
   /**
@@ -82,7 +80,7 @@ export class GroundManager extends Component {
   }
 
   buildBattleScene() {
-    const playerPos = this.eng.scene.player.tileIndex;
+    const playerPos = this.eng.player.tileIndex;
 
     const startI = playerPos.x - 5;
     const startJ = playerPos.y - 5;

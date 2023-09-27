@@ -1,6 +1,6 @@
 import { Engine } from "../core/Engine";
 import { SceneManager } from "../systems/SceneManager";
-import { EarthQuestSceneManager } from "./SceneManager";
+import { EarthQuestSceneManager } from "./EarthQuestSceneManager";
 
 
 export class EarthQuestEngine extends Engine {

@@ -106,7 +106,7 @@ export class TileFactory extends Component {
 
     } else if (tileType == 'player') {
       // the player is already created. Just set his position
-      const player = this.eng.scene.player;
+      const player = this.eng.player;
       player.setTilePosition(i, j, k);
       return player;
 

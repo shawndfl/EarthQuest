@@ -21,7 +21,7 @@ export enum PointingDirection {
 /**
  * Controls the player sprite.
  */
-export class PlayerController extends TileComponent {
+export class TilePointer extends TileComponent {
   /** The direction the player is facing */
   protected _facingDirection: PointingDirection;
   /** is the player walking */
@@ -144,7 +144,8 @@ export class PlayerController extends TileComponent {
     // if the user tapped or clicked on the screen
     if (state.isReleased(UserAction.A)) {
       // action event
-      this.eng.ground.raisePlayerAction(this);
+      this.eng.notificationManager.post('play.action', { source: this });
+
     } else if ((state.buttonsReleased & UserAction.Start) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {

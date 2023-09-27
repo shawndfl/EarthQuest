@@ -71,7 +71,7 @@ export abstract class TileComponent extends Component {
    * Easy access to ground
    */
   get groundManager(): GroundManager {
-    return this.eng.scene.ground;
+    return this.eng.ground;
   }
 
   /**

@@ -70,8 +70,7 @@ export class NpcComponent extends TileComponent {
       { x: 20, y: 40, width: 400, height: 200 },
       (dialog) => {
         if (dialog.selectedOption == 'Fight') {
-          // start a battle
-          this.eng.battleManager.startBattle({});
+          this.yourScaringMe();
         } else {
           this.keepTraining();
         }
@@ -84,6 +83,15 @@ export class NpcComponent extends TileComponent {
 
   keepTraining() {
     this.eng.dialogManager.showDialog('You should be scared. Keep training!', {
+      x: 10,
+      y: 40,
+      width: 600,
+      height: 150,
+    });
+  }
+
+  yourScaringMe() {
+    this.eng.dialogManager.showDialog('Your scaring me!! I don\'t really want to fight', {
       x: 10,
       y: 40,
       width: 600,
