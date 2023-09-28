@@ -13,24 +13,6 @@ import { InputState } from '../../core/InputHandler';
  *
  */
 export class EditorScene extends SceneComponent {
-  private _spriteSheetTexture: Texture;
-  private _ground: GroundManager;
-  private _player: PlayerController;
-  private _dialog: DialogMenu;
-  private _initialized: boolean;
-
-  get spriteSheetTexture(): Texture {
-    return this._spriteSheetTexture;
-  }
-  get ground(): GroundManager {
-    return this._ground;
-  }
-  get player(): PlayerController {
-    return this._player;
-  }
-  get dialog(): DialogMenu {
-    return this._dialog;
-  }
 
   get type(): string {
     return typeof this;
@@ -42,11 +24,6 @@ export class EditorScene extends SceneComponent {
    */
   constructor(eng: Engine) {
     super(eng);
-
-    this._ground = new GroundManager(eng);
-    this._player = new PlayerController(eng);
-    this._dialog = new DialogMenu(eng);
-    this._initialized = false;
   }
 
   /**
@@ -58,6 +35,17 @@ export class EditorScene extends SceneComponent {
   }
 
   loadLevel() {
+    this.eng.dialogManager.showDialog(
+      'You can now edit your levels',
+      { x: 20, y: 40, width: 500, height: 240 },
+      (dialog) => {
+
+      },
+      ['Walk Around', 'Edit Scene',]
+    );
+  }
+
+  closeLevel(): void {
 
   }
 
@@ -74,11 +62,7 @@ export class EditorScene extends SceneComponent {
    */
   handleUserAction(state: InputState): boolean {
     // handle main menu, pause menu, battles menu, dialog menu, environment
-
-    return (
-      this.eng.dialogManager.handleUserAction(state) ||
-      this.player.handleUserAction(state)
-    );
+    return false;
   }
 
   /**
@@ -90,18 +74,6 @@ export class EditorScene extends SceneComponent {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.ground.update(dt);
 
-    this.player.update(dt);
-
-    //this.spriteDebugger.update(dt);
-
-    this.dialog.update(dt);
-  }
-
-  resize(width: number, height: number) { }
-
-  dispose() {
-    console.log('dispose');
   }
 }

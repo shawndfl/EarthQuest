@@ -8,15 +8,6 @@ import { Component } from './Component';
  */
 export abstract class SceneComponent extends Component {
 
-  private _levelData: ILevelData;
-
-  /**
-   * Get the static level data used to create this scene.
-   */
-  get levelData(): ILevelData {
-    return this._levelData;
-  }
-
   /**
    * Get the scene type
    */
@@ -44,10 +35,4 @@ export abstract class SceneComponent extends Component {
   abstract handleUserAction(action: InputState): boolean;
 
 
-  /**
-   * Show scene is called when a SceneManager changes to a new scene.
-   */
-  loadLevel(level: ILevelData): void {
-    this._levelData = level;
-  }
 }

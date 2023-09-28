@@ -109,6 +109,10 @@ export class Editor extends Component implements IEditor {
     this._parent.style.display = 'none';
   }
 
+  show(): void {
+    this._parent.style.display = 'block';
+  }
+
   update(dt: number) {
     this.editorCanvas.render();
   }

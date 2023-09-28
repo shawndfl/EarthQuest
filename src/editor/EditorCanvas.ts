@@ -39,7 +39,7 @@ export class EditorCanvas extends EditorComponent {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
 
-    this.scaleStep = 0.005;
+    this.scaleStep = 0.05;
 
     this.canvas.addEventListener('keyup', this.keyup.bind(this));
     this.canvas.addEventListener('keydown', this.keydown.bind(this));
@@ -55,7 +55,7 @@ export class EditorCanvas extends EditorComponent {
   keyup(e: KeyboardEvent): void {
     //this.canvas.style.cursor = 'pointer';
   }
-  keydown(e: KeyboardEvent): void {}
+  keydown(e: KeyboardEvent): void { }
 
   mouseDown(e: MouseEvent) {
     this.lastPos = undefined;

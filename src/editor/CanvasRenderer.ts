@@ -92,7 +92,7 @@ export class CanvasRenderer extends EditorComponent {
 
       this.renderTiles();
 
-      //this.renderGrid();
+      this.renderGrid();
     }
 
     this.dirty = false;
@@ -110,7 +110,7 @@ export class CanvasRenderer extends EditorComponent {
       baseOffsetY * this.ctx.canvas.height * this._scale
     );
 
-    //this.setOffset(newOffset);
+    this.setOffset(newOffset);
     this.dirty = true;
   }
 
@@ -144,15 +144,16 @@ export class CanvasRenderer extends EditorComponent {
    */
   private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
 
-    const screen = this.eng.tileHelper.toScreenLoc(i, j, k, true);
+    const screen = this.eng.tileHelper.toScreenLoc(i + .5, j + .5, k, true);
     const img = data.image;
-    const x = data.sx;
-    const y = data.sy;
-    const w = data.srcWidth;
-    const h = data.srcHeight;
+    const x = data.sx + 1;
+    const y = data.sy + 1;
+    const w = data.srcWidth - 2;
+    const h = data.srcHeight - 2;
 
-    const destX = screen.x + data.offsetX;
+    const destX = - screen.x + data.offsetX;
     const destY = screen.y - data.offsetY - h * 2;
+
     this.context.drawImage(img, x, y, w, h, destX, destY, w * 2, h * 2);
   }
 
@@ -176,7 +177,7 @@ export class CanvasRenderer extends EditorComponent {
     const ed = this.editor;
     if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
       let selected: SelectTileBrowserData = null;
-      const selectedTile = this.editor.tileBrowser.selectedItem.spriteData;
+      const selectedTile = this.editor.tileBrowser.selectedItem?.spriteData;
 
       if (selectedTile) {
         selected = {

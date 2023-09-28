@@ -1,7 +1,6 @@
 import { Component } from '../components/Component';
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
-import Level1 from '../assets/levels/level1.json';
 import { ISceneFactory } from './ISceneFactory';
 import { DefaultSceneFactory } from './DefaultSceneFactory';
 import { ILevelData } from '../environment/ILevelData';
@@ -12,6 +11,11 @@ import { ILevelData } from '../environment/ILevelData';
 export class SceneManager extends Component {
   private _activeScene: SceneComponent;
   private _sceneFactory: ISceneFactory;
+  private _levelData: ILevelData;
+
+  get levelData(): ILevelData {
+    return this._levelData;
+  }
 
   get scene(): SceneComponent {
     return this._activeScene;
@@ -35,6 +39,8 @@ export class SceneManager extends Component {
   * @param level 
   */
   loadLevel(level: ILevelData): void {
+    this._levelData = level;
+
     const type = level?.controllerType;
     if (!type) {
       console.warn('Level data is missing controllerType');

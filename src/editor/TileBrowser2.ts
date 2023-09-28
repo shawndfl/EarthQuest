@@ -154,8 +154,6 @@ export class TileBrowser2 extends EditorComponent {
     this.list.classList.add('tile-list');
 
     this.container.append(this.list);
-
-    await this.refreshLevel(this.eng.scene.levelData);
   }
 
   /**

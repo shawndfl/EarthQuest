@@ -32,9 +32,11 @@ export class WorldScene extends SceneComponent {
       'Welcome to Earth Quest!\nWhat should we do today?',
       { x: 20, y: 40, width: 500, height: 240 },
       (dialog) => {
-        console.debug('user selected ' + dialog.selectedOption);
+        if (dialog.selectedOption == 'Edit Scene') {
+          this.eng.showEditor();
+        }
       },
-      ['Walk Around', 'New Game', 'Load']
+      ['Walk Around', 'Edit Scene',]
     );
 
   }

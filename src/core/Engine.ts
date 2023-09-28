@@ -108,6 +108,7 @@ export class Engine {
     this.assetManager.loadLevel(level);
     this.textManager.loadLevel(level);
     this.dialogManager.loadLevel(level);
+    this.editor.loadLevel(level);
   }
 
   closeLevel(): void {
@@ -141,13 +142,9 @@ export class Engine {
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.sceneManager.initialize();
+    await this.editor.initialize(rootElement)
 
     this.loadFirstLevel();
-
-    const url = new URL(window.location.href);
-    if (url.searchParams.get('editor')) {
-      this.showEditor();
-    }
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
@@ -162,17 +159,18 @@ export class Engine {
   }
 
   loadFirstLevel() {
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.get('editor')) {
+      this.showEditor();
+    }
+
     this.loadLevel(Level1);
   }
 
-  /**
-   * Show the editor 
-   */
   showEditor() {
-    //this.editor.loadLevel(this.scene.levelData)
-    //this.editor.isEnabled = true;
-
-    //this.canvasController.showCanvas(false);
+    this.editor.isEnabled = true;
+    this.canvasController.showCanvas(false);
   }
 
   hideEditor() {
@@ -213,7 +211,7 @@ export class Engine {
     this.dialogManager.update(dt);
 
     // update the editor
-    //this.editor.update(dt);
+    this.editor.update(dt);
 
     // update text manager
     this.textManager.update(dt);
