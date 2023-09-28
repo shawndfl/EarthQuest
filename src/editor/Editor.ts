@@ -84,6 +84,8 @@ export class Editor extends Component implements IEditor {
             continue;
           }
 
+          tileTypeData.typeIndex = index;
+
           const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
           if (spriteData) {
             const tileData: SelectTileBrowserData = {
@@ -94,10 +96,15 @@ export class Editor extends Component implements IEditor {
               image: spriteData.image,
               offsetX: spriteData.tileData.offset[0],
               offsetY: spriteData.tileData.offset[1],
-              tileIndex: index
+              typeIndex: tileTypeData.typeIndex,
+              spriteIndex: spriteData.spriteIndex
             };
 
-            this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
+            if (spriteData.tileData.id == 'empty') {
+              this.editorCanvas.canvasRenderer.setTile(null, i, j, k);
+            } else {
+              this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
+            }
             i++;
           }
         }
@@ -157,7 +164,7 @@ export class Editor extends Component implements IEditor {
 
     resizable.classList.add('editor-h-resize');
 
-    main.append(entityContainer, resizable, this.editorCanvas.buildHtml());
+    main.append(entityContainer, resizable, this.editorCanvas.container);
 
     this._parent.append(main);
   }
@@ -182,7 +189,7 @@ export class Editor extends Component implements IEditor {
           for (let i = 0; i < maxI; i++) {
             const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
             if (tile) {
-              const index = tile.tileIndex;
+              const index = tile.typeIndex;
               row += index.toString(16).padStart(2, '0');
             } else {
               row += '00';

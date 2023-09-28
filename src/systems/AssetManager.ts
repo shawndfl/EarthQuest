@@ -17,7 +17,7 @@ import { ISpriteData, ITileData } from '../graphics/ISpriteData';
 export interface ISpriteDataAndImage {
   tileData: ITileData;
   /** The index of the tile in the list */
-  tileIndex: number;
+  spriteIndex: number;
   image: HTMLImageElement;
 }
 
@@ -109,7 +109,7 @@ export class AssetManager extends Component {
       if (!tileData.loc) {
         tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
       }
-      return { tileData, tileIndex: index, image: this._tileImage.cloneNode(true) as HTMLImageElement };
+      return { tileData, spriteIndex: index, image: this._tileImage.cloneNode(true) as HTMLImageElement };
     }
 
     // if not found check the character data
@@ -126,7 +126,7 @@ export class AssetManager extends Component {
         if (!tileData.loc) {
           tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
         }
-        return { tileData, tileIndex: index, image: this._characterImage.cloneNode(true) as HTMLImageElement };
+        return { tileData, spriteIndex: index, image: this._characterImage.cloneNode(true) as HTMLImageElement };
       }
     }
 

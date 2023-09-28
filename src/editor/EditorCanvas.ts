@@ -16,6 +16,8 @@ export enum MouseMoveAction {
  */
 export class EditorCanvas extends EditorComponent {
   canvas: HTMLCanvasElement;
+  container: HTMLElement;
+
   canvasRenderer: CanvasRenderer;
   scaleStep: number;
   lastPos: vec2;
@@ -29,18 +31,22 @@ export class EditorCanvas extends EditorComponent {
 
   constructor(editor: IEditor) {
     super(editor);
-    this.canvas = document.createElement('canvas');
-    const context = this.canvas.getContext('2d');
-    this.canvasRenderer = new CanvasRenderer(this.editor, context);
-  }
-
-  buildHtml(): HTMLCanvasElement {
-    this.canvas.classList.add('editor-canvas');
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
 
     this.scaleStep = 0.05;
 
+    this.buildHtml();
+  }
+
+  private buildHtml(): void {
+
+    this.container = document.createElement('div');
+    this.container.classList.add('editor-canvas-container');
+
+    this.canvas = document.createElement('canvas');
+
+    this.canvas.classList.add('editor-canvas');
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
     this.canvas.addEventListener('keyup', this.keyup.bind(this));
     this.canvas.addEventListener('keydown', this.keydown.bind(this));
     this.canvas.addEventListener('mousedown', this.mouseDown.bind(this));
@@ -49,7 +55,21 @@ export class EditorCanvas extends EditorComponent {
     this.canvas.addEventListener('mousemove', this.mouseMove.bind(this));
     this.canvas.addEventListener('wheel', this.mouseWheel.bind(this));
     this.canvas.setAttribute('tabindex', '1');
-    return this.canvas;
+
+    const context = this.canvas.getContext('2d');
+    this.canvasRenderer = new CanvasRenderer(this.editor, context);
+
+    const activeLayerInput = document.createElement('input');
+    activeLayerInput.setAttribute('type', 'number');
+    activeLayerInput.classList.add('active-layer');
+    activeLayerInput.min = '0';
+    activeLayerInput.max = this.canvasRenderer.MaxK.toString();
+    activeLayerInput.value = '0';
+    activeLayerInput.addEventListener('change', () => {
+      this.canvasRenderer.activeLayer = Number.parseInt(activeLayerInput.value);
+    })
+    this.container.append(this.canvas, activeLayerInput);
+
   }
 
   keyup(e: KeyboardEvent): void {

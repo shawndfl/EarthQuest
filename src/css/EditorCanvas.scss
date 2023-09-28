@@ -1,6 +1,17 @@
-.editor-canvas {
-  width: 800px;
-  height: 600px;
-  box-shadow: 1px 1px 3px #c4c4c4;
-  
+.editor-canvas-container {
+  position: relative;
+  height: 100%;
+
+  .editor-canvas {
+    width: 800px;
+    height: 600px;
+    box-shadow: 1px 1px 3px #c4c4c4;
+  }
+
+  .active-layer {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 50px;
+  }
 }

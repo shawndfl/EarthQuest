@@ -25,6 +25,14 @@ export class CanvasRenderer extends EditorComponent {
 
   private tiles: SelectTileBrowserData[][][];
 
+  get activeLayer(): number {
+    return this._activeLayer;
+  }
+  set activeLayer(value: number) {
+    this._activeLayer = value;
+    this.dirty = true;
+  }
+
   get scale(): number {
     return this._scale;
   }
@@ -91,8 +99,6 @@ export class CanvasRenderer extends EditorComponent {
       this.ctx.translate(this.offset.x, this.offset.y);
 
       this.renderTiles();
-
-      this.renderGrid();
     }
 
     this.dirty = false;
@@ -122,8 +128,6 @@ export class CanvasRenderer extends EditorComponent {
   }
 
   private renderTiles(): void {
-    const stepX = 16;
-    const stepY = 16;
     for (let k = 0; k < this.MaxK; k++) {
       for (let j = 0; j < this.MaxJ; j++) {
         for (let i = 0; i < this.MaxI; i++) {
@@ -133,6 +137,10 @@ export class CanvasRenderer extends EditorComponent {
           }
         }
       }
+      if (k == this._activeLayer) {
+        this.renderGrid();
+      }
+
     }
   }
 
@@ -162,14 +170,15 @@ export class CanvasRenderer extends EditorComponent {
     this.ctx.fillStyle = '#00ff00';
     const x = left / this.scale - this.offset.x;
     const y = top / this.scale - this.offset.y;
+    const koffset = this._activeLayer;
     const w = 32 * this.scale;
     const h = 32 * this.scale;
 
     const tileI = (x * -1) / 64 + (y * 1) / 32;
     const tileJ = x / 64 + (y * 1) / 32;
 
-    this.selectedTile.i = Math.floor(tileI);
-    this.selectedTile.j = Math.floor(tileJ);
+    this.selectedTile.i = Math.floor(tileI + koffset);
+    this.selectedTile.j = Math.floor(tileJ + koffset);
     console.debug(' tile ' + tileI.toFixed(4) + ', ' + tileJ.toFixed(4));
     console.debug(' screen ' + screenX.toFixed(4) + ', ' + screenY.toFixed(4));
     this.dirty = true;
@@ -177,21 +186,23 @@ export class CanvasRenderer extends EditorComponent {
     const ed = this.editor;
     if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
       let selected: SelectTileBrowserData = null;
-      const selectedTile = this.editor.tileBrowser.selectedItem?.spriteData;
+      const selectedTileTypeIndex = this.editor.tileBrowser.selectedItem?.tileTypeData.typeIndex;
+      const selectedSprite = this.editor.tileBrowser.selectedItem?.spriteData;
 
-      if (selectedTile) {
+      if (selectedSprite) {
         selected = {
-          sx: selectedTile.tileData.loc[0],
-          sy: selectedTile.tileData.loc[1],
-          srcHeight: selectedTile.tileData.loc[2],
-          srcWidth: selectedTile.tileData.loc[3],
-          offsetX: selectedTile.tileData.offset[0],
-          offsetY: selectedTile.tileData.offset[1],
-          image: selectedTile.image,
-          tileIndex: selectedTile.tileIndex
+          sx: selectedSprite.tileData.loc[0],
+          sy: selectedSprite.tileData.loc[1],
+          srcHeight: selectedSprite.tileData.loc[2],
+          srcWidth: selectedSprite.tileData.loc[3],
+          offsetX: selectedSprite.tileData.offset[0],
+          offsetY: selectedSprite.tileData.offset[1],
+          image: selectedSprite.image,
+          spriteIndex: selectedSprite.spriteIndex,
+          typeIndex: selectedTileTypeIndex
         };
       }
-      const location = new TilePlaceLocation(this.selectedTile.i, this.selectedTile.j, this._activeLayer);
+      const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
       const placeJob = new JobPlaceTile(ed, selected, location);
       ed.jobManager.execute(placeJob);
     }
@@ -203,14 +214,16 @@ export class CanvasRenderer extends EditorComponent {
     const stepX = 16;
     const stepY = 16;
 
-    this.ctx.strokeStyle = '#000000';
+    this.ctx.strokeStyle = '#646464'
+    this.ctx.fillStyle = '#c4c4c4';
     const maxI = 50;
     const maxJ = 50;
+    const kOffset = -this._activeLayer * stepY * 2;
     for (let i = 0; i < this.MaxI; i++) {
       const x1 = -i * stepX * 2;
-      const y1 = i * stepY + this._activeLayer * stepY * .5;
+      const y1 = i * stepY + kOffset;
       const x2 = -i * stepX * 2 + (maxJ - 1) * stepX * 2;
-      const y2 = (maxJ - 1) * stepX + i * stepY + this._activeLayer * stepY * .5;
+      const y2 = (maxJ - 1) * stepX + i * stepY + kOffset;
 
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
@@ -218,9 +231,9 @@ export class CanvasRenderer extends EditorComponent {
 
     for (let j = 0; j < this.MaxJ; j++) {
       const x1 = j * stepX * 2;
-      const y1 = j * stepY;
+      const y1 = j * stepY + kOffset;
       const x2 = j * stepX * 2 - (maxI - 1) * stepX * 2;
-      const y2 = (maxI - 1) * stepX + j * stepY;
+      const y2 = (maxI - 1) * stepX + j * stepY + kOffset;
 
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
@@ -232,13 +245,13 @@ export class CanvasRenderer extends EditorComponent {
       const i = this.selectedTile.i;
       const j = this.selectedTile.j;
       // top
-      const p0 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY };
+      const p0 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + kOffset };
       // right
-      const p1 = { x: -i * stepX * 2 + j * stepY * 2 + stepX * 2, y: i * stepX + j * stepY + stepY };
+      const p1 = { x: -i * stepX * 2 + j * stepY * 2 + stepX * 2, y: i * stepX + j * stepY + stepY + kOffset };
       // left
-      const p2 = { x: -i * stepX * 2 + j * stepY * 2 - stepX * 2, y: i * stepX + j * stepY + stepY };
+      const p2 = { x: -i * stepX * 2 + j * stepY * 2 - stepX * 2, y: i * stepX + j * stepY + stepY + kOffset };
       // bottom
-      const p3 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + stepY * 2 };
+      const p3 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + stepY * 2 + kOffset };
 
       this.ctx.beginPath();
       this.ctx.strokeStyle = 'rgb(0,255,0)';

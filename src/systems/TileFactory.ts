@@ -15,7 +15,8 @@ export interface ITileTypeData {
   tile: string;
   tileType: string,
   spriteId: string,
-  options: string[]
+  options: string[],
+  typeIndex: number;  /// The index of the type
 }
 
 export class TileFactory extends Component {
@@ -57,7 +58,7 @@ export class TileFactory extends Component {
       tile = 'empty|empty|';
     }
 
-    const TileData: ITileTypeData = { tile, tileType: '', spriteId: '', options: null }
+    const TileData: ITileTypeData = { tile, tileType: '', spriteId: '', options: null, typeIndex: -1 }
 
     const typeSpriteParams = tile.split('|');
 

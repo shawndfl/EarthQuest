@@ -132,6 +132,8 @@ export class TileBrowser2 extends EditorComponent {
         continue;
       }
 
+      tileTypeData.typeIndex = i;
+
       const spriteData = await this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
       if (!spriteData) {
         // error message is in getImageFrom()
