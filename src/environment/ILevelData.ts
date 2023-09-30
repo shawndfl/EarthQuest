@@ -25,7 +25,5 @@ export interface ILevelData {
    * The index returned by the cells is offset by 10 to make it easier to align number in the json.
    * The array is height, column, row and the value is an index into tiles.
    */
-  cells: number[][][];
-
   encode: string[][];
 }

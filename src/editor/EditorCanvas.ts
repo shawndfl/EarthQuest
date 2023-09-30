@@ -32,7 +32,7 @@ export class EditorCanvas extends EditorComponent {
   constructor(editor: IEditor) {
     super(editor);
 
-    this.scaleStep = 0.05;
+    this.scaleStep = 0.005;
 
     this.buildHtml();
   }

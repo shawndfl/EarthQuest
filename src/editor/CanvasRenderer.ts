@@ -129,6 +129,9 @@ export class CanvasRenderer extends EditorComponent {
 
   private renderTiles(): void {
     for (let k = 0; k < this.MaxK; k++) {
+      if (k > this._activeLayer) {
+        break;
+      }
       for (let j = 0; j < this.MaxJ; j++) {
         for (let i = 0; i < this.MaxI; i++) {
           // if there is a tile draw it

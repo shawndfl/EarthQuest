@@ -198,7 +198,6 @@ export class Editor extends Component implements IEditor {
           tiles[k].push(row);
         }
       }
-      this.levelData.cells = [[[]]]
       this.levelData.encode = tiles;
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.levelData));

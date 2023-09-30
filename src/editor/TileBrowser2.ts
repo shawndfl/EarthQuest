@@ -75,7 +75,7 @@ export class TileBrowser2 extends EditorComponent {
     imageContainer.style.height = tileData.tileData.loc[3].toString() + 'px';
     tileData.image.style.marginLeft = '-' + tileData.tileData.loc[0].toString() + 'px';
     tileData.image.style.marginTop = '-' + tileData.tileData.loc[1].toString() + 'px';
-    imageContainer.append(tileData.image);
+    imageContainer.append(tileData.image.cloneNode());
     imagePreview.append(imageContainer);
     itemContainer.append(imagePreview);
 
@@ -134,7 +134,7 @@ export class TileBrowser2 extends EditorComponent {
 
       tileTypeData.typeIndex = i;
 
-      const spriteData = await this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
+      const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
       if (!spriteData) {
         // error message is in getImageFrom()
         continue;

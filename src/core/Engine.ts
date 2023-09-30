@@ -108,7 +108,9 @@ export class Engine {
     this.assetManager.loadLevel(level);
     this.textManager.loadLevel(level);
     this.dialogManager.loadLevel(level);
-    this.editor.loadLevel(level);
+    if (this.editor.isEnabled) {
+      this.editor.loadLevel(level);
+    }
   }
 
   closeLevel(): void {

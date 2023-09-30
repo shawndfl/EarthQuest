@@ -109,7 +109,7 @@ export class AssetManager extends Component {
       if (!tileData.loc) {
         tileData.loc = [(tileData.index[0]) * data.tileWidth, (tileData.index[1]) * data.tileHeight, data.tileWidth, data.tileHeight];
       }
-      return { tileData, spriteIndex: index, image: this._tileImage.cloneNode(true) as HTMLImageElement };
+      return { tileData, spriteIndex: index, image: this._tileImage as HTMLImageElement };
     }
 
     // if not found check the character data

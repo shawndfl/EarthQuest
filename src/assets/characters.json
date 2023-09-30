@@ -178,6 +178,41 @@
       "id": "mario.success",
       "loc": [70, 841, 16, 24],
       "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.down",
+      "loc": [0, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.up",
+      "loc": [17, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.right",
+      "loc": [34, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.right.step",
+      "loc": [48, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.angry.down",
+      "loc": [64, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.angry.right",
+      "loc": [80, 212, 16, 24],
+      "offset": [-16, -16]
+    },
+    {
+      "id": "swamp.enemy.angry.right.step",
+      "loc": [96, 212, 16, 24],
+      "offset": [-16, -16]
     }
   ]
 }

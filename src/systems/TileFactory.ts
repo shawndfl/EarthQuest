@@ -10,6 +10,7 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { PortalTileComponent } from '../components/PortalTileComponent';
 import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
 import { ITileCreateionArgs } from '../components/ITileCreationArgs';
+import { EnemyTileComponent } from '../components/EnemyTileComponent';
 
 export interface ITileTypeData {
   tile: string;
@@ -119,6 +120,9 @@ export class TileFactory extends Component {
 
     } else if (tileType == 'collide') {
       return new CollideTileComponent(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'enemy') {
+      return new EnemyTileComponent(this.eng, this.spriteBatch, args);
 
     } else if (tileType == 'portal') {
       return new PortalTileComponent(this.eng, this.spriteBatch, args);
