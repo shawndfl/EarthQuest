@@ -133,7 +133,6 @@ export class PlayerController extends TileComponent {
     this._moveController.cancelMove();
 
     //console.debug('action ' + action + ' was walking ' + wasWalking);
-    this._facingDirection = PointingDirection.None;
     this._walking = false;
 
     // if the player cannot walk don;t let them
@@ -144,10 +143,18 @@ export class PlayerController extends TileComponent {
     // if the user tapped or clicked on the screen
     if (state.isReleased(UserAction.A)) {
       // action event
-      this.eng.ground.raisePlayerAction(this);
+      //this.eng.ground.raisePlayerAction(this);
+
+      this.raiseAction();
+
     } else if ((state.buttonsReleased & UserAction.Start) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {
+      // if an arrow key is pressed reset the facing direction
+      if (state.isDown(UserAction.Left) || state.isDown(UserAction.Right) ||
+        state.isDown(UserAction.Up) || state.isDown(UserAction.Down)) {
+        this._facingDirection = PointingDirection.None;
+      }
       const screenDirection = new vec2();
       // use arrow keys or d-pad on a game controller
       if (state.isDown(UserAction.Left)) {
@@ -271,5 +278,55 @@ export class PlayerController extends TileComponent {
       this.screenPosition.x - this.eng.width * 0.5,
       -this.eng.height * 0.5 + this.screenPosition.y
     );
+  }
+
+  protected raiseAction() {
+    const i = this.tileIndex.x;
+    const j = this.tileIndex.y;
+    const k = this.tileIndex.z;
+    const ground = this.eng.ground;
+    const direction = this.facingDirection;
+    /*
+        ground.getTile(i - 0, j + 1, k).onPlayerAction(this);
+        ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
+        ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
+        ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
+        ground.getTile(i - 0, j - 1, k).onPlayerAction(this);
+        ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
+        ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
+        ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
+    */
+
+
+    // Check 3 tiles around the direction the player is facing
+    if ((direction & PointingDirection.E) > 0) {
+      ground.getTile(i + 0, j + 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
+      ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
+      ground.getTile(i + 0, j - 1, k).onPlayerAction(this);
+    } else if ((direction & PointingDirection.W) > 0) {
+      ground.getTile(i - 0, j + 1, k).onPlayerAction(this);
+      ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
+      ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
+      ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
+      ground.getTile(i - 0, j - 1, k).onPlayerAction(this);
+    } else if ((direction & PointingDirection.S) > 0) {
+      ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
+      ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
+      ground.getTile(i + 0, j + 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
+    } else if ((direction & PointingDirection.N) > 0) {
+      ground.getTile(i - 1, j - 0, k).onPlayerAction(this);
+      ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
+      ground.getTile(i + 0, j - 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
+      ground.getTile(i + 1, j - 0, k).onPlayerAction(this);
+    }
+
+    // this should not happen but just in case
+    ground.getTile(i, j, k).onPlayerAction(this);
+
   }
 }

@@ -196,8 +196,8 @@ export class CanvasRenderer extends EditorComponent {
         selected = {
           sx: selectedSprite.tileData.loc[0],
           sy: selectedSprite.tileData.loc[1],
-          srcHeight: selectedSprite.tileData.loc[2],
-          srcWidth: selectedSprite.tileData.loc[3],
+          srcWidth: selectedSprite.tileData.loc[2],
+          srcHeight: selectedSprite.tileData.loc[3],
           offsetX: selectedSprite.tileData.offset[0],
           offsetY: selectedSprite.tileData.offset[1],
           image: selectedSprite.image,

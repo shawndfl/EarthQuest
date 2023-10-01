@@ -1,3 +1,6 @@
+import vec3 from "../math/vec3";
+import vec4 from "../math/vec4";
+
 /**
  * This is the model data that represents a quad
  */
@@ -174,6 +177,114 @@ export class GlBuffer {
         offset
       );
       this.gl.enableVertexAttribArray(textureAttribute);
+    }
+
+    // index buffer
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(index),
+      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
+      bufferIndex
+    );
+  }
+
+  /**
+   * This will work with a sharder that uses
+   *    vec3 aPos;
+   *    vec4 aColor;
+   * 
+   * @param points 
+   * @param colors 
+   * @param indices 
+   * @param isStatic 
+   * @param bufferIndex 
+   */
+  setBuffersPointsColors(
+    points: vec3[],
+    colors: vec4[],
+    indices: number[],
+    isStatic: boolean = true,
+    bufferIndex: number = 0
+  ) {
+
+    const verts: number[] = [];
+    const index: number[] = indices.splice(0);
+
+    // check if we have buffer
+    if (!this.vertBuffer || !this.indexBuffer) {
+      this.createBuffer();
+    }
+
+    // reset counters
+    this.indexCount = 0;
+    points.forEach(((p, i) => {
+      const color = colors[i] ?? new vec4([0, 0, 0, 1]);
+      verts.push(p.x, p.y, p.z, ...color.rgba);
+    }))
+      ;
+
+    // save the index count for rendering
+    this.indexCount = index.length;
+
+    // bind the array buffer
+    this.gl.bindVertexArray(this.vertArrayBuffer);
+
+    // Create a buffer for positions.
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      new Float32Array(verts),
+      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
+      bufferIndex
+    );
+
+    // in order for this to work the vertex shader will
+    // need to have position
+    //  vec3 aPos;
+    //  vec4 aColor;
+    //
+    const positionAttribute = 0;
+    const colorAttribute = 1;
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute
+    {
+      const numComponents = 3; // position x, y, z
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + color4 * 4 byte float
+      const offset = 0;
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(
+        positionAttribute,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      this.gl.enableVertexAttribArray(positionAttribute);
+    }
+
+    // Tell WebGL how to pull out the texture coordinates from
+    // the texture coordinate buffer into the textureCoord attribute.
+    {
+      const numComponents = 4;
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + color4 * 4 byte float
+      const offset = 3 * 4; // start after the position
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(
+        colorAttribute,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset
+      );
+      this.gl.enableVertexAttribArray(colorAttribute);
     }
 
     // index buffer
