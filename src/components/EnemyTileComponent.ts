@@ -79,4 +79,8 @@ export class EnemyTileComponent extends TileComponent {
     this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
   }
+
+  dispose(): void {
+    this.spriteController?.dispose();
+  }
 }

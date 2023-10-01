@@ -124,19 +124,6 @@ export class InputHandler extends Component {
     this.buttonsReleased = UserAction.None;
     this.hasGamePad = 'getGamepads' in navigator;
     console.debug('initializing input:');
-    if (this.hasGamePad) {
-      console.debug(' gamepad supported');
-
-      window.addEventListener('gamepadconnected', (e) => {
-        this.connectGamepad(e);
-      });
-
-      window.addEventListener('gamepaddisconnected', (e) => {
-        this.disconnectGamepad(e);
-      });
-    } else {
-      console.warn('gamepad not supported!');
-    }
 
     window.addEventListener('keydown', (e) => {
       this.keydown(e);
@@ -353,5 +340,26 @@ export class InputHandler extends Component {
     this.isCalibrating = false;
     this.activeButtonIndex = 0;
     console.debug('done calibrating!!')
+  }
+
+  resetInput() {
+    this.buttonsDown = UserAction.None;
+    this.buttonsReleased = UserAction.None;
+
+    this.hasGamePad = 'getGamepads' in navigator;
+    if (this.hasGamePad) {
+      console.debug(' gamepad supported');
+      window.removeEventListener('gamepadconnected', this.connectGamepad.bind(this));
+      window.removeEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
+
+      window.addEventListener('gamepadconnected', this.connectGamepad.bind(this));
+      window.addEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
+    } else {
+      console.warn('gamepad not supported!');
+    }
+  }
+
+  closeLevel(): void {
+    this.resetInput();
   }
 }

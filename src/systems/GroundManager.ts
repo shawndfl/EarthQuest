@@ -68,6 +68,11 @@ export class GroundManager extends Component {
 
   loadLevel(levelData: ILevelData): void {
     this._levelData = levelData;
+
+    // reset tiles that need updates
+    this._updateTiles = [];
+
+    // load new ones
     this._tiles = this._levelLoader.load(this._levelData);
   }
 
@@ -77,49 +82,6 @@ export class GroundManager extends Component {
    */
   buildLevel(params: LevelConstructionParams) {
     this._tiles = this._levelGenerator.Generate(params);
-  }
-
-  buildBattleScene() {
-    const playerPos = this.eng.player.tileIndex;
-
-    const startI = playerPos.x - 5;
-    const startJ = playerPos.y - 5;
-    const k = playerPos.z - 1;
-    const width = 10;
-    const length = 10;
-    const tiles = this._tiles;
-
-    // create the floor
-    const jStart = startJ < 0 ? 0 : startJ;
-    for (let j = jStart; j < length + jStart; j++) {
-      const iStart = startI < 0 ? 0 : startI;
-      for (let i = iStart; i < width + iStart; i++) {
-        tiles[k][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k);
-      }
-    }
-
-    // create the border around the ring
-    for (let j = jStart; j < length + jStart; j++) {
-      const i = startI;
-      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
-    }
-
-    for (let j = jStart; j < length + jStart; j++) {
-      const i = startI + width;
-      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
-    }
-
-    for (let i = startI; i <= width + startI; i++) {
-      const j = startJ + length;
-      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
-    }
-
-    for (let i = startI; i <= width + startI; i++) {
-      const j = startJ;
-      tiles[k + 1][j][i] = this._tileFactory.createStaticTile('open|block.brick', i, j, k + 1);
-    }
-
-    return true;
   }
 
   /**
@@ -263,5 +225,20 @@ export class GroundManager extends Component {
     for (const tile of this._updateTiles) {
       tile.update(dt);
     }
+  }
+
+  closeLevel(): void {
+    this._updateTiles = [];
+
+    // clean up old tiles
+    for (let k = 0; k < this._tiles.length; k++) {
+      for (let j = 0; j < this._tiles[k].length; j++) {
+        for (let i = 0; i < this._tiles[k][j].length; i++) {
+          this._tiles[k][j][i]?.dispose();
+        }
+      }
+    }
+
+    this._tiles = [[[]]];
   }
 }

@@ -108,9 +108,6 @@ export class Engine {
     this.assetManager.loadLevel(level);
     this.textManager.loadLevel(level);
     this.dialogManager.loadLevel(level);
-    if (this.editor.isEnabled) {
-      this.editor.loadLevel(level);
-    }
   }
 
   closeLevel(): void {
@@ -171,13 +168,15 @@ export class Engine {
   }
 
   showEditor() {
-    this.editor.isEnabled = true;
+    this.editor.show(this.sceneManager.levelData);
     this.canvasController.showCanvas(false);
   }
 
   hideEditor() {
-    this.editor.isEnabled = false;
+    this.editor.hide();
     this.canvasController.showCanvas(true);
+    this.closeLevel();
+    this.loadLevel(this.editor.levelData);
   }
 
   update(dt: number) {

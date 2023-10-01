@@ -254,4 +254,10 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
    * render by calling gl draw functions
    */
   abstract render(): void;
+
+  dispose(): void {
+    if (this._buffer) {
+      this._buffer.dispose();
+    }
+  }
 }

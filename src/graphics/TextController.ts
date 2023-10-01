@@ -112,4 +112,11 @@ export class TextController extends Component {
       }
     }
   }
+
+  dispose(): void {
+    if (this.buffer) {
+      this.buffer.dispose();
+    }
+  }
+
 }

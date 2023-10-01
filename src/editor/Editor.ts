@@ -29,7 +29,6 @@ export class Editor extends Component implements IEditor {
 
   readonly zoomStep: number = 0.1;
   levelData: ILevelData;
-  isEnabled: boolean;
 
   public get parent(): HTMLElement {
     return this._parent;
@@ -43,12 +42,11 @@ export class Editor extends Component implements IEditor {
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
     this.jobManager = new JobManager(this);
-    this.isEnabled = false;
   }
 
   async initialize(parentContainer: HTMLElement) {
     this._parent = document.createElement('div');
-    this._parent.classList.add('editor');
+    this.hide();
 
     parentContainer.append(this._parent);
 
@@ -113,11 +111,14 @@ export class Editor extends Component implements IEditor {
   }
 
   hide(): void {
-    this._parent.style.display = 'none';
+    this._parent.classList.add('hidden');
   }
 
-  show(): void {
-    this._parent.style.display = 'block';
+  show(level?: ILevelData): void {
+    this._parent.classList.remove('hidden');
+    if (level) {
+      this.loadLevel(level);
+    }
   }
 
   update(dt: number) {
@@ -169,37 +170,44 @@ export class Editor extends Component implements IEditor {
     this._parent.append(main);
   }
 
+  /**
+   * Updates the level data with the state of the canvas render
+   */
+  updateLevelData() {
+    const maxI = this.editorCanvas.canvasRenderer.MaxI;
+    const maxJ = this.editorCanvas.canvasRenderer.MaxJ;
+    const maxK = this.editorCanvas.canvasRenderer.MaxK;
+    const tiles: string[][] = [[]];
+    for (let k = 0; k < maxK; k++) {
+      tiles.push([])
+      for (let j = 0; j < maxJ; j++) {
+        if (tiles[k] == undefined) {
+          tiles[k] = [];
+        }
+        let row = '';
+        for (let i = 0; i < maxI; i++) {
+          const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
+          if (tile) {
+            const index = tile.typeIndex;
+            row += index.toString(16).padStart(2, '0');
+          } else {
+            row += '00';
+          }
+        }
+        tiles[k].push(row);
+      }
+    }
+    this.levelData.encode = tiles;
+
+  }
+
   buildToolbar() {
     this.toolbar.addButton('new', File, 'New Scene', () => {
       console.debug('new scene!!');
     });
 
     const saveButton = this.toolbar.addButton('save', File, 'Save', (source: MouseEvent) => {
-      const maxI = this.editorCanvas.canvasRenderer.MaxI;
-      const maxJ = this.editorCanvas.canvasRenderer.MaxJ;
-      const maxK = this.editorCanvas.canvasRenderer.MaxK;
-      const tiles: string[][] = [[]];
-      for (let k = 0; k < maxK; k++) {
-        tiles.push([])
-        for (let j = 0; j < maxJ; j++) {
-          if (tiles[k] == undefined) {
-            tiles[k] = [];
-          }
-          let row = '';
-          for (let i = 0; i < maxI; i++) {
-            const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
-            if (tile) {
-              const index = tile.typeIndex;
-              row += index.toString(16).padStart(2, '0');
-            } else {
-              row += '00';
-            }
-          }
-          tiles[k].push(row);
-        }
-      }
-      this.levelData.encode = tiles;
-
+      this.updateLevelData();
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.levelData));
       const downloadAnchorElem = document.createElement('a');
       this._parent.append(downloadAnchorElem);
@@ -214,8 +222,7 @@ export class Editor extends Component implements IEditor {
     });
     this.toolbar.addButton('play', File, 'Play', () => {
 
-
-      //this.eng.scene.initialize(this.levelData);
+      this.updateLevelData();
       this.eng.hideEditor();
     });
 

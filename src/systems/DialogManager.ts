@@ -97,4 +97,9 @@ export class DialogManager extends Component {
     this._gameMenu.update(dt);
     this._spriteController.update(dt);
   }
+
+  closeLevel(): void {
+    this._gameMenu.hide();
+    this._dialog.hide();
+  }
 }

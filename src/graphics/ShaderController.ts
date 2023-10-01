@@ -13,7 +13,7 @@ export class ShaderController {
    * @param {WebGL2RenderingContext} gl GL Context
    * @param {string} shaderName The name of the shader. This is just a way to id different shader for debugging
    */
-  constructor(private gl: WebGL2RenderingContext, private shaderName: string) {}
+  constructor(private gl: WebGL2RenderingContext, private shaderName: string) { }
 
   /**
    * Initialize a shader program, so WebGL knows how to draw our data
@@ -141,8 +141,7 @@ export class ShaderController {
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
       const typeString = type == this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
       console.error(
-        `An error occurred compiling the ${typeString} shaders in ${
-          this.shaderName
+        `An error occurred compiling the ${typeString} shaders in ${this.shaderName
         }: ${this.gl.getShaderInfoLog(shader)}`
       );
       this.gl.deleteShader(shader);
@@ -150,5 +149,10 @@ export class ShaderController {
     }
 
     return shader;
+  }
+
+  dispose() {
+    this.gl.deleteProgram(this.shaderProgram);
+    this.shaderProgram = 0;
   }
 }

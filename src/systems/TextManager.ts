@@ -5,6 +5,7 @@ import { ShaderController } from '../graphics/ShaderController';
 import { Texture } from '../graphics/Texture';
 import { Engine } from '../core/Engine';
 import { Component } from '../components/Component';
+import { ILevelData } from '../environment/ILevelData';
 
 /**
  * Vertex shader for Font
@@ -176,5 +177,17 @@ export class TextManager extends Component {
   /**
    * clean up everything
    */
-  dispose() {}
+  dispose() {
+    this.shader.dispose();
+  }
+
+  loadLevel(level: ILevelData): void {
+
+  }
+
+  closeLevel(): void {
+    // reset the text controllers
+    this.texts.forEach(t => t.dispose());
+    this.texts.clear();
+  }
 }

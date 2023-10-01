@@ -33,6 +33,4 @@ export abstract class SceneComponent extends Component {
    * @returns True if the action was handled else false
    */
   abstract handleUserAction(action: InputState): boolean;
-
-
 }

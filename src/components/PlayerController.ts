@@ -10,6 +10,7 @@ import { TileComponent } from './TileComponent';
 import vec3 from '../math/vec3';
 import { InputState } from '../core/InputHandler';
 import { AutoMoveController } from './AutoMoveController';
+import { ILevelData } from '../environment/ILevelData';
 
 export enum PointingDirection {
   None = 0x00,
@@ -90,16 +91,20 @@ export class PlayerController extends TileComponent {
 
   constructor(eng: Engine) {
     super(eng, null);
+    this.resetPlayer();
+  }
+
+  private resetPlayer() {
     this._facingDirection = PointingDirection.S;
     this._walking = false;
     this._speed = 3.0; // tiles per second
     this._sprites = ['ness.down.step.left', 'ness.down.step.right'];
-    //this._sprites = ['mario.down.step', 'mario.down.step'];
     this._spriteFlip = false;
     this._resetFlip = false;
     this._walkingDirection = new vec3([0, 0, 0]);
     this._moveController = new AutoMoveController(this.eng);
     this._canWalk = true;
+
   }
 
   initialize(spriteSheet: Texture, characterData: ISpriteData) {
@@ -327,6 +332,15 @@ export class PlayerController extends TileComponent {
 
     // this should not happen but just in case
     ground.getTile(i, j, k).onPlayerAction(this);
+
+  }
+
+
+  loadLevel(level: ILevelData): void {
+    this.resetPlayer();
+  }
+
+  closeLevel(): void {
 
   }
 }

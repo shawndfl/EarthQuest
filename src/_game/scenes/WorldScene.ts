@@ -61,8 +61,4 @@ export class WorldScene extends SceneComponent {
   }
 
   resize(width: number, height: number) { }
-
-  dispose() {
-    console.log('dispose');
-  }
 }
