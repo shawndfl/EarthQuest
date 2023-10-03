@@ -1,6 +1,8 @@
 {
   "tileHeight": 24,
   "tileWidth": 16,
+  "tileSpacing": 1,
+  "tileOffset": 0,
   "tiles": [
     {
       "id": "error",
@@ -181,17 +183,17 @@
     },
     {
       "id": "swamp.enemy.down",
-      "loc": [0, 212, 16, 24],
+      "index": [0, 9],
       "offset": [-16, -16]
     },
     {
       "id": "swamp.enemy.up",
-      "loc": [17, 212, 16, 24],
+      "index": [9, 1],
       "offset": [-16, -16]
     },
     {
       "id": "swamp.enemy.right",
-      "loc": [34, 212, 16, 24],
+      "index": [9, 2],
       "offset": [-16, -16]
     },
     {

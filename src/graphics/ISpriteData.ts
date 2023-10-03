@@ -46,6 +46,14 @@ export interface ISpriteData {
   tileWidth: number;
 
   /**
+   * Space inbetween tiles
+   */
+  tileSpacing: number;
+
+  /** Offset in pixels */
+  tileOffset: number;
+
+  /**
    * Tile data
    */
   tiles: ITileData[];

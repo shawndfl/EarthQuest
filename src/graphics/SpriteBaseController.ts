@@ -197,8 +197,9 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
         });
       } else {
         // use index
-        const pixelX = this._spriteData.tileWidth * sprite.index[0];
-        const pixelY = this._spriteData.tileHeight * sprite.index[1];
+        const s = this._spriteData;
+        const pixelX = s.tileOffset + (s.tileWidth + s.tileSpacing) * sprite.index[0];
+        const pixelY = s.tileOffset + (s.tileHeight + s.tileSpacing) * sprite.index[1];
 
         this.sprite.setSprite({
           pixelXOffset: pixelX,

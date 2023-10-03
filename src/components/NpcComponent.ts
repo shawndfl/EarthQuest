@@ -24,7 +24,6 @@ export class NpcComponent extends TileComponent {
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
-    console.warn('npc component');
     return false;
   }
 
