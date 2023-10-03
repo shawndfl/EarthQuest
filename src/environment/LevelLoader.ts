@@ -8,7 +8,7 @@ import { ILevelData } from './ILevelData';
  * Loads a level and creates a 3D array of tiles
  */
 export class LevelLoader extends Component {
-  constructor(eng: Engine, protected _tileFactory: TileFactory) {
+  constructor(eng: Engine) {
     super(eng);
   }
 
@@ -17,7 +17,7 @@ export class LevelLoader extends Component {
    * @param levelData 
    * @returns 
    */
-  load(levelData: ILevelData): TileComponent[][][] {
+  load(levelData: ILevelData, tileFactory: TileFactory): TileComponent[][][] {
     const tileComponent: TileComponent[][][] = [[[]]];
 
     const uuid = this.eng.random.getUuid();
@@ -34,7 +34,7 @@ export class LevelLoader extends Component {
           const element = row[s] + row[s + 1];
           const index = parseInt(element, 16);
           const type = levelData.tiles[index];
-          const tile = this._tileFactory.createStaticTile(type, i++, j, k);
+          const tile = tileFactory.createStaticTile(type, i++, j, k);
           tileComponent[k][j].push(tile);
         }
       }

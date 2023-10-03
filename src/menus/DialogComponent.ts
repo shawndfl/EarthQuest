@@ -159,7 +159,7 @@ export class DialogComponent extends PanelComponent {
           optionPositions,
           (index) => {
             this._selectedIndex = index;
-            this._selectedOption = this._options[this._selectedIndex];
+            this._selectedOption = this._options ? this._options[this._selectedIndex] : null;
           },
           this._depth - 0.01 // set the depth just in front of this dialog box
         );

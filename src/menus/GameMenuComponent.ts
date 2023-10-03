@@ -56,25 +56,7 @@ export class GameMenuComponent extends Component {
     const config = new vec2(30, 240);
     const save = new vec2(30, 290);
 
-    this._cursor.initialize('cursor.1', this._spriteController, [items, status, map, config, save], (index) => {
-      switch (index) {
-        case 0:
-          break;
-        case 1:
-          break;
-        case 2:
-          break;
-        case 3:
-          this.showEditor();
-          break;
-        case 4:
-          this.save();
-          console.debug('saved!');
-          break;
-      }
-
-      console.debug('selecting index ' + index);
-    });
+    this._cursor.initialize('cursor.1', this._spriteController, [items, status, map, config, save]);
   }
 
   showEditor() {
@@ -94,7 +76,25 @@ export class GameMenuComponent extends Component {
   show() {
     this._visible = true;
     this._dirty = true;
-    this._cursor.show(0);
+    this._cursor.show(0, (index) => {
+      switch (index) {
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+        case 3:
+          this.showEditor();
+          break;
+        case 4:
+          this.save();
+          console.debug('saved!');
+          break;
+      }
+
+      console.debug('selecting index ' + index);
+    });
   }
 
   getFormattedTime(): string {

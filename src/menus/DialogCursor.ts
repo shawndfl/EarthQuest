@@ -96,12 +96,15 @@ export class DialogCursor extends Component {
     }
   }
 
-  show(index?: number) {
+  show(index?: number, onSelect?: (index: number, cursor: DialogCursor) => void,) {
     if (index != undefined) {
       this._activeIndex = index;
     }
     this._visible = true;
     this._dirty = true;
+    if (onSelect) {
+      this._onSelect = onSelect;
+    }
   }
 
   /**

@@ -169,20 +169,6 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * When a cell is created
-   */
-  onCreate() {
-    //NOP
-  }
-
-  /**
-   * When a cell is destroyed
-   */
-  onDestroy() {
-    //NOP
-  }
-
-  /**
    * Called when the player hits the action button
    * @param tileComponent
    */
@@ -213,111 +199,6 @@ export abstract class TileComponent extends Component {
    */
   update(dt: number): void {
     //NOP
-  }
-
-  /**
-   * Moves the tile by a given amount
-   * @param i
-   * @param j
-   * @param k
-   */
-  OffsetTilePosition(i: number, j: number, k: number): void {
-    const tileX = Math.floor(this._tilePosition.x);
-    const tileY = Math.floor(this._tilePosition.y);
-    const tileZ = Math.floor(this._tilePosition.z);
-    const floorHeight = tileZ - 1;
-
-    const fractionI = this.tilePosition.x % 1;
-    const fractionJ = this.tilePosition.y % 1;
-    const dir = new vec3([i, j, k]);
-
-    const ground = this.groundManager;
-
-    // check the current floor height and the level above
-    for (let height = floorHeight; height < floorHeight + 2; height++) {
-      const options: TileAccessOptions = {
-        ignoreEmpty: height != floorHeight,
-      };
-
-      // left
-      if (dir.x < 0 && fractionI < 0.25) {
-        // cancel x movement
-        if (!ground.canAccessTile(this, tileX - 1, tileY, height, options)) {
-          dir.x = 0;
-        }
-      }
-
-      // right
-      else if (dir.x > 0 && fractionI > 0.75) {
-        // cancel x movement
-        if (!ground.canAccessTile(this, tileX + 1, tileY, height, options)) {
-          dir.x = 0;
-        }
-      }
-
-      // up
-      if (dir.y < 0 && fractionJ < 0.25) {
-        // cancel y movement
-        if (!ground.canAccessTile(this, tileX, tileY - 1, height, options)) {
-          dir.y = 0;
-        }
-      }
-      // down
-      else if (dir.y > 0 && fractionJ > 0.75) {
-        // cancel y movement
-        if (!ground.canAccessTile(this, tileX, tileY + 1, height, options)) {
-          dir.y = 0;
-        }
-      }
-
-      // check corners
-      if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
-        //top right
-        if (!ground.canAccessTile(this, tileX + 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //top left
-        if (!ground.canAccessTile(this, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
-        //bottom left
-        if (!ground.canAccessTile(this, tileX - 1, tileY - 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //bottom right
-        if (!ground.canAccessTile(this, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      }
-    }
-    // check if the player can access this tile
-    if (dir.length() > 0) {
-      this.moveToTilePosition(
-        this._tilePosition.x + dir.x,
-        this._tilePosition.y + dir.y,
-        this._tilePosition.z + dir.z,
-        dir
-      );
-    }
   }
 
   /**
@@ -378,5 +259,9 @@ export abstract class TileComponent extends Component {
     if (this.spriteController) {
       this.spriteController.setSpritePosition(this.screenPosition.x, this.screenPosition.y, screenDepth.z);
     }
+  }
+
+  dispose(): void {
+    //this.spriteController?.dispose();
   }
 }

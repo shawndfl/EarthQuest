@@ -107,9 +107,11 @@ export class PlayerController extends TileComponent {
 
   }
 
-  initialize(spriteSheet: Texture, characterData: ISpriteData) {
+  initialize() {
+    const texture = this.eng.assetManager.character.texture
+    const data = this.eng.assetManager.character.data
     this._spriteController = new SpritController(this.eng);
-    this._spriteController.initialize(spriteSheet, characterData);
+    this._spriteController.initialize(texture, data);
 
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
@@ -124,8 +126,6 @@ export class PlayerController extends TileComponent {
         { p: 1, t: 300 },
       ])
       .repeat(-1);
-
-    console.info('sprite list ', this._spriteController.getSpriteList());
   }
 
   /**
@@ -258,7 +258,7 @@ export class PlayerController extends TileComponent {
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
       // move up and down on stairs and slops
-      this.OffsetTilePosition(moveVector.x, moveVector.y, moveVector.z);
+      this.groundManager.offsetTile(this, moveVector.x, moveVector.y, moveVector.z);
     }
 
     // toggle and animation. This can happen when not walking too.
@@ -337,10 +337,10 @@ export class PlayerController extends TileComponent {
 
 
   loadLevel(level: ILevelData): void {
-    this.resetPlayer();
+
   }
 
   closeLevel(): void {
-
+    this.resetPlayer();
   }
 }

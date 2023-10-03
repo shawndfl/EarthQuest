@@ -19,6 +19,8 @@ export class EnemyTileComponent extends TileComponent {
   protected _idleAnimation: Curve;
   /** Should the sprites be flipped */
   private _spriteFlip: boolean;
+  private _moveCounter = 0;
+  private _moveSpeed = .010;
 
   canAccessTile(tileComponent: TileComponent): boolean {
     return false;
@@ -50,8 +52,8 @@ export class EnemyTileComponent extends TileComponent {
     this._idleAnimation
       .points([
         { p: 1, t: 0 },
-        { p: 0, t: 600 },
-        { p: 1, t: 1200 },
+        { p: 0, t: 200 },
+        { p: 1, t: 400 },
       ])
       .repeat(-1);
     this._idleAnimation.start(true);
@@ -78,6 +80,19 @@ export class EnemyTileComponent extends TileComponent {
 
     this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
+
+    const playerLocal = this.eng.player.tilePosition.copy();
+    const walkingDirection = playerLocal.subtract(this.tilePosition).normalize();
+
+    // scale velocity by time
+    const moveVector = walkingDirection.scale(this._moveSpeed);
+
+    // screen space converted to tile space for x and y position (ground plane)
+    // then use the movement dot of the slope vector which will allow the player for
+    // move up and down on stairs and slops
+    this.groundManager.offsetTile(this, moveVector.x, moveVector.y, 0);
+
+
   }
 
   dispose(): void {

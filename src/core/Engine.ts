@@ -46,8 +46,18 @@ export class Engine {
   readonly ground: GroundManager;
   readonly player: PlayerController;
 
+  /**
+   * the render context
+   */
   get gl(): WebGL2RenderingContext {
     return this.canvasController.gl;
+  }
+
+  /**
+   * Is the game paused.
+   */
+  get pause(): boolean {
+    return this.dialogManager.gameMenu.visible;
   }
 
   /**
@@ -137,7 +147,7 @@ export class Engine {
     await this.assetManager.initialize();
     await this.gameManager.initialize();
     await this.ground.initialize();
-    await this.player.initialize(this.assetManager.character.texture, this.assetManager.character.data);
+    await this.player.initialize();
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.sceneManager.initialize();

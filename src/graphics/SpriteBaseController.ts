@@ -258,6 +258,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   dispose(): void {
     if (this._buffer) {
       this._buffer.dispose();
+      this._buffer = null;
     }
   }
 }

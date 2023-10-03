@@ -12,6 +12,7 @@ import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
 import { TileAccessOptions } from '../components/TileAccessOptions';
 import { TileContext } from '../components/TileContext';
 import { LevelLoader } from '../environment/LevelLoader';
+import vec3 from '../math/vec3';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -57,8 +58,7 @@ export class GroundManager extends Component {
 
     this._tileFactory = new TileFactory(this.eng, this._spriteController);
     this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
-    this._levelLoader = new LevelLoader(this.eng, this._tileFactory);
-
+    this._levelLoader = new LevelLoader(this.eng);
 
     // create the initial level
     if (false) {
@@ -72,8 +72,14 @@ export class GroundManager extends Component {
     // reset tiles that need updates
     this._updateTiles = [];
 
+    const texture = this.eng.assetManager.tile.texture;
+    const data = this.eng.assetManager.tile.data;
+    this._spriteController = new SpritBatchController(this.eng);
+    this._spriteController.initialize(texture, data);
+    this._tileFactory = new TileFactory(this.eng, this._spriteController);
+
     // load new ones
-    this._tiles = this._levelLoader.load(this._levelData);
+    this._tiles = this._levelLoader.load(this._levelData, this._tileFactory);
   }
 
   /**
@@ -122,6 +128,109 @@ export class GroundManager extends Component {
     this.getTile(i + 0, j - 1, k).onPlayerAction(tileComponent);
     this.getTile(i - 1, j - 1, k).onPlayerAction(tileComponent);
     this.getTile(i - 1, j + 0, k).onPlayerAction(tileComponent);
+  }
+
+  /**
+    * Moves the tile by a given amount
+    * @param i
+    * @param j
+    * @param k
+    */
+  offsetTile(target: TileComponent, i: number, j: number, k: number): void {
+    const tileX = Math.floor(target.tilePosition.x);
+    const tileY = Math.floor(target.tilePosition.y);
+    const tileZ = Math.floor(target.tilePosition.z);
+    const floorHeight = tileZ - 1;
+
+    const fractionI = target.tilePosition.x % 1;
+    const fractionJ = target.tilePosition.y % 1;
+    const dir = new vec3([i, j, k]);
+
+    // check the current floor height and the level above
+    for (let height = floorHeight; height < floorHeight + 2; height++) {
+      const options: TileAccessOptions = {
+        ignoreEmpty: height != floorHeight,
+      };
+
+      // left
+      if (dir.x < 0 && fractionI < 0.25) {
+        // cancel x movement
+        if (!this.canAccessTile(target, tileX - 1, tileY, height, options)) {
+          dir.x = 0;
+        }
+      }
+
+      // right
+      else if (dir.x > 0 && fractionI > 0.75) {
+        // cancel x movement
+        if (!this.canAccessTile(target, tileX + 1, tileY, height, options)) {
+          dir.x = 0;
+        }
+      }
+
+      // up
+      if (dir.y < 0 && fractionJ < 0.25) {
+        // cancel y movement
+        if (!this.canAccessTile(target, tileX, tileY - 1, height, options)) {
+          dir.y = 0;
+        }
+      }
+      // down
+      else if (dir.y > 0 && fractionJ > 0.75) {
+        // cancel y movement
+        if (!this.canAccessTile(target, tileX, tileY + 1, height, options)) {
+          dir.y = 0;
+        }
+      }
+
+      // check corners
+      if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
+        //top right
+        if (!this.canAccessTile(target, tileX + 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+        //top left
+        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
+        //bottom left
+        if (!this.canAccessTile(target, tileX - 1, tileY - 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+        //bottom right
+        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      }
+    }
+    // check if the player can access this tile
+    if (dir.length() > 0) {
+      target.moveToTilePosition(
+        target.tilePosition.x + dir.x,
+        target.tilePosition.y + dir.y,
+        target.tilePosition.z + dir.z,
+        dir
+      );
+    }
   }
 
   /**
@@ -222,8 +331,10 @@ export class GroundManager extends Component {
    */
   update(dt: number): void {
     this._spriteController.update(dt);
-    for (const tile of this._updateTiles) {
-      tile.update(dt);
+    if (!this.eng.pause) {
+      for (const tile of this._updateTiles) {
+        tile.update(dt);
+      }
     }
   }
 
@@ -238,6 +349,8 @@ export class GroundManager extends Component {
         }
       }
     }
+
+    this._spriteController.dispose();
 
     this._tiles = [[[]]];
   }
