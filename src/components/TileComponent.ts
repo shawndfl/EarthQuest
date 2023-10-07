@@ -139,9 +139,7 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   setTilePosition(i: number, j: number, k: number) {
-    if (this.type == 'player') {
-      console.debug('setting player position ', i, j, k);
-    }
+
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;

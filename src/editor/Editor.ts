@@ -46,6 +46,7 @@ export class Editor extends Component implements IEditor {
 
   async initialize(parentContainer: HTMLElement) {
     this._parent = document.createElement('div');
+    this._parent.classList.add('editor-container');
     this.hide();
 
     parentContainer.append(this._parent);

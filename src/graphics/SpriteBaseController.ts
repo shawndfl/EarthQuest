@@ -80,6 +80,8 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
 
     // needs to be committed to buffer when update is called
     this._dirty = true;
+
+    //console.debug('Sprite: initialize!!');
   }
 
   /**
@@ -102,6 +104,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   setSpritePosition(x: number, y: number, depth?: number) {
     this.sprite.setPosition(x, y, depth);
     this._dirty = true;
+    //console.debug('Sprite: setSpritePosition');
   }
 
   spriteWidth() {
@@ -119,6 +122,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   scale(scale: number | { x: number; y: number }) {
     this.sprite.setSpriteScale(scale);
     this._dirty = true;
+    //console.debug('Sprite: Scale');
   }
 
   /**
@@ -128,6 +132,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   flip(flipDirection: SpriteFlip): void {
     this.sprite.setSpriteFlip(flipDirection);
     this._dirty = true;
+    //console.debug('Sprite: flip');
   }
 
   /**
@@ -137,6 +142,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   rotate(angle: number): void {
     this.sprite.setSpriteRotate(angle);
     this._dirty = true;
+    //console.debug('Sprite: rotate');
   }
 
   /**
@@ -147,6 +153,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   viewOffset(offset?: vec2) {
     this._viewOffset = offset;
     this._dirty = true;
+    //console.debug('Sprite: view offset');
   }
 
   /**
@@ -157,6 +164,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   viewScale(scale?: number) {
     this._viewScale = scale;
     this._dirty = true;
+    //console.debug('Sprite: view scale');
   }
 
   /**
@@ -209,6 +217,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
         });
       }
       this._dirty = true;
+      //console.debug('Sprite: set sprite');
     } else {
       console.error('cannot find sprite ' + id);
     }

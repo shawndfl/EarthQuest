@@ -1,3 +1,4 @@
+import vec2 from "../math/vec2";
 import vec3 from "../math/vec3";
 import vec4 from "../math/vec4";
 
@@ -6,16 +7,16 @@ import vec4 from "../math/vec4";
  */
 export interface IQuadModel {
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  min: [number, number, number];
+  min: vec3
 
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  max: [number, number, number];
+  max: vec3
 
   /** min texture (u,v) in uv space -1 to 1 */
-  minTex: [number, number];
+  minTex: vec2;
 
   /** max texture (u,v) in uv space -1 to 1 */
-  maxTex: [number, number];
+  maxTex: vec2;
 }
 
 /**
@@ -25,6 +26,9 @@ export class GlBuffer {
   vertBuffer: WebGLBuffer;
   indexBuffer: WebGLBuffer;
   vertArrayBuffer: WebGLVertexArrayObject;
+
+  verts: Float32Array;
+  index: Uint16Array;
 
   /** were the buffers created */
   get buffersCreated() {
@@ -42,6 +46,8 @@ export class GlBuffer {
     this.indexBuffer = 0;
     this.indexCount = 0;
     this.vertArrayBuffer = 0;
+    this.verts = new Float32Array();
+    this.index = new Uint16Array();
   }
 
   /**
@@ -68,13 +74,18 @@ export class GlBuffer {
     isStatic: boolean = true,
     bufferIndex: number = 0
   ) {
-    // Now create an array of positions for the square.
-    const verts: number[] = [];
-    const index: number[] = [];
 
     // check if we have buffer
     if (!this.vertBuffer || !this.indexBuffer) {
       this.createBuffer();
+    }
+
+    if (this.verts.length < quads.length * (4 * 5)) {
+      this.verts = new Float32Array(quads.length * (4 * 5));
+    }
+
+    if (this.index.length < quads.length * 6) {
+      this.index = new Uint16Array(quads.length * 6);
     }
 
     // reset counters
@@ -92,32 +103,47 @@ export class GlBuffer {
     //  (min)                      (min)
     //
     let vertCount = 0;
-    quads.forEach((quad) => {
-      verts.push(quad.min[0], quad.min[1], quad.min[2]);
-      verts.push(quad.minTex[0], quad.maxTex[1]);
+    let vertIndex = 0;
+    let indexIndex = 0;
+    for (let i = 0; i < quads.length; i++) {
+      const quad = quads[i];
+      this.verts[vertIndex++] = quad.min.x;
+      this.verts[vertIndex++] = quad.min.y;
+      this.verts[vertIndex++] = quad.min.z;
+      this.verts[vertIndex++] = quad.minTex.x;
+      this.verts[vertIndex++] = quad.maxTex.y;
 
-      verts.push(quad.max[0], quad.min[1], quad.min[2]);
-      verts.push(quad.maxTex[0], quad.maxTex[1]);
+      this.verts[vertIndex++] = quad.max.x;
+      this.verts[vertIndex++] = quad.min.y;
+      this.verts[vertIndex++] = quad.min.z;
+      this.verts[vertIndex++] = quad.maxTex.x;
+      this.verts[vertIndex++] = quad.maxTex.y;
 
-      verts.push(quad.max[0], quad.max[1], quad.max[2]);
-      verts.push(quad.maxTex[0], quad.minTex[1]);
+      this.verts[vertIndex++] = quad.max.x;
+      this.verts[vertIndex++] = quad.max.y;
+      this.verts[vertIndex++] = quad.max.z;
+      this.verts[vertIndex++] = quad.maxTex.x;
+      this.verts[vertIndex++] = quad.minTex.y;
 
-      verts.push(quad.min[0], quad.max[1], quad.max[2]);
-      verts.push(quad.minTex[0], quad.minTex[1]);
+      this.verts[vertIndex++] = quad.min.x;
+      this.verts[vertIndex++] = quad.max.y;
+      this.verts[vertIndex++] = quad.max.z;
+      this.verts[vertIndex++] = quad.minTex.x;
+      this.verts[vertIndex++] = quad.minTex.y;
 
-      index.push(vertCount + 0);
-      index.push(vertCount + 1);
-      index.push(vertCount + 3);
+      this.index[indexIndex++] = vertCount + 0;
+      this.index[indexIndex++] = vertCount + 1;
+      this.index[indexIndex++] = vertCount + 3;
 
-      index.push(vertCount + 1);
-      index.push(vertCount + 2);
-      index.push(vertCount + 3);
+      this.index[indexIndex++] = vertCount + 1;
+      this.index[indexIndex++] = vertCount + 2;
+      this.index[indexIndex++] = vertCount + 3;
 
       vertCount += 4;
-    });
+    };
 
     // save the index count for rendering
-    this.indexCount = index.length;
+    this.indexCount = this.index.length;
 
     // bind the array buffer
     this.gl.bindVertexArray(this.vertArrayBuffer);
@@ -126,7 +152,7 @@ export class GlBuffer {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      new Float32Array(verts),
+      this.verts,
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
       bufferIndex
     );
@@ -183,7 +209,7 @@ export class GlBuffer {
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     this.gl.bufferData(
       this.gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array(index),
+      this.index,
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
       bufferIndex
     );
@@ -327,5 +353,8 @@ export class GlBuffer {
     if (this.vertArrayBuffer) {
       this.gl.deleteVertexArray(this.vertArrayBuffer);
     }
+
+    this.verts = new Float32Array();
+    this.index = new Uint16Array();
   }
 }

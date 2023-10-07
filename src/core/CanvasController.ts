@@ -51,7 +51,11 @@ export class CanvasController extends Component {
   }
 
   showCanvas(show: boolean): void {
-    this._container.style.display = show ? 'inherit' : 'none';
+    if (!show) {
+      this._container.classList.add('background');
+    } else {
+      this._container.classList.remove('background');
+    }
   }
 
   logGlError(error: string, functionName: string, args: any) {

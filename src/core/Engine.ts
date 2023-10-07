@@ -190,6 +190,7 @@ export class Engine {
   }
 
   update(dt: number) {
+    console.time('Game update');
     // handle gamepad polling
     this.input.preUpdate(dt);
 
@@ -229,6 +230,7 @@ export class Engine {
 
     // used to reset flags and update hold timers
     this.input.postUpdate(dt);
+    console.timeEnd('Game update');
   }
 
   resize(width: number, height: number) {

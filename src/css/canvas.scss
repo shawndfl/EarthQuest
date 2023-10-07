@@ -14,7 +14,11 @@ body {
     background-color: lightgray;
     margin: auto;
     display: flex;
+}
 
+.background {
+    position: absolute;
+    top: 200vh;
 }
 
 .hidden {

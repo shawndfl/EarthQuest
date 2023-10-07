@@ -74,12 +74,18 @@ export class CanvasRenderer extends EditorComponent {
   }
 
   setTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
+    if (i >= this.MaxI || j >= this.MaxJ || k >= this.MaxK) {
+      return;
+    }
     this.tiles[k][j][i] = data;
     this.dirty = true;
   }
 
-  getTile(i: number, j: number, k: number) {
-    return this.tiles[k][j][i];
+  getTile(i: number, j: number, k: number): SelectTileBrowserData {
+    if (this.tiles[k] && this.tiles[k][j] && this.tiles[k][j][i]) {
+      return this.tiles[k][j][i];
+    }
+    return null;
   }
 
   render() {
