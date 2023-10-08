@@ -18,7 +18,6 @@ export class DialogCursor extends Component {
   private _activeIndex: number;
   /** animation curve */
   protected _cursorCurve: Curve; // used for animations
-  private _dirty: boolean;
   private _cursorId: string;
   private _visible: boolean;
   private _depth: number;
@@ -36,7 +35,7 @@ export class DialogCursor extends Component {
 
   set index(value: number) {
     this._activeIndex = value;
-    this._dirty = true;
+
   }
 
   /**
@@ -68,7 +67,7 @@ export class DialogCursor extends Component {
     ]);
     this._cursorCurve.curve(CurveType.linear);
     this._cursorCurve.repeat(-1);
-    this._dirty = true;
+
     this._visible = false;
   }
 
@@ -101,7 +100,6 @@ export class DialogCursor extends Component {
       this._activeIndex = index;
     }
     this._visible = true;
-    this._dirty = true;
     if (onSelect) {
       this._onSelect = onSelect;
     }
@@ -119,10 +117,10 @@ export class DialogCursor extends Component {
    */
   hide() {
     this._visible = false;
-    this._dirty = true;
 
     if (this._spriteController) {
       this._spriteController.removeSprite(this._cursorId);
+      this._spriteController.commitToBuffer();
     }
   }
 
@@ -149,6 +147,7 @@ export class DialogCursor extends Component {
       }
     } else {
       this._spriteController.removeSprite(this._cursorId);
+      this._spriteController.commitToBuffer();
     }
   }
 
@@ -158,11 +157,7 @@ export class DialogCursor extends Component {
    */
   update(dt: number) {
     this._cursorCurve.update(dt);
-
-    if (this._dirty) {
-      this.redraw();
-      this._dirty = false;
-    }
+    this.redraw();
   }
 
   dispose(): void {

@@ -32,6 +32,11 @@ export class InputState {
    */
   touchPoint: [vec2, vec2];
 
+  /**
+   * how many touch points are there.
+   */
+  touchCount: number;
+
   isReleased(btn: UserAction) {
     return (this.buttonsReleased & btn) > 0;
   }
@@ -114,6 +119,11 @@ export class InputHandler extends Component {
    */
   touchPoint: [vec2, vec2];
 
+  /**
+   * how many touch points are there.
+   */
+  touchCount: number;
+
   constructor(eng: Engine) {
     super(eng);
 
@@ -124,6 +134,9 @@ export class InputHandler extends Component {
     this.buttonsReleased = UserAction.None;
     this.hasGamePad = 'getGamepads' in navigator;
     console.debug('initializing input:');
+
+    this.touchPoint = [vec2.zero, vec2.zero];
+    this.touchCount = 0;
 
     window.addEventListener('keydown', (e) => {
       this.keydown(e);
@@ -142,14 +155,18 @@ export class InputHandler extends Component {
             this.inputDown = [true, false];
           }
           this.inputReleased = false;
-          this.touchPoint = [new vec2(e.offsetX, e.offsetY), new vec2(e.offsetX, e.offsetY)];
+          this.touchPoint[0].x = e.offsetX;
+          this.touchPoint[0].y = e.offsetY;
+          this.touchCount = 1;
         }
       });
       window.addEventListener('mouseup', (e) => {
         if (!this.isCalibrating) {
           this.inputDown = [false, false];
           this.inputReleased = true;
-          this.touchPoint = [new vec2(e.offsetX, e.offsetY), new vec2(e.offsetX, e.offsetY)];
+          this.touchPoint[0].x = e.offsetX;
+          this.touchPoint[0].y = e.offsetY;
+          this.touchCount = 1;
         }
       });
     } else {
@@ -161,9 +178,13 @@ export class InputHandler extends Component {
             this.inputReleased = false;
 
             const t = e.touches[0].target as HTMLCanvasElement;
-            const p0 = new vec2(e.touches[0].pageX - t.clientTop, e.touches[0].screenY);
-            const p1 = new vec2(e.touches[0].pageX - t.clientTop, e.touches[0].screenY);
-            this.touchPoint = [p0, p1];
+            this.touchPoint[0].x = e.touches[0].pageX - t.clientTop;
+            this.touchPoint[0].y = e.touches[0].screenY;
+            if (e.touches.length > 1) {
+              this.touchPoint[1].x = e.touches[1].pageX - t.clientTop;;
+              this.touchPoint[1].y = e.touches[1].screenY;
+            }
+            this.touchCount = e.touches.length;
           }
         }
       });

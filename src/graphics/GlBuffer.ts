@@ -72,24 +72,27 @@ export class GlBuffer {
   setBuffers(
     quads: IQuadModel[],
     isStatic: boolean = true,
-    bufferIndex: number = 0
+    bufferIndex: number = 0,
+    quadLength?: number
   ) {
+
+    const length = quadLength ?? quads.length;
 
     // check if we have buffer
     if (!this.vertBuffer || !this.indexBuffer) {
       this.createBuffer();
     }
 
-    if (this.verts.length < quads.length * (4 * 5)) {
-      this.verts = new Float32Array(quads.length * (4 * 5));
+    if (this.verts.length < length * (4 * 5)) {
+      this.verts = new Float32Array(length * (4 * 5));
     }
 
-    if (this.index.length < quads.length * 6) {
-      this.index = new Uint16Array(quads.length * 6);
+    if (this.index.length < length * 6) {
+      this.index = new Uint16Array(length * 6);
     }
 
     // reset counters
-    this.indexCount = 0;
+    this.indexCount = length * 6;
 
     //               Building a quad
     //
@@ -105,7 +108,7 @@ export class GlBuffer {
     let vertCount = 0;
     let vertIndex = 0;
     let indexIndex = 0;
-    for (let i = 0; i < quads.length; i++) {
+    for (let i = 0; i < length; i++) {
       const quad = quads[i];
       this.verts[vertIndex++] = quad.min.x;
       this.verts[vertIndex++] = quad.min.y;
@@ -142,9 +145,6 @@ export class GlBuffer {
       vertCount += 4;
     };
 
-    // save the index count for rendering
-    this.indexCount = this.index.length;
-
     // bind the array buffer
     this.gl.bindVertexArray(this.vertArrayBuffer);
 
@@ -154,7 +154,8 @@ export class GlBuffer {
       this.gl.ARRAY_BUFFER,
       this.verts,
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
-      bufferIndex
+      bufferIndex,
+      vertIndex
     );
 
     // in order for this to work the vertex shader will
@@ -211,7 +212,8 @@ export class GlBuffer {
       this.gl.ELEMENT_ARRAY_BUFFER,
       this.index,
       isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
-      bufferIndex
+      bufferIndex,
+      this.indexCount
     );
   }
 

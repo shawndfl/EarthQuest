@@ -19,7 +19,6 @@ export class GameMenuComponent extends Component {
   protected _size: vec2;
   protected _text: string;
   protected _textOffset: vec2;
-  protected _dirty: boolean;
   protected _cursor: DialogCursor;
 
   private _formattedTime: string;
@@ -41,7 +40,6 @@ export class GameMenuComponent extends Component {
     this._pos = new vec2();
     this._size = new vec2(300, 200);
     this._textOffset = new vec2(50, 60);
-    this._dirty = false;
     this._cursor = new DialogCursor(eng);
   }
 
@@ -70,12 +68,10 @@ export class GameMenuComponent extends Component {
   setPosition(x: number, y: number) {
     this._pos.x = x;
     this._pos.y = y;
-    this._dirty = true;
   }
 
   show() {
     this._visible = true;
-    this._dirty = true;
     this._cursor.show(0, (index) => {
       switch (index) {
         case 0:
@@ -107,7 +103,10 @@ export class GameMenuComponent extends Component {
 
   hide() {
     this._visible = false;
-    this._dirty = true;
+    this._dialogBuild.hide();
+    this._cursor.hide();
+    this.eng.textManager.hideText('menu.gold');
+    this.eng.textManager.hideText('menu.time');
   }
 
   /**
@@ -158,49 +157,39 @@ export class GameMenuComponent extends Component {
   }
 
   redraw() {
-    if (this.visible) {
-      this._dialogBuild.show();
 
-      this._spriteController.commitToBuffer();
+    this._dialogBuild.show();
 
-      const gold = this.eng.gameManager.data.player.gold.toString();
+    const gold = this.eng.gameManager.data.player.gold.toString();
+    this.eng.textManager.setTextBlock({
+      id: 'menu.gold',
+      text: gold.padStart(7, '0'),
+      position: new vec2([90, 370]),
+      color: new vec4([0.0, 0.0, 0.0, 1.0]),
+      depth: -1,
+      scale: 1.0,
+    });
+
+    if (this._formattedTime != this.getFormattedTime()) {
+      this._formattedTime = this.getFormattedTime();
       this.eng.textManager.setTextBlock({
-        id: 'menu.gold',
-        text: gold.padStart(7, '0'),
-        position: new vec2([90, 370]),
+        id: 'menu.time',
+        text: this._formattedTime,
+        position: new vec2([90, 430]),
         color: new vec4([0.0, 0.0, 0.0, 1.0]),
         depth: -1,
         scale: 1.0,
       });
-    } else {
-      this._dialogBuild.hide();
-      this._cursor.hide();
-      this.eng.textManager.hideText('menu.gold');
-      this.eng.textManager.hideText('menu.time');
+
     }
   }
 
   update(dt: number) {
-    if (this._dirty) {
-      this.redraw();
-      this._dirty = false;
-    }
 
     // show the time updates
     if (this.visible) {
-      if (this._formattedTime != this.getFormattedTime()) {
-        this._formattedTime = this.getFormattedTime();
-        this.eng.textManager.setTextBlock({
-          id: 'menu.time',
-          text: this._formattedTime,
-          position: new vec2([90, 430]),
-          color: new vec4([0.0, 0.0, 0.0, 1.0]),
-          depth: -1,
-          scale: 1.0,
-        });
-      }
+      this.redraw();
     }
-
     this._cursor.update(dt);
   }
 }
