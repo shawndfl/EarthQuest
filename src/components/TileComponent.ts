@@ -32,6 +32,7 @@ export abstract class TileComponent extends Component {
    * is the depth which is between 1 and -1
    */
   private _screenPosition: vec3;
+  private _screenDepthPos: vec3;
 
   /** 
    * id of the tile in the form of i,j,k
@@ -243,19 +244,21 @@ export abstract class TileComponent extends Component {
    */
   protected updateSpritePosition() {
     // Get the screen depth using the tile index not position of this tile
-    const screenDepth = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z);
+    this._screenDepthPos = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z, false, this._screenDepthPos);
 
     // Get the screen position of this tile using the position
     this._screenPosition = this.eng.tileHelper.toScreenLoc(
       this._tilePosition.x,
       this._tilePosition.y,
-      this._tilePosition.z
+      this._tilePosition.z,
+      false,
+      this._screenPosition
     );
 
     // move the sprite if there is one. some tiles like empty
     // don't need sprite controllers
     if (this.spriteController) {
-      this.spriteController.setSpritePosition(this.screenPosition.x, this.screenPosition.y, screenDepth.z);
+      this.spriteController.setSpritePosition(this.screenPosition.x, this.screenPosition.y, this._screenDepthPos.z);
     }
   }
 

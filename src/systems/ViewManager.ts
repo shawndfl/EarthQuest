@@ -77,7 +77,7 @@ export class ViewManager extends Component {
     this._right = 0;
     this._bottom = 0;
 
-    this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1);
+    mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
     this._screenX = 0;
     this._screenY = 0;
     this._screenW = eng.width;
@@ -132,8 +132,8 @@ export class ViewManager extends Component {
     this._right = this.eng.width * this._scale + this._screenX;
     this._top = this.eng.height * this._scale + this._screenY;
 
-    this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1);
+    this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
   }
 
-  update(dt: number) {}
+  update(dt: number) { }
 }

@@ -280,16 +280,19 @@ export default class mat4 {
     return this;
   }
 
-  multiplyVec3(vector: vec3): vec3 {
+  multiplyVec3(vector: vec3, target?: vec3): vec3 {
     const x = vector.x;
     const y = vector.y;
     const z = vector.z;
 
-    return new vec3([
-      this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12],
-      this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13],
-      this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14],
-    ]);
+    if (!target) {
+      return target;
+    }
+
+    target.x = this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12];
+    target.y = this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13];
+    target.z = this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14];
+    return target;
   }
 
   multiplyVec4(vector: vec4, dest?: vec4): vec4 {
@@ -499,32 +502,35 @@ export default class mat4 {
     return mat4.frustum(-right, right, -top, top, near, far);
   }
 
-  static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): mat4 {
+  static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number, target?: mat4): mat4 {
     const rl = right - left;
     const tb = top - bottom;
     const fn = far - near;
+    if (!target) {
+      target = new mat4();
+    }
 
-    return new mat4([
-      2 / rl,
-      0,
-      0,
-      0,
+    target.values[0] = 2 / rl;
+    target.values[1] = 0;
+    target.values[2] = 0;
+    target.values[3] = 0;
 
-      0,
-      2 / tb,
-      0,
-      0,
+    target.values[4] = 0;
+    target.values[5] = 2 / tb;
+    target.values[6] = 0;
+    target.values[7] = 0;
 
-      0,
-      0,
-      -2 / fn,
-      0,
+    target.values[8] = 0;
+    target.values[9] = 0;
+    target.values[10] = -2 / fn;
+    target.values[11] = 0;
 
-      -(left + right) / rl,
-      -(top + bottom) / tb,
-      -(far + near) / fn,
-      1,
-    ]);
+    target.values[12] = -(left + right) / rl;
+    target.values[13] = -(top + bottom) / tb;
+    target.values[14] = -(far + near) / fn;
+    target.values[15] = 1;
+
+    return target
   }
 
   static lookAt(position: vec3, target: vec3, up: vec3 = vec3.up): mat4 {

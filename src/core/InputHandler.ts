@@ -183,7 +183,7 @@ export class InputHandler extends Component {
   }
 
   beginCalibration() {
-    console.debug('Starting new input calibration...');
+    console.info('Starting new input calibration...');
     this.isCalibrating = true;
     this.activeButtonIndex = 0;
     this.calibrationNextPrompt = true;
@@ -233,7 +233,7 @@ export class InputHandler extends Component {
 
     if (this.isCalibrating) {
       this.inputMappings.keyboardMapping[this.activeButtonIndex] = e.key;
-      console.log('  Mapping: ', e.key);
+      console.info('  Mapping: ', e.key);
       this.activeButtonIndex++;
       this.calibrationNextPrompt = true;
 
@@ -288,7 +288,7 @@ export class InputHandler extends Component {
   preUpdate(dt: number) {
     if (this.isCalibrating) {
       if (this.calibrationNextPrompt) {
-        console.debug('Hit the ' + Array.from(Object.keys(this.mappingIndex)).find((key, index) =>
+        console.info('Hit the ' + Array.from(Object.keys(this.mappingIndex)).find((key, index) =>
           index == this.activeButtonIndex
         ))
         this.calibrationNextPrompt = false;

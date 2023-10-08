@@ -189,13 +189,25 @@ export class Engine {
     this.loadLevel(this.editor.levelData);
   }
 
-  update(dt: number) {
-    console.time('Game update');
-    // handle gamepad polling
-    this.input.preUpdate(dt);
-
+  onlyFps(dt: number) {
     // update the fps
     this.fps.update(dt);
+    // Clear the canvas before we start drawing on it.
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
+    // update text manager
+    this.textManager.update(dt);
+  }
+
+  update(dt: number) {
+    //this.onlyFps(dt);
+
+    //console.time('Game update');
+    // update the fps
+    this.fps.update(dt);
+
+    // handle gamepad polling
+    this.input.preUpdate(dt);
 
     // handle input
     if (this.input.buttonsDown != UserAction.None || this.input.buttonsReleased != UserAction.None) {
@@ -230,7 +242,8 @@ export class Engine {
 
     // used to reset flags and update hold timers
     this.input.postUpdate(dt);
-    console.timeEnd('Game update');
+    //console.timeEnd('Game update');
+
   }
 
   resize(width: number, height: number) {

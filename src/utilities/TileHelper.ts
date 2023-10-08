@@ -118,14 +118,17 @@ export class TileHelper {
     return normalizedDepth;
   }
 
-  toScreenLoc(i: number, j: number, k: number, invertYAxis: boolean = false): vec3 {
+  toScreenLoc(i: number, j: number, k: number, invertYAxis: boolean = false, target?: vec3): vec3 {
+    if (!target) {
+      target = new vec3();
+    }
     const cell = new vec3([i, j, k]);
     if (invertYAxis) {
-      const screen = this._toScreenFlipped.multiplyVec3(cell);
-      return screen;
+      this._toScreenFlipped.multiplyVec3(cell, target);
+      return target;
     } else {
-      const screen = this._toScreen.multiplyVec3(cell);
-      return screen;
+      this._toScreen.multiplyVec3(cell, target);
+      return target;
     }
   }
 }

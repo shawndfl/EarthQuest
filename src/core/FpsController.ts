@@ -24,7 +24,7 @@ export class FpsController extends Component {
     /** Just a counter for displaying FPS to the console */
     this.delayCounter = 0;
     /** Show the FPS every second */
-    this.displayInterval = 100;
+    this.displayInterval = 1000;
   }
 
   /**
