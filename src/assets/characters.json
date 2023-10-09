@@ -84,7 +84,21 @@
       "index": [14, 1],
       "offset": [-16, -15]
     },
-
+    {
+      "id": "ness.down.swing.0",
+      "loc": [290, 25, 32, 24],
+      "offset": [-32, -15]
+    },
+    {
+      "id": "ness.down.swing.1",
+      "loc": [325, 25, 32, 24],
+      "offset": [-32, -15]
+    },
+    {
+      "id": "ness.down.swing.2",
+      "loc": [359, 25, 32, 24],
+      "offset": [-32, -15]
+    },
     {
       "id": "poo.down.step",
       "index": [0, 2],

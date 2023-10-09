@@ -31,6 +31,8 @@ export class PlayerController extends TileComponent {
   private _wasWalking: boolean;
   /** the walk animation. This is just two frames */
   protected _walkAnimation: Curve;
+  /** the attack animation. */
+  protected _attackAnimation: Curve;
   /** The speed the player can walk at */
   private _speed: number;
   /** Used for animations */
@@ -51,6 +53,8 @@ export class PlayerController extends TileComponent {
 
   /** Can the player walk */
   protected _canWalk: boolean;
+
+  protected _attacking: boolean;
 
   get canWalk(): boolean {
     return this._canWalk;
@@ -126,7 +130,11 @@ export class PlayerController extends TileComponent {
         { p: 1, t: 300 },
       ])
       .repeat(-1);
+
+    this._attackAnimation = new Curve();
+    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 100 }, { p: 3, t: 250 }]);
   }
+
 
   /**
    * Handles user input. The logic goes through a chain of command.
@@ -146,7 +154,9 @@ export class PlayerController extends TileComponent {
     }
 
     // if the user tapped or clicked on the screen
-    if (state.isReleased(UserAction.A)) {
+    if (state.isDown(UserAction.A)) {
+      this.attack();
+    } else if (state.isReleased(UserAction.A)) {
       // action event
       //this.eng.ground.raisePlayerAction(this);
 
@@ -208,15 +218,46 @@ export class PlayerController extends TileComponent {
     return true;
   }
 
-  update(dt: number) {
-    this._spriteController.update(dt);
-    this._walkAnimation.update(dt);
-    this._moveController.update(dt);
-
-    this.walkAnimation(dt, this._facingDirection);
+  attack(): void {
+    this._attacking = true;
   }
 
-  walkAnimation(dt: number, direction: PointingDirection) {
+  update(dt: number) {
+    this._spriteController.update(dt);
+    this._moveController.update(dt);
+
+    if (!this.attackAnimation(dt, this._facingDirection)) {
+      this.walkAnimation(dt, this._facingDirection);
+    }
+  }
+
+  attackAnimation(dt: number, direction: PointingDirection): boolean {
+    this._attackAnimation.update(dt);
+    if (this._attacking) {
+      if (!this._attackAnimation.isRunning()) {
+        this._attackAnimation.start(true, () => {
+          this._attacking = false;
+        });
+      }
+      if ((direction & PointingDirection.S) > 0) {
+        this._sprites = ['ness.down.swing.0', 'ness.down.swing.1', 'ness.down.swing.2'];
+        this._spriteFlip = false;
+      } else {
+        // error handling
+        this._sprites = ['ness.scared', 'ness.scared', 'ness.scared'];
+        this._spriteFlip = false;
+      }
+
+      this._spriteController.flip(SpriteFlip.None);
+      this._spriteController.setSprite(this._sprites[this._attackAnimation.getValue()]);
+      return true;
+    }
+    return false;
+  }
+
+  walkAnimation(dt: number, direction: PointingDirection): void {
+    this._walkAnimation.update(dt);
+
     this._resetFlip = false;
 
     // check multiple angle movements first so the else statements work correctly

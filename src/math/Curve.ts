@@ -165,6 +165,7 @@ export class Curve {
         } else {
           // we are done. Set flag.
           this._isDone = true;
+          this._running = false;
 
           // raise event as needed
           if (this.onDone) {
