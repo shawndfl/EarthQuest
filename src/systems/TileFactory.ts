@@ -11,6 +11,7 @@ import { PortalTileComponent } from '../components/PortalTileComponent';
 import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
 import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { EnemyTileComponent } from '../components/EnemyTileComponent';
+import { FreeTileComponent } from '../components/FreeTileComponent';
 
 export interface ITileTypeData {
   tile: string;
@@ -105,6 +106,9 @@ export class TileFactory extends Component {
 
     } else if (tileType == 'open') {
       return new OpenTileComponent(this.eng, this.spriteBatch, args);
+
+    } else if (tileType == 'free') {
+      return new FreeTileComponent(this.eng, this.spriteBatch, args);
 
     } else if (tileType == 'player') {
       // the player is already created. Just set his position

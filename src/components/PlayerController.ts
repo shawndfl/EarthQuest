@@ -132,7 +132,7 @@ export class PlayerController extends TileComponent {
       .repeat(-1);
 
     this._attackAnimation = new Curve();
-    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 100 }, { p: 3, t: 250 }]);
+    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 100 }, { p: 2, t: 150 }, { p: 3, t: 200 }, { p: 3, t: 300 }]);
   }
 
 
@@ -220,6 +220,7 @@ export class PlayerController extends TileComponent {
 
   attack(): void {
     this._attacking = true;
+    this.raiseAction();
   }
 
   update(dt: number) {
@@ -240,7 +241,7 @@ export class PlayerController extends TileComponent {
         });
       }
       if ((direction & PointingDirection.S) > 0) {
-        this._sprites = ['ness.down.swing.0', 'ness.down.swing.1', 'ness.down.swing.2'];
+        this._sprites = ['ness.down.swing.0', 'ness.down.swing.1', 'ness.down.swing.2', 'ness.down.swing.3'];
         this._spriteFlip = false;
       } else {
         // error handling

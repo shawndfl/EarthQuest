@@ -5,12 +5,14 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileFactory } from '../systems/TileFactory';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
+import { SpritController } from '../graphics/SpriteController';
 
 /**
  * This is any thing that the player or some NPC can walk on
  */
 export class OpenTileComponent extends TileComponent {
 
+  private lastSprite: SpritController;
   /**
    * Check if the tile component (or player) can access this tile.
    * For open tiles we need to check the tile on top of it.
@@ -30,6 +32,13 @@ export class OpenTileComponent extends TileComponent {
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
     const pos = tileComponent.tilePosition;
     tileComponent.setTilePosition(pos.x, pos.y, this.tileHeight + 1);
+  }
+
+  onPlayerAction(tileComponent: TileComponent): void {
+    this._spriteController.activeSprite(this.id);
+    this._spriteController.setSprite('highlight');
+    this._spriteController.scale(this.eng.tileScale);
+
   }
 
   get spriteController(): SpritBaseController {

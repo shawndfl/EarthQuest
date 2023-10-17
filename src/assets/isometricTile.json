@@ -3,6 +3,16 @@
   "tileWidth": 32,
   "tiles": [
     {
+      "id": "highlight",
+      "loc": [224, 0, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "shadow",
+      "loc": [256, 0, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
       "id": "block",
       "loc": [0, 0, 32, 32],
       "offset": [-32, -48]
