@@ -17,16 +17,15 @@ export class LevelLoader extends Component {
    * @param levelData 
    * @returns 
    */
-  load(levelData: ILevelData, tileFactory: TileFactory): TileComponent[][][] {
-    const tileComponent: TileComponent[][][] = [[[]]];
+  load(levelData: ILevelData, tileFactory: TileFactory, tiles: TileComponent[][][]): void {
 
     const uuid = this.eng.random.getUuid();
     console.debug('uuid ' + uuid);
 
     for (let k = 0; k < levelData.encode.length; k++) {
-      tileComponent.push([]);
+      tiles.push([]);
       for (let j = 0; j < levelData.encode[k].length; j++) {
-        tileComponent[k].push([]);
+        tiles[k].push([]);
 
         const row = levelData.encode[k][j];
         let i = 0;
@@ -35,10 +34,9 @@ export class LevelLoader extends Component {
           const index = parseInt(element, 16);
           const type = levelData.tiles[index];
           const tile = tileFactory.createStaticTile(type, i++, j, k);
-          tileComponent[k][j].push(tile);
+          tiles[k][j].push(tile);
         }
       }
     }
-    return tileComponent;
   }
 }

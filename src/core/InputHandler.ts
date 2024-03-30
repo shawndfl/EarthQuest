@@ -55,7 +55,7 @@ export interface InputMappings {
   /**
    * Mappint for the game pads
    */
-  gamePadMapping: Map<string, number[]>
+  gamePadMapping: Map<string, number[]>;
 }
 
 /**
@@ -127,8 +127,16 @@ export class InputHandler extends Component {
   constructor(eng: Engine) {
     super(eng);
 
-    this.mappingIndex = { Start: 0, Select: 1, A: 2, B: 3, Up: 4, Down: 5, Right: 6, Left: 7 };
-
+    this.mappingIndex = {
+      Start: 0,
+      Select: 1,
+      A: 2,
+      B: 3,
+      Up: 4,
+      Down: 5,
+      Right: 6,
+      Left: 7,
+    };
 
     this.buttonsDown = UserAction.None;
     this.buttonsReleased = UserAction.None;
@@ -174,14 +182,17 @@ export class InputHandler extends Component {
       window.addEventListener('touchstart', (e) => {
         if (!this.isCalibrating) {
           if (e.touches.length > 0 && e.touches[0].target === eng.gl.canvas) {
-            this.inputDown = [e.touches.item(0) ? true : false, e.touches.item(1) ? true : false];
+            this.inputDown = [
+              e.touches.item(0) ? true : false,
+              e.touches.item(1) ? true : false,
+            ];
             this.inputReleased = false;
 
             const t = e.touches[0].target as HTMLCanvasElement;
             this.touchPoint[0].x = e.touches[0].pageX - t.clientTop;
             this.touchPoint[0].y = e.touches[0].screenY;
             if (e.touches.length > 1) {
-              this.touchPoint[1].x = e.touches[1].pageX - t.clientTop;;
+              this.touchPoint[1].x = e.touches[1].pageX - t.clientTop;
               this.touchPoint[1].y = e.touches[1].screenY;
             }
             this.touchCount = e.touches.length;
@@ -216,102 +227,93 @@ export class InputHandler extends Component {
 
   keydown(e: KeyboardEvent) {
     if (!this.isCalibrating) {
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Right]) {
+      if (e.key == 'ArrowRight') {
         this.buttonsDown = this.buttonsDown | UserAction.Right;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Left]) {
+      if (e.key == 'ArrowLeft') {
         this.buttonsDown = this.buttonsDown | UserAction.Left;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Up]) {
+      if (e.key == 'ArrowUp') {
         this.buttonsDown = this.buttonsDown | UserAction.Up;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Down]) {
+      if (e.key == 'ArrowDown') {
         this.buttonsDown = this.buttonsDown | UserAction.Down;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.A]) {
+      if (e.key == ' ') {
         this.buttonsDown = this.buttonsDown | UserAction.A;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.B]) {
+      if (e.key == 'b') {
         this.buttonsDown = this.buttonsDown | UserAction.B;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Start]) {
+      if (e.key == 'Enter') {
         this.buttonsDown = this.buttonsDown | UserAction.Start;
       }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Select]) {
+      if (e.key == 'esc') {
         this.buttonsDown = this.buttonsDown | UserAction.Select;
       }
     }
   }
 
   keyup(e: KeyboardEvent) {
+    console.info('  Mapping: ', e.key);
 
-    if (this.isCalibrating) {
-      this.inputMappings.keyboardMapping[this.activeButtonIndex] = e.key;
-      console.info('  Mapping: ', e.key);
-      this.activeButtonIndex++;
-      this.calibrationNextPrompt = true;
+    if (e.key == 'ArrowRight') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Right;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Right;
+    }
 
-      // are we done calibrating
-      if (this.activeButtonIndex >= Object.keys(this.mappingIndex).length) {
-        this.doneCalibrating();
-      }
-    } else {
+    if (e.key == 'ArrowLeft') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Left;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Left;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Right]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Right;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Right;
-      }
+    if (e.key == 'ArrowUp') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Up;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Up;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Left]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Left;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Left;
-      }
+    if (e.key == 'ArrowDown') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Down;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Down;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Up]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Up;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Up;
-      }
+    if (e.key == ' ') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.A;
+      this.buttonsReleased = this.buttonsReleased | UserAction.A;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Down]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Down;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Down;
-      }
+    if (e.key == 'b') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.B;
+      this.buttonsReleased = this.buttonsReleased | UserAction.B;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.A]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.A;
-        this.buttonsReleased = this.buttonsReleased | UserAction.A;
-      }
+    if (e.key == 'Enter') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Start;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Start;
+    }
 
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.B]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.B;
-        this.buttonsReleased = this.buttonsReleased | UserAction.B;
-      }
-
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Start]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Start;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Start;
-      }
-
-      if (e.key == this.inputMappings.keyboardMapping[this.mappingIndex.Select]) {
-        this.buttonsDown = this.buttonsDown & ~UserAction.Select;
-        this.buttonsReleased = this.buttonsReleased | UserAction.Select;
-      }
+    if (e.key == 'esc') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Select;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Select;
     }
   }
 
   preUpdate(dt: number) {
     if (this.isCalibrating) {
       if (this.calibrationNextPrompt) {
-        console.info('Hit the ' + Array.from(Object.keys(this.mappingIndex)).find((key, index) =>
-          index == this.activeButtonIndex
-        ))
+        console.info(
+          'Hit the ' +
+            Array.from(Object.keys(this.mappingIndex)).find(
+              (key, index) => index == this.activeButtonIndex
+            )
+        );
         this.calibrationNextPrompt = false;
       }
     }
@@ -327,8 +329,8 @@ export class InputHandler extends Component {
 
       //TODO capture state from game pads
       gamepad.buttons.forEach((btn) => {
-        btn.pressed
-      })
+        btn.pressed;
+      });
     }
   }
 
@@ -351,16 +353,22 @@ export class InputHandler extends Component {
     if (inputMappingString) {
       this.inputMappings = JSON.parse(inputMappingString);
     } else {
-      this.inputMappings = { keyboardMapping: [], gamePadMapping: new Map<string, number[]>() }
+      this.inputMappings = {
+        keyboardMapping: [],
+        gamePadMapping: new Map<string, number[]>(),
+      };
       this.beginCalibration();
     }
   }
 
   doneCalibrating() {
-    window.localStorage.setItem('inputMapping', JSON.stringify(this.inputMappings));
+    window.localStorage.setItem(
+      'inputMapping',
+      JSON.stringify(this.inputMappings)
+    );
     this.isCalibrating = false;
     this.activeButtonIndex = 0;
-    console.debug('done calibrating!!')
+    console.debug('done calibrating!!');
   }
 
   resetInput() {
@@ -370,11 +378,23 @@ export class InputHandler extends Component {
     this.hasGamePad = 'getGamepads' in navigator;
     if (this.hasGamePad) {
       console.debug(' gamepad supported');
-      window.removeEventListener('gamepadconnected', this.connectGamepad.bind(this));
-      window.removeEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
+      window.removeEventListener(
+        'gamepadconnected',
+        this.connectGamepad.bind(this)
+      );
+      window.removeEventListener(
+        'gamepaddisconnected',
+        this.disconnectGamepad.bind(this)
+      );
 
-      window.addEventListener('gamepadconnected', this.connectGamepad.bind(this));
-      window.addEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
+      window.addEventListener(
+        'gamepadconnected',
+        this.connectGamepad.bind(this)
+      );
+      window.addEventListener(
+        'gamepaddisconnected',
+        this.disconnectGamepad.bind(this)
+      );
     } else {
       console.warn('gamepad not supported!');
     }

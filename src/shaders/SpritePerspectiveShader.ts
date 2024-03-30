@@ -16,7 +16,7 @@ void main() {
     vTex = aTex;
     vec4 pos = uProj * vec4(aPos.xyz, 1.0);
     gl_Position =  pos;
-    depth = vec3((pos.z + 1.0) *.5);
+    depth = vec3(pos.z *.1);
 }
 `;
 

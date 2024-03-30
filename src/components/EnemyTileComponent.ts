@@ -5,6 +5,7 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { SpritController } from '../graphics/SpriteController';
 import { Curve } from '../math/Curve';
 import { ITileCreateionArgs } from './ITileCreationArgs';
+import { PlayerController } from './PlayerController';
 import { TileComponent } from './TileComponent';
 
 /**
@@ -21,6 +22,19 @@ export class EnemyTileComponent extends TileComponent {
   private _spriteFlip: boolean;
   private _moveCounter = 0;
   private _moveSpeed = .010;
+
+  private _isDead: boolean;
+
+  onPlayerAction(tileComponent: TileComponent): void {
+    if (tileComponent instanceof PlayerController) {
+      const player = tileComponent as PlayerController;
+      if (player.attacking) {
+        this._spriteController.removeSprite(this.id);
+        this._spriteController.commitToBuffer();
+        this._isDead = true;
+      }
+    }
+  }
 
   canAccessTile(tileComponent: TileComponent): boolean {
     return false;
@@ -63,8 +77,10 @@ export class EnemyTileComponent extends TileComponent {
   }
 
   update(dt: number) {
-    this._spriteController.update(dt);
-    this.runIdle(dt);
+    if (!this._isDead) {
+      this._spriteController.update(dt);
+      this.runIdle(dt);
+    }
   }
 
   runIdle(dt: number) {

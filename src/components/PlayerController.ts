@@ -56,6 +56,10 @@ export class PlayerController extends TileComponent {
 
   protected _attacking: boolean;
 
+  get attacking(): boolean {
+    return this._attacking;
+  }
+
   get canWalk(): boolean {
     return this._canWalk;
   }
@@ -119,8 +123,6 @@ export class PlayerController extends TileComponent {
 
     this._spriteController.scale(2);
     this._spriteController.setSprite('ness.left.stand');
-    // set the position of the sprite in the center of the screen
-    this.setTilePosition(4, 5, 1);
 
     this._walkAnimation = new Curve();
     this._walkAnimation
@@ -132,7 +134,7 @@ export class PlayerController extends TileComponent {
       .repeat(-1);
 
     this._attackAnimation = new Curve();
-    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 100 }, { p: 2, t: 150 }, { p: 3, t: 200 }, { p: 3, t: 300 }]);
+    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 50 }, { p: 2, t: 100 }, { p: 3, t: 150 }]);
   }
 
 
@@ -241,7 +243,7 @@ export class PlayerController extends TileComponent {
         });
       }
       if ((direction & PointingDirection.S) > 0) {
-        this._sprites = ['ness.down.swing.0', 'ness.down.swing.1', 'ness.down.swing.2', 'ness.down.swing.3'];
+        this._sprites = ['ness.down.swing.0', 'ness.down.swing.1', 'ness.down.swing.2'];
         this._spriteFlip = false;
       } else {
         // error handling
@@ -345,6 +347,7 @@ export class PlayerController extends TileComponent {
     */
 
 
+    ground.getTile(i, j, k).onPlayerAction(this);
     // Check 3 tiles around the direction the player is facing
     if ((direction & PointingDirection.E) > 0) {
       ground.getTile(i + 0, j + 1, k).onPlayerAction(this);

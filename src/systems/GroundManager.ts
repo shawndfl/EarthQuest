@@ -78,8 +78,23 @@ export class GroundManager extends Component {
     this._spriteController.initialize(texture, data);
     this._tileFactory = new TileFactory(this.eng, this._spriteController);
 
-    // load new ones
-    this._tiles = this._levelLoader.load(this._levelData, this._tileFactory);
+    // allocate tiles first
+    this._tiles = [[[]]];
+    for (let k = 0; k < levelData.encode.length; k++) {
+      this._tiles.push([]);
+
+      for (let j = 0; j < levelData.encode[k].length; j++) {
+        this._tiles[k].push([]);
+        const row = levelData.encode[k][j];
+
+        for (let s = 0; s < row.length; s += 2) {
+          this._tiles[k][j].push(this._tileFactory.empty);
+        }
+      }
+    }
+
+    // then load the level
+    this._levelLoader.load(this._levelData, this._tileFactory, this._tiles);
   }
 
   /**
@@ -278,6 +293,22 @@ export class GroundManager extends Component {
       tile = this._tiles[k][j][i] ?? this._tileFactory.empty;
     }
     return tile;
+  }
+
+  /**
+   * Moves a tile to a new location
+   * @param tileComponent 
+   * @param i 
+   * @param j 
+   * @param k 
+   */
+  moveTile(tileComponent: TileComponent, i: number, j: number, k: number): void {
+
+    const last = tileComponent.tileIndex;
+
+    this._tiles[last.z][last.y][last.x] = this._tileFactory.empty;
+    this._tiles[k][j][i] = tileComponent;
+
   }
 
   /**

@@ -55,7 +55,7 @@ export abstract class TileComponent extends Component {
   }
 
   /**
-   * Get the tile index
+   * Get the tile index. This is the floor value of the tilePosition
    */
   get tileIndex(): vec3 {
     return this._tileIndex;
@@ -145,9 +145,15 @@ export abstract class TileComponent extends Component {
     this._tilePosition.y = j;
     this._tilePosition.z = k;
 
-    this._tileIndex.x = Math.floor(this._tilePosition.x);
-    this._tileIndex.y = Math.floor(this._tilePosition.y);
-    this._tileIndex.z = Math.floor(this._tilePosition.z);
+    const indexI = Math.floor(this._tilePosition.x);
+    const indexJ = Math.floor(this._tilePosition.y);
+    const indexK = Math.floor(this._tilePosition.z);
+
+    this.groundManager.moveTile(this, indexI, indexJ, indexK);
+
+    this._tileIndex.x = indexI;
+    this._tileIndex.y = indexJ;
+    this._tileIndex.z = indexK;
 
     this.updateSpritePosition();
   }
