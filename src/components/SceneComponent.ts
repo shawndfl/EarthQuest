@@ -1,13 +1,11 @@
 import { Engine } from '../core/Engine';
 import { InputState } from '../core/InputHandler';
-import { ILevelData } from '../environment/ILevelData';
 import { Component } from './Component';
 
 /**
  * This is a base class for a scene
  */
 export abstract class SceneComponent extends Component {
-
   /**
    * Get the scene type
    */
@@ -20,7 +18,6 @@ export abstract class SceneComponent extends Component {
   constructor(eng: Engine) {
     super(eng);
   }
-
 
   /**
    * Handles user input. The logic goes through a chain of commands

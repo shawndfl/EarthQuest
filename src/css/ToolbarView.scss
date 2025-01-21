@@ -5,6 +5,22 @@
   background-color: black;
   display: inline-flex;
   align-items: center;
+  flex-direction: row;
+  @media (max-width: 800px) {
+    .btn span div {
+      display: none;
+    }
+  }
+  @media (max-width: 500px) {
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: unset;
+    .btn span div {
+      display: none;
+    }
+  }
   .btn.active {
     background-color: rgb(22, 59, 59);
     border: unset;
@@ -17,6 +33,11 @@
     border: none;
     border-radius: unset;
     width: unset;
+    img {
+      // https://isotropic.co/tool/hex-color-to-css-filter/
+      filter: invert(99%) sepia(2%) saturate(0%) hue-rotate(290deg)
+        brightness(200%) contrast(101%);
+    }
   }
 
   .btn:hover {

@@ -2,14 +2,11 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritController } from '../graphics/SpriteController';
 import { TileComponent } from './TileComponent';
-import { TileFactory } from '../systems/TileFactory';
 import { Curve } from '../math/Curve';
 import { SpriteFlip } from '../graphics/Sprite';
-import { AssetManager } from '../systems/AssetManager';
 import { ITileCreateionArgs } from './ITileCreationArgs';
 
 export class NpcComponent extends TileComponent {
-
   protected _spriteController;
 
   /** Sprite animation */
@@ -29,7 +26,7 @@ export class NpcComponent extends TileComponent {
 
   constructor(eng: Engine, args: ITileCreateionArgs) {
     super(eng, args);
-    this._spriteController = new SpritController(eng)
+    this._spriteController = new SpritController(eng);
     const i = args.i;
     const j = args.j;
     const k = args.k;
@@ -90,12 +87,15 @@ export class NpcComponent extends TileComponent {
   }
 
   yourScaringMe() {
-    this.eng.dialogManager.showDialog('Your scaring me!! I don\'t really want to fight', {
-      x: 10,
-      y: 40,
-      width: 600,
-      height: 150,
-    });
+    this.eng.dialogManager.showDialog(
+      "Your scaring me!! I don't really want to fight",
+      {
+        x: 10,
+        y: 40,
+        width: 600,
+        height: 150,
+      }
+    );
   }
 
   update(dt: number) {
@@ -114,7 +114,9 @@ export class NpcComponent extends TileComponent {
       this._spriteFlip = false;
     }
 
-    this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
+    this._spriteController.flip(
+      this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
+    );
     this._spriteController.setSprite(this._sprites[index]);
   }
 }

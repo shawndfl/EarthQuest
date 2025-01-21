@@ -35,7 +35,12 @@ export class Toolbar extends EditorComponent {
    * @param text
    * @param click
    */
-  addButton(id: string, icon: string, text: string, click: (e: MouseEvent) => void): HTMLElement {
+  addButton(
+    id: string,
+    icon: string,
+    text: string,
+    click: (e: MouseEvent) => void
+  ): HTMLElement {
     const btn = document.createElement('button');
     btn.dataset.id = id;
     btn.classList.add('btn');

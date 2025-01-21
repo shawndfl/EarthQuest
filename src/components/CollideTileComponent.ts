@@ -1,7 +1,6 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { TileFactory } from '../systems/TileFactory';
 import { ITileCreateionArgs } from './ITileCreationArgs';
 import { TileComponent } from './TileComponent';
 
@@ -9,7 +8,6 @@ import { TileComponent } from './TileComponent';
  * This is any thing that the player or some NPC can walk on
  */
 export class CollideTileComponent extends TileComponent {
-
   canAccessTile(tileComponent: TileComponent): boolean {
     return false;
   }

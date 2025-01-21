@@ -1,12 +1,20 @@
 import { Toolbar } from './Toolbar';
 import '../css/Editor.scss';
 import File from '../assets/editor/file.svg';
+import Open from '../assets/editor/file_open.svg';
+import New from '../assets/editor/new.svg';
+import Save from '../assets/editor/file_save.svg';
+import Play from '../assets/editor/play_arrow.svg';
+import Undo from '../assets/editor/undo.svg';
+import Redo from '../assets/editor/redo.svg';
+import ZoomIn from '../assets/editor/zoom_in.svg';
+import ZoomOut from '../assets/editor/zoom_out.svg';
+
 import { EditorCanvas } from './EditorCanvas';
 import { IEditor } from './IEditor';
 import { StatusBar } from './StatusBar';
 import { MenuBar } from './MenuBar';
 import { JobManager } from './JobManager';
-import { TileHelper } from '../utilities/TileHelper';
 import { ToolbarOptions } from './ToolbarOptions';
 import { ILevelData } from '../environment/ILevelData';
 import { Component } from '../components/Component';
@@ -63,7 +71,6 @@ export class Editor extends Component implements IEditor {
     this.tileBrowser.refreshLevel(level);
     for (let k = 0; k < level.encode.length; k++) {
       for (let j = 0; j < level.encode[k].length; j++) {
-
         const row = level.encode[k][j];
         let i = 0;
         for (let s = 0; s < row.length; s += 2) {
@@ -78,14 +85,20 @@ export class Editor extends Component implements IEditor {
 
           let tileTypeData = TileFactory.parseTile(tile);
           if (!tileTypeData) {
-            console.warn('invalid tile: \'' + tile + '\'' +
-              ' Format should be <tile type>|<sprint id>|[option1,options2,...] ');
+            console.warn(
+              "invalid tile: '" +
+                tile +
+                "'" +
+                ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
+            );
             continue;
           }
 
           tileTypeData.typeIndex = index;
 
-          const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
+          const spriteData = this.eng.assetManager.getImageFrom(
+            tileTypeData.spriteId
+          );
           if (spriteData) {
             const tileData: SelectTileBrowserData = {
               sx: spriteData.tileData.loc[0],
@@ -96,7 +109,7 @@ export class Editor extends Component implements IEditor {
               offsetX: spriteData.tileData.offset[0],
               offsetY: spriteData.tileData.offset[1],
               typeIndex: tileTypeData.typeIndex,
-              spriteIndex: spriteData.spriteIndex
+              spriteIndex: spriteData.spriteIndex,
             };
 
             if (spriteData.tileData.id == 'empty') {
@@ -147,7 +160,7 @@ export class Editor extends Component implements IEditor {
         const dx = e.x - lastX;
         lastX = e.x;
         const width = parseInt(entityContainer.style.width);
-        entityContainer.style.width = (width + dx) + 'px';
+        entityContainer.style.width = width + dx + 'px';
         e.preventDefault();
       }
     });
@@ -180,7 +193,7 @@ export class Editor extends Component implements IEditor {
     const maxK = this.editorCanvas.canvasRenderer.MaxK;
     const tiles: string[][] = [[]];
     for (let k = 0; k < maxK; k++) {
-      tiles.push([])
+      tiles.push([]);
       for (let j = 0; j < maxJ; j++) {
         if (tiles[k] == undefined) {
           tiles[k] = [];
@@ -199,67 +212,58 @@ export class Editor extends Component implements IEditor {
       }
     }
     this.levelData.encode = tiles;
-
   }
 
   buildToolbar() {
-    this.toolbar.addButton('new', File, 'New Scene', () => {
+    this.toolbar.addButton('new', New, 'New Scene', () => {
       console.debug('new scene!!');
     });
 
-    const saveButton = this.toolbar.addButton('save', File, 'Save', (source: MouseEvent) => {
-      this.updateLevelData();
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.levelData));
-      const downloadAnchorElem = document.createElement('a');
-      this._parent.append(downloadAnchorElem);
-      downloadAnchorElem.setAttribute("href", dataStr);
-      downloadAnchorElem.setAttribute("download", "scene.json");
-      downloadAnchorElem.click();
-      downloadAnchorElem.remove();
-
-    });
-    this.toolbar.addButton('open', File, 'Open', () => {
+    const saveButton = this.toolbar.addButton(
+      'save',
+      Save,
+      'Save',
+      (source: MouseEvent) => {
+        this.updateLevelData();
+        const dataStr =
+          'data:text/json;charset=utf-8,' +
+          encodeURIComponent(JSON.stringify(this.levelData));
+        const downloadAnchorElem = document.createElement('a');
+        this._parent.append(downloadAnchorElem);
+        downloadAnchorElem.setAttribute('href', dataStr);
+        downloadAnchorElem.setAttribute('download', 'scene.json');
+        downloadAnchorElem.click();
+        downloadAnchorElem.remove();
+      }
+    );
+    this.toolbar.addButton('open', Open, 'Open', () => {
       console.debug('Open!!');
     });
-    this.toolbar.addButton('play', File, 'Play', () => {
-
+    this.toolbar.addButton('play', Play, 'Play', () => {
       this.updateLevelData();
       this.eng.hideEditor();
     });
 
-    this.toolbar.addButton('zoomIn', File, 'Zoom In', () => {
+    this.toolbar.addButton('zoomIn', ZoomIn, 'Zoom In', () => {
       const scale = this.editorCanvas.canvasRenderer.scale;
       this.editorCanvas.canvasRenderer.setScale(scale + this.zoomStep);
     });
 
-    this.toolbar.addButton('zoomOut', File, 'Zoom Out', () => {
+    this.toolbar.addButton('zoomOut', ZoomOut, 'Zoom Out', () => {
       const scale = this.editorCanvas.canvasRenderer.scale;
       this.editorCanvas.canvasRenderer.setScale(scale - this.zoomStep);
     });
 
-    this.toolbar.addButton('undo', File, 'Undo', () => {
+    this.toolbar.addButton('undo', Undo, 'Undo', () => {
       this.jobManager.undo();
     });
 
-    this.toolbar.addButton('redo', File, 'Redo', () => {
+    this.toolbar.addButton('redo', Redo, 'Redo', () => {
       this.jobManager.redo();
-    });
-
-    this.toolbar.addButton('place', File, 'Place', (e: MouseEvent) => {
-      const button = e.target as HTMLButtonElement;
-      this.toolbar.selectedTool = ToolbarOptions.Place;
-
-      this.toolbar.setActive(button, true);
-
-      const pan = this.toolbar.getButton('pan');
-      this.toolbar.setActive(pan, false);
-    });
-    this.toolbar.addButton('pan', File, 'Pan', () => {
-      this.toolbar.selectedTool = ToolbarOptions.Place;
     });
 
     // set default
     this.toolbar.selectedTool = ToolbarOptions.Place;
-    this.toolbar.setActive(this.toolbar.getButton('place'), true);
+    //this.toolbar.setActive(this.toolbar.getButton('place'), true);
   }
 }
