@@ -9,7 +9,6 @@ import { TileContext } from './TileContext';
  * This is any thing that the player or some NPC can walk through
  */
 export class FreeTileComponent extends TileComponent {
-
   canAccessTile(tileComponent: TileComponent): boolean {
     return true;
   }

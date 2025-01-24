@@ -98,12 +98,14 @@ export class Engine {
     this.editor = new Editor(this);
     this.ground = new GroundManager(this);
     this.player = new PlayerController(this);
-    this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
-
+    this.spritePerspectiveShader = new SpritePerspectiveShader(
+      this.gl,
+      'spritePerspectiveShader'
+    );
 
     this.notificationManager.subscribe('EditorClose', (data: any) => {
       this.editor.hide();
-    })
+    });
   }
 
   createSceneManager() {
@@ -151,7 +153,7 @@ export class Engine {
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.sceneManager.initialize();
-    await this.editor.initialize(rootElement)
+    await this.editor.initialize(rootElement);
 
     this.loadFirstLevel();
 
@@ -161,7 +163,12 @@ export class Engine {
 
     this.gl.enable(this.gl.BLEND);
 
-    this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ONE, this.gl.ZERO);
+    this.gl.blendFuncSeparate(
+      this.gl.SRC_ALPHA,
+      this.gl.ONE_MINUS_SRC_ALPHA,
+      this.gl.ONE,
+      this.gl.ZERO
+    );
     this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
@@ -171,14 +178,18 @@ export class Engine {
     const url = new URL(window.location.href);
 
     if (url.searchParams.get('editor')) {
-      this.showEditor();
+      this.showEditor(Level1);
     }
 
     this.loadLevel(Level1);
   }
 
-  showEditor() {
-    this.editor.show(this.sceneManager.levelData);
+  showEditor(levelData?: ILevelData) {
+    if (!levelData) {
+      this.editor.show(this.sceneManager.levelData);
+    } else {
+      this.editor.show(levelData);
+    }
     this.canvasController.showCanvas(false);
   }
 
@@ -210,11 +221,15 @@ export class Engine {
     this.input.preUpdate(dt);
 
     // handle input
-    if (this.input.buttonsDown != UserAction.None || this.input.buttonsReleased != UserAction.None) {
+    if (
+      this.input.buttonsDown != UserAction.None ||
+      this.input.buttonsReleased != UserAction.None
+    ) {
       this.soundManager.UserReady();
       const inputState = this.input.getInputState();
       // handle dialog input first
-      this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
+      this.dialogManager.handleUserAction(inputState) ||
+        this.player.handleUserAction(inputState);
     }
 
     // clear the buffers
@@ -243,7 +258,6 @@ export class Engine {
     // used to reset flags and update hold timers
     this.input.postUpdate(dt);
     //console.timeEnd('Game update');
-
   }
 
   resize(width: number, height: number) {

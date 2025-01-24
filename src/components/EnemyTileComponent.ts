@@ -2,7 +2,6 @@ import { Engine } from '../core/Engine';
 import { SpriteFlip } from '../graphics/Sprite';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { SpritController } from '../graphics/SpriteController';
 import { Curve } from '../math/Curve';
 import { ITileCreateionArgs } from './ITileCreationArgs';
 import { PlayerController } from './PlayerController';
@@ -12,7 +11,6 @@ import { TileComponent } from './TileComponent';
  * This is any thing that the player or some NPC can walk on
  */
 export class EnemyTileComponent extends TileComponent {
-
   /** Sprite animation */
   protected _sprites: string[];
   private _spriteController: SpritBatchController;
@@ -21,7 +19,7 @@ export class EnemyTileComponent extends TileComponent {
   /** Should the sprites be flipped */
   private _spriteFlip: boolean;
   private _moveCounter = 0;
-  private _moveSpeed = .010;
+  private _moveSpeed = 0.01;
 
   private _isDead: boolean;
 
@@ -45,11 +43,7 @@ export class EnemyTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(
-    eng: Engine,
-    spriteController: SpritBatchController,
-    args: ITileCreateionArgs
-  ) {
+  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreateionArgs) {
     super(eng, args);
     this._spriteController = new SpritBatchController(eng);
     const character = eng.assetManager.character;
@@ -107,8 +101,6 @@ export class EnemyTileComponent extends TileComponent {
     // then use the movement dot of the slope vector which will allow the player for
     // move up and down on stairs and slops
     this.groundManager.offsetTile(this, moveVector.x, moveVector.y, 0);
-
-
   }
 
   dispose(): void {

@@ -48,7 +48,6 @@ export class GroundManager extends Component {
    * @param levelData
    */
   async initialize() {
-
     // reset tiles that need updates
     this._updateTiles = [];
 
@@ -62,7 +61,13 @@ export class GroundManager extends Component {
 
     // create the initial level
     if (false) {
-      this.buildLevel({ seed: 605, width: 60, length: 60, height: 7, playerPos: new vec2([9, 6]) });
+      this.buildLevel({
+        seed: 605,
+        width: 60,
+        length: 60,
+        height: 7,
+        playerPos: new vec2([9, 6]),
+      });
     }
   }
 
@@ -146,12 +151,138 @@ export class GroundManager extends Component {
   }
 
   /**
-    * Moves the tile by a given amount
-    * @param i
-    * @param j
-    * @param k
-    */
+   * Gets the highest tile starting from a height of K
+   * @param k
+   */
+  getHighestTileFrom(i: number, j: number, k: number): number {
+    const tileX = Math.floor(i);
+    const tileY = Math.floor(j);
+    let tileZ = Math.floor(k);
+    let tile = this.getTile(tileX, tileY, tileZ);
+
+    if (tile.empty) {
+      for (; tileZ > 0; tileZ--) {
+        tile = this.getTile(tileX, tileY, tileZ);
+        if (!tile.empty) {
+          return tile.tileHeight;
+        }
+      }
+    }
+  }
+
+  /**
+   * This function will place a tile
+   * @param target
+   * @param i
+   * @param j
+   */
+  placeTileOn(target: TileComponent, i: number, j: number): void {
+    const tileX = Math.floor(target.tilePosition.x);
+    const tileY = Math.floor(target.tilePosition.y);
+    const tileZ = Math.floor(target.tilePosition.z);
+    const floorHeight = tileZ - 1;
+
+    const fractionI = target.tilePosition.x % 1;
+    const fractionJ = target.tilePosition.y % 1;
+    const dir = new vec3([i, j, 0]);
+
+    // check the current floor height and the level above
+    for (let height = floorHeight; height < floorHeight + 2; height++) {
+      const options: TileAccessOptions = {
+        ignoreEmpty: height != floorHeight,
+      };
+
+      // left
+      if (dir.x < 0 && fractionI < 0.25) {
+        // cancel x movement
+        if (!this.canAccessTile(target, tileX - 1, tileY, height, options)) {
+          dir.x = 0;
+        }
+      }
+
+      // right
+      else if (dir.x > 0 && fractionI > 0.75) {
+        // cancel x movement
+        if (!this.canAccessTile(target, tileX + 1, tileY, height, options)) {
+          dir.x = 0;
+        }
+      }
+
+      // up
+      if (dir.y < 0 && fractionJ < 0.25) {
+        // cancel y movement
+        if (!this.canAccessTile(target, tileX, tileY - 1, height, options)) {
+          dir.y = 0;
+        }
+      }
+      // down
+      else if (dir.y > 0 && fractionJ > 0.75) {
+        // cancel y movement
+        if (!this.canAccessTile(target, tileX, tileY + 1, height, options)) {
+          dir.y = 0;
+        }
+      }
+
+      // check corners
+      if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
+        //top right
+        if (!this.canAccessTile(target, tileX + 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+        //top left
+        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
+        //bottom left
+        if (!this.canAccessTile(target, tileX - 1, tileY - 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+        //bottom right
+        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
+          if (Math.abs(dir.x) > Math.abs(dir.y)) {
+            dir.y = 0;
+          } else {
+            dir.x = 0;
+          }
+        }
+      }
+    }
+    // check if the player can access this tile
+    if (dir.length() > 0) {
+      target.moveToTilePosition(
+        target.tilePosition.x + dir.x,
+        target.tilePosition.y + dir.y,
+        target.tilePosition.z + dir.z,
+        dir
+      );
+    }
+  }
+
+  /**
+   * Moves the tile by a given amount
+   * @param i
+   * @param j
+   * @param k
+   */
   offsetTile(target: TileComponent, i: number, j: number, k: number): void {
+    if (target.type == 'player') {
+      console.debug('hit');
+    }
     const tileX = Math.floor(target.tilePosition.x);
     const tileY = Math.floor(target.tilePosition.y);
     const tileZ = Math.floor(target.tilePosition.z);
@@ -286,29 +417,34 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  getTile(i: number, j: number, k: number) {
+  getTile(i: number, j: number, k: number, topMost?: boolean) {
     let tile: TileComponent = this._tileFactory.empty;
 
     if (this._tiles[k] != undefined && this._tiles[k][j] != undefined) {
       tile = this._tiles[k][j][i] ?? this._tileFactory.empty;
     }
+
     return tile;
   }
 
   /**
    * Moves a tile to a new location
-   * @param tileComponent 
-   * @param i 
-   * @param j 
-   * @param k 
+   * @param tileComponent
+   * @param i
+   * @param j
+   * @param k
    */
   moveTile(tileComponent: TileComponent, i: number, j: number, k: number): void {
-
     const last = tileComponent.tileIndex;
 
-    this._tiles[last.z][last.y][last.x] = this._tileFactory.empty;
-    this._tiles[k][j][i] = tileComponent;
+    // did the tile index change
+    if (k != last.z || j != last.y || i != last.x) {
+      // switch the tiles
+      const lastTile = this._tiles[last.z][last.y][last.x];
 
+      this._tiles[last.z][last.y][last.x] = this._tileFactory.empty;
+      this._tiles[k][j][i] = tileComponent;
+    }
   }
 
   /**
@@ -329,6 +465,22 @@ export class GroundManager extends Component {
    */
   canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number, options: TileAccessOptions): boolean {
     let tile = this.getTile(i, j, k);
+
+    // look below this tile if it is empty
+    if (tile.empty) {
+      for (let x = k - 1; x >= 0; x--) {
+        tile = this.getTile(i, j, x);
+        if (!tile.empty) {
+          break;
+        }
+      }
+    }
+    // there is nothing under us
+    if (tile.empty) {
+      return false;
+    }
+
+    // try and access this tile
     return tile.canAccessTile(tileComponent, options);
   }
 
@@ -341,7 +493,7 @@ export class GroundManager extends Component {
    * @returns
    */
   onEnter(tileComponent: TileComponent, i: number, j: number, k: number, tileContext: TileContext): void {
-    let tile = this.getTile(i, j, k);
+    let tile = this.getTile(i, j, k, true);
     tile.onEnter(tileComponent, tileContext);
   }
 

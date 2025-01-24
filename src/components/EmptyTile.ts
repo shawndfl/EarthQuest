@@ -3,6 +3,7 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { TileFactory } from '../systems/TileFactory';
 import { ITileCreateionArgs } from './ITileCreationArgs';
+import { TileAccessOptions } from './TileAccessOptions';
 import { TileComponent } from './TileComponent';
 
 /**
@@ -22,6 +23,6 @@ export class EmptyTile extends TileComponent {
 
     if (i && j && k) {
       this.setTilePosition(i, j, k);
-    } 
+    }
   }
 }

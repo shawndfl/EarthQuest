@@ -11,7 +11,6 @@ import { SpritController } from '../graphics/SpriteController';
  * This is any thing that the player or some NPC can walk on
  */
 export class OpenTileComponent extends TileComponent {
-
   private lastSprite: SpritController;
   /**
    * Check if the tile component (or player) can access this tile.
@@ -20,6 +19,9 @@ export class OpenTileComponent extends TileComponent {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent): boolean {
+    if (tileComponent.type == 'player') {
+      console.debug('can access');
+    }
     // cannot move higher than a half of a step
     const canAccess = Math.abs(tileComponent.tilePosition.z - 1 - this.tileHeight) < 1;
     if (canAccess) {
@@ -30,15 +32,16 @@ export class OpenTileComponent extends TileComponent {
   }
 
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
-    const pos = tileComponent.tilePosition;
-    tileComponent.setTilePosition(pos.x, pos.y, this.tileHeight + 1);
+    if (tileComponent.type == 'player') {
+      console.debug('player entered');
+    }
+    tileContext.k = this.tileHeight + 1;
   }
 
   onPlayerAction(tileComponent: TileComponent): void {
     this._spriteController.activeSprite(this.id);
     this._spriteController.setSprite('highlight');
     this._spriteController.scale(this.eng.tileScale);
-
   }
 
   get spriteController(): SpritBaseController {
@@ -46,11 +49,7 @@ export class OpenTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(
-    eng: Engine,
-    protected _spriteController: SpritBatchController,
-    args: ITileCreateionArgs
-  ) {
+  constructor(eng: Engine, protected _spriteController: SpritBatchController, args: ITileCreateionArgs) {
     super(eng, args);
     this._spriteController.activeSprite(this.id);
     this._spriteController.setSprite(this.spriteId);

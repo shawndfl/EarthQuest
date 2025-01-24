@@ -34,10 +34,15 @@ export abstract class TileComponent extends Component {
   private _screenPosition: vec3;
   private _screenDepthPos: vec3;
 
-  /** 
+  /**
    * id of the tile in the form of i,j,k
    */
   private _id: string;
+
+  /**
+   * If some tile sets the position of this tile don't set it in the moveToTilePosition function
+   */
+  protected _positionSet: boolean;
 
   /**
    * Gets the tile below this tile
@@ -123,8 +128,7 @@ export abstract class TileComponent extends Component {
     return this._options?.options;
   }
 
-  constructor(eng: Engine,
-    private _options?: ITileCreateionArgs) {
+  constructor(eng: Engine, private _options?: ITileCreateionArgs) {
     super(eng);
 
     this._id = TileFactory.createStaticID(this._options?.i, this._options?.j, this._options?.k);
@@ -140,15 +144,26 @@ export abstract class TileComponent extends Component {
    * @param k
    */
   setTilePosition(i: number, j: number, k: number) {
-
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;
 
     const indexI = Math.floor(this._tilePosition.x);
     const indexJ = Math.floor(this._tilePosition.y);
-    const indexK = Math.floor(this._tilePosition.z);
 
+    //TODO find k by searching the below Math.ceil(this._tilePosition.z);
+    let indexK = Math.ceil(this._tilePosition.z);
+    const isEmpty = this.groundManager.getTile(indexI, indexJ, indexK).empty;
+    if (isEmpty) {
+      for (; indexK > 0; indexK--) {
+        if (!this.groundManager.getTile(indexI, indexJ, indexK).empty) {
+          break;
+        }
+      }
+    }
+
+    // update the tile map by removing this component from its tile
+    // and moving it to the new one
     this.groundManager.moveTile(this, indexI, indexJ, indexK);
 
     this._tileIndex.x = indexI;
@@ -165,12 +180,7 @@ export abstract class TileComponent extends Component {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent, options: TileAccessOptions): boolean {
-    if (this.empty && options.ignoreEmpty) {
-      return true;
-    } else {
-      // default component
-    }
-    return false;
+    return true;
   }
 
   /**
@@ -224,18 +234,16 @@ export abstract class TileComponent extends Component {
 
     const floor = tileZ - 1;
     const changedTiles = this._tileIndex.x != tileX || this._tileIndex.y != tileY;
-    // set the tile position first. This will allow onEnter on Exit to finalize the position if needed.
-    this.setTilePosition(i, j, k);
 
-    const tileContext: TileContext = { direction: dir ?? new vec3() };
+    const tileContext: TileContext = { direction: dir ?? new vec3(), i, j, k };
 
     // we moved off the last tile call on exit
     if (changedTiles) {
       // exit the ground tile
-      this.groundManager.onExit(this, this._tileIndex.x, this._tileIndex.y, floor, tileContext);
+      this.groundManager.onExit(this, tileX, tileY, floor, tileContext);
 
       // exit the tile at eye level
-      this.groundManager.onExit(this, this._tileIndex.x, this._tileIndex.y, floor + 1, tileContext);
+      this.groundManager.onExit(this, tileX, tileY, floor + 1, tileContext);
 
       // enter the tile on the ground
       this.groundManager.onEnter(this, tileX, tileY, floor, tileContext);
@@ -243,6 +251,9 @@ export abstract class TileComponent extends Component {
       // enter the tile in front of the player
       this.groundManager.onEnter(this, tileX, tileY, floor + 1, tileContext);
     }
+
+    // set the tile's new position
+    this.setTilePosition(tileContext.i, tileContext.j, tileContext.k);
   }
 
   /**
@@ -250,7 +261,13 @@ export abstract class TileComponent extends Component {
    */
   protected updateSpritePosition() {
     // Get the screen depth using the tile index not position of this tile
-    this._screenDepthPos = this.eng.tileHelper.toScreenLoc(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z, false, this._screenDepthPos);
+    this._screenDepthPos = this.eng.tileHelper.toScreenLoc(
+      this._tileIndex.x,
+      this._tileIndex.y,
+      this._tileIndex.z,
+      false,
+      this._screenDepthPos
+    );
 
     // Get the screen position of this tile using the position
     this._screenPosition = this.eng.tileHelper.toScreenLoc(

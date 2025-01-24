@@ -2,7 +2,6 @@ import { Component } from '../components/Component';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Engine } from '../core/Engine';
 import { DialogComponent } from '../menus/DialogComponent';
-import { UserAction } from '../core/UserAction';
 import { InputState } from '../core/InputHandler';
 import { GameMenuComponent } from '../menus/GameMenuComponent';
 import { DialogBuilder } from '../menus/DialogBuilder';
@@ -39,7 +38,11 @@ export class DialogManager extends Component {
     this._gameMenuBuilder = new GameMenuBuilder(eng);
     this._spriteController = new SpritBatchController(eng);
     this._dialog = new DialogComponent(this.eng, this._dialogBuild);
-    this._gameMenu = new GameMenuComponent(this.eng, 'gameMenu', this._gameMenuBuilder);
+    this._gameMenu = new GameMenuComponent(
+      this.eng,
+      'gameMenu',
+      this._gameMenuBuilder
+    );
   }
 
   async initialize() {
@@ -57,7 +60,10 @@ export class DialogManager extends Component {
    * @returns
    */
   handleUserAction(state: InputState): boolean {
-    return this._dialog.handleUserAction(state) || this._gameMenu.handleUserAction(state);
+    return (
+      this._dialog.handleUserAction(state) ||
+      this._gameMenu.handleUserAction(state)
+    );
   }
 
   /**
