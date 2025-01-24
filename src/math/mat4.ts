@@ -286,7 +286,7 @@ export default class mat4 {
     const z = vector.z;
 
     if (!target) {
-      return target;
+      target = new vec3();
     }
 
     target.x = this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12];
@@ -502,7 +502,15 @@ export default class mat4 {
     return mat4.frustum(-right, right, -top, top, near, far);
   }
 
-  static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number, target?: mat4): mat4 {
+  static orthographic(
+    left: number,
+    right: number,
+    bottom: number,
+    top: number,
+    near: number,
+    far: number,
+    target?: mat4
+  ): mat4 {
     const rl = right - left;
     const tb = top - bottom;
     const fn = far - near;
@@ -530,7 +538,7 @@ export default class mat4 {
     target.values[14] = -(far + near) / fn;
     target.values[15] = 1;
 
-    return target
+    return target;
   }
 
   static lookAt(position: vec3, target: vec3, up: vec3 = vec3.up): mat4 {

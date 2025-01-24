@@ -1,7 +1,7 @@
 import { IEditor } from '../src/editor/IEditor';
 import { NotificationManager } from '../src/core/NotificationManager';
-import { MockEngine } from './MockEngine';
 import { Engine } from '../src/core/Engine';
+import { MockEngine } from '../src/testSupport/MockEngine';
 
 test('notification', () => {
   const manger = new NotificationManager(new MockEngine() as Engine);
@@ -43,12 +43,10 @@ test('multiple Events', () => {
   let callCount1 = 0;
   let callCount2 = 0;
   const event = (data: any) => {
-    console.debug('Got event ' + data.name);
     expect(data?.name).toBe('hello');
     callCount1++;
   };
   const event2 = (data: any) => {
-    console.debug('Got event2 ' + data.name);
     expect(data?.name).toBe('hello');
     callCount2++;
   };

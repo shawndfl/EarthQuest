@@ -7,8 +7,8 @@ import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
 import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
-import { TileAccessOptions } from './TileAccessOptions';
 import { TileContext } from './TileContext';
+import { TileAccessOptions } from './TileAccessOptions';
 
 /**
  * A tile component is a component that controls a single tile.
