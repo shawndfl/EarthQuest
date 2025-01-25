@@ -160,9 +160,10 @@ export class PlayerController extends TileComponent {
 
     // if the user tapped or clicked on the screen
     if (state.isDown(UserAction.A)) {
-      this.attack();
+      this._attacking = true;
+      this.raiseAction(false);
     } else if (state.isReleased(UserAction.A)) {
-      this.raiseAction();
+      this.raiseAction(true);
     } else if ((state.buttonsReleased & UserAction.Start) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {
@@ -221,11 +222,6 @@ export class PlayerController extends TileComponent {
     }
 
     return true;
-  }
-
-  attack(): void {
-    this._attacking = true;
-    this.raiseAction();
   }
 
   update(dt: number) {
@@ -330,43 +326,47 @@ export class PlayerController extends TileComponent {
     );
   }
 
-  protected raiseAction() {
+  /**
+   *
+   * @param keyRelease - was the key just released or is it currently down
+   */
+  protected raiseAction(keyReleased: boolean) {
     const i = this.tileIndex.x;
     const j = this.tileIndex.y;
     const k = this.tileIndex.z;
     const ground = this.eng.ground;
     const direction = this.facingDirection;
 
-    ground.getTile(i, j, k).onPlayerAction(this);
+    ground.getTile(i, j, k).onPlayerAction(this, keyReleased);
     // Check 3 tiles around the direction the player is facing
     if ((direction & PointingDirection.E) > 0) {
-      ground.getTile(i + 0, j + 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
-      ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
-      ground.getTile(i + 0, j - 1, k).onPlayerAction(this);
+      ground.getTile(i + 0, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j + 0, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j - 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 0, j - 1, k).onPlayerAction(this, keyReleased);
     } else if ((direction & PointingDirection.W) > 0) {
-      ground.getTile(i - 0, j + 1, k).onPlayerAction(this);
-      ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
-      ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
-      ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
-      ground.getTile(i - 0, j - 1, k).onPlayerAction(this);
+      ground.getTile(i - 0, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 1, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 1, j + 0, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 1, j - 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 0, j - 1, k).onPlayerAction(this, keyReleased);
     } else if ((direction & PointingDirection.S) > 0) {
-      ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
-      ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
-      ground.getTile(i + 0, j + 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
+      ground.getTile(i - 1, j + 0, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 1, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 0, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j + 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j + 0, k).onPlayerAction(this, keyReleased);
     } else if ((direction & PointingDirection.N) > 0) {
-      ground.getTile(i - 1, j - 0, k).onPlayerAction(this);
-      ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
-      ground.getTile(i + 0, j - 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
-      ground.getTile(i + 1, j - 0, k).onPlayerAction(this);
+      ground.getTile(i - 1, j - 0, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i - 1, j - 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 0, j - 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j - 1, k).onPlayerAction(this, keyReleased);
+      ground.getTile(i + 1, j - 0, k).onPlayerAction(this, keyReleased);
     }
 
     // this should not happen but just in case
-    ground.getTile(i, j, k).onPlayerAction(this);
+    ground.getTile(i, j, k).onPlayerAction(this, keyReleased);
   }
 
   loadLevel(level: ILevelData): void {}

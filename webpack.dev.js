@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -15,14 +16,17 @@ module.exports = {
     compress: true,
     port: 8080,
     client: {
-      logging: 'log'
-    }
+      logging: 'log',
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Development',
       template: path.resolve(__dirname, 'src/index.html'),
       chunks: ['debug', 'main'],
+    }),
+    new CopyPlugin({
+      patterns: [{ from: 'assets/levels/*.json', context: './src/.' }],
     }),
   ],
   module: {
@@ -38,7 +42,7 @@ module.exports = {
       },
       {
         test: /\.mp3$/,
-        use: ["url-loader"]
+        use: ['url-loader'],
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -48,13 +52,13 @@ module.exports = {
         test: /\.s[ac]ss$/i,
         use: [
           // Creates `style` nodes from JS strings
-          "style-loader",
+          'style-loader',
           // Translates CSS into CommonJS
-          "css-loader",
+          'css-loader',
           // Compiles Sass to CSS
-          "sass-loader",
+          'sass-loader',
         ],
-      }
+      },
     ],
   },
 };

@@ -19,9 +19,6 @@ export class OpenTileComponent extends TileComponent {
    * @returns
    */
   canAccessTile(tileComponent: TileComponent): boolean {
-    if (tileComponent.type == 'player') {
-      console.debug('can access');
-    }
     // cannot move higher than a half of a step
     const canAccess = Math.abs(tileComponent.tilePosition.z - 1 - this.tileHeight) < 1;
     if (canAccess) {
@@ -32,9 +29,6 @@ export class OpenTileComponent extends TileComponent {
   }
 
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
-    if (tileComponent.type == 'player') {
-      console.debug('player entered');
-    }
     tileContext.k = this.tileHeight + 1;
   }
 

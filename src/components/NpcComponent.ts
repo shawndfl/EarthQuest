@@ -60,7 +60,11 @@ export class NpcComponent extends TileComponent {
    * Called when the player hits the action button
    * @param tileComponent
    */
-  onPlayerAction(tileComponent: TileComponent) {
+  onPlayerAction(tileComponent: TileComponent, keyRelease: boolean) {
+    if (!keyRelease) {
+      return;
+    }
+
     this.eng.dialogManager.showDialog(
       'You want a piece of me?',
       { x: 20, y: 40, width: 400, height: 200 },
@@ -87,15 +91,12 @@ export class NpcComponent extends TileComponent {
   }
 
   yourScaringMe() {
-    this.eng.dialogManager.showDialog(
-      "Your scaring me!! I don't really want to fight",
-      {
-        x: 10,
-        y: 40,
-        width: 600,
-        height: 150,
-      }
-    );
+    this.eng.dialogManager.showDialog("You're scaring me!! I don't really want to fight", {
+      x: 10,
+      y: 40,
+      width: 700,
+      height: 150,
+    });
   }
 
   update(dt: number) {
@@ -114,9 +115,7 @@ export class NpcComponent extends TileComponent {
       this._spriteFlip = false;
     }
 
-    this._spriteController.flip(
-      this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None
-    );
+    this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
   }
 }

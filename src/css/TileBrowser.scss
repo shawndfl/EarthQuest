@@ -38,7 +38,6 @@
 /** NEW */
 
 .tile-list {
-
   .tile-item-selected {
     background-color: rgb(141, 238, 238);
   }
@@ -52,7 +51,7 @@
 
     .tile-item-container {
       height: 100%;
-      width: 300px;
+      width: 100%;
       display: inline-flex;
 
       .tile-preview {
@@ -65,7 +64,6 @@
       }
 
       .text {
-
         justify-content: center;
         align-items: center;
         width: 200px;
@@ -94,8 +92,6 @@
         justify-content: center;
         align-items: center;
       }
-
     }
   }
-
 }

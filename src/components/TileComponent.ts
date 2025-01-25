@@ -167,8 +167,9 @@ export abstract class TileComponent extends Component {
   /**
    * Called when the player hits the action button
    * @param tileComponent
+   * @param keyRelease - was the key just released or is it currently down
    */
-  onPlayerAction(tileComponent: TileComponent) {
+  onPlayerAction(tileComponent: TileComponent, keyRelease: boolean) {
     //NOP
   }
 

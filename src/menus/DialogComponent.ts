@@ -63,6 +63,7 @@ export class DialogComponent extends PanelComponent {
   handleUserAction(state: InputState): boolean {
     const active = this.visible;
     if (active && state.isReleased(UserAction.A)) {
+      console.debug('selected something', state);
       let canHide = true;
 
       if (this.onClosing) {

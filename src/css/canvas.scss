@@ -1,26 +1,27 @@
 body {
-    margin: 0px;
-    padding: 0px;
-    overflow: hidden;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
 }
 
 .canvas-container {
-    width: 100%;
-    height: 100vh;
-    margin: 0px;
+  width: 100%;
+  height: 100vh;
+  margin: 0px;
 }
 
 .canvas {
-    background-color: lightgray;
-    margin: auto;
-    display: flex;
+  background-color: lightgray;
+  height: 100vh;
+  margin: auto;
+  display: flex;
 }
 
 .background {
-    position: absolute;
-    top: 200vh;
+  position: absolute;
+  top: 200vh;
 }
 
 .hidden {
-    display: none;
+  display: none !important;
 }

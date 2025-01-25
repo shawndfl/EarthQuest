@@ -29,6 +29,7 @@ export class EnemyTileComponent extends TileComponent {
       if (player.attacking) {
         this._spriteController.removeSprite(this.id);
         this._spriteController.commitToBuffer();
+        this.groundManager.removeTile(this);
         this._isDead = true;
       }
     }

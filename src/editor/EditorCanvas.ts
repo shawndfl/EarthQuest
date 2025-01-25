@@ -38,7 +38,6 @@ export class EditorCanvas extends EditorComponent {
   }
 
   private buildHtml(): void {
-
     this.container = document.createElement('div');
     this.container.classList.add('editor-canvas-container');
 
@@ -67,15 +66,14 @@ export class EditorCanvas extends EditorComponent {
     activeLayerInput.value = '0';
     activeLayerInput.addEventListener('change', () => {
       this.canvasRenderer.activeLayer = Number.parseInt(activeLayerInput.value);
-    })
+    });
     this.container.append(this.canvas, activeLayerInput);
-
   }
 
   keyup(e: KeyboardEvent): void {
     //this.canvas.style.cursor = 'pointer';
   }
-  keydown(e: KeyboardEvent): void { }
+  keydown(e: KeyboardEvent): void {}
 
   mouseDown(e: MouseEvent) {
     this.lastPos = undefined;

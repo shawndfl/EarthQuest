@@ -1,6 +1,6 @@
 import { Toolbar } from './Toolbar';
 import '../css/Editor.scss';
-import File from '../assets/editor/file.svg';
+
 import Open from '../assets/editor/file_open.svg';
 import New from '../assets/editor/new.svg';
 import Save from '../assets/editor/file_save.svg';
@@ -86,19 +86,14 @@ export class Editor extends Component implements IEditor {
           let tileTypeData = TileFactory.parseTile(tile);
           if (!tileTypeData) {
             console.warn(
-              "invalid tile: '" +
-                tile +
-                "'" +
-                ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
+              "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
             );
             continue;
           }
 
           tileTypeData.typeIndex = index;
 
-          const spriteData = this.eng.assetManager.getImageFrom(
-            tileTypeData.spriteId
-          );
+          const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
           if (spriteData) {
             const tileData: SelectTileBrowserData = {
               sx: spriteData.tileData.loc[0],
@@ -161,6 +156,9 @@ export class Editor extends Component implements IEditor {
         lastX = e.x;
         const width = parseInt(entityContainer.style.width);
         entityContainer.style.width = width + dx + 'px';
+
+        this.tileBrowser.updateItemList(width + dx);
+
         e.preventDefault();
       }
     });
@@ -219,23 +217,16 @@ export class Editor extends Component implements IEditor {
       console.debug('new scene!!');
     });
 
-    const saveButton = this.toolbar.addButton(
-      'save',
-      Save,
-      'Save',
-      (source: MouseEvent) => {
-        this.updateLevelData();
-        const dataStr =
-          'data:text/json;charset=utf-8,' +
-          encodeURIComponent(JSON.stringify(this.levelData));
-        const downloadAnchorElem = document.createElement('a');
-        this._parent.append(downloadAnchorElem);
-        downloadAnchorElem.setAttribute('href', dataStr);
-        downloadAnchorElem.setAttribute('download', 'scene.json');
-        downloadAnchorElem.click();
-        downloadAnchorElem.remove();
-      }
-    );
+    const saveButton = this.toolbar.addButton('save', Save, 'Save', (source: MouseEvent) => {
+      this.updateLevelData();
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(this.levelData));
+      const downloadAnchorElem = document.createElement('a');
+      this._parent.append(downloadAnchorElem);
+      downloadAnchorElem.setAttribute('href', dataStr);
+      downloadAnchorElem.setAttribute('download', 'scene.json');
+      downloadAnchorElem.click();
+      downloadAnchorElem.remove();
+    });
     this.toolbar.addButton('open', Open, 'Open', () => {
       console.debug('Open!!');
     });

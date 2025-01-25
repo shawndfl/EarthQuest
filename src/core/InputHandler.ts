@@ -182,10 +182,7 @@ export class InputHandler extends Component {
       window.addEventListener('touchstart', (e) => {
         if (!this.isCalibrating) {
           if (e.touches.length > 0 && e.touches[0].target === eng.gl.canvas) {
-            this.inputDown = [
-              e.touches.item(0) ? true : false,
-              e.touches.item(1) ? true : false,
-            ];
+            this.inputDown = [e.touches.item(0) ? true : false, e.touches.item(1) ? true : false];
             this.inputReleased = false;
 
             const t = e.touches[0].target as HTMLCanvasElement;
@@ -245,6 +242,7 @@ export class InputHandler extends Component {
 
       if (e.key == ' ') {
         this.buttonsDown = this.buttonsDown | UserAction.A;
+        console.debug('A is down' + this.buttonsDown);
       }
 
       if (e.key == 'b') {
@@ -287,6 +285,7 @@ export class InputHandler extends Component {
     if (e.key == ' ') {
       this.buttonsDown = this.buttonsDown & ~UserAction.A;
       this.buttonsReleased = this.buttonsReleased | UserAction.A;
+      console.debug('A is up' + this.buttonsReleased);
     }
 
     if (e.key == 'b') {
@@ -309,10 +308,7 @@ export class InputHandler extends Component {
     if (this.isCalibrating) {
       if (this.calibrationNextPrompt) {
         console.info(
-          'Hit the ' +
-            Array.from(Object.keys(this.mappingIndex)).find(
-              (key, index) => index == this.activeButtonIndex
-            )
+          'Hit the ' + Array.from(Object.keys(this.mappingIndex)).find((key, index) => index == this.activeButtonIndex)
         );
         this.calibrationNextPrompt = false;
       }
@@ -336,6 +332,9 @@ export class InputHandler extends Component {
 
   postUpdate(dt: number) {
     // reset press actions
+    if (this.buttonsReleased != UserAction.None) {
+      console.debug('releasing button');
+    }
     this.buttonsReleased = UserAction.None;
     this.inputReleased = false;
   }
@@ -362,10 +361,7 @@ export class InputHandler extends Component {
   }
 
   doneCalibrating() {
-    window.localStorage.setItem(
-      'inputMapping',
-      JSON.stringify(this.inputMappings)
-    );
+    window.localStorage.setItem('inputMapping', JSON.stringify(this.inputMappings));
     this.isCalibrating = false;
     this.activeButtonIndex = 0;
     console.debug('done calibrating!!');
@@ -378,23 +374,11 @@ export class InputHandler extends Component {
     this.hasGamePad = 'getGamepads' in navigator;
     if (this.hasGamePad) {
       console.debug(' gamepad supported');
-      window.removeEventListener(
-        'gamepadconnected',
-        this.connectGamepad.bind(this)
-      );
-      window.removeEventListener(
-        'gamepaddisconnected',
-        this.disconnectGamepad.bind(this)
-      );
+      window.removeEventListener('gamepadconnected', this.connectGamepad.bind(this));
+      window.removeEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
 
-      window.addEventListener(
-        'gamepadconnected',
-        this.connectGamepad.bind(this)
-      );
-      window.addEventListener(
-        'gamepaddisconnected',
-        this.disconnectGamepad.bind(this)
-      );
+      window.addEventListener('gamepadconnected', this.connectGamepad.bind(this));
+      window.addEventListener('gamepaddisconnected', this.disconnectGamepad.bind(this));
     } else {
       console.warn('gamepad not supported!');
     }

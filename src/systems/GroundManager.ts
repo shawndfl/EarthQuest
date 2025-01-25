@@ -309,6 +309,17 @@ export class GroundManager extends Component {
   }
 
   /**
+   * Makes a tile empty
+   * @param tileComponent
+   */
+  removeTile(tileComponent: TileComponent): void {
+    const i = tileComponent.tileIndex.x;
+    const j = tileComponent.tileIndex.y;
+    const k = tileComponent.tileIndex.z;
+    this._tiles[i][j][k] = this._tileFactory.empty;
+  }
+
+  /**
    * Moves a tile to a new location
    * @param tileComponent
    * @param i

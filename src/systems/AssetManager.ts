@@ -13,7 +13,6 @@ import { Texture } from '../graphics/Texture';
 import { IFontData } from '../graphics/IFontData';
 import { ISpriteData, ITileData } from '../graphics/ISpriteData';
 
-
 export interface ISpriteDataAndImage {
   tileData: ITileData;
   spriteData: ISpriteData;
@@ -21,7 +20,6 @@ export interface ISpriteDataAndImage {
   spriteIndex: number;
   image: HTMLImageElement;
 }
-
 
 /**
  * Manages texture assets
@@ -82,18 +80,18 @@ export class AssetManager extends Component {
 
   /**
    * Gets a list of tiles form the tile data and character data
-   * @returns 
+   * @returns
    */
   getTileAssetList(): string[] {
     const tileId = (TileSheetData as ISpriteData).tiles.map((tile) => tile.id);
-    tileId.push(... (CharacterData as ISpriteData).tiles.map((tile) => tile.id));
+    tileId.push(...(CharacterData as ISpriteData).tiles.map((tile) => tile.id));
     return tileId;
   }
 
   /**
    * Gets the image by looking up the sprite id.
-   * @param id 
-   * @returns 
+   * @param id
+   * @returns
    */
   getImageFrom(id: string): ISpriteDataAndImage {
     // check the tileData
@@ -108,9 +106,12 @@ export class AssetManager extends Component {
     });
     if (tileData) {
       if (!tileData.loc) {
-        tileData.loc = [spriteData.tileOffset + (tileData.index[0] + spriteData.tileSpacing) * spriteData.tileWidth,
-        spriteData.tileOffset + (tileData.index[1] + spriteData.tileSpacing) * spriteData.tileHeight,
-        spriteData.tileWidth, spriteData.tileHeight];
+        tileData.loc = [
+          spriteData.tileOffset + (tileData.index[0] + spriteData.tileSpacing) * spriteData.tileWidth,
+          spriteData.tileOffset + (tileData.index[1] + spriteData.tileSpacing) * spriteData.tileHeight,
+          spriteData.tileWidth,
+          spriteData.tileHeight,
+        ];
       }
       return { spriteData, tileData, spriteIndex: index, image: this._tileImage as HTMLImageElement };
     }
@@ -127,11 +128,19 @@ export class AssetManager extends Component {
       });
       if (tileData) {
         if (!tileData.loc) {
-          tileData.loc = [spriteData.tileOffset + (spriteData.tileWidth + spriteData.tileSpacing) * tileData.index[0],
-          spriteData.tileOffset + (spriteData.tileHeight + spriteData.tileSpacing) * tileData.index[1],
-          spriteData.tileWidth, spriteData.tileHeight];
+          tileData.loc = [
+            spriteData.tileOffset + (spriteData.tileWidth + spriteData.tileSpacing) * tileData.index[0],
+            spriteData.tileOffset + (spriteData.tileHeight + spriteData.tileSpacing) * tileData.index[1],
+            spriteData.tileWidth,
+            spriteData.tileHeight,
+          ];
         }
-        return { spriteData, tileData, spriteIndex: index, image: this._characterImage.cloneNode(true) as HTMLImageElement };
+        return {
+          spriteData,
+          tileData,
+          spriteIndex: index,
+          image: this._characterImage.cloneNode(true) as HTMLImageElement,
+        };
       }
     }
 
@@ -140,5 +149,35 @@ export class AssetManager extends Component {
       console.error('Error sprite ' + id + ' not found.');
       return null;
     }
+  }
+
+  /**
+   * Request a json file
+   * @param url
+   * @returns
+   */
+  async requestJson(url: string): Promise<any> {
+    const promise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.onload = (e) => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            const json = JSON.parse(xhr.responseText);
+            return resolve(json);
+          } else {
+            console.error(xhr.statusText);
+            return reject(xhr.statusText);
+          }
+        }
+      };
+      xhr.onerror = (e) => {
+        console.error(xhr.statusText);
+        return reject(xhr.statusText);
+      };
+      xhr.send(null);
+    });
+
+    return promise;
   }
 }
