@@ -9,7 +9,6 @@ import { LevelGenerator } from '../environment/LevelGenerator';
 import { LevelConstructionParams } from '../environment/LevelConstructionParams';
 import vec2 from '../math/vec2';
 import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
-import { TileAccessOptions } from '../components/TileAccessOptions';
 import { TileContext } from '../components/TileContext';
 import { LevelLoader } from '../environment/LevelLoader';
 import vec3 from '../math/vec3';
@@ -130,27 +129,6 @@ export class GroundManager extends Component {
   }
 
   /**
-   *
-   * @param tileComponent
-   * @param moveDirection
-   */
-  raisePlayerAction(tileComponent: TileComponent) {
-    const i = tileComponent.tileIndex.x;
-    const j = tileComponent.tileIndex.y;
-    const k = tileComponent.tileIndex.z;
-
-    // Check all tiles around this tile component
-    this.getTile(i - 1, j + 1, k).onPlayerAction(tileComponent);
-    this.getTile(i + 0, j + 1, k).onPlayerAction(tileComponent);
-    this.getTile(i + 1, j + 1, k).onPlayerAction(tileComponent);
-    this.getTile(i + 1, j + 0, k).onPlayerAction(tileComponent);
-    this.getTile(i + 1, j - 1, k).onPlayerAction(tileComponent);
-    this.getTile(i + 0, j - 1, k).onPlayerAction(tileComponent);
-    this.getTile(i - 1, j - 1, k).onPlayerAction(tileComponent);
-    this.getTile(i - 1, j + 0, k).onPlayerAction(tileComponent);
-  }
-
-  /**
    * Gets the highest tile starting from a height of K
    * @param k
    */
@@ -171,243 +149,100 @@ export class GroundManager extends Component {
   }
 
   /**
-   * This function will place a tile
-   * @param target
+   * This function will place a source tile onto the tile located at i,j.
+   * It will search up and down to find a non empty tile.
+   * @param source
    * @param i
    * @param j
    */
-  placeTileOn(target: TileComponent, i: number, j: number): void {
-    const tileX = Math.floor(target.tilePosition.x);
-    const tileY = Math.floor(target.tilePosition.y);
-    const tileZ = Math.floor(target.tilePosition.z);
-    const floorHeight = tileZ - 1;
+  placeTileOn(source: TileComponent, i: number, j: number): void {
+    const tileX = Math.floor(source.tilePosition.x);
+    const tileY = Math.floor(source.tilePosition.y);
+    const tileZ = Math.floor(source.tilePosition.z);
 
-    const fractionI = target.tilePosition.x % 1;
-    const fractionJ = target.tilePosition.y % 1;
+    const fractionI = source.tilePosition.x % 1;
+    const fractionJ = source.tilePosition.y % 1;
     const dir = new vec3([i, j, 0]);
 
-    // check the current floor height and the level above
-    for (let height = floorHeight; height < floorHeight + 2; height++) {
-      const options: TileAccessOptions = {
-        ignoreEmpty: height != floorHeight,
-      };
+    // left
+    if (dir.x < 0 && fractionI < 0.25) {
+      // cancel x movement
+      if (!this.canAccessTile(source, tileX - 1, tileY, tileZ)) {
+        dir.x = 0;
+      }
+    }
 
-      // left
-      if (dir.x < 0 && fractionI < 0.25) {
-        // cancel x movement
-        if (!this.canAccessTile(target, tileX - 1, tileY, height, options)) {
+    // right
+    else if (dir.x > 0 && fractionI > 0.75) {
+      // cancel x movement
+      if (!this.canAccessTile(source, tileX + 1, tileY, tileZ)) {
+        dir.x = 0;
+      }
+    }
+
+    // up
+    if (dir.y < 0 && fractionJ < 0.25) {
+      // cancel y movement
+      if (!this.canAccessTile(source, tileX, tileY - 1, tileZ)) {
+        dir.y = 0;
+      }
+    }
+    // down
+    else if (dir.y > 0 && fractionJ > 0.75) {
+      // cancel y movement
+      if (!this.canAccessTile(source, tileX, tileY + 1, tileZ)) {
+        dir.y = 0;
+      }
+    }
+
+    // check corners
+    if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
+      //top right
+      if (!this.canAccessTile(source, tileX + 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
           dir.x = 0;
         }
       }
-
-      // right
-      else if (dir.x > 0 && fractionI > 0.75) {
-        // cancel x movement
-        if (!this.canAccessTile(target, tileX + 1, tileY, height, options)) {
+    } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+      //top left
+      if (!this.canAccessTile(source, tileX - 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
+          dir.y = 0;
+        } else {
           dir.x = 0;
         }
       }
-
-      // up
-      if (dir.y < 0 && fractionJ < 0.25) {
-        // cancel y movement
-        if (!this.canAccessTile(target, tileX, tileY - 1, height, options)) {
+    } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
+      //bottom left
+      if (!this.canAccessTile(source, tileX - 1, tileY - 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
+        } else {
+          dir.x = 0;
         }
       }
-      // down
-      else if (dir.y > 0 && fractionJ > 0.75) {
-        // cancel y movement
-        if (!this.canAccessTile(target, tileX, tileY + 1, height, options)) {
+    } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
+      //bottom right
+      if (!this.canAccessTile(source, tileX - 1, tileY + 1, tileZ)) {
+        if (Math.abs(dir.x) > Math.abs(dir.y)) {
           dir.y = 0;
-        }
-      }
-
-      // check corners
-      if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
-        //top right
-        if (!this.canAccessTile(target, tileX + 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //top left
-        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
-        //bottom left
-        if (!this.canAccessTile(target, tileX - 1, tileY - 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //bottom right
-        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
+        } else {
+          dir.x = 0;
         }
       }
     }
+
     // check if the player can access this tile
     if (dir.length() > 0) {
-      target.moveToTilePosition(
-        target.tilePosition.x + dir.x,
-        target.tilePosition.y + dir.y,
-        target.tilePosition.z + dir.z,
+      source.moveToTilePosition(
+        source.tilePosition.x + dir.x,
+        source.tilePosition.y + dir.y,
+        source.tilePosition.z + dir.z,
         dir
       );
     }
-  }
-
-  /**
-   * Moves the tile by a given amount
-   * @param i
-   * @param j
-   * @param k
-   */
-  offsetTile(target: TileComponent, i: number, j: number, k: number): void {
-    if (target.type == 'player') {
-      console.debug('hit');
-    }
-    const tileX = Math.floor(target.tilePosition.x);
-    const tileY = Math.floor(target.tilePosition.y);
-    const tileZ = Math.floor(target.tilePosition.z);
-    const floorHeight = tileZ - 1;
-
-    const fractionI = target.tilePosition.x % 1;
-    const fractionJ = target.tilePosition.y % 1;
-    const dir = new vec3([i, j, k]);
-
-    // check the current floor height and the level above
-    for (let height = floorHeight; height < floorHeight + 2; height++) {
-      const options: TileAccessOptions = {
-        ignoreEmpty: height != floorHeight,
-      };
-
-      // left
-      if (dir.x < 0 && fractionI < 0.25) {
-        // cancel x movement
-        if (!this.canAccessTile(target, tileX - 1, tileY, height, options)) {
-          dir.x = 0;
-        }
-      }
-
-      // right
-      else if (dir.x > 0 && fractionI > 0.75) {
-        // cancel x movement
-        if (!this.canAccessTile(target, tileX + 1, tileY, height, options)) {
-          dir.x = 0;
-        }
-      }
-
-      // up
-      if (dir.y < 0 && fractionJ < 0.25) {
-        // cancel y movement
-        if (!this.canAccessTile(target, tileX, tileY - 1, height, options)) {
-          dir.y = 0;
-        }
-      }
-      // down
-      else if (dir.y > 0 && fractionJ > 0.75) {
-        // cancel y movement
-        if (!this.canAccessTile(target, tileX, tileY + 1, height, options)) {
-          dir.y = 0;
-        }
-      }
-
-      // check corners
-      if (dir.x > 0 && dir.y > 0 && fractionJ > 0.75 && fractionI > 0.75) {
-        //top right
-        if (!this.canAccessTile(target, tileX + 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //top left
-        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y < 0 && fractionJ < 0.25 && fractionI < 0.25) {
-        //bottom left
-        if (!this.canAccessTile(target, tileX - 1, tileY - 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      } else if (dir.x < 0 && dir.y > 0 && fractionJ < 0.25 && fractionI > 0.75) {
-        //bottom right
-        if (!this.canAccessTile(target, tileX - 1, tileY + 1, height, options)) {
-          if (Math.abs(dir.x) > Math.abs(dir.y)) {
-            dir.y = 0;
-          } else {
-            dir.x = 0;
-          }
-        }
-      }
-    }
-    // check if the player can access this tile
-    if (dir.length() > 0) {
-      target.moveToTilePosition(
-        target.tilePosition.x + dir.x,
-        target.tilePosition.y + dir.y,
-        target.tilePosition.z + dir.z,
-        dir
-      );
-    }
-  }
-
-  /**
-   * Gets the cells height by searching up and down until a tile is found
-   * @param i
-   * @param j
-   * @param k
-   * @returns
-   */
-  getHeightAt(i: number, j: number, k: number) {
-    let height = k;
-    try {
-      // if it is empty search down to zero
-      if (this.isEmpty(i, j, k) && k > 0) {
-        while (this.isEmpty(i, j, --k) && k > 0) {
-          height = k;
-        }
-      } else {
-        // else search up
-        while (!this.isEmpty(i, j, ++k)) {
-          height = k;
-        }
-      }
-
-      const tile = this.getTile(i, j, k);
-      if (tile) {
-      }
-    } catch (e) {
-      //NOP
-    }
-    return height;
   }
 
   /**
@@ -417,11 +252,57 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  getTile(i: number, j: number, k: number, topMost?: boolean) {
+  getTile(i: number, j: number, k: number) {
+    const tileX = Math.floor(i);
+    const tileY = Math.floor(j);
+    let tileZ = Math.floor(k);
+
     let tile: TileComponent = this._tileFactory.empty;
 
-    if (this._tiles[k] != undefined && this._tiles[k][j] != undefined) {
-      tile = this._tiles[k][j][i] ?? this._tileFactory.empty;
+    if (this._tiles[tileZ] != undefined && this._tiles[tileZ][tileY] != undefined) {
+      tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+    }
+
+    return tile;
+  }
+
+  /**
+   * Search down then up at the current location for a tile that is not empty
+   * @param i
+   * @param j
+   * @param k
+   * @returns
+   */
+  findTile(i: number, j: number, k: number) {
+    const tileX = Math.floor(i);
+    const tileY = Math.floor(j);
+    let tileZ = Math.floor(k);
+    const maxTileAbove = Math.floor(k) + 3;
+
+    let tile: TileComponent = this._tileFactory.empty;
+
+    // look at the exact place we are told to look.
+    if (this._tiles[tileZ] != undefined && this._tiles[tileZ][tileY] != undefined) {
+      tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+    }
+
+    // if empty look down then up
+    if (tile.empty) {
+      // first go down to the bottom.
+      for (tileZ--; tileZ >= 0; tileZ--) {
+        tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+        if (!tile.empty) {
+          return tile;
+        }
+      }
+
+      // now go up
+      for (tileZ = Math.floor(k); tileZ < maxTileAbove; tileZ++) {
+        tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+        if (!tile.empty) {
+          return tile;
+        }
+      }
     }
 
     return tile;
@@ -439,9 +320,6 @@ export class GroundManager extends Component {
 
     // did the tile index change
     if (k != last.z || j != last.y || i != last.x) {
-      // switch the tiles
-      const lastTile = this._tiles[last.z][last.y][last.x];
-
       this._tiles[last.z][last.y][last.x] = this._tileFactory.empty;
       this._tiles[k][j][i] = tileComponent;
     }
@@ -463,25 +341,16 @@ export class GroundManager extends Component {
    * @param z screen space
    * @returns true if the player can access this cell
    */
-  canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number, options: TileAccessOptions): boolean {
-    let tile = this.getTile(i, j, k);
+  canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number): boolean {
+    let tile = this.findTile(i, j, k);
 
-    // look below this tile if it is empty
-    if (tile.empty) {
-      for (let x = k - 1; x >= 0; x--) {
-        tile = this.getTile(i, j, x);
-        if (!tile.empty) {
-          break;
-        }
-      }
-    }
     // there is nothing under us
     if (tile.empty) {
       return false;
     }
 
     // try and access this tile
-    return tile.canAccessTile(tileComponent, options);
+    return tile.canAccessTile(tileComponent);
   }
 
   /**
@@ -493,7 +362,7 @@ export class GroundManager extends Component {
    * @returns
    */
   onEnter(tileComponent: TileComponent, i: number, j: number, k: number, tileContext: TileContext): void {
-    let tile = this.getTile(i, j, k, true);
+    let tile = this.getTile(i, j, k);
     tile.onEnter(tileComponent, tileContext);
   }
 

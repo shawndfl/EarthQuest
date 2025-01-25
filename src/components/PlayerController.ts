@@ -112,12 +112,11 @@ export class PlayerController extends TileComponent {
     this._walkingDirection = new vec3([0, 0, 0]);
     this._moveController = new AutoMoveController(this.eng);
     this._canWalk = true;
-
   }
 
   initialize() {
-    const texture = this.eng.assetManager.character.texture
-    const data = this.eng.assetManager.character.data
+    const texture = this.eng.assetManager.character.texture;
+    const data = this.eng.assetManager.character.data;
     this._spriteController = new SpritController(this.eng);
     this._spriteController.initialize(texture, data);
 
@@ -134,9 +133,13 @@ export class PlayerController extends TileComponent {
       .repeat(-1);
 
     this._attackAnimation = new Curve();
-    this._attackAnimation.points([{ p: 0, t: 0 }, { p: 1, t: 50 }, { p: 2, t: 100 }, { p: 3, t: 150 }]);
+    this._attackAnimation.points([
+      { p: 0, t: 0 },
+      { p: 1, t: 50 },
+      { p: 2, t: 100 },
+      { p: 3, t: 150 },
+    ]);
   }
-
 
   /**
    * Handles user input. The logic goes through a chain of command.
@@ -159,17 +162,17 @@ export class PlayerController extends TileComponent {
     if (state.isDown(UserAction.A)) {
       this.attack();
     } else if (state.isReleased(UserAction.A)) {
-      // action event
-      //this.eng.ground.raisePlayerAction(this);
-
       this.raiseAction();
-
     } else if ((state.buttonsReleased & UserAction.Start) > 0) {
       this.eng.dialogManager.showGameMenu();
     } else {
       // if an arrow key is pressed reset the facing direction
-      if (state.isDown(UserAction.Left) || state.isDown(UserAction.Right) ||
-        state.isDown(UserAction.Up) || state.isDown(UserAction.Down)) {
+      if (
+        state.isDown(UserAction.Left) ||
+        state.isDown(UserAction.Right) ||
+        state.isDown(UserAction.Up) ||
+        state.isDown(UserAction.Down)
+      ) {
         this._facingDirection = PointingDirection.None;
       }
       const screenDirection = new vec2();
@@ -302,7 +305,7 @@ export class PlayerController extends TileComponent {
       // screen space converted to tile space for x and y position (ground plane)
       // then use the movement dot of the slope vector which will allow the player for
       // move up and down on stairs and slops
-      this.groundManager.offsetTile(this, moveVector.x, moveVector.y, moveVector.z);
+      this.groundManager.placeTileOn(this, moveVector.x, moveVector.y);
     }
 
     // toggle and animation. This can happen when not walking too.
@@ -320,8 +323,6 @@ export class PlayerController extends TileComponent {
   protected updateSpritePosition() {
     super.updateSpritePosition();
 
-
-
     // update the view manger with the player new position
     this.eng.viewManager.setTarget(
       this.screenPosition.x - this.eng.width * 0.5,
@@ -335,17 +336,6 @@ export class PlayerController extends TileComponent {
     const k = this.tileIndex.z;
     const ground = this.eng.ground;
     const direction = this.facingDirection;
-    /*
-        ground.getTile(i - 0, j + 1, k).onPlayerAction(this);
-        ground.getTile(i - 1, j + 1, k).onPlayerAction(this);
-        ground.getTile(i - 1, j + 0, k).onPlayerAction(this);
-        ground.getTile(i - 1, j - 1, k).onPlayerAction(this);
-        ground.getTile(i - 0, j - 1, k).onPlayerAction(this);
-        ground.getTile(i + 1, j - 1, k).onPlayerAction(this);
-        ground.getTile(i + 1, j + 0, k).onPlayerAction(this);
-        ground.getTile(i + 1, j + 1, k).onPlayerAction(this);
-    */
-
 
     ground.getTile(i, j, k).onPlayerAction(this);
     // Check 3 tiles around the direction the player is facing
@@ -377,13 +367,9 @@ export class PlayerController extends TileComponent {
 
     // this should not happen but just in case
     ground.getTile(i, j, k).onPlayerAction(this);
-
   }
 
-
-  loadLevel(level: ILevelData): void {
-
-  }
+  loadLevel(level: ILevelData): void {}
 
   closeLevel(): void {
     this.resetPlayer();

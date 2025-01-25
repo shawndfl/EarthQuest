@@ -8,7 +8,6 @@ import { GroundManager } from '../systems/GroundManager';
 import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
 import { TileContext } from './TileContext';
-import { TileAccessOptions } from './TileAccessOptions';
 
 /**
  * A tile component is a component that controls a single tile.
@@ -43,14 +42,6 @@ export abstract class TileComponent extends Component {
    * If some tile sets the position of this tile don't set it in the moveToTilePosition function
    */
   protected _positionSet: boolean;
-
-  /**
-   * Gets the tile below this tile
-   * @returns
-   */
-  getTileBelow(): TileComponent {
-    return this.groundManager.getTile(this._tileIndex.x, this._tileIndex.y, this._tileIndex.z - 1);
-  }
 
   /**
    * Is this tile empty
@@ -150,17 +141,7 @@ export abstract class TileComponent extends Component {
 
     const indexI = Math.floor(this._tilePosition.x);
     const indexJ = Math.floor(this._tilePosition.y);
-
-    //TODO find k by searching the below Math.ceil(this._tilePosition.z);
-    let indexK = Math.ceil(this._tilePosition.z);
-    const isEmpty = this.groundManager.getTile(indexI, indexJ, indexK).empty;
-    if (isEmpty) {
-      for (; indexK > 0; indexK--) {
-        if (!this.groundManager.getTile(indexI, indexJ, indexK).empty) {
-          break;
-        }
-      }
-    }
+    const indexK = Math.ceil(this._tilePosition.z);
 
     // update the tile map by removing this component from its tile
     // and moving it to the new one
@@ -179,7 +160,7 @@ export abstract class TileComponent extends Component {
    * @param tileComponent
    * @returns
    */
-  canAccessTile(tileComponent: TileComponent, options: TileAccessOptions): boolean {
+  canAccessTile(tileComponent: TileComponent): boolean {
     return true;
   }
 

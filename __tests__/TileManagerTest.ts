@@ -1,9 +1,9 @@
-import { MockEngine } from '../src/testSupport/MockEngine';
+import { Engine } from '../src/core/Engine';
 import { TileHelper } from '../src/utilities/TileHelper';
+import 'jest-webgl-canvas-mock';
+const eng = new Engine();
 
 test('To screen', () => {
-  const eng = new MockEngine();
-
   const t = new TileHelper();
   t.calculateTransform(eng.width, eng.height);
 
@@ -18,4 +18,12 @@ test('To screen', () => {
       }
     }
   }
+});
+
+test('Create an Engine', () => {
+  const canvas = new HTMLCanvasElement();
+  const eng = new Engine();
+
+  eng.initialize(canvas);
+  eng.gl.depthFunc(eng.gl.ALWAYS);
 });

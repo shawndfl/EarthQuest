@@ -100,7 +100,7 @@ export class EnemyTileComponent extends TileComponent {
     // screen space converted to tile space for x and y position (ground plane)
     // then use the movement dot of the slope vector which will allow the player for
     // move up and down on stairs and slops
-    this.groundManager.offsetTile(this, moveVector.x, moveVector.y, 0);
+    this.groundManager.placeTileOn(this, moveVector.x, moveVector.y);
   }
 
   dispose(): void {
