@@ -255,7 +255,7 @@ export class GroundManager extends Component {
   getTile(i: number, j: number, k: number) {
     const tileX = Math.floor(i);
     const tileY = Math.floor(j);
-    let tileZ = Math.floor(k);
+    const tileZ = Math.floor(k);
 
     let tile: TileComponent = this._tileFactory.empty;
 
@@ -274,23 +274,16 @@ export class GroundManager extends Component {
    * @returns
    */
   findTile(i: number, j: number, k: number) {
-    const tileX = Math.floor(i);
-    const tileY = Math.floor(j);
     let tileZ = Math.floor(k);
     const maxTileAbove = Math.floor(k) + 3;
 
-    let tile: TileComponent = this._tileFactory.empty;
-
-    // look at the exact place we are told to look.
-    if (this._tiles[tileZ] != undefined && this._tiles[tileZ][tileY] != undefined) {
-      tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
-    }
+    let tile: TileComponent = this.getTile(i, j, k);
 
     // if empty look down then up
     if (tile.empty) {
       // first go down to the bottom.
       for (tileZ--; tileZ >= 0; tileZ--) {
-        tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+        tile = this.getTile(i, j, tileZ);
         if (!tile.empty) {
           return tile;
         }
@@ -298,7 +291,7 @@ export class GroundManager extends Component {
 
       // now go up
       for (tileZ = Math.floor(k); tileZ < maxTileAbove; tileZ++) {
-        tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
+        tile = this.getTile(i, j, tileZ);
         if (!tile.empty) {
           return tile;
         }

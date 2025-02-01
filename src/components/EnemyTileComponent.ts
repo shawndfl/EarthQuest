@@ -24,7 +24,7 @@ export class EnemyTileComponent extends TileComponent {
   private _isDead: boolean;
 
   onPlayerAction(tileComponent: TileComponent): void {
-    if (tileComponent instanceof PlayerController) {
+    if (tileComponent instanceof PlayerController && !this._isDead) {
       const player = tileComponent as PlayerController;
       if (player.attacking) {
         this._spriteController.removeSprite(this.id);

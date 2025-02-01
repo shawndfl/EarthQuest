@@ -242,7 +242,6 @@ export class InputHandler extends Component {
 
       if (e.key == ' ') {
         this.buttonsDown = this.buttonsDown | UserAction.A;
-        console.debug('A is down' + this.buttonsDown);
       }
 
       if (e.key == 'b') {
@@ -285,7 +284,6 @@ export class InputHandler extends Component {
     if (e.key == ' ') {
       this.buttonsDown = this.buttonsDown & ~UserAction.A;
       this.buttonsReleased = this.buttonsReleased | UserAction.A;
-      console.debug('A is up' + this.buttonsReleased);
     }
 
     if (e.key == 'b') {
@@ -332,9 +330,6 @@ export class InputHandler extends Component {
 
   postUpdate(dt: number) {
     // reset press actions
-    if (this.buttonsReleased != UserAction.None) {
-      console.debug('releasing button');
-    }
     this.buttonsReleased = UserAction.None;
     this.inputReleased = false;
   }
