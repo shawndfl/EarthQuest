@@ -135,9 +135,14 @@ export class CanvasRenderer extends EditorComponent {
 
   private renderTiles(): void {
     for (let k = 0; k < this.MaxK; k++) {
-      if (k > this._activeLayer) {
-        break;
+      let alpha = 1;
+
+      // make all the layers fade out
+      if (k != this._activeLayer) {
+        alpha = Math.max(0, 1 - Math.abs(k - this._activeLayer) / this.MaxK - 0.5);
       }
+      this.context.globalAlpha = alpha;
+
       for (let j = 0; j < this.MaxJ; j++) {
         for (let i = 0; i < this.MaxI; i++) {
           // if there is a tile draw it
@@ -147,9 +152,9 @@ export class CanvasRenderer extends EditorComponent {
         }
       }
       if (k == this._activeLayer) {
+        this.context.globalAlpha = 0.5;
         this.renderGrid();
       }
-
     }
   }
 
@@ -160,15 +165,14 @@ export class CanvasRenderer extends EditorComponent {
    * @param top
    */
   private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
-
-    const screen = this.eng.tileHelper.toScreenLoc(i + .5, j + .5, k, true);
+    const screen = this.eng.tileHelper.toScreenLoc(i + 0.5, j + 0.5, k, true);
     const img = data.image;
     const x = data.sx + 1;
     const y = data.sy + 1;
     const w = data.srcWidth - 2;
     const h = data.srcHeight - 2;
 
-    const destX = - screen.x + data.offsetX;
+    const destX = -screen.x + data.offsetX;
     const destY = screen.y - data.offsetY - h * 2;
 
     this.context.drawImage(img, x, y, w, h, destX, destY, w * 2, h * 2);
@@ -188,8 +192,6 @@ export class CanvasRenderer extends EditorComponent {
 
     this.selectedTile.i = Math.floor(tileI + koffset);
     this.selectedTile.j = Math.floor(tileJ + koffset);
-    console.debug(' tile ' + tileI.toFixed(4) + ', ' + tileJ.toFixed(4));
-    console.debug(' screen ' + screenX.toFixed(4) + ', ' + screenY.toFixed(4));
     this.dirty = true;
 
     const ed = this.editor;
@@ -208,7 +210,7 @@ export class CanvasRenderer extends EditorComponent {
           offsetY: selectedSprite.tileData.offset[1],
           image: selectedSprite.image,
           spriteIndex: selectedSprite.spriteIndex,
-          typeIndex: selectedTileTypeIndex
+          typeIndex: selectedTileTypeIndex,
         };
       }
       const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
@@ -223,7 +225,7 @@ export class CanvasRenderer extends EditorComponent {
     const stepX = 16;
     const stepY = 16;
 
-    this.ctx.strokeStyle = '#646464'
+    this.ctx.strokeStyle = '#646464';
     this.ctx.fillStyle = '#c4c4c4';
     const maxI = 50;
     const maxJ = 50;

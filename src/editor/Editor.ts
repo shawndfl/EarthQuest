@@ -23,6 +23,8 @@ import { TileBrowser2 } from './TileBrowser2';
 import { SelectTileBrowserData } from './JobPlaceTile';
 import { TileFactory } from '../systems/TileFactory';
 
+import NewLevel from '../assets/levels/newLevel.json';
+
 /**
  * Editor class manages all the components of the editor
  */
@@ -68,7 +70,9 @@ export class Editor extends Component implements IEditor {
 
   loadLevel(level: ILevelData): void {
     this.levelData = level;
+
     this.tileBrowser.refreshLevel(level);
+
     for (let k = 0; k < level.encode.length; k++) {
       for (let j = 0; j < level.encode[k].length; j++) {
         const row = level.encode[k][j];
@@ -212,9 +216,25 @@ export class Editor extends Component implements IEditor {
     this.levelData.encode = tiles;
   }
 
+  pickerOpts = {
+    types: [
+      {
+        description: 'Images',
+        accept: {
+          'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+        },
+      },
+    ],
+    excludeAcceptAllOption: true,
+    multiple: false,
+  };
+
+  /**
+   * builds the tool bar ribbon
+   */
   buildToolbar() {
     this.toolbar.addButton('new', New, 'New Scene', () => {
-      console.debug('new scene!!');
+      this.show(NewLevel);
     });
 
     const saveButton = this.toolbar.addButton('save', Save, 'Save', (source: MouseEvent) => {
@@ -227,9 +247,34 @@ export class Editor extends Component implements IEditor {
       downloadAnchorElem.click();
       downloadAnchorElem.remove();
     });
-    this.toolbar.addButton('open', Open, 'Open', () => {
-      console.debug('Open!!');
+
+    // opening a file
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.id = 'open_file';
+    input.style.display = 'none';
+    input.accept = '.json';
+    input.addEventListener('change', (e: MouseEvent) => {
+      if ((e.target as any).files?.length > 0) {
+        const file = (e.target as any).files[0];
+        const reader = new FileReader();
+        reader.onloadend = (evt) => {
+          if (evt.target.readyState == FileReader.DONE) {
+            const levelData = JSON.parse(reader.result.toString());
+            this.show(levelData);
+          }
+        };
+        reader.readAsText(file);
+      }
     });
+    const openBtn = this.toolbar.addButton('open', Open, 'Open', (e: MouseEvent) => {
+      var evt = new MouseEvent('click', {
+        relatedTarget: input,
+      });
+      input.dispatchEvent(evt);
+    });
+    openBtn.append(input);
+
     this.toolbar.addButton('play', Play, 'Play', () => {
       this.updateLevelData();
       this.eng.hideEditor();
@@ -254,7 +299,7 @@ export class Editor extends Component implements IEditor {
     });
 
     // set default
-    this.toolbar.selectedTool = ToolbarOptions.Place;
+    this.toolbar.selectedTool = ToolbarOptions.Pan;
     //this.toolbar.setActive(this.toolbar.getButton('place'), true);
   }
 }

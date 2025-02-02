@@ -1,5 +1,5 @@
 .editor-toolbar {
-  position: sticky;
+  position: relative;
   left: 0px;
   width: 100%;
   background-color: black;
@@ -35,8 +35,7 @@
     width: unset;
     img {
       // https://isotropic.co/tool/hex-color-to-css-filter/
-      filter: invert(99%) sepia(2%) saturate(0%) hue-rotate(290deg)
-        brightness(200%) contrast(101%);
+      filter: invert(99%) sepia(2%) saturate(0%) hue-rotate(290deg) brightness(200%) contrast(101%);
     }
   }
 

@@ -20,7 +20,7 @@ import { Editor } from '../editor/Editor';
 import { NotificationManager } from './NotificationManager';
 import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
-import Level1 from '../assets/levels/level1.json';
+import NewLevel from '../assets/levels/newLevel.json';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -170,10 +170,10 @@ export class Engine {
     const url = new URL(window.location.href);
 
     if (url.searchParams.get('editor')) {
-      this.showEditor(Level1);
+      this.showEditor(NewLevel);
     }
 
-    this.loadLevel(Level1);
+    this.loadLevel(NewLevel);
   }
 
   showEditor(levelData?: ILevelData) {

@@ -309,7 +309,9 @@ export class GroundManager extends Component {
     const i = tileComponent.tileIndex.x;
     const j = tileComponent.tileIndex.y;
     const k = tileComponent.tileIndex.z;
-    this._tiles[i][j][k] = this._tileFactory.empty;
+    if (this._tiles[i] != undefined && this._tiles[i][j] != undefined) {
+      this._tiles[i][j][k] = this._tileFactory.empty;
+    }
   }
 
   /**

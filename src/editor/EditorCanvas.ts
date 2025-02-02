@@ -3,6 +3,7 @@ import vec2 from '../math/vec2';
 import { CanvasRenderer } from './CanvasRenderer';
 import { EditorComponent } from './EditorComponent';
 import { IEditor } from './IEditor';
+import { ToolbarOptions } from './ToolbarOptions';
 
 export enum MouseMoveAction {
   None,
@@ -81,7 +82,6 @@ export class EditorCanvas extends EditorComponent {
 
   mouseExit(e: MouseEvent) {
     this.lastPos = undefined;
-    console.debug('down', e);
   }
 
   mouseUp(e: MouseEvent) {
@@ -99,21 +99,24 @@ export class EditorCanvas extends EditorComponent {
 
   mouseMove(e: MouseEvent) {
     if (!this.lastPos) {
-      console.debug('reset');
       this.lastPos = new vec2(e.offsetX, e.offsetY);
     }
 
     const delta = new vec2(e.offsetX, e.offsetY).subtract(this.lastPos);
 
+    //select
+    var rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width; // relationship bitmap vs. element for x
+    const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
+
+    const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+
+    this.canvasRenderer.select(point.x, point.y);
+    this.canvas.style.cursor = 'pointer';
+    this.editor.toolbar.selectedTool = ToolbarOptions.Pan;
+
     if (e.shiftKey) {
-      // pan
-      this.canvas.style.cursor = 'grab';
-      const scale = 0.9;
-
-      const offset = this.canvasRenderer.offset.add(delta.scale(scale));
-
-      this.canvasRenderer.setOffset(offset);
-      this.lastPos = new vec2(e.offsetX, e.offsetY);
+      this.editor.toolbar.selectedTool = ToolbarOptions.Place;
     } else if (e.ctrlKey) {
       //zoom
       this.canvas.style.cursor = 'zoom-in';
@@ -125,16 +128,15 @@ export class EditorCanvas extends EditorComponent {
         this.lastPos = new vec2(e.offsetX, e.offsetY);
       }
     } else {
-      this.canvas.style.cursor = 'pointer';
       if (e.buttons == 1) {
-        //place
-        var rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width; // relationship bitmap vs. element for x
-        const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
+        // pan
+        this.canvas.style.cursor = 'grab';
+        const scale = 0.9;
 
-        const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+        const offset = this.canvasRenderer.offset.add(delta.scale(scale));
 
-        this.canvasRenderer.select(point.x, point.y);
+        this.canvasRenderer.setOffset(offset);
+        this.lastPos = new vec2(e.offsetX, e.offsetY);
       } else {
         // reset last pos
         this.lastPos = undefined;
