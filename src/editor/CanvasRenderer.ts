@@ -178,7 +178,7 @@ export class CanvasRenderer extends EditorComponent {
     this.context.drawImage(img, x, y, w, h, destX, destY, w * 2, h * 2);
   }
 
-  public select(left: number, top: number): void {
+  public select(left: number, top: number, place: boolean): void {
     this.ctx.beginPath();
     this.ctx.fillStyle = '#00ff00';
     const x = left / this.scale - this.offset.x;
@@ -194,8 +194,7 @@ export class CanvasRenderer extends EditorComponent {
     this.selectedTile.j = Math.floor(tileJ + koffset);
     this.dirty = true;
 
-    const ed = this.editor;
-    if (ed.toolbar.selectedTool == ToolbarOptions.Place) {
+    if (place) {
       let selected: SelectTileBrowserData = null;
       const selectedTileTypeIndex = this.editor.tileBrowser.selectedItem?.tileTypeData.typeIndex;
       const selectedSprite = this.editor.tileBrowser.selectedItem?.spriteData;
@@ -214,8 +213,9 @@ export class CanvasRenderer extends EditorComponent {
         selected.spriteIndex = selectedSprite.spriteIndex;
 
         const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
-        const placeJob = new JobPlaceTile(ed, selected, location);
-        ed.jobManager.execute(placeJob);
+        const placeJob = new JobPlaceTile(this.editor, selected, location);
+
+        this.editor.jobManager.execute(placeJob);
       }
     }
   }

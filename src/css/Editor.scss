@@ -25,44 +25,6 @@
   }
 }
 
-.btn.active {
-  background-color: rgb(200, 240, 240);
-  font-weight: bold;
-  border: solid 1px #666666;
-}
-
-.btn {
-  border: none;
-  width: 120px;
-  text-align: center;
-  justify-items: center;
-  height: 32px;
-  background-color: rgb(230, 230, 230);
-  border-radius: 4px;
-  cursor: pointer;
-
-  span {
-    display: inline-flex;
-  }
-
-  div {
-    display: inline-flex;
-    align-items: center;
-    padding: 0px 5px 0px;
-    justify-content: center;
-  }
-
-  img {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.btn:hover {
-  background-color: rgb(255, 255, 255);
-  box-shadow: 1px 1px 3px #c4c4c4;
-}
-
 .tile-list-container {
   width: 100%;
   .tile-list {

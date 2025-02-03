@@ -1,6 +1,7 @@
 import { Toolbar } from './Toolbar';
 import '../css/Editor.scss';
 
+// get icons from https://fonts.google.com/icons
 import Open from '../assets/editor/file_open.svg';
 import New from '../assets/editor/new.svg';
 import Save from '../assets/editor/file_save.svg';
@@ -9,6 +10,8 @@ import Undo from '../assets/editor/undo.svg';
 import Redo from '../assets/editor/redo.svg';
 import ZoomIn from '../assets/editor/zoom_in.svg';
 import ZoomOut from '../assets/editor/zoom_out.svg';
+import Place from '../assets/editor/place_item.svg';
+import PanTool from '../assets/editor/pan_tool.svg';
 
 import { EditorCanvas } from './EditorCanvas';
 import { IEditor } from './IEditor';
@@ -319,8 +322,26 @@ export class Editor extends Component implements IEditor {
       this.jobManager.redo();
     });
 
+    this.toolbar.addButton('place', Place, 'Place', () => {
+      const pan = this.toolbar.getButton('pan');
+      const place = this.toolbar.getButton('place');
+
+      pan.classList.remove('active');
+      place.classList.add('active');
+      this.toolbar.selectedTool = ToolbarOptions.Place;
+    });
+
+    this.toolbar.addButton('pan', PanTool, 'Pan', (e: MouseEvent) => {
+      const pan = this.toolbar.getButton('pan');
+      const place = this.toolbar.getButton('place');
+
+      pan.classList.add('active');
+      place.classList.remove('active');
+      this.toolbar.selectedTool = ToolbarOptions.Pan;
+    });
+
     // set default
     this.toolbar.selectedTool = ToolbarOptions.Pan;
-    //this.toolbar.setActive(this.toolbar.getButton('place'), true);
+    this.toolbar.setActive(this.toolbar.getButton('pan'), true);
   }
 }

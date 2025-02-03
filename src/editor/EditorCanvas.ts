@@ -86,6 +86,14 @@ export class EditorCanvas extends EditorComponent {
 
   mouseUp(e: MouseEvent) {
     this.lastPos = undefined;
+    var rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width; // relationship bitmap vs. element for x
+    const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
+
+    const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+    if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
+      this.canvasRenderer.select(point.x, point.y, true);
+    }
   }
 
   mouseWheel(e: WheelEvent) {
@@ -110,37 +118,31 @@ export class EditorCanvas extends EditorComponent {
     const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
 
     const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-
-    this.canvasRenderer.select(point.x, point.y);
     this.canvas.style.cursor = 'pointer';
-    this.editor.toolbar.selectedTool = ToolbarOptions.Pan;
 
-    if (e.shiftKey) {
-      this.editor.toolbar.selectedTool = ToolbarOptions.Place;
-    } else if (e.ctrlKey) {
-      //zoom
-      this.canvas.style.cursor = 'zoom-in';
-      const scaleStep = delta.y < 0 ? -this.scaleStep : this.scaleStep;
-      const scale = this.canvasRenderer.scale + scaleStep;
-      console.debug('zoom ' + scale + ' ' + delta.y + ' ' + this.canvasRenderer.scale + '  ' + scaleStep);
-      this.zoom(scale);
-      if (Math.abs(delta.y) > 10) {
-        this.lastPos = new vec2(e.offsetX, e.offsetY);
-      }
-    } else {
-      if (e.buttons == 1) {
+    // if the mouse is down
+    if (e.buttons == 1) {
+      if (this.editor.toolbar.selectedTool == ToolbarOptions.Pan) {
         // pan
         this.canvas.style.cursor = 'grab';
         const scale = 0.9;
-
         const offset = this.canvasRenderer.offset.add(delta.scale(scale));
-
         this.canvasRenderer.setOffset(offset);
         this.lastPos = new vec2(e.offsetX, e.offsetY);
-      } else {
-        // reset last pos
-        this.lastPos = undefined;
+      } else if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
+        this.canvasRenderer.select(point.x, point.y, true);
       }
+    }
+    // if the mouse is panning with the mouse up
+    else {
+      if (this.editor.toolbar.selectedTool == ToolbarOptions.Pan) {
+        this.canvasRenderer.select(point.x, point.y, false);
+      } else if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
+        this.canvasRenderer.select(point.x, point.y, false);
+      }
+
+      // reset last pos
+      this.lastPos = undefined;
     }
   }
 

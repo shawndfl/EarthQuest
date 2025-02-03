@@ -178,6 +178,11 @@ export class TileBrowser2 extends EditorComponent {
       // add the item
       this.addTileItem(this.tileList.length, tileTypeData, spriteData);
 
+      // set the selected to the first one that is not empty
+      if (this.selectedIndex == -1 && tile != 'empty|empty|') {
+        this.setSelected(i);
+      }
+
       // add tile list
       this.tileList.push({ tileTypeData, spriteData });
     }
@@ -209,6 +214,23 @@ export class TileBrowser2 extends EditorComponent {
           console.debug('selected ', this.selectedItem);
         }
       });
+    });
+  }
+
+  /**
+   * Set the selected index
+   * @param index
+   */
+  setSelected(index: number): void {
+    const items = Array.from(this.list.getElementsByClassName('item'));
+    items.forEach((it, i) => {
+      if (i != index) {
+        it.classList.remove('tile-item-selected');
+      } else {
+        this.selectedIndex = parseInt((it as HTMLElement).dataset?.index);
+        it.classList.add('tile-item-selected');
+        console.debug('selected ', this.selectedItem);
+      }
     });
   }
 }
