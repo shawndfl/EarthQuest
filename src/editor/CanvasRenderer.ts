@@ -199,23 +199,24 @@ export class CanvasRenderer extends EditorComponent {
       let selected: SelectTileBrowserData = null;
       const selectedTileTypeIndex = this.editor.tileBrowser.selectedItem?.tileTypeData.typeIndex;
       const selectedSprite = this.editor.tileBrowser.selectedItem?.spriteData;
+      const currentTile = this.getTile(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
+      // make sure there is a sprite and it is a different tile
+      if (selectedSprite && (!currentTile || currentTile.typeIndex != selectedTileTypeIndex)) {
+        selected = new SelectTileBrowserData();
+        selected.sx = selectedSprite.tileData.loc[0];
+        selected.sy = selectedSprite.tileData.loc[1];
+        selected.srcWidth = selectedSprite.tileData.loc[2];
+        selected.srcHeight = selectedSprite.tileData.loc[3];
+        selected.image = selectedSprite.image;
+        selected.offsetX = selectedSprite.tileData.offset[0];
+        selected.offsetY = selectedSprite.tileData.offset[1];
+        selected.typeIndex = selectedTileTypeIndex;
+        selected.spriteIndex = selectedSprite.spriteIndex;
 
-      if (selectedSprite) {
-        selected = {
-          sx: selectedSprite.tileData.loc[0],
-          sy: selectedSprite.tileData.loc[1],
-          srcWidth: selectedSprite.tileData.loc[2],
-          srcHeight: selectedSprite.tileData.loc[3],
-          offsetX: selectedSprite.tileData.offset[0],
-          offsetY: selectedSprite.tileData.offset[1],
-          image: selectedSprite.image,
-          spriteIndex: selectedSprite.spriteIndex,
-          typeIndex: selectedTileTypeIndex,
-        };
+        const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
+        const placeJob = new JobPlaceTile(ed, selected, location);
+        ed.jobManager.execute(placeJob);
       }
-      const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
-      const placeJob = new JobPlaceTile(ed, selected, location);
-      ed.jobManager.execute(placeJob);
     }
   }
 

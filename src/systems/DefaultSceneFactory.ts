@@ -1,7 +1,6 @@
-
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
-import { DefautlScene } from '../scenes/DefaultScene';
+import { DefaultScene } from '../scenes/DefaultScene';
 import { ISceneFactory } from '../systems/ISceneFactory';
 
 /**
@@ -18,6 +17,6 @@ export class DefaultSceneFactory extends ISceneFactory {
    * @returns
    */
   createScene(type: string): SceneComponent {
-    return new DefautlScene(this.eng);
+    return new DefaultScene(this.eng);
   }
 }

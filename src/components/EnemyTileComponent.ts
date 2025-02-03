@@ -6,6 +6,7 @@ import { Curve } from '../math/Curve';
 import { ITileCreateionArgs } from './ITileCreationArgs';
 import { PlayerController } from './PlayerController';
 import { TileComponent } from './TileComponent';
+import { TileContext } from './TileContext';
 
 /**
  * This is any thing that the player or some NPC can walk on
@@ -36,7 +37,24 @@ export class EnemyTileComponent extends TileComponent {
   }
 
   canAccessTile(tileComponent: TileComponent): boolean {
-    return false;
+    if (tileComponent.type == 'player') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  onEnter(tileComponent: TileComponent, context: TileContext): void {
+    if (tileComponent.type == 'player') {
+      this.eng.battleManager.queueNextBattle({
+        enemies: [
+          {
+            id: 'test',
+            tile: [10, 20],
+          },
+        ],
+      });
+    }
   }
 
   get spriteController(): SpritBaseController {

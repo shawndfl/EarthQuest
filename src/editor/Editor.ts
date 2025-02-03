@@ -38,7 +38,13 @@ export class Editor extends Component implements IEditor {
   readonly jobManager: JobManager;
 
   readonly zoomStep: number = 0.1;
-  levelData: ILevelData;
+  public levelData: ILevelData;
+
+  private _isActive: boolean;
+
+  public get isActive(): boolean {
+    return this._isActive;
+  }
 
   public get parent(): HTMLElement {
     return this._parent;
@@ -68,6 +74,10 @@ export class Editor extends Component implements IEditor {
     this.editorCanvas.render();
   }
 
+  /**
+   * Loads a level
+   * @param level
+   */
   loadLevel(level: ILevelData): void {
     this.levelData = level;
 
@@ -99,17 +109,16 @@ export class Editor extends Component implements IEditor {
 
           const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
           if (spriteData) {
-            const tileData: SelectTileBrowserData = {
-              sx: spriteData.tileData.loc[0],
-              sy: spriteData.tileData.loc[1],
-              srcWidth: spriteData.tileData.loc[2],
-              srcHeight: spriteData.tileData.loc[3],
-              image: spriteData.image,
-              offsetX: spriteData.tileData.offset[0],
-              offsetY: spriteData.tileData.offset[1],
-              typeIndex: tileTypeData.typeIndex,
-              spriteIndex: spriteData.spriteIndex,
-            };
+            const tileData = new SelectTileBrowserData();
+            tileData.sx = spriteData.tileData.loc[0];
+            tileData.sy = spriteData.tileData.loc[1];
+            tileData.srcWidth = spriteData.tileData.loc[2];
+            tileData.srcHeight = spriteData.tileData.loc[3];
+            tileData.image = spriteData.image;
+            tileData.offsetX = spriteData.tileData.offset[0];
+            tileData.offsetY = spriteData.tileData.offset[1];
+            tileData.typeIndex = tileTypeData.typeIndex;
+            tileData.spriteIndex = spriteData.spriteIndex;
 
             if (spriteData.tileData.id == 'empty') {
               this.editorCanvas.canvasRenderer.setTile(null, i, j, k);
@@ -123,11 +132,20 @@ export class Editor extends Component implements IEditor {
     }
   }
 
+  /**
+   * Hide the editor
+   */
   hide(): void {
+    this._isActive = false;
     this._parent.classList.add('hidden');
   }
 
+  /**
+   * Show the editor
+   * @param level
+   */
   show(level?: ILevelData): void {
+    this._isActive = true;
     this._parent.classList.remove('hidden');
     if (level) {
       this.loadLevel(level);
@@ -214,6 +232,9 @@ export class Editor extends Component implements IEditor {
       }
     }
     this.levelData.encode = tiles;
+
+    // save in local cache
+    window.localStorage.setItem('lastLevel', JSON.stringify(this.levelData));
   }
 
   pickerOpts = {

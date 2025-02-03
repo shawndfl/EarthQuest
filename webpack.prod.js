@@ -16,7 +16,10 @@ module.exports = {
       chunks: ['debug', 'main'],
     }),
     new CopyPlugin({
-      patterns: [{ from: 'assets/levels/*.json', context: './src/.' }],
+      patterns: [
+        { from: 'assets/levels/*.json', context: '.' },
+        { from: 'assets/tiles/*', context: '.' },
+      ],
     }),
   ],
   output: {

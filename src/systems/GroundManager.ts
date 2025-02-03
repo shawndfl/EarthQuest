@@ -30,9 +30,6 @@ export class GroundManager extends Component {
   /** tiles that require an update */
   protected _updateTiles: TileComponent[];
 
-  /** used to generate the levels */
-  protected _levelGenerator: LevelGenerator;
-
   /** Used to load levels from json */
   protected _levelLoader: LevelLoader;
 
@@ -55,19 +52,7 @@ export class GroundManager extends Component {
     this._spriteController.initialize(texture, data);
 
     this._tileFactory = new TileFactory(this.eng, this._spriteController);
-    this._levelGenerator = new LevelGenerator(this.eng, this._tileFactory);
     this._levelLoader = new LevelLoader(this.eng);
-
-    // create the initial level
-    if (false) {
-      this.buildLevel({
-        seed: 605,
-        width: 60,
-        length: 60,
-        height: 7,
-        playerPos: new vec2([9, 6]),
-      });
-    }
   }
 
   loadLevel(levelData: ILevelData): void {
@@ -99,14 +84,6 @@ export class GroundManager extends Component {
 
     // then load the level
     this._levelLoader.load(this._levelData, this._tileFactory, this._tiles);
-  }
-
-  /**
-   * Build an auto generated level
-   * @param params
-   */
-  buildLevel(params: LevelConstructionParams) {
-    this._tiles = this._levelGenerator.Generate(params);
   }
 
   /**

@@ -1,6 +1,6 @@
-import { PlayerController } from '../components/PlayerController';
-import { TileComponent } from '../components/TileComponent';
-
+/**
+ * The graphics used in the battle scene
+ */
 export interface IBattleGraphics {
   background: string;
   surface: string;
@@ -8,6 +8,9 @@ export interface IBattleGraphics {
   leftSide: string;
 }
 
+/**
+ * Used to build a battle
+ */
 export interface IBattleData {
   song?: string;
   graphics?: IBattleGraphics;

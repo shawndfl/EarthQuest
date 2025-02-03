@@ -21,6 +21,8 @@ import { NotificationManager } from './NotificationManager';
 import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
 import NewLevel from '../assets/levels/newLevel.json';
+import { IBattleData } from '../battle/IBattleData';
+import { BattleManager } from '../systems/BattleManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -45,6 +47,7 @@ export class Engine {
   readonly notificationManager: NotificationManager;
   readonly ground: GroundManager;
   readonly player: PlayerController;
+  readonly battleManager: BattleManager;
 
   /**
    * the render context
@@ -99,6 +102,7 @@ export class Engine {
     this.ground = new GroundManager(this);
     this.player = new PlayerController(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
+    this.battleManager = new BattleManager(this);
 
     this.notificationManager.subscribe('EditorClose', (data: any) => {
       this.editor.hide();
@@ -109,14 +113,21 @@ export class Engine {
     return new SceneManager(this);
   }
 
-  loadLevel(level: ILevelData) {
-    this.sceneManager.loadLevel(level);
-    this.gameManager.loadLevel(level);
-    this.ground.loadLevel(level);
-    this.player.loadLevel(level);
-    this.assetManager.loadLevel(level);
-    this.textManager.loadLevel(level);
-    this.dialogManager.loadLevel(level);
+  /**
+   * Loads a new level. This will update each system with the
+   * new level. This function makes sure all systems are in sync
+   * and each system can perform its own state management as needed.
+   * @param level
+   */
+  async loadLevel(level: ILevelData): Promise<void> {
+    await this.sceneManager.loadLevel(level);
+    await this.gameManager.loadLevel(level);
+    await this.ground.loadLevel(level);
+    await this.player.loadLevel(level);
+    await this.assetManager.loadLevel(level);
+    await this.textManager.loadLevel(level);
+    await this.dialogManager.loadLevel(level);
+    await this.battleManager.loadLevel(level);
   }
 
   closeLevel(): void {
@@ -127,6 +138,7 @@ export class Engine {
     this.textManager.closeLevel();
     this.dialogManager.closeLevel();
     this.sceneManager.closeLevel();
+    this.battleManager.closeLevel();
   }
 
   async initialize(rootElement: HTMLElement) {
@@ -151,8 +163,9 @@ export class Engine {
     await this.dialogManager.initialize();
     await this.sceneManager.initialize();
     await this.editor.initialize(rootElement);
+    await this.battleManager.initialize();
 
-    this.loadFirstLevel();
+    await this.loadFirstLevel();
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
@@ -166,16 +179,48 @@ export class Engine {
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
   }
 
-  loadFirstLevel() {
-    const url = new URL(window.location.href);
+  /**
+   * Loads the first level from local the url or local storage
+   */
+  async loadFirstLevel(): Promise<void> {
+    let levelData: ILevelData;
 
-    if (url.searchParams.get('editor')) {
-      this.showEditor(NewLevel);
+    // check for a url first
+    const url = new URL(window.location.href);
+    const levelUrl = url.searchParams.get('level');
+    if (levelUrl) {
+      levelData = await this.assetManager.requestJson(levelUrl);
     }
 
-    this.loadLevel(NewLevel);
+    // check local storage
+    if (!levelData) {
+      const levelDataString = window.localStorage.getItem('lastLevel');
+      if (levelDataString) {
+        try {
+          levelData = JSON.parse(levelDataString);
+        } catch (e) {
+          console.error('error parsing local storage ', e);
+        }
+      }
+    }
+
+    // use new level
+    if (!levelData) {
+      levelData = NewLevel;
+    }
+
+    // are we loading the editor
+    if (url.searchParams.get('editor')) {
+      this.showEditor(levelData);
+    }
+
+    await this.loadLevel(levelData);
   }
 
+  /**
+   * Show the editor
+   * @param levelData
+   */
   showEditor(levelData?: ILevelData) {
     if (!levelData) {
       this.editor.show(this.sceneManager.levelData);
@@ -185,6 +230,9 @@ export class Engine {
     this.canvasController.showCanvas(false);
   }
 
+  /**
+   * Hide the editor
+   */
   hideEditor() {
     this.editor.hide();
     this.canvasController.showCanvas(true);
@@ -203,49 +251,54 @@ export class Engine {
   }
 
   update(dt: number) {
-    //this.onlyFps(dt);
-
-    //console.time('Game update');
-    // update the fps
-    this.fps.update(dt);
-
-    // handle gamepad polling
-    this.input.preUpdate(dt);
-
-    // handle input
-    if (this.input.buttonsDown != UserAction.None || this.input.buttonsReleased != UserAction.None) {
-      this.soundManager.UserReady();
-      const inputState = this.input.getInputState();
-      // handle dialog input first
-      this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
+    // only the editor will be updated
+    if (this.editor.isActive) {
+      // update the editor
+      this.editor.update(dt);
     }
+    // just playing the game
+    else {
+      // update the fps
+      this.fps.update(dt);
 
-    // clear the buffers
-    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
-    this.gl.clearDepth(1.0); // Clear everything
+      // handle gamepad polling
+      this.input.preUpdate(dt);
 
-    // update time for game manager
-    this.gameManager.update(dt);
+      // handle input
+      if (this.input.buttonsDown != UserAction.None || this.input.buttonsReleased != UserAction.None) {
+        this.soundManager.UserReady();
+        const inputState = this.input.getInputState();
+        // handle dialog input first
+        this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
+      }
 
-    // update most of the game components
-    this.scene.update(dt);
+      // clear the buffers
+      this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
+      this.gl.clearDepth(1.0); // Clear everything
 
-    this.ground.update(dt);
+      // update the battle scene
+      this.battleManager.update(dt);
 
-    this.player.update(dt);
+      if (!this.battleManager.isActive) {
+        // update time for game manager
+        this.gameManager.update(dt);
 
-    // update the menu manager
-    this.dialogManager.update(dt);
+        // update most of the game components
+        this.scene.update(dt);
 
-    // update the editor
-    this.editor.update(dt);
+        this.ground.update(dt);
 
-    // update text manager
-    this.textManager.update(dt);
+        this.player.update(dt);
+      }
+      // update the menu manager
+      this.dialogManager.update(dt);
 
-    // used to reset flags and update hold timers
-    this.input.postUpdate(dt);
-    //console.timeEnd('Game update');
+      // update text manager
+      this.textManager.update(dt);
+
+      // used to reset flags and update hold timers
+      this.input.postUpdate(dt);
+    }
   }
 
   resize(width: number, height: number) {

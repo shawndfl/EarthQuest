@@ -167,13 +167,13 @@ export class AssetManager extends Component {
             return resolve(json);
           } else {
             console.error(xhr.statusText);
-            return reject(xhr.statusText);
+            return resolve(null);
           }
         }
       };
       xhr.onerror = (e) => {
         console.error(xhr.statusText);
-        return reject(xhr.statusText);
+        return resolve(null);
       };
       xhr.send(null);
     });

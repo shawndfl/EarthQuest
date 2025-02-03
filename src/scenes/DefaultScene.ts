@@ -12,7 +12,7 @@ import { InputState } from '../core/InputHandler';
  * walk around talk to NPC pick up items and fight enemies.
  *
  */
-export class DefautlScene extends SceneComponent {
+export class DefaultScene extends SceneComponent {
   private _spriteSheetTexture: Texture;
 
   get spriteSheetTexture(): Texture {
@@ -32,12 +32,13 @@ export class DefautlScene extends SceneComponent {
   }
 
   loadLevel() {
-    this.eng.dialogManager.showDialog(
-      'Welcome to Earth Quest!\nThis is a default scene for the engine',
-      { x: 20, y: 40, width: 600, height: 240 }
-    );
+    this.eng.dialogManager.showDialog('Welcome to Earth Quest!\nThis is a default scene for the engine', {
+      x: 20,
+      y: 40,
+      width: 600,
+      height: 240,
+    });
   }
-
 
   /**
    * Handles user input. The logic goes through a chain of commands
@@ -57,5 +58,4 @@ export class DefautlScene extends SceneComponent {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
-
 }
