@@ -3,6 +3,7 @@ import { Engine } from '../core/Engine';
 import { WorldScene } from './scenes/WorldScene';
 import { ISceneFactory } from '../systems/ISceneFactory';
 import { DefaultScene } from '../scenes/DefaultScene';
+import { BattleScene } from './scenes/BattleScene';
 
 /**
  * Creates a scene from a type
@@ -23,6 +24,8 @@ export class SceneFactory extends ISceneFactory {
       return new DefaultScene(this.eng);
     } else if (type == 'world') {
       return new WorldScene(this.eng);
+    } else if (type == 'battle') {
+      return new BattleScene(this.eng);
     } else {
       console.error('Unknown scene type ' + type);
       return new DefaultScene(this.eng);

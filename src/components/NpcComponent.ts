@@ -65,10 +65,13 @@ export class NpcComponent extends TileComponent {
       return;
     }
 
-    this.eng.dialogManager.showDialog(
-      'You want a piece of me?',
-      { x: 20, y: 40, width: 400, height: 200 },
-      (dialog) => {
+    this.eng.dialogManager.showDialog({
+      text: 'You want a piece of me?',
+      x: 20,
+      y: 40,
+      width: 400,
+      height: 200,
+      onClosed: (dialog) => {
         if (dialog.selectedOption == 'Fight') {
           this.yourScaringMe();
         } else {
@@ -77,12 +80,13 @@ export class NpcComponent extends TileComponent {
 
         return true;
       },
-      ['Fight', 'Run Away']
-    );
+      choices: ['Fight', 'Run Away'],
+    });
   }
 
   keepTraining() {
-    this.eng.dialogManager.showDialog('You should be scared. Keep training!', {
+    this.eng.dialogManager.showDialog({
+      text: 'You should be scared. Keep training!',
       x: 10,
       y: 40,
       width: 600,
@@ -91,7 +95,8 @@ export class NpcComponent extends TileComponent {
   }
 
   yourScaringMe() {
-    this.eng.dialogManager.showDialog("You're scaring me!! I don't really want to fight", {
+    this.eng.dialogManager.showDialog({
+      text: "You're scaring me!! I don't really want to fight",
       x: 10,
       y: 40,
       width: 700,

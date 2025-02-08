@@ -35,8 +35,8 @@ export class DialogComponent extends PanelComponent {
     return this._visible;
   }
 
-  constructor(eng: Engine, dialogBuild: DialogBuilder) {
-    super(eng, 'dialog1', dialogBuild);
+  constructor(eng: Engine, dialogBuild: DialogBuilder, id: string) {
+    super(eng, id, dialogBuild);
     this._expandAnimation = new Curve();
     this._expandAnimation.curve(CurveType.linear);
     this._expandAnimation.points([

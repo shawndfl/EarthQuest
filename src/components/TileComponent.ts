@@ -2,7 +2,6 @@ import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
 import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
-import { SpritBatchController } from '../graphics/SpriteBatchController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
 import { TileFactory } from '../systems/TileFactory';

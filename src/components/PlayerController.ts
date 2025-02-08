@@ -1,8 +1,6 @@
 import { Curve } from '../math/Curve';
 import { Engine } from '../core/Engine';
-import { ISpriteData } from '../graphics/ISpriteData';
 import { SpriteFlip } from '../graphics/Sprite';
-import { Texture } from '../graphics/Texture';
 import { UserAction } from '../core/UserAction';
 import { SpritController } from '../graphics/SpriteController';
 import vec2 from '../math/vec2';
@@ -11,6 +9,7 @@ import vec3 from '../math/vec3';
 import { InputState } from '../core/InputHandler';
 import { AutoMoveController } from './AutoMoveController';
 import { ILevelData } from '../environment/ILevelData';
+import { TileContext } from './TileContext';
 
 export enum PointingDirection {
   None = 0x00,
@@ -324,6 +323,27 @@ export class PlayerController extends TileComponent {
       this.screenPosition.x - this.eng.width * 0.5,
       -this.eng.height * 0.5 + this.screenPosition.y
     );
+  }
+
+  canAccessTile(tileComponent: TileComponent): boolean {
+    if (tileComponent.type == 'enemy') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  onEnter(tileComponent: TileComponent, context: TileContext): void {
+    if (tileComponent.type == 'enemy') {
+      this.eng.battleManager.queueNextBattle({
+        enemies: [
+          {
+            id: 'test',
+            tile: [10, 20],
+          },
+        ],
+      });
+    }
   }
 
   /**

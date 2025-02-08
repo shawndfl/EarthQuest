@@ -12,6 +12,7 @@ import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
 import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { EnemyTileComponent } from '../components/EnemyTileComponent';
 import { FreeTileComponent } from '../components/FreeTileComponent';
+import { EnemyBattleTileComponent } from '../components/EnemyBattleTileComponent';
 
 export interface ITileTypeData {
   tile: string;
@@ -88,12 +89,7 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  createStaticTile(
-    tile: string,
-    i: number,
-    j: number,
-    k: number
-  ): TileComponent {
+  createStaticTile(tile: string, i: number, j: number, k: number): TileComponent {
     if (!tile || tile == '---' || tile == 'empty') {
       return new EmptyTile(this.eng, i, j, k);
     }
@@ -136,6 +132,11 @@ export class TileFactory extends Component {
       const player = this.eng.player;
       player.setTilePosition(i, j, k);
       return player;
+    } else if (tileType == 'player.battle') {
+      // TODO setup a battle player
+      const player = this.eng.player;
+      player.setTilePosition(i, j, k);
+      return player;
     } else if (tileType == 'npc') {
       return new NpcComponent(this.eng, args);
     } else if (tileType == 'gold') {
@@ -144,12 +145,12 @@ export class TileFactory extends Component {
       return new CollideTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'enemy') {
       return new EnemyTileComponent(this.eng, this.spriteBatch, args);
+    } else if (tileType == 'enemy.battle') {
+      return new EnemyBattleTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'portal') {
       return new PortalTileComponent(this.eng, this.spriteBatch, args);
     } else {
-      console.error(
-        "Unknown tile type '" + tile + "' @ (" + i + ', ' + j + ', ' + k + ')'
-      );
+      console.error("Unknown tile type '" + tile + "' @ (" + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, i, j, k);
     }
   }

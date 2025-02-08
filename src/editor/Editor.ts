@@ -286,6 +286,8 @@ export class Editor extends Component implements IEditor {
           if (evt.target.readyState == FileReader.DONE) {
             const levelData = JSON.parse(reader.result.toString());
             this.show(levelData);
+            // clear out the files
+            (e.target as any).value = null;
           }
         };
         reader.readAsText(file);

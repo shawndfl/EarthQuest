@@ -1,10 +1,5 @@
-import { Texture } from '../../graphics/Texture';
-import { GroundManager } from '../../systems/GroundManager';
-import { PlayerController } from '../../components/PlayerController';
 import { Engine } from '../../core/Engine';
-import { DialogMenu } from '../../menus/DialogMenu';
 import { SceneComponent } from '../../components/SceneComponent';
-import { ILevelData } from '../../environment/ILevelData';
 import { InputState } from '../../core/InputHandler';
 
 /**
@@ -23,13 +18,9 @@ export class WorldScene extends SceneComponent {
    */
   constructor(eng: Engine) {
     super(eng);
-
   }
 
-  loadLevel() {
-
-  }
-
+  loadLevel() {}
 
   /**
    * Handles user input. The logic goes through a chain of commands
@@ -49,5 +40,5 @@ export class WorldScene extends SceneComponent {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
 
-  resize(width: number, height: number) { }
+  resize(width: number, height: number) {}
 }

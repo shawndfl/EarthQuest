@@ -7,15 +7,35 @@ import { GameMenuComponent } from '../menus/GameMenuComponent';
 import { DialogBuilder } from '../menus/DialogBuilder';
 import { GameMenuBuilder } from '../menus/GameMenuBuilder';
 
+export const defaultDialogDepth = -0.5;
+
+/**
+ * Interface for creating a dialog
+ */
+export interface DialogOptions {
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  onClosed?: (dialog: DialogComponent) => void;
+  choices?: string[];
+  onClosing?: (dialog: DialogComponent) => boolean;
+  depth?: number; // = -0.5
+}
+
+export const MaxDialogCount = 5;
+
 /**
  * Manages dialog boxes
  */
 export class DialogManager extends Component {
   protected _spriteController: SpritBatchController;
-  protected _dialog: DialogComponent;
+  protected _dialogQueue: DialogComponent[] = [];
   protected _gameMenu: GameMenuComponent;
   protected _dialogBuild: DialogBuilder;
   protected _gameMenuBuilder: GameMenuBuilder;
+  protected _dialogIndex: number = -1;
 
   /**
    * Get the game menu
@@ -28,7 +48,9 @@ export class DialogManager extends Component {
    * Get the dialog menu
    */
   get dialog() {
-    return this._dialog;
+    return this._dialogIndex < 0 || this._dialogIndex > this._dialogQueue.length - 1
+      ? null
+      : this._dialogQueue[this._dialogIndex];
   }
 
   constructor(eng: Engine) {
@@ -37,19 +59,21 @@ export class DialogManager extends Component {
     this._dialogBuild = new DialogBuilder(eng);
     this._gameMenuBuilder = new GameMenuBuilder(eng);
     this._spriteController = new SpritBatchController(eng);
-    this._dialog = new DialogComponent(this.eng, this._dialogBuild);
-    this._gameMenu = new GameMenuComponent(
-      this.eng,
-      'gameMenu',
-      this._gameMenuBuilder
-    );
+    // add all the dialogs
+    for (let i = 0; i < MaxDialogCount; i++) {
+      this._dialogQueue.push(new DialogComponent(this.eng, this._dialogBuild, 'dialog' + i));
+    }
+
+    this._gameMenu = new GameMenuComponent(this.eng, 'gameMenu', this._gameMenuBuilder);
   }
 
   async initialize() {
     const texture = this.eng.assetManager.menu.texture;
     const data = this.eng.assetManager.menu.data;
     this._spriteController.initialize(texture, data);
-    this._dialog.initialize(this._spriteController);
+    for (let i = 0; i < MaxDialogCount; i++) {
+      this._dialogQueue[i].initialize(this._spriteController);
+    }
     this._gameMenu.initialize(this._spriteController);
     this._spriteController.commitToBuffer();
   }
@@ -60,10 +84,11 @@ export class DialogManager extends Component {
    * @returns
    */
   handleUserAction(state: InputState): boolean {
-    return (
-      this._dialog.handleUserAction(state) ||
-      this._gameMenu.handleUserAction(state)
-    );
+    if (this.dialog) {
+      return this.dialog.handleUserAction(state) || this._gameMenu.handleUserAction(state);
+    } else {
+      return this._gameMenu.handleUserAction(state);
+    }
   }
 
   /**
@@ -71,22 +96,24 @@ export class DialogManager extends Component {
    * @param text
    * @param loc
    */
-  showDialog(
-    text: string,
-    loc: { x: number; y: number; width: number; height: number },
-    onClosed?: (dialog: DialogComponent) => void,
-    options?: string[],
-    onClosing?: (dialog: DialogComponent) => boolean,
-    depth: number = -0.5
-  ) {
-    this._dialog.setOptions(options);
-    this._dialog.setPosition(loc.x, loc.y);
-    this._dialog.setSize(loc.width, loc.height);
-    this._dialog.setText(text);
-    this._dialog.onClosed = onClosed;
-    this._dialog.onClosing = onClosing;
-    this._dialog.setDepth(depth);
-    this._dialog.show();
+  showDialog(options: DialogOptions) {
+    // get ready for the next dialog
+    this._dialogIndex++;
+
+    this.dialog.setOptions(options.choices);
+    this.dialog.setPosition(options.x, options.y);
+    this.dialog.setSize(options.width, options.height);
+    this.dialog.setText(options.text);
+    this.dialog.onClosing = options.onClosing;
+    this.dialog.setDepth(options.depth ?? defaultDialogDepth);
+    this.dialog.onClosed = (dialog) => {
+      this._dialogIndex--;
+      if (options.onClosed) {
+        options.onClosed(dialog);
+      }
+    };
+
+    this.dialog.show();
   }
 
   showGameMenu(onHide?: (dialog: GameMenuComponent) => boolean) {
@@ -99,13 +126,20 @@ export class DialogManager extends Component {
    * @param dt
    */
   update(dt: number) {
-    this._dialog.update(dt);
+    // update all dialogs
+    for (let i = 0; i < this._dialogIndex + 1; i++) {
+      this._dialogQueue[i].update(dt);
+    }
     this._gameMenu.update(dt);
     this._spriteController.update(dt);
   }
 
   closeLevel(): void {
     this._gameMenu.hide();
-    this._dialog.hide();
+
+    // hide all dialogs
+    for (let i = 0; i < this._dialogIndex + 1; i++) {
+      this._dialogQueue[i].hide();
+    }
   }
 }

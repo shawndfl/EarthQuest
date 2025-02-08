@@ -28,7 +28,9 @@
     "enemy|swamp.enemy.down|",
     "open|highlight|",
     "free|shadow|",
-    "portal|block.grass.dirt|"
+    "portal|block.grass.dirt|",
+    "enemy.battle|swamp.enemy.down|",
+    "player.battle|ness.down.step.right|"
   ],
   "encode": [
     [

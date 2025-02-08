@@ -21,7 +21,6 @@ import { NotificationManager } from './NotificationManager';
 import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
 import NewLevel from '../assets/levels/newLevel.json';
-import { IBattleData } from '../battle/IBattleData';
 import { BattleManager } from '../systems/BattleManager';
 
 /**
