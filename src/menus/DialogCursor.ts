@@ -22,6 +22,15 @@ export class DialogCursor extends Component {
   private _visible: boolean;
   private _depth: number;
 
+  /**
+   * Is the cursor dancing
+   */
+  private _isActive: boolean;
+
+  get isActive(): boolean {
+    return this._isActive;
+  }
+
   /** On select event */
   private _onSelect: (index: number, cursor: DialogCursor) => void;
 
@@ -35,7 +44,6 @@ export class DialogCursor extends Component {
 
   set index(value: number) {
     this._activeIndex = value;
-
   }
 
   /**
@@ -51,6 +59,7 @@ export class DialogCursor extends Component {
     this._activeIndex = -1;
     this._activePosition = new vec2(0, 0);
     this._cursorCurve = new Curve();
+    this._cursorCurve.id = 'cursor';
     this._cursorCurve.points([
       {
         p: 0,
@@ -95,7 +104,7 @@ export class DialogCursor extends Component {
     }
   }
 
-  show(index?: number, onSelect?: (index: number, cursor: DialogCursor) => void,) {
+  show(index?: number, onSelect?: (index: number, cursor: DialogCursor) => void) {
     if (index != undefined) {
       this._activeIndex = index;
     }
@@ -108,8 +117,13 @@ export class DialogCursor extends Component {
   /**
    * Cause the cursor to stop moving as the player selected something
    */
-  lock() {
-    this._cursorCurve.pause(0);
+  activate(isActive: boolean) {
+    if (isActive) {
+      this._cursorCurve.start(true);
+    } else {
+      this._cursorCurve.pause(0);
+    }
+    this._isActive = isActive;
   }
 
   /**
@@ -138,12 +152,15 @@ export class DialogCursor extends Component {
         this._spriteController.viewOffset(new vec2(0, 0));
         this._spriteController.viewScale(1.0);
         this._spriteController.setSprite('cursor');
-        this._spriteController.setSpritePosition(position.x, this.eng.height - position.y, this._depth);
+        if (!this._cursorCurve.isRunning()) {
+          this._spriteController.setSpritePosition(position.x, this.eng.height - position.y, this._depth);
+        }
 
-        this._cursorCurve.start(true, undefined, (val) => {
+        this._cursorCurve.onUpdate = (val, curve) => {
           this._spriteController.activeSprite(this._cursorId);
           this._spriteController.setSpritePosition(position.x + val, this.eng.height - position.y, this._depth);
-        });
+          this._spriteController.commitToBuffer();
+        };
       }
     } else {
       this._spriteController.removeSprite(this._cursorId);

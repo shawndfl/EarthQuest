@@ -97,6 +97,10 @@ export class DialogManager extends Component {
    * @param loc
    */
   showDialog(options: DialogOptions) {
+    if (this.dialog) {
+      this.dialog.activate(false);
+    }
+
     // get ready for the next dialog
     this._dialogIndex++;
 
@@ -105,15 +109,22 @@ export class DialogManager extends Component {
     this.dialog.setSize(options.width, options.height);
     this.dialog.setText(options.text);
     this.dialog.onClosing = options.onClosing;
-    this.dialog.setDepth(options.depth ?? defaultDialogDepth);
+    this.dialog.setDepth(defaultDialogDepth - 0.01 * this._dialogIndex);
     this.dialog.onClosed = (dialog) => {
+      if (this.dialog) {
+        this.dialog.activate(false);
+      }
       this._dialogIndex--;
       if (options.onClosed) {
         options.onClosed(dialog);
       }
+      if (this.dialog) {
+        this.dialog.activate(true);
+      }
     };
 
     this.dialog.show();
+    this.dialog.activate(true);
   }
 
   showGameMenu(onHide?: (dialog: GameMenuComponent) => boolean) {

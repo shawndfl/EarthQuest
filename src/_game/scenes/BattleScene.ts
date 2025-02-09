@@ -44,8 +44,8 @@ export class BattleScene extends SceneComponent {
 
   pickTarget(): void {
     this.eng.dialogManager.showDialog({
-      x: 50,
-      y: 60,
+      x: 150,
+      y: 120,
       text: 'Enemy1 or enemy 2',
       width: 400,
       height: 200,

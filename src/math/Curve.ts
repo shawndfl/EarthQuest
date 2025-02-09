@@ -19,6 +19,8 @@ export class Curve {
   private _repeat: number;
   private _isDone: boolean;
 
+  public id: string;
+
   onDone: (curve: Curve) => void;
   onUpdate: (value: number, curve: Curve) => void;
 
@@ -52,12 +54,6 @@ export class Curve {
       this._time = 0;
       this._position = 0;
       this._isDone = false;
-      if (onDone) {
-        this.onDone = onDone;
-      }
-      if (onUpdate) {
-        this.onUpdate = onUpdate;
-      }
 
       // if there are points use them
       if (this._points.length > 0) {
@@ -70,6 +66,13 @@ export class Curve {
           this._position = this._points[0].p;
         }
       }
+    }
+
+    if (onDone) {
+      this.onDone = onDone;
+    }
+    if (onUpdate) {
+      this.onUpdate = onUpdate;
     }
 
     this._running = true;

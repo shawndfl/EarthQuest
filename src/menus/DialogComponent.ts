@@ -19,6 +19,12 @@ export class DialogComponent extends PanelComponent {
   protected _selectedIndex: number;
   protected _cursor: DialogCursor;
 
+  private _isActive: boolean;
+
+  get isActive(): boolean {
+    return this._isActive;
+  }
+
   onClosing: (dialog: DialogComponent) => boolean;
 
   onClosed: (dialog: DialogComponent) => void;
@@ -48,6 +54,13 @@ export class DialogComponent extends PanelComponent {
   }
 
   /**
+   * Cause the cursor to stop moving as the player selected something
+   */
+  activate(isActive: boolean) {
+    this._cursor.activate(isActive);
+    this._isActive = isActive;
+  }
+  /**
    * Options are use to allow the user to select something from the dialog box
    * @param options
    */
@@ -63,7 +76,6 @@ export class DialogComponent extends PanelComponent {
   handleUserAction(state: InputState): boolean {
     const active = this.visible;
     if (active && state.isReleased(UserAction.A)) {
-      console.debug('selected something', state);
       let canHide = true;
 
       if (this.onClosing) {
@@ -145,7 +157,7 @@ export class DialogComponent extends PanelComponent {
             text: option,
             position: textPos,
             color: new vec4([0.9, 0.9, 1.0, 1.0]),
-            depth: this._depth - 0.01, // set the depth just in front of this dialog box
+            depth: this._depth - 0.001, // set the depth just in front of this dialog box
             scale: 1.0,
           });
           optionPositions.push(new vec2(x - optionIndent, y + this.eng.textManager.lineHeight * 0.5));
