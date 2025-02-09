@@ -152,5 +152,7 @@ export class DialogManager extends Component {
     for (let i = 0; i < this._dialogIndex + 1; i++) {
       this._dialogQueue[i].hide();
     }
+
+    this._dialogIndex = -1;
   }
 }

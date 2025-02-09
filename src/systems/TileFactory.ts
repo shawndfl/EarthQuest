@@ -128,12 +128,17 @@ export class TileFactory extends Component {
     } else if (tileType == 'free') {
       return new FreeTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'player') {
+      let pos = this.eng.gameManager.data.player.position;
+      if (!pos) {
+        pos = { i, j, k };
+      }
       // the player is already created. Just set his position
       const player = this.eng.player;
-      player.setTilePosition(i, j, k);
+
+      player.setTilePosition(pos.i, pos.j, pos.k);
+
       return player;
     } else if (tileType == 'player.battle') {
-      // TODO setup a battle player
       const player = this.eng.player;
       player.setTilePosition(i, j, k);
       return player;

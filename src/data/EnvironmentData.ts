@@ -2,6 +2,8 @@
  * Environment data for the game
  */
 export class EnvironmentData {
+  /** what level to load */
+  level: string;
   /** seed for generating the level */
   seed: number = 1001;
 

@@ -48,6 +48,10 @@ export class Engine {
   readonly player: PlayerController;
   readonly battleManager: BattleManager;
 
+  private _nextLevel: ILevelData = null;
+  private _levelReady: boolean = false;
+  private _previousLevel: ILevelData;
+  private _newLevelRequest: boolean = false;
   /**
    * the render context
    */
@@ -108,6 +112,32 @@ export class Engine {
     });
   }
 
+  /**
+   * Queue the next level. This level will be loaded on the next frame
+   * @param levelData
+   */
+  pushNewLevel(levelData: ILevelData): void {
+    if (!this._newLevelRequest) {
+      this._previousLevel = this._nextLevel;
+      this._nextLevel = levelData;
+      this._newLevelRequest = true;
+    } else {
+      console.error('new level already requested!');
+    }
+  }
+
+  /**
+   * Load the last level
+   */
+  popLevel(): void {
+    if (!this._newLevelRequest) {
+      this._nextLevel = this._previousLevel;
+      this._newLevelRequest = true;
+    } else {
+      console.error('new level already requested!');
+    }
+  }
+
   createSceneManager() {
     return new SceneManager(this);
   }
@@ -118,7 +148,14 @@ export class Engine {
    * and each system can perform its own state management as needed.
    * @param level
    */
-  async loadLevel(level: ILevelData): Promise<void> {
+  private async loadLevel(level: ILevelData): Promise<void> {
+    this._levelReady = false;
+    this._newLevelRequest = false;
+
+    // close anything that is open
+    this.closeLevel();
+
+    // load all the managers
     await this.sceneManager.loadLevel(level);
     await this.gameManager.loadLevel(level);
     await this.ground.loadLevel(level);
@@ -127,9 +164,11 @@ export class Engine {
     await this.textManager.loadLevel(level);
     await this.dialogManager.loadLevel(level);
     await this.battleManager.loadLevel(level);
+
+    this._levelReady = true;
   }
 
-  closeLevel(): void {
+  private closeLevel(): void {
     this.gameManager.closeLevel();
     this.ground.closeLevel();
     this.player.closeLevel();
@@ -213,7 +252,7 @@ export class Engine {
       this.showEditor(levelData);
     }
 
-    await this.loadLevel(levelData);
+    this.pushNewLevel(levelData);
   }
 
   /**
@@ -235,8 +274,8 @@ export class Engine {
   hideEditor() {
     this.editor.hide();
     this.canvasController.showCanvas(true);
-    this.closeLevel();
-    this.loadLevel(this.editor.levelData);
+    // the level will be loaded next frame
+    this.pushNewLevel(this.editor.levelData);
   }
 
   onlyFps(dt: number) {
@@ -257,6 +296,21 @@ export class Engine {
     }
     // just playing the game
     else {
+      // clear the buffers
+      this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
+      this.gl.clearDepth(1.0); // Clear everything
+
+      // should we load the next level
+      if (this._newLevelRequest) {
+        this.loadLevel(this._nextLevel);
+      }
+
+      // skip some frames
+      if (!this._levelReady) {
+        //TODO show some kind of loading screen
+        return;
+      }
+
       // update the fps
       this.fps.update(dt);
 
@@ -271,24 +325,19 @@ export class Engine {
         this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
       }
 
-      // clear the buffers
-      this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
-      this.gl.clearDepth(1.0); // Clear everything
-
       // update the battle scene
       this.battleManager.update(dt);
 
-      if (!this.battleManager.isActive) {
-        // update time for game manager
-        this.gameManager.update(dt);
+      // update time for game manager
+      this.gameManager.update(dt);
 
-        // update most of the game components
-        this.scene.update(dt);
+      // update most of the game components
+      this.scene.update(dt);
 
-        this.ground.update(dt);
+      this.ground.update(dt);
 
-        this.player.update(dt);
-      }
+      this.player.update(dt);
+
       // update the menu manager
       this.dialogManager.update(dt);
 

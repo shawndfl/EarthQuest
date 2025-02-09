@@ -1,7 +1,6 @@
 import { Engine } from '../../core/Engine';
 import { SceneComponent } from '../../components/SceneComponent';
 import { InputState } from '../../core/InputHandler';
-import { DialogBuilder } from '../../menus/DialogBuilder';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -24,21 +23,21 @@ export class BattleScene extends SceneComponent {
   loadLevel() {
     this.eng.dialogManager.showDialog({
       x: 20,
-      y: 40,
+      y: 400,
       text: '',
-      width: 400,
-      height: 200,
+      width: 300,
+      height: 180,
       onClosing: (dialog) => {
         if (dialog.selectedOption == 'Attack') {
-          console.debug('attacking!!');
           this.pickTarget();
-          return false;
-        } else {
+        } else if (dialog.selectedOption == 'Run Away') {
+          // go back to the level
+          this.eng.popLevel();
         }
 
-        return true;
+        return false;
       },
-      choices: ['Attack', 'Run Away'],
+      choices: ['Attack', 'Items', 'Run Away'],
     });
   }
 

@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { ILevelData } from '../environment/ILevelData';
 import { SpriteFlip } from '../graphics/Sprite';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
@@ -46,14 +47,13 @@ export class EnemyTileComponent extends TileComponent {
 
   onEnter(tileComponent: TileComponent, context: TileContext): void {
     if (tileComponent.type == 'player') {
-      this.eng.battleManager.queueNextBattle({
-        enemies: [
-          {
-            id: 'test',
-            tile: [10, 20],
-          },
-        ],
+      this.eng.assetManager.requestJson('assets/levels/battle1.json').then((levelData: ILevelData) => {
+        const pos = this.eng.player.tilePosition;
+        this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
+        this.eng.pushNewLevel(levelData);
+        //TODO fade in
       });
+      //TODO fad out
     }
   }
 

@@ -1,6 +1,8 @@
 import { IBattleData } from '../battle/IBattleData';
+import { IEnemyData } from '../battle/IEnemyData';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
+import { ILevelData } from '../environment/ILevelData';
 
 /**
  * Manages battles including starting them and ending them
@@ -9,6 +11,12 @@ import { Engine } from '../core/Engine';
 export class BattleManager extends Component {
   private nextBattle: IBattleData;
   private _activeBattle: boolean;
+
+  private _enemyList: IEnemyData[] = [];
+
+  public get enemyList(): IEnemyData[] {
+    return this._enemyList;
+  }
 
   public get isActive(): boolean {
     return this._activeBattle;
@@ -19,11 +27,17 @@ export class BattleManager extends Component {
   }
 
   /**
+   * When a new battle scene loads it will start here
+   * @param level
+   */
+  loadLevel(level: ILevelData): void {
+    this._enemyList = [];
+  }
+
+  /**
    * Setup the battle manager
    */
-  async initialize(): Promise<void> {
-    //TODO load battle data
-  }
+  async initialize(): Promise<void> {}
 
   /**
    * Gives this a changes to load the battle and update the battle
@@ -39,8 +53,6 @@ export class BattleManager extends Component {
     if (!this._activeBattle) {
       return;
     }
-
-    console.debug('Fighting!!!');
   }
 
   /**

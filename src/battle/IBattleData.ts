@@ -13,6 +13,7 @@ export interface IBattleGraphics {
  */
 export interface IBattleData {
   song?: string;
+  scene: string;
   graphics?: IBattleGraphics;
   enemies?: [
     {

@@ -375,17 +375,20 @@ export class GroundManager extends Component {
 
   closeLevel(): void {
     this._updateTiles = [];
-
-    // clean up old tiles
-    for (let k = 0; k < this._tiles.length; k++) {
-      for (let j = 0; j < this._tiles[k].length; j++) {
-        for (let i = 0; i < this._tiles[k][j].length; i++) {
-          this._tiles[k][j][i]?.dispose();
+    if (this._tiles) {
+      // clean up old tiles
+      for (let k = 0; k < this._tiles.length; k++) {
+        for (let j = 0; j < this._tiles[k].length; j++) {
+          for (let i = 0; i < this._tiles[k][j].length; i++) {
+            this._tiles[k][j][i]?.dispose();
+          }
         }
       }
     }
 
-    this._spriteController.dispose();
+    if (this._spriteController) {
+      this._spriteController.dispose();
+    }
 
     this._tiles = [[[]]];
   }

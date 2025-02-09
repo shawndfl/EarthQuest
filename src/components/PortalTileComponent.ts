@@ -17,12 +17,15 @@ export class PortalTileComponent extends OpenTileComponent {
       player.canWalk = false;
 
       this.eng.assetManager.requestJson('assets/levels/level2.json').then((levelData: ILevelData) => {
-        const level = this.eng.loadLevel(levelData);
+        // clear out the position so that the player position is loaded from the level
+        this.eng.gameManager.data.player.position = null;
+
+        // load the new level
+        this.eng.pushNewLevel(levelData);
         //TODO fade in
       });
       //TODO fad out
 
-      //this.eng.ground.buildLevel({ seed: 2003, length: 50, width: 40, height: 10, playerPos: new vec2(1, 1) });
       player.canWalk = true;
     }
   }
