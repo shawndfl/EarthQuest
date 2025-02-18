@@ -61,13 +61,13 @@ export class CanvasController extends Component {
   logGlError(error: string, functionName: string, args: any) {
     console.error(
       'GL error: ' +
-      error +
-      ' in gl.' +
-      functionName +
-      '(' +
-      // @ts-ignore
-      (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
-      ')'
+        error +
+        ' in gl.' +
+        functionName +
+        '(' +
+        // @ts-ignore
+        (WebGLDebugUtils as any).glFunctionArgsToString(functionName, args) +
+        ')'
     );
   }
 

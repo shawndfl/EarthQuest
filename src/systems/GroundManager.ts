@@ -69,18 +69,6 @@ export class GroundManager extends Component {
 
     // allocate tiles first
     this._tiles = [[[]]];
-    for (let k = 0; k < levelData.encode.length; k++) {
-      this._tiles.push([]);
-
-      for (let j = 0; j < levelData.encode[k].length; j++) {
-        this._tiles[k].push([]);
-        const row = levelData.encode[k][j];
-
-        for (let s = 0; s < row.length; s += 2) {
-          this._tiles[k][j].push(this._tileFactory.empty);
-        }
-      }
-    }
 
     // then load the level
     this._levelLoader.load(this._levelData, this._tileFactory, this._tiles);
@@ -239,8 +227,30 @@ export class GroundManager extends Component {
     if (this._tiles[tileZ] != undefined && this._tiles[tileZ][tileY] != undefined) {
       tile = this._tiles[tileZ][tileY][tileX] ?? this._tileFactory.empty;
     }
-
+    [].find;
     return tile;
+  }
+
+  /**
+   * finds a tile
+   * @param search
+   */
+  findTile(predicate: (tile: TileComponent, i: number, j: number, k: number) => boolean): TileComponent[] {
+    const found: TileComponent[] = [];
+    if (!predicate) {
+      return found;
+    }
+    for (let k = 0; k < this._tiles.length; k++) {
+      for (let j = 0; j < this._tiles[k].length; j++) {
+        for (let i = 0; i < this._tiles[k][j].length; i++) {
+          const tile = this._tiles[k][j][i];
+          if (predicate(tile, i, j, k)) {
+            found.push(tile);
+          }
+        }
+      }
+    }
+    return found;
   }
 
   /**
@@ -250,7 +260,7 @@ export class GroundManager extends Component {
    * @param k
    * @returns
    */
-  findTile(i: number, j: number, k: number) {
+  findTileSolid(i: number, j: number, k: number) {
     let tileZ = Math.floor(k);
     const maxTileAbove = Math.floor(k) + 3;
 
@@ -325,7 +335,7 @@ export class GroundManager extends Component {
    * @returns true if the player can access this cell
    */
   canAccessTile(tileComponent: TileComponent, i: number, j: number, k: number): boolean {
-    let tile = this.findTile(i, j, k);
+    let tile = this.findTileSolid(i, j, k);
 
     // there is nothing under us
     if (tile.empty) {

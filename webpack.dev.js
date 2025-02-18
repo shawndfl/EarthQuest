@@ -44,8 +44,13 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.mp3$/,
+        test: /\.(mp3)$/,
         use: ['url-loader'],
+      },
+      {
+        test: /\.dat$/,
+        exclude: /node_modules/,
+        use: ['binary-loader'],
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,

@@ -9,7 +9,7 @@ import { InputState } from '../../core/InputHandler';
  */
 export class WorldScene extends SceneComponent {
   get type(): string {
-    return typeof this;
+    return this.constructor.name;
   }
 
   /**
