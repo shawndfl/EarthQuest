@@ -1,26 +1,28 @@
 import { Engine } from '../core/Engine';
-import { BackgroundData } from '../data/BackgroundData';
-import { GlBuffer } from '../graphics/GlBuffer';
 import { PlanePrimitive } from '../graphics/PlanePrimitive';
-import { SpritController } from '../graphics/SpriteController';
+import { Texture } from '../graphics/Texture';
 import { BackgroundImageShader } from '../shaders/BackgroundImageShader';
-import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
-import { AssetManager } from '../systems/AssetManager';
 import { Component } from './Component';
 
 export class BackgroundComponent extends Component {
   plane: PlanePrimitive;
   shader: BackgroundImageShader;
+  texture: Texture;
 
   constructor(eng: Engine) {
     super(eng);
-    this.plane = new PlanePrimitive(this.eng);
-    this.shader = new BackgroundImageShader(this.eng.gl, 'BackgroundShader');
   }
 
-  async initialize(data: BackgroundData) {
-    this.plane.initialize();
-    this.shader.setBackgroundImage(data.image);
+  async initialize() {
+    this.plane = new PlanePrimitive(this.eng);
+    this.plane.initialize(1.0);
+    this.shader = new BackgroundImageShader(this.eng.gl, 'BackgroundShader');
+    this.texture = new Texture(this.eng.gl);
+    this.shader.setBackgroundImage(this.texture);
+  }
+
+  setImage(imageData: TexImageSource): void {
+    this.texture.updateTexture(imageData);
   }
 
   update(dt: number) {

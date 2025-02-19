@@ -11,6 +11,7 @@ export default class Engine {
     this.alpha = opts.alpha;
     this.canvas = opts.canvas;
     this.tick = 0;
+    this.image = new Image();
   }
   animate(debug) {
     let then = Date.now();
@@ -38,9 +39,7 @@ export default class Engine {
       if (elapsed > fpsInterval) {
         then = now - (elapsed % fpsInterval);
         for (let i = 0; i < this.layers.length; ++i) {
-          if (debug) {
-            console.log(canvas.toDataURL());
-          }
+          this.image.src = canvas.toDataURL();
           bitmap = this.layers[i].overlayFrame(image.data, this.aspectRatio, this.tick, this.alpha[i], i === 0);
         }
         this.tick += this.frameSkip;

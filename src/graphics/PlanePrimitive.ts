@@ -15,8 +15,15 @@ export class PlanePrimitive extends Component {
     this.buffer = new GlBuffer(this.eng.gl);
   }
 
-  initialize() {
-    this.buffer.setBuffers([{ min: new vec3([-1, -1, 0]), max: new vec3([1, 1, 0]), minTex: new vec2([0, 1]), maxTex: new vec2([1, 0]) }]);
+  initialize(depth: number) {
+    this.buffer.setBuffers([
+      {
+        min: new vec3([-1, -1, depth]),
+        max: new vec3([1, 1, depth]),
+        minTex: new vec2([0, 1]),
+        maxTex: new vec2([1, 0]),
+      },
+    ]);
   }
 
   draw() {

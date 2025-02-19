@@ -325,14 +325,14 @@ export class Engine {
         this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
       }
 
-      // update the battle scene
-      this.battleManager.update(dt);
-
       // update time for game manager
       this.gameManager.update(dt);
 
       // update most of the game components
       this.scene.update(dt);
+
+      // update the battle scene
+      this.battleManager.update(dt);
 
       this.ground.update(dt);
 
