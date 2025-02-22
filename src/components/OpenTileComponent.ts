@@ -1,11 +1,10 @@
 import { Engine } from '../core/Engine';
-import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { TileFactory } from '../systems/TileFactory';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
 import { SpritController } from '../graphics/SpriteController';
+import { ITileCreationArgs } from './ITileCreationArgs';
 
 /**
  * This is any thing that the player or some NPC can walk on
@@ -43,7 +42,7 @@ export class OpenTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(eng: Engine, protected _spriteController: SpritBatchController, args: ITileCreateionArgs) {
+  constructor(eng: Engine, protected _spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController.activeSprite(this.id);
     this._spriteController.setSprite(this.spriteId);

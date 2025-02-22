@@ -3,7 +3,7 @@ import { SpriteFlip } from '../graphics/Sprite';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve } from '../math/Curve';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 import { PlayerController } from './PlayerController';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
@@ -49,7 +49,7 @@ export class EnemyBattleTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreateionArgs) {
+  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController = new SpritBatchController(eng);
     const character = eng.assetManager.character;

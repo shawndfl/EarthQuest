@@ -1,5 +1,4 @@
-import { ISpriteData } from '../graphics/ISpriteData';
-import { Texture } from '../graphics/Texture';
+import { SceneControllerType } from './SceneControllerType';
 
 /**
  * This interface is used to build levels.
@@ -8,7 +7,7 @@ export interface ILevelData {
   /**
    * The scene component that uses this data.
    */
-  controllerType: string;
+  controllerType: SceneControllerType;
 
   /**
    * The url of the sprite sheet.

@@ -1,8 +1,7 @@
 import { Engine } from '../core/Engine';
 import { ILevelData } from '../environment/ILevelData';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import vec2 from '../math/vec2';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 import { OpenTileComponent } from './OpenTileComponent';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
@@ -13,7 +12,7 @@ import { TileContext } from './TileContext';
 export class PortalTileComponent extends OpenTileComponent {
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
     if (tileComponent.type == 'player') {
-      const player = this.eng.player;
+      const player = this.eng.worldPlayer;
       player.canWalk = false;
 
       this.eng.assetManager.requestJson('assets/levels/level2.json').then((levelData: ILevelData) => {
@@ -30,7 +29,7 @@ export class PortalTileComponent extends OpenTileComponent {
     }
   }
 
-  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreateionArgs) {
+  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, spriteController, args);
   }
 }

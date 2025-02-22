@@ -4,7 +4,7 @@ import { SpritController } from '../graphics/SpriteController';
 import { TileComponent } from './TileComponent';
 import { Curve } from '../math/Curve';
 import { SpriteFlip } from '../graphics/Sprite';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 
 export class NpcComponent extends TileComponent {
   protected _spriteController;
@@ -24,7 +24,7 @@ export class NpcComponent extends TileComponent {
     return false;
   }
 
-  constructor(eng: Engine, args: ITileCreateionArgs) {
+  constructor(eng: Engine, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController = new SpritController(eng);
     const i = args.i;

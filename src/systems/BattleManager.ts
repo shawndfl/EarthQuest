@@ -10,6 +10,7 @@ import BackgroundLayer from '../battleBackgrounds/rom/background_layer';
 import ROM from '../battleBackgrounds/rom/rom';
 import { SpritController } from '../graphics/SpriteController';
 import { BackgroundComponent } from '../components/BackgroundComponent';
+import { EnemyBattleTileComponent } from '../components/EnemyBattleTileComponent';
 /**
  * Manages battles including starting them and ending them
  * as well as level up and game over.
@@ -22,6 +23,7 @@ export class BattleManager extends Component {
   private _backgroundSprite: BackgroundComponent;
 
   private _enemyList: IEnemyData[] = [];
+  private _enemyComponents: EnemyBattleTileComponent[] = [];
 
   public get enemyList(): IEnemyData[] {
     return this._enemyList;
@@ -60,7 +62,7 @@ export class BattleManager extends Component {
       alpha: [0.3, 0.3],
       canvas: this.eng.canvasController.canvas2D,
     });
-    this._backgroundEngine.animate();
+    this._backgroundEngine.initialize();
   }
 
   /**
@@ -71,16 +73,15 @@ export class BattleManager extends Component {
     // we only want to look at battle scenes
     if (this.eng.scene.type == 'BattleScene') {
       this._activeBattle = true;
+
+      // setup the a random back ground
       this._backgroundEngine.layers[0].loadEntry(Math.floor(this.eng.random.rand() * 325));
       this._backgroundEngine.layers[1].loadEntry(Math.floor(this.eng.random.rand() * 325));
-      const enemyComponents = this.eng.ground.findTile((tile, i, j, k) => {
-        if (tile.type == 'enemy.battle') {
-          console.debug('FOUND! ' + i + ', ' + j + ', ' + k, tile);
-        }
-        return tile.type.startsWith('enemy.battle');
-      });
-      console.debug('enemies ', enemyComponents);
-      this._enemyList = [];
+
+      // find all the enemy components
+      this._enemyComponents = this.eng.battleGround.findTile((tile, i, j, k) => {
+        return tile instanceof EnemyBattleTileComponent;
+      }) as EnemyBattleTileComponent[];
     }
     // not a battle scene
     else {
@@ -102,6 +103,7 @@ export class BattleManager extends Component {
     if (!this._activeBattle) {
       return;
     }
+    this._backgroundEngine.update(dt);
     this._backgroundSprite.setImage(this.eng.canvasController.canvas2D);
     this._backgroundSprite.update(dt);
   }

@@ -9,16 +9,18 @@ import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { PortalTileComponent } from '../components/PortalTileComponent';
 import { HalfStepTileComponent } from '../components/HalfStepTileComponent';
-import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { EnemyTileComponent } from '../components/EnemyTileComponent';
 import { FreeTileComponent } from '../components/FreeTileComponent';
 import { EnemyBattleTileComponent } from '../components/EnemyBattleTileComponent';
+import { GroundManager } from './GroundManager';
+import { ITileCreationArgs } from '../components/ITileCreationArgs';
+import { PlayerBattleTileComponent } from '../components/PlayerBattleTileComponent';
 
 export interface ITileTypeData {
   tile: string;
   tileType: string;
   spriteId: string;
-  options: string[];
+  flags: string[];
   typeIndex: number; /// The index of the type
 }
 
@@ -33,9 +35,9 @@ export class TileFactory extends Component {
    */
   readonly emptyId = 'empty';
 
-  constructor(eng: Engine, protected spriteBatch: SpritBatchController) {
+  constructor(eng: Engine, protected groundManager: GroundManager, protected spriteBatch: SpritBatchController) {
     super(eng);
-    this.empty = new EmptyTile(this.eng);
+    this.empty = new EmptyTile(this.eng, groundManager);
   }
 
   /**
@@ -64,19 +66,20 @@ export class TileFactory extends Component {
       tile,
       tileType: '',
       spriteId: '',
-      options: null,
+      flags: null,
       typeIndex: -1,
     };
 
     const typeSpriteParams = tile.split('|');
 
     if (typeSpriteParams.length != 3) {
+      console.error("Error parsing tile '" + tile + "'. Should be in the format of type|sprite id|[flags]");
       return null;
     }
 
     TileData.tileType = typeSpriteParams[0];
     TileData.spriteId = typeSpriteParams[1];
-    TileData.options = typeSpriteParams[2].split(',');
+    TileData.flags = typeSpriteParams[2].split(',');
 
     return TileData;
   }
@@ -91,7 +94,7 @@ export class TileFactory extends Component {
    */
   createStaticTile(tile: string, i: number, j: number, k: number): TileComponent {
     if (!tile || tile == '---' || tile == 'empty') {
-      return new EmptyTile(this.eng, i, j, k);
+      return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
 
     const data = TileFactory.parseTile(tile);
@@ -108,17 +111,18 @@ export class TileFactory extends Component {
           ')' +
           ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
       );
-      return new EmptyTile(this.eng, i, j, k);
+      return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
     const tileType = data.tileType;
 
-    const args: ITileCreateionArgs = {
+    const args: ITileCreationArgs = {
       i,
       j,
       k,
+      groundManager: this.groundManager,
       type: data.tileType,
       sprite: data.spriteId,
-      options: data.options,
+      flags: data.flags,
     };
 
     if (tileType == 'block.half') {
@@ -133,15 +137,11 @@ export class TileFactory extends Component {
         pos = { i, j, k };
       }
       // the player is already created. Just set his position
-      const player = this.eng.player;
-
+      const player = this.eng.worldPlayer;
       player.setTilePosition(pos.i, pos.j, pos.k);
-
       return player;
     } else if (tileType == 'player.battle') {
-      const player = this.eng.player;
-      player.setTilePosition(i, j, k);
-      return player;
+      return new PlayerBattleTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'npc') {
       return new NpcComponent(this.eng, args);
     } else if (tileType == 'gold') {
@@ -156,7 +156,7 @@ export class TileFactory extends Component {
       return new PortalTileComponent(this.eng, this.spriteBatch, args);
     } else {
       console.error("Unknown tile type '" + tile + "' @ (" + i + ', ' + j + ', ' + k + ')');
-      return new EmptyTile(this.eng, i, j, k);
+      return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
   }
 

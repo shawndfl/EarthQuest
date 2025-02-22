@@ -1,11 +1,11 @@
 import { EmptyTileId } from '../core/EmptyTileId';
 import { Engine } from '../core/Engine';
-import { ITileCreateionArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
 import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
+import { ITileCreationArgs } from './ITileCreationArgs';
 import { TileContext } from './TileContext';
 
 /**
@@ -67,7 +67,7 @@ export abstract class TileComponent extends Component {
    * Easy access to ground
    */
   get groundManager(): GroundManager {
-    return this.eng.ground;
+    return this._options.groundManager;
   }
 
   /**
@@ -115,13 +115,13 @@ export abstract class TileComponent extends Component {
    * Gets the options used to create this tile
    */
   get options(): string[] {
-    return this._options?.options;
+    return this._options?.flags ?? [];
   }
 
-  constructor(eng: Engine, private _options?: ITileCreateionArgs) {
+  constructor(eng: Engine, private _options: ITileCreationArgs) {
     super(eng);
 
-    this._id = TileFactory.createStaticID(this._options?.i, this._options?.j, this._options?.k);
+    this._id = TileFactory.createStaticID(this._options.i, this._options.j, this._options.k);
     this._tileIndex = new vec3([0, 0, 0]);
     this._tilePosition = new vec3([0, 0, 0]);
   }

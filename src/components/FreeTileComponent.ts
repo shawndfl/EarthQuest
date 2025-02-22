@@ -1,5 +1,5 @@
 import { Engine } from '../core/Engine';
-import { ITileCreateionArgs } from '../components/ITileCreationArgs';
+import { ITileCreationArgs } from '../components/ITileCreationArgs';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { TileComponent } from './TileComponent';
@@ -18,11 +18,7 @@ export class FreeTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(
-    eng: Engine,
-    protected _spriteController: SpritBatchController,
-    args: ITileCreateionArgs
-  ) {
+  constructor(eng: Engine, protected _spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController.activeSprite(this.id);
     this._spriteController.setSprite(this.spriteId);

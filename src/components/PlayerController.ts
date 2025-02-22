@@ -18,6 +18,8 @@ export enum PointingDirection {
   S = 0x04,
   W = 0x08,
 }
+
+export const PlayerControllerId = 'player';
 /**
  * Controls the player sprite.
  */
@@ -81,11 +83,11 @@ export class PlayerController extends TileComponent {
   }
 
   get id(): string {
-    return 'player';
+    return PlayerControllerId;
   }
 
   get type(): string {
-    return 'player';
+    return PlayerControllerId;
   }
 
   get heightIndex(): number {
@@ -97,7 +99,15 @@ export class PlayerController extends TileComponent {
   }
 
   constructor(eng: Engine) {
-    super(eng, null);
+    super(eng, {
+      flags: [],
+      sprite: null,
+      type: PlayerControllerId,
+      groundManager: eng.worldGround,
+      i: null,
+      j: null,
+      k: null,
+    });
     this.resetPlayer();
   }
 
@@ -336,7 +346,7 @@ export class PlayerController extends TileComponent {
   onEnter(tileComponent: TileComponent, context: TileContext): void {
     if (tileComponent.type == 'enemy') {
       this.eng.assetManager.requestJson('assets/levels/battle1.json').then((levelData: ILevelData) => {
-        const pos = this.eng.player.tilePosition;
+        const pos = this.tilePosition;
         this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
         this.eng.pushNewLevel(levelData);
         //TODO fade in
@@ -353,7 +363,7 @@ export class PlayerController extends TileComponent {
     const i = this.tileIndex.x;
     const j = this.tileIndex.y;
     const k = this.tileIndex.z;
-    const ground = this.eng.ground;
+    const ground = this.eng.worldGround;
     const direction = this.facingDirection;
 
     ground.getTile(i, j, k).onPlayerAction(this, keyReleased);

@@ -22,6 +22,7 @@ import { GroundManager } from '../systems/GroundManager';
 import { PlayerController } from '../components/PlayerController';
 import NewLevel from '../assets/levels/newLevel.json';
 import { BattleManager } from '../systems/BattleManager';
+import { SceneControllerType } from '../environment/SceneControllerType';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -44,8 +45,9 @@ export class Engine {
   readonly sceneManager: SceneManager;
   readonly editor: Editor;
   readonly notificationManager: NotificationManager;
-  readonly ground: GroundManager;
-  readonly player: PlayerController;
+  readonly worldGround: GroundManager;
+  readonly battleGround: GroundManager;
+  readonly worldPlayer: PlayerController;
   readonly battleManager: BattleManager;
 
   private _nextLevel: ILevelData = null;
@@ -102,8 +104,9 @@ export class Engine {
     this.fps = new FpsController(this);
     this.notificationManager = new NotificationManager(this);
     this.editor = new Editor(this);
-    this.ground = new GroundManager(this);
-    this.player = new PlayerController(this);
+    this.worldGround = new GroundManager(this, SceneControllerType.world);
+    this.battleGround = new GroundManager(this, SceneControllerType.battle);
+    this.worldPlayer = new PlayerController(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
     this.battleManager = new BattleManager(this);
 
@@ -111,6 +114,8 @@ export class Engine {
       this.editor.hide();
     });
   }
+
+  startBattle(levelData: ILevelData): void {}
 
   /**
    * Queue the next level. This level will be loaded on the next frame
@@ -158,8 +163,9 @@ export class Engine {
     // load all the managers
     await this.sceneManager.loadLevel(level);
     await this.gameManager.loadLevel(level);
-    await this.ground.loadLevel(level);
-    await this.player.loadLevel(level);
+    await this.worldGround.loadLevel(level);
+    await this.battleGround.loadLevel(level);
+    await this.worldPlayer.loadLevel(level);
     await this.assetManager.loadLevel(level);
     await this.textManager.loadLevel(level);
     await this.dialogManager.loadLevel(level);
@@ -170,8 +176,9 @@ export class Engine {
 
   private closeLevel(): void {
     this.gameManager.closeLevel();
-    this.ground.closeLevel();
-    this.player.closeLevel();
+    this.worldGround.closeLevel();
+    this.battleGround.closeLevel();
+    this.worldPlayer.closeLevel();
     this.assetManager.closeLevel();
     this.textManager.closeLevel();
     this.dialogManager.closeLevel();
@@ -195,8 +202,9 @@ export class Engine {
     this.tileHelper.calculateTransform(this.width, this.height);
     await this.assetManager.initialize();
     await this.gameManager.initialize();
-    await this.ground.initialize();
-    await this.player.initialize();
+    await this.worldGround.initialize();
+    await this.battleGround.initialize();
+    await this.worldPlayer.initialize();
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.sceneManager.initialize();
@@ -322,7 +330,7 @@ export class Engine {
         this.soundManager.UserReady();
         const inputState = this.input.getInputState();
         // handle dialog input first
-        this.dialogManager.handleUserAction(inputState) || this.player.handleUserAction(inputState);
+        this.dialogManager.handleUserAction(inputState) || this.worldPlayer.handleUserAction(inputState);
       }
 
       // update time for game manager
@@ -334,9 +342,11 @@ export class Engine {
       // update the battle scene
       this.battleManager.update(dt);
 
-      this.ground.update(dt);
+      this.battleGround.update(dt);
 
-      this.player.update(dt);
+      this.worldGround.update(dt);
+
+      this.worldPlayer.update(dt);
 
       // update the menu manager
       this.dialogManager.update(dt);

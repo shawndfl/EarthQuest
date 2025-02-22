@@ -1,7 +1,7 @@
 import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 import { TileComponent } from './TileComponent';
 
 /**
@@ -17,11 +17,7 @@ export class CollideTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(
-    eng: Engine,
-    protected _spriteController: SpritBatchController,
-    args: ITileCreateionArgs
-  ) {
+  constructor(eng: Engine, protected _spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController.activeSprite(this.id);
     this._spriteController.setSprite(this.spriteId);

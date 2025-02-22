@@ -44,6 +44,11 @@ module.exports = {
         use: ['url-loader'],
       },
       {
+        test: /\.dat$/,
+        exclude: /node_modules/,
+        use: ['binary-loader'],
+      },
+      {
         test: /\.(jpe?g|png|gif|svg)$/i,
         loader: 'file-loader',
       },

@@ -4,7 +4,7 @@ import { CollideTileComponent } from './CollideTileComponent';
 import { TileComponent } from './TileComponent';
 import { Curve, CurveType } from '../math/Curve';
 import { TileContext } from './TileContext';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 
 export class GoldComponents extends CollideTileComponent {
   private _collected: boolean;
@@ -30,11 +30,7 @@ export class GoldComponents extends CollideTileComponent {
     }
   }
 
-  constructor(
-    eng: Engine,
-    spriteController: SpritBatchController,
-    args: ITileCreateionArgs
-  ) {
+  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, spriteController, args);
     this._baseSprite = this.spriteId.split('.')[0];
     this._collected = false;

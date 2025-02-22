@@ -5,13 +5,11 @@ import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileComponent } from '../components/TileComponent';
 import { TileFactory } from './TileFactory';
-import { LevelGenerator } from '../environment/LevelGenerator';
-import { LevelConstructionParams } from '../environment/LevelConstructionParams';
-import vec2 from '../math/vec2';
 import { TouchSurfaceEvent } from '../components/TouchSurfaceEvent';
 import { TileContext } from '../components/TileContext';
 import { LevelLoader } from '../environment/LevelLoader';
 import vec3 from '../math/vec3';
+import { SceneControllerType } from '../environment/SceneControllerType';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -33,8 +31,21 @@ export class GroundManager extends Component {
   /** Used to load levels from json */
   protected _levelLoader: LevelLoader;
 
-  constructor(eng: Engine) {
+  /** The type of level controller this manager supports */
+  protected _controllerType: SceneControllerType;
+
+  protected _isActive: boolean = false;
+
+  public get isActive(): boolean {
+    return this._isActive;
+  }
+  public get sceneControllerType(): SceneControllerType {
+    return this._controllerType;
+  }
+
+  constructor(eng: Engine, controllerType: SceneControllerType) {
     super(eng);
+    this._controllerType = controllerType;
 
     this._spriteController = new SpritBatchController(eng);
   }
@@ -51,11 +62,19 @@ export class GroundManager extends Component {
     const data = this.eng.assetManager.tile.data;
     this._spriteController.initialize(texture, data);
 
-    this._tileFactory = new TileFactory(this.eng, this._spriteController);
+    this._tileFactory = new TileFactory(this.eng, this, this._spriteController);
     this._levelLoader = new LevelLoader(this.eng);
   }
 
   loadLevel(levelData: ILevelData): void {
+    // make sure the controller types match
+    if (levelData.controllerType != this._controllerType) {
+      this._isActive = false;
+      return;
+    }
+
+    this._isActive = true;
+
     this._levelData = levelData;
 
     // reset tiles that need updates
@@ -65,7 +84,7 @@ export class GroundManager extends Component {
     const data = this.eng.assetManager.tile.data;
     this._spriteController = new SpritBatchController(this.eng);
     this._spriteController.initialize(texture, data);
-    this._tileFactory = new TileFactory(this.eng, this._spriteController);
+    this._tileFactory = new TileFactory(this.eng, this, this._spriteController);
 
     // allocate tiles first
     this._tiles = [[[]]];
@@ -375,6 +394,9 @@ export class GroundManager extends Component {
    * @param dt
    */
   update(dt: number): void {
+    if (!this._isActive) {
+      return;
+    }
     this._spriteController.update(dt);
     if (!this.eng.pause) {
       for (const tile of this._updateTiles) {

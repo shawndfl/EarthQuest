@@ -4,7 +4,7 @@ import { SpriteFlip } from '../graphics/Sprite';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve } from '../math/Curve';
-import { ITileCreateionArgs } from './ITileCreationArgs';
+import { ITileCreationArgs } from './ITileCreationArgs';
 import { PlayerController } from './PlayerController';
 import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
@@ -48,7 +48,7 @@ export class EnemyTileComponent extends TileComponent {
   onEnter(tileComponent: TileComponent, context: TileContext): void {
     if (tileComponent.type == 'player') {
       this.eng.assetManager.requestJson('assets/levels/battle1.json').then((levelData: ILevelData) => {
-        const pos = this.eng.player.tilePosition;
+        const pos = this.eng.worldPlayer.tilePosition;
         this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
         this.eng.pushNewLevel(levelData);
         //TODO fade in
@@ -62,7 +62,7 @@ export class EnemyTileComponent extends TileComponent {
     return this._spriteController;
   }
 
-  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreateionArgs) {
+  constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
     this._spriteController = new SpritBatchController(eng);
     const character = eng.assetManager.character;
@@ -110,7 +110,7 @@ export class EnemyTileComponent extends TileComponent {
     this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
 
-    const playerLocal = this.eng.player.tilePosition.copy();
+    const playerLocal = this.eng.worldPlayer.tilePosition.copy();
     const walkingDirection = playerLocal.subtract(this.tilePosition).normalize();
 
     // scale velocity by time
