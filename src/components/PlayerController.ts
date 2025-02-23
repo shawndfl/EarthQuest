@@ -10,6 +10,7 @@ import { InputState } from '../core/InputHandler';
 import { AutoMoveController } from './AutoMoveController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileContext } from './TileContext';
+import { LevelRequest } from '../core/ILevelRequest';
 
 export enum PointingDirection {
   None = 0x00,
@@ -345,13 +346,13 @@ export class PlayerController extends TileComponent {
 
   onEnter(tileComponent: TileComponent, context: TileContext): void {
     if (tileComponent.type == 'enemy') {
-      this.eng.assetManager.requestJson('assets/levels/battle1.json').then((levelData: ILevelData) => {
-        const pos = this.tilePosition;
-        this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
-        this.eng.pushNewLevel(levelData);
-        //TODO fade in
+      const pos = this.tilePosition;
+      this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
+
+      this.eng.sceneManager.requestNewLevel({
+        levelUrl: 'assets/levels/battle1.json',
+        requestType: LevelRequest.battleUrl,
       });
-      //TODO fad out
     }
   }
 
@@ -397,8 +398,6 @@ export class PlayerController extends TileComponent {
     // this should not happen but just in case
     ground.getTile(i, j, k).onPlayerAction(this, keyReleased);
   }
-
-  loadLevel(level: ILevelData): void {}
 
   closeLevel(): void {
     this.resetPlayer();

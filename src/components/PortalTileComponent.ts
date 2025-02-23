@@ -1,4 +1,5 @@
 import { Engine } from '../core/Engine';
+import { LevelRequest } from '../core/ILevelRequest';
 import { ILevelData } from '../environment/ILevelData';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { ITileCreationArgs } from './ITileCreationArgs';
@@ -15,15 +16,13 @@ export class PortalTileComponent extends OpenTileComponent {
       const player = this.eng.worldPlayer;
       player.canWalk = false;
 
-      this.eng.assetManager.requestJson('assets/levels/level2.json').then((levelData: ILevelData) => {
-        // clear out the position so that the player position is loaded from the level
-        this.eng.gameManager.data.player.position = null;
+      // clear out the position so that the player position is loaded from the level
+      this.eng.gameManager.data.player.position = null;
 
-        // load the new level
-        this.eng.pushNewLevel(levelData);
-        //TODO fade in
+      this.eng.sceneManager.requestNewLevel({
+        levelUrl: 'assets/levels/level2.json',
+        requestType: LevelRequest.levelUrl,
       });
-      //TODO fad out
 
       player.canWalk = true;
     }

@@ -181,13 +181,9 @@ export class TextManager extends Component {
     this.shader.dispose();
   }
 
-  loadLevel(level: ILevelData): void {
-
-  }
-
   closeLevel(): void {
     // reset the text controllers
-    this.texts.forEach(t => t.dispose());
+    this.texts.forEach((t) => t.dispose());
     this.texts.clear();
   }
 }

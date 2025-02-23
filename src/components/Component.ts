@@ -13,7 +13,7 @@ export class Component {
     return this.eng.gl;
   }
 
-  constructor(readonly eng: Engine) { }
+  constructor(readonly eng: Engine) {}
 
   /**
    * Called only once after all systems are created
@@ -27,36 +27,39 @@ export class Component {
 
   /**
    * Loads a new level
-   * @param level 
+   * @param level
    */
-  loadLevel(level: ILevelData): void {
+  async loadLevel(level: ILevelData): Promise<void> {}
 
-  }
+  /**
+   * Loads a battle scene
+   * @param level
+   */
+  async loadBattle(level: ILevelData): Promise<void> {}
+
+  /**
+   * Switching from the battle to the active level
+   */
+  endBattle(): void {}
 
   /**
    * When the window is resized
    */
-  resize(width: number, height: number) { }
+  resize(width: number, height: number) {}
 
   /**
    * Called every frame
    * @param dt - delta time in ms
    */
-  update(dt: number) {
-
-  }
+  update(dt: number) {}
 
   /**
    * When a scene is closed
    */
-  closeLevel() {
-
-  }
+  closeLevel() {}
 
   /**
    * Called once to destroy everything
    */
-  dispose() {
-
-  }
+  dispose() {}
 }

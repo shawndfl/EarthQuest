@@ -81,7 +81,7 @@ export class Editor extends Component implements IEditor {
    * Loads a level
    * @param level
    */
-  loadLevel(level: ILevelData): void {
+  async loadLevel(level: ILevelData): Promise<void> {
     this.levelData = level;
 
     this.tileBrowser.refreshLevel(level);

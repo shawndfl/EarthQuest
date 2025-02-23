@@ -1,6 +1,8 @@
 import { Engine } from '../../core/Engine';
 import { SceneComponent } from '../../components/SceneComponent';
 import { InputState } from '../../core/InputHandler';
+import { ILevelData } from '../../environment/ILevelData';
+import { LevelRequest } from '../../core/ILevelRequest';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -20,7 +22,7 @@ export class BattleScene extends SceneComponent {
     super(eng);
   }
 
-  loadLevel() {
+  async loadBattle(): Promise<void> {
     this.eng.dialogManager.showDialog({
       x: 20,
       y: 400,
@@ -32,7 +34,10 @@ export class BattleScene extends SceneComponent {
           this.pickTarget();
         } else if (dialog.selectedOption == 'Run Away') {
           // go back to the level
-          this.eng.popLevel();
+          this.eng.sceneManager.endBattle();
+
+          // this is used to pop out of a sub level like a house or store.
+          //this.eng.sceneManager.requestNewLevel({ requestType: LevelRequest.previousLevel });
         }
 
         return false;

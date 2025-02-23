@@ -31,7 +31,7 @@ export class DefaultScene extends SceneComponent {
     super(eng);
   }
 
-  loadLevel() {
+  async loadLevel(): Promise<void> {
     this.eng.dialogManager.showDialog({
       text: 'Welcome to Earth Quest!\nThis is a default scene for the engine',
       x: 20,

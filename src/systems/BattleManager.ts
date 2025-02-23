@@ -69,7 +69,7 @@ export class BattleManager extends Component {
    * When a new battle scene loads it will start here
    * @param level
    */
-  loadLevel(level: ILevelData): void {
+  async loadLevel(level: ILevelData): Promise<void> {
     // we only want to look at battle scenes
     if (this.eng.scene.type == 'BattleScene') {
       this._activeBattle = true;

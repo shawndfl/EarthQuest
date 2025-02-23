@@ -20,8 +20,6 @@ export class WorldScene extends SceneComponent {
     super(eng);
   }
 
-  loadLevel() {}
-
   /**
    * Handles user input. The logic goes through a chain of commands
    * @param action the action from keyboard or gamepad

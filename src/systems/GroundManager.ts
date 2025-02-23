@@ -66,16 +66,16 @@ export class GroundManager extends Component {
     this._levelLoader = new LevelLoader(this.eng);
   }
 
-  loadLevel(levelData: ILevelData): void {
+  async loadLevel(level: ILevelData): Promise<void> {
     // make sure the controller types match
-    if (levelData.controllerType != this._controllerType) {
+    if (level.controllerType != this._controllerType) {
       this._isActive = false;
       return;
     }
 
     this._isActive = true;
 
-    this._levelData = levelData;
+    this._levelData = level;
 
     // reset tiles that need updates
     this._updateTiles = [];
