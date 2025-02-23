@@ -48,13 +48,20 @@ export class EnemyTileComponent extends TileComponent {
 
   onEnter(tileComponent: TileComponent, context: TileContext): void {
     if (tileComponent.type == 'player') {
-      const pos = this.eng.worldPlayer.tilePosition;
-      this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
-      this.eng.sceneManager.requestNewLevel({
-        levelUrl: 'assets/levels/battle1.json',
-        requestType: LevelRequest.battleUrl,
-      });
+      this.enterBattle();
     }
+  }
+
+  enterBattle(): void {
+    this._spriteController.removeSprite(this.id);
+    this._spriteController.commitToBuffer();
+    this.groundManager.removeTile(this);
+    this._isDead = true;
+
+    this.eng.sceneManager.requestNewLevel({
+      levelUrl: 'assets/levels/battle1.json',
+      requestType: LevelRequest.battleUrl,
+    });
   }
 
   get spriteController(): SpritBaseController {
@@ -110,7 +117,7 @@ export class EnemyTileComponent extends TileComponent {
     this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
 
-    const playerLocal = this.eng.worldPlayer.tilePosition.copy();
+    const playerLocal = this.eng.scene.ground.worldPlayer.tilePosition.copy();
     const walkingDirection = playerLocal.subtract(this.tilePosition).normalize();
 
     // scale velocity by time

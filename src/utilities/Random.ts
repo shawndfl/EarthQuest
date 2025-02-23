@@ -7,6 +7,10 @@ import { RANDOM } from '../math/constants';
 export class Random {
   rand: () => number;
 
+  mathRand(): number {
+    return Math.random();
+  }
+
   constructor(seed: number) {
     const seedXor = seed ^ 0xdeadbeef; // 32-bit seed with optional XOR value
     // Pad seed with Phi, Pi and E.

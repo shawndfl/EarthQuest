@@ -39,7 +39,8 @@ export class PlayerBattleTileComponent extends TileComponent {
 
   constructor(eng: Engine, spriteController: SpritBatchController, args: ITileCreationArgs) {
     super(eng, args);
-    this._spriteController = spriteController;
+
+    this._spriteController = new SpritBatchController(eng);
     const character = eng.assetManager.character;
     this._spriteController.initialize(character.texture, character.data);
 

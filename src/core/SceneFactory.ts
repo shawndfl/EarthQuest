@@ -1,14 +1,14 @@
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
-import { WorldScene } from './scenes/WorldScene';
-import { ISceneFactory } from '../systems/ISceneFactory';
 import { DefaultScene } from '../scenes/DefaultScene';
-import { BattleScene } from './scenes/BattleScene';
+import { Component } from '../components/Component';
+import { WorldScene } from '../scenes/WorldScene';
+import { BattleScene } from '../scenes/BattleScene';
 
 /**
  * Creates a scene from a type
  */
-export class SceneFactory extends ISceneFactory {
+export class SceneFactory extends Component {
   constructor(eng: Engine) {
     super(eng);
   }

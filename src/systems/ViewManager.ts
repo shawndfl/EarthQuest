@@ -20,6 +20,10 @@ export class ViewManager extends Component {
 
   protected _targetX: number;
   protected _targetY: number;
+
+  protected _lastTargetX: number;
+  protected _lastTargetY: number;
+
   protected _scale: number;
   protected _projection: mat4;
 
@@ -104,6 +108,15 @@ export class ViewManager extends Component {
     );
   }
 
+  pushTarget(): void {
+    this._lastTargetX = this._targetX;
+    this._lastTargetY = this._targetY;
+  }
+
+  popTarget(): void {
+    this.setTarget(this._lastTargetX, this._lastTargetY);
+  }
+
   /**
    * Set the target for the project
    * @param x
@@ -135,5 +148,5 @@ export class ViewManager extends Component {
     this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
   }
 
-  update(dt: number) { }
+  update(dt: number) {}
 }

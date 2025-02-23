@@ -11,6 +11,8 @@ import { AutoMoveController } from './AutoMoveController';
 import { ILevelData } from '../environment/ILevelData';
 import { TileContext } from './TileContext';
 import { LevelRequest } from '../core/ILevelRequest';
+import { ITileCreationArgs } from './ITileCreationArgs';
+import { EnemyTileComponent } from './EnemyTileComponent';
 
 export enum PointingDirection {
   None = 0x00,
@@ -99,16 +101,22 @@ export class PlayerController extends TileComponent {
     return this._facingDirection;
   }
 
-  constructor(eng: Engine) {
-    super(eng, {
-      flags: [],
-      sprite: null,
-      type: PlayerControllerId,
-      groundManager: eng.worldGround,
-      i: null,
-      j: null,
-      k: null,
-    });
+  constructor(eng: Engine, args: ITileCreationArgs) {
+    let pos = eng.gameManager.data.player.position;
+    if (pos) {
+      args.i = pos.i;
+      args.j = pos.j;
+      args.k = pos.k;
+    }
+    super(eng, args);
+
+    // this tile will be animated
+    this.groundManager.registerForUpdate(this);
+
+    this.initialize();
+
+    this.setTilePosition(args.i, args.j, args.k);
+
     this.resetPlayer();
   }
 
@@ -345,14 +353,8 @@ export class PlayerController extends TileComponent {
   }
 
   onEnter(tileComponent: TileComponent, context: TileContext): void {
-    if (tileComponent.type == 'enemy') {
-      const pos = this.tilePosition;
-      this.eng.gameManager.data.player.position = { i: pos.x, j: pos.y, k: pos.z };
-
-      this.eng.sceneManager.requestNewLevel({
-        levelUrl: 'assets/levels/battle1.json',
-        requestType: LevelRequest.battleUrl,
-      });
+    if (tileComponent instanceof EnemyTileComponent) {
+      tileComponent.enterBattle();
     }
   }
 
@@ -364,7 +366,7 @@ export class PlayerController extends TileComponent {
     const i = this.tileIndex.x;
     const j = this.tileIndex.y;
     const k = this.tileIndex.z;
-    const ground = this.eng.worldGround;
+    const ground = this.eng.scene.ground;
     const direction = this.facingDirection;
 
     ground.getTile(i, j, k).onPlayerAction(this, keyReleased);

@@ -13,7 +13,7 @@ import { TileContext } from './TileContext';
 export class PortalTileComponent extends OpenTileComponent {
   onEnter(tileComponent: TileComponent, tileContext: TileContext): void {
     if (tileComponent.type == 'player') {
-      const player = this.eng.worldPlayer;
+      const player = this.eng.scene.ground.worldPlayer;
       player.canWalk = false;
 
       // clear out the position so that the player position is loaded from the level

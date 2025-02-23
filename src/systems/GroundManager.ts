@@ -10,6 +10,7 @@ import { TileContext } from '../components/TileContext';
 import { LevelLoader } from '../environment/LevelLoader';
 import vec3 from '../math/vec3';
 import { SceneControllerType } from '../environment/SceneControllerType';
+import { PlayerController } from '../components/PlayerController';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
@@ -31,22 +32,14 @@ export class GroundManager extends Component {
   /** Used to load levels from json */
   protected _levelLoader: LevelLoader;
 
-  /** The type of level controller this manager supports */
-  protected _controllerType: SceneControllerType;
+  protected _worldPlayer: PlayerController;
 
-  protected _isActive: boolean = false;
-
-  public get isActive(): boolean {
-    return this._isActive;
-  }
-  public get sceneControllerType(): SceneControllerType {
-    return this._controllerType;
+  public get worldPlayer(): PlayerController {
+    return this._worldPlayer;
   }
 
-  constructor(eng: Engine, controllerType: SceneControllerType) {
+  constructor(eng: Engine) {
     super(eng);
-    this._controllerType = controllerType;
-
     this._spriteController = new SpritBatchController(eng);
   }
 
@@ -66,24 +59,16 @@ export class GroundManager extends Component {
     this._levelLoader = new LevelLoader(this.eng);
   }
 
+  /**
+   * Load all the tiles
+   * @param level
+   */
   async loadLevel(level: ILevelData): Promise<void> {
-    // make sure the controller types match
-    if (level.controllerType != this._controllerType) {
-      this._isActive = false;
-      return;
-    }
-
-    this._isActive = true;
-
     this._levelData = level;
 
     // reset tiles that need updates
     this._updateTiles = [];
 
-    const texture = this.eng.assetManager.tile.texture;
-    const data = this.eng.assetManager.tile.data;
-    this._spriteController = new SpritBatchController(this.eng);
-    this._spriteController.initialize(texture, data);
     this._tileFactory = new TileFactory(this.eng, this, this._spriteController);
 
     // allocate tiles first
@@ -91,6 +76,13 @@ export class GroundManager extends Component {
 
     // then load the level
     this._levelLoader.load(this._levelData, this._tileFactory, this._tiles);
+
+    // save the player tile
+    this._worldPlayer = this._tileFactory.player;
+  }
+
+  async loadBattle(level: ILevelData): Promise<void> {
+    await this.loadLevel(level);
   }
 
   /**
@@ -394,9 +386,6 @@ export class GroundManager extends Component {
    * @param dt
    */
   update(dt: number): void {
-    if (!this._isActive) {
-      return;
-    }
     this._spriteController.update(dt);
     if (!this.eng.pause) {
       for (const tile of this._updateTiles) {

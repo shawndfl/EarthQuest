@@ -1,6 +1,6 @@
-import { Engine } from '../../core/Engine';
-import { SceneComponent } from '../../components/SceneComponent';
-import { InputState } from '../../core/InputHandler';
+import { SceneComponent } from '../components/SceneComponent';
+import { Engine } from '../core/Engine';
+import { InputState } from '../core/InputHandler';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -36,6 +36,7 @@ export class WorldScene extends SceneComponent {
   update(dt: number) {
     // Clear the canvas before we start drawing on it.
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    super.update(dt);
   }
 
   resize(width: number, height: number) {}

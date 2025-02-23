@@ -37,6 +37,10 @@ export interface ITileData {
  */
 export interface ISpriteData {
   /**
+   * Id for this data
+   */
+  id: string;
+  /**
    * The pixel height of a tile. Mostly 24 or 32
    */
   tileHeight: number;

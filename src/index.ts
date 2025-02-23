@@ -1,9 +1,9 @@
-import { EarthQuestEngine } from './_game/EarthQuestEngine';
+import { Engine } from './core/Engine';
 import './css/canvas.scss';
 /**
  * Create the only instance of a canvas controller
  */
-const engine = new EarthQuestEngine();
+const engine = new Engine();
 
 /** time tracking variables */
 let previousTimeStamp: number;
@@ -23,11 +23,9 @@ function step(timestamp: number) {
   if (elapsed < 100) {
     // update the scene
     engine.update(elapsed);
-
   }
   // request a new frame
   previousTimeStamp = timestamp;
-
 }
 
 /**
@@ -42,4 +40,3 @@ engine
   .catch((e) => {
     console.error('Error initializing ', e);
   });
-

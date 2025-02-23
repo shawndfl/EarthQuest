@@ -2,16 +2,16 @@ import { Component } from '../components/Component';
 import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
 import { ISceneFactory } from './ISceneFactory';
-import { DefaultSceneFactory } from './DefaultSceneFactory';
 import { ILevelData } from '../environment/ILevelData';
 import { ILevelRequest, LevelRequest } from '../core/ILevelRequest';
 import NewLevel from '../assets/levels/newLevel.json';
+import { SceneFactory } from '../core/SceneFactory';
 
 /**
  * Manages the active scene and switching from scene to scene.
  */
 export class SceneManager extends Component {
-  private _activeScene: SceneComponent;
+  private _worldScene: SceneComponent;
   private _battleScene: SceneComponent;
   private _sceneFactory: ISceneFactory;
 
@@ -31,11 +31,7 @@ export class SceneManager extends Component {
   }
 
   get scene(): SceneComponent {
-    return this._activeScene;
-  }
-
-  get sceneBattle(): SceneComponent {
-    return this._battleScene;
+    return this._worldScene;
   }
 
   constructor(eng: Engine) {
@@ -43,6 +39,9 @@ export class SceneManager extends Component {
     this._sceneFactory = this.createSceneFactory();
   }
 
+  /**
+   * Setup the scene initialize the first scene and the ground
+   */
   async initialize() {
     let levelData: ILevelData;
 
@@ -79,8 +78,12 @@ export class SceneManager extends Component {
     this._levelReady = true;
   }
 
+  /**
+   * Create a scene factory
+   * @returns
+   */
   createSceneFactory(): ISceneFactory {
-    return new DefaultSceneFactory(this.eng);
+    return new SceneFactory(this.eng);
   }
 
   /**
@@ -95,7 +98,7 @@ export class SceneManager extends Component {
    * Start loading the level. This is async
    * @param levelRequest
    */
-  async startLoadingRequest(levelRequest: ILevelRequest): Promise<void> {
+  private async startLoadingRequest(levelRequest: ILevelRequest): Promise<void> {
     if (!levelRequest) {
       return;
     }
@@ -138,13 +141,16 @@ export class SceneManager extends Component {
     }
 
     // close any open scene
-    this.closeLevel();
+    if (this._worldScene) {
+      this._worldScene.closeLevel();
+    }
 
     // create a new scene if needed
-    this._activeScene = this._sceneFactory.createScene(type);
+    this._worldScene = this._sceneFactory.createScene(type);
+    this._worldScene.initialize();
 
     // load the level
-    this._activeScene.loadLevel(level);
+    this._worldScene.loadLevel(level);
   }
 
   async loadBattle(level: ILevelData): Promise<void> {
@@ -156,23 +162,31 @@ export class SceneManager extends Component {
     }
 
     // close any open scene
-    this.closeLevel();
+    if (this._battleScene) {
+      this._battleScene.closeLevel();
+    }
 
     // create a new scene if needed
     this._battleScene = this._sceneFactory.createScene(type);
+    this._battleScene.initialize();
 
     // load the level
-    this._battleScene.loadLevel(level);
+    this._battleScene.loadBattle(level);
   }
 
   closeLevel(): void {
     this._previousLevel = this._currentLevel;
-    if (this._activeScene) {
-      this._activeScene.closeLevel();
+    if (this._worldScene) {
+      this._worldScene.closeLevel();
     }
+    // end any battle you might be in. Battles are like a sub scene to the world scene
+    this.endBattle();
   }
 
   endBattle(): void {
+    if (this._battleScene) {
+      this._battleScene.closeLevel();
+    }
     this._battleScene = null;
     this._currentBattleLevel = null;
   }

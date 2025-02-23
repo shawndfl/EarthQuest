@@ -45,9 +45,6 @@ export class Engine {
   readonly sceneManager: SceneManager;
   readonly editor: Editor;
   readonly notificationManager: NotificationManager;
-  readonly worldGround: GroundManager;
-  readonly battleGround: GroundManager;
-  readonly worldPlayer: PlayerController;
   readonly battleManager: BattleManager;
 
   /**
@@ -100,9 +97,6 @@ export class Engine {
     this.fps = new FpsController(this);
     this.notificationManager = new NotificationManager(this);
     this.editor = new Editor(this);
-    this.worldGround = new GroundManager(this, SceneControllerType.world);
-    this.battleGround = new GroundManager(this, SceneControllerType.battle);
-    this.worldPlayer = new PlayerController(this);
     this.spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'spritePerspectiveShader');
     this.battleManager = new BattleManager(this);
 
@@ -117,9 +111,6 @@ export class Engine {
   public endBattle(): void {
     this.sceneManager.endBattle();
     this.gameManager.endBattle();
-    this.worldGround.endBattle();
-    this.battleGround.endBattle();
-    this.worldPlayer.endBattle();
     this.assetManager.endBattle();
     this.textManager.endBattle();
     this.dialogManager.endBattle();
@@ -138,9 +129,6 @@ export class Engine {
     // load all the managers
     await this.sceneManager.loadBattle(level);
     await this.gameManager.loadBattle(level);
-    await this.worldGround.loadBattle(level);
-    await this.battleGround.loadBattle(level);
-    await this.worldPlayer.loadBattle(level);
     await this.assetManager.loadBattle(level);
     await this.textManager.loadBattle(level);
     await this.dialogManager.loadBattle(level);
@@ -160,9 +148,6 @@ export class Engine {
     // load all the managers
     await this.sceneManager.loadLevel(level);
     await this.gameManager.loadLevel(level);
-    await this.worldGround.loadLevel(level);
-    await this.battleGround.loadLevel(level);
-    await this.worldPlayer.loadLevel(level);
     await this.assetManager.loadLevel(level);
     await this.textManager.loadLevel(level);
     await this.dialogManager.loadLevel(level);
@@ -172,9 +157,6 @@ export class Engine {
   private closeLevel(): void {
     this.battleManager.closeLevel();
     this.gameManager.closeLevel();
-    this.worldGround.closeLevel();
-    this.battleGround.closeLevel();
-    this.worldPlayer.closeLevel();
     this.assetManager.closeLevel();
     this.textManager.closeLevel();
     this.dialogManager.closeLevel();
@@ -197,9 +179,6 @@ export class Engine {
     this.tileHelper.calculateTransform(this.width, this.height);
     await this.assetManager.initialize();
     await this.gameManager.initialize();
-    await this.worldGround.initialize();
-    await this.battleGround.initialize();
-    await this.worldPlayer.initialize();
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.editor.initialize(rootElement);
@@ -213,6 +192,9 @@ export class Engine {
     this.gl.cullFace(this.gl.BACK);
 
     this.gl.enable(this.gl.BLEND);
+
+    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
+    this.gl.clearDepth(1.0); // Clear everything
 
     this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ONE, this.gl.ZERO);
     this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -261,10 +243,6 @@ export class Engine {
     }
     // just playing the game
     else {
-      // clear the buffers
-      this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
-      this.gl.clearDepth(1.0); // Clear everything
-
       // update the active scene, battle scene, and handle scene loading
       this.sceneManager.update(dt);
 
@@ -285,7 +263,7 @@ export class Engine {
         this.soundManager.UserReady();
         const inputState = this.input.getInputState();
         // handle dialog input first
-        this.dialogManager.handleUserAction(inputState) || this.worldPlayer.handleUserAction(inputState);
+        this.dialogManager.handleUserAction(inputState) || this.scene?.ground.worldPlayer?.handleUserAction(inputState);
       }
 
       // update time for game manager
@@ -293,12 +271,6 @@ export class Engine {
 
       // update the battle scene
       this.battleManager.update(dt);
-
-      this.battleGround.update(dt);
-
-      this.worldGround.update(dt);
-
-      this.worldPlayer.update(dt);
 
       // update the menu manager
       this.dialogManager.update(dt);

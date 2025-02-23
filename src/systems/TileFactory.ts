@@ -15,6 +15,7 @@ import { EnemyBattleTileComponent } from '../components/EnemyBattleTileComponent
 import { GroundManager } from './GroundManager';
 import { ITileCreationArgs } from '../components/ITileCreationArgs';
 import { PlayerBattleTileComponent } from '../components/PlayerBattleTileComponent';
+import { PlayerController } from '../components/PlayerController';
 
 export interface ITileTypeData {
   tile: string;
@@ -25,6 +26,11 @@ export interface ITileTypeData {
 }
 
 export class TileFactory extends Component {
+  private _player: PlayerController;
+  public get player(): PlayerController {
+    return this._player;
+  }
+
   /**
    * a readonly empty tile
    */
@@ -132,14 +138,12 @@ export class TileFactory extends Component {
     } else if (tileType == 'free') {
       return new FreeTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'player') {
-      let pos = this.eng.gameManager.data.player.position;
-      if (!pos) {
-        pos = { i, j, k };
+      if (this._player) {
+        return this._player;
+      } else {
+        this._player = new PlayerController(this.eng, args);
+        return this._player;
       }
-      // the player is already created. Just set his position
-      const player = this.eng.worldPlayer;
-      player.setTilePosition(pos.i, pos.j, pos.k);
-      return player;
     } else if (tileType == 'player.battle') {
       return new PlayerBattleTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'npc') {

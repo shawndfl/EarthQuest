@@ -1,4 +1,5 @@
 import { Component } from '../components/Component';
+import { PlayerController } from '../components/PlayerController';
 import { TileComponent } from '../components/TileComponent';
 import { Engine } from '../core/Engine';
 import { TileFactory } from '../systems/TileFactory';
@@ -14,11 +15,10 @@ export class LevelLoader extends Component {
 
   /**
    * Load the levels
-   * @param levelData 
-   * @returns 
+   * @param levelData
+   * @returns
    */
   load(levelData: ILevelData, tileFactory: TileFactory, tiles: TileComponent[][][]): void {
-
     const uuid = this.eng.random.getUuid();
     console.debug('uuid ' + uuid);
 
