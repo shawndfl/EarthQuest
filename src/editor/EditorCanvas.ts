@@ -22,6 +22,7 @@ export class EditorCanvas extends EditorComponent {
   canvasRenderer: CanvasRenderer;
   scaleStep: number;
   lastPos: vec2;
+  lastButtonDown: number;
   moveVector: vec2;
   readonly width: number = 800;
   readonly height: number = 600;
@@ -91,14 +92,15 @@ export class EditorCanvas extends EditorComponent {
     const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
 
     const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-    if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
+    if (this.editor.toolbar.selectedTool == ToolbarOptions.Place && (this.lastButtonDown & 0x04) == 0) {
       this.canvasRenderer.select(point.x, point.y, true);
     }
   }
 
   mouseWheel(e: WheelEvent) {
-    const scale = this.canvasRenderer.scale + 2.0 / (e.deltaY > 0 ? -this.scaleStep : this.scaleStep);
-    this.zoom(scale);
+    const delta = e.deltaY > 0 ? -this.scaleStep : this.scaleStep;
+    const scale = this.canvasRenderer.scale;
+    this.zoom(scale + delta);
   }
 
   zoom(scale: number): void {
@@ -107,43 +109,62 @@ export class EditorCanvas extends EditorComponent {
 
   mouseMove(e: MouseEvent) {
     if (!this.lastPos) {
-      this.lastPos = new vec2(e.offsetX, e.offsetY);
+      this.lastPos = new vec2(e.clientX, e.clientY);
     }
-
-    const delta = new vec2(e.offsetX, e.offsetY).subtract(this.lastPos);
 
     //select
     var rect = this.canvas.getBoundingClientRect();
     const scaleX = this.canvas.width / rect.width; // relationship bitmap vs. element for x
     const scaleY = this.canvas.height / rect.height; // relationship bitmap vs. element for y
 
-    const point = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+    const canvasPoint = {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+    const canvasPointLast = {
+      x: (this.lastPos.x - rect.left) * scaleX,
+      y: (this.lastPos.y - rect.top) * scaleY,
+    };
+    const delta = new vec2(canvasPoint.x - canvasPointLast.x, canvasPoint.y - canvasPointLast.y);
     this.canvas.style.cursor = 'pointer';
 
-    // if the mouse is down
-    if (e.buttons == 1) {
+    // if the mouse is left button down
+    if ((e.buttons & 0x01) > 0) {
       if (this.editor.toolbar.selectedTool == ToolbarOptions.Pan) {
         // pan
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('pan'), true);
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('place'), false);
         this.canvas.style.cursor = 'grab';
-        const scale = 0.9;
-        const offset = this.canvasRenderer.offset.add(delta.scale(scale));
+        const offset = this.canvasRenderer.offset.add(delta);
         this.canvasRenderer.setOffset(offset);
-        this.lastPos = new vec2(e.offsetX, e.offsetY);
+        this.lastPos = new vec2(e.clientX, e.clientY);
       } else if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
-        this.canvasRenderer.select(point.x, point.y, true);
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('place'), true);
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('pan'), false);
+        this.canvasRenderer.select(canvasPoint.x, canvasPoint.y, true);
+      }
+    }
+    // middle mouse
+    else if ((e.buttons & 0x04) > 0) {
+      if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
+        // pan
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('pan'), true);
+        this.editor.toolbar.setActive(this.editor.toolbar.getButton('place'), false);
+        this.canvas.style.cursor = 'grab';
+        const offset = this.canvasRenderer.offset.add(delta);
+        this.canvasRenderer.setOffset(offset);
+        this.lastPos = new vec2(e.clientX, e.clientY);
       }
     }
     // if the mouse is panning with the mouse up
-    else {
-      if (this.editor.toolbar.selectedTool == ToolbarOptions.Pan) {
-        this.canvasRenderer.select(point.x, point.y, false);
-      } else if (this.editor.toolbar.selectedTool == ToolbarOptions.Place) {
-        this.canvasRenderer.select(point.x, point.y, false);
-      }
+    else if (e.buttons == 0) {
+      this.canvasRenderer.select(canvasPoint.x, canvasPoint.y, false);
 
       // reset last pos
       this.lastPos = undefined;
     }
+
+    this.lastButtonDown = e.buttons;
   }
 
   render() {

@@ -133,7 +133,7 @@ export abstract class TileComponent extends Component {
    * @param j
    * @param k
    */
-  setTilePosition(i: number, j: number, k: number) {
+  setTilePosition(i: number, j: number, k: number, updateGroundManager?: boolean) {
     this._tilePosition.x = i;
     this._tilePosition.y = j;
     this._tilePosition.z = k;
@@ -142,9 +142,11 @@ export abstract class TileComponent extends Component {
     const indexJ = Math.floor(this._tilePosition.y);
     const indexK = Math.ceil(this._tilePosition.z);
 
-    // update the tile map by removing this component from its tile
-    // and moving it to the new one
-    this.groundManager.moveTile(this, indexI, indexJ, indexK);
+    if (updateGroundManager) {
+      // update the tile map by removing this component from its tile
+      // and moving it to the new one
+      this.groundManager.moveTile(this, indexI, indexJ, indexK);
+    }
 
     this._tileIndex.x = indexI;
     this._tileIndex.y = indexJ;
@@ -234,7 +236,7 @@ export abstract class TileComponent extends Component {
     }
 
     // set the tile's new position
-    this.setTilePosition(tileContext.i, tileContext.j, tileContext.k);
+    this.setTilePosition(tileContext.i, tileContext.j, tileContext.k, true);
   }
 
   /**

@@ -287,6 +287,11 @@ export class GroundManager extends Component {
         }
       }
 
+      // there is nothing under this.
+      if (tile.empty) {
+        return tile;
+      }
+
       // now go up
       for (tileZ = Math.floor(k); tileZ < maxTileAbove; tileZ++) {
         tile = this.getTile(i, j, tileZ);

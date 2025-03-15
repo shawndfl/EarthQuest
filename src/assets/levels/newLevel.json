@@ -30,7 +30,16 @@
     "free|shadow|",
     "portal|block.grass.dirt|",
     "enemy.battle|swamp.enemy.down|",
-    "player.battle|ness.down.step.right|"
+    "player.battle|ness.down.step.right|",
+    "collide|tree.winter|",
+    "open|sidewalk|",
+    "open|sidewalk.crack.curb|",
+    "---",
+    "open|sidewalk.curb|",
+    "open|street.bottom.dash|",
+    "open|street.bottom|",
+    "open|street.top.dash|",
+    "open|street.top|"
   ],
   "encode": [
     [

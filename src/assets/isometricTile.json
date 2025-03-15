@@ -1,5 +1,4 @@
 {
-  "id": "tiles",
   "tileHeight": 32,
   "tileWidth": 32,
   "tiles": [
@@ -46,6 +45,11 @@
     {
       "id": "tree",
       "loc": [0, 32, 64, 64],
+      "offset": [-64, -48]
+    },
+    {
+      "id": "tree.winter",
+      "loc": [32, 128, 64, 64],
       "offset": [-64, -48]
     },
     {
@@ -127,6 +131,47 @@
       "id": "coin.collect.3",
       "loc": [256, 96, 32, 32],
       "offset": [-32, -48]
+    },
+    {
+      "id": "sidewalk.crack",
+      "loc": [192, 128, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "sidewalk",
+      "loc": [224, 128, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "sidewalk.crack.curb",
+      "loc": [192, 160, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "sidewalk.curb",
+      "loc": [224, 160, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "street.bottom.dash",
+      "loc": [256, 160, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "street.bottom",
+      "loc": [288, 160, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "street.top.dash",
+      "loc": [256, 128, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "street.top",
+      "loc": [288, 128, 32, 32],
+      "offset": [-32, -48]
     }
+
   ]
 }

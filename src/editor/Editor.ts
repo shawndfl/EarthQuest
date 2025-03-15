@@ -343,7 +343,7 @@ export class Editor extends Component implements IEditor {
     });
 
     // set default
-    this.toolbar.selectedTool = ToolbarOptions.Pan;
-    this.toolbar.setActive(this.toolbar.getButton('pan'), true);
+    this.toolbar.selectedTool = ToolbarOptions.Place;
+    this.toolbar.setActive(this.toolbar.getButton('place'), true);
   }
 }

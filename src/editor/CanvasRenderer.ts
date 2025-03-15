@@ -49,8 +49,8 @@ export class CanvasRenderer extends EditorComponent {
     this.ctx.imageSmoothingEnabled = false;
     this.offsetBounds = new rect([-200, 4000, -2000, 4000]);
     this._scale = 1.0;
-    this.minScale = 0.3;
-    this.maxScale = 4;
+    this.minScale = 0.5;
+    this.maxScale = 1.5;
     this._offset = new vec2(400, 10); // 600, 450
     this.dirty = true;
     this.tiles = [];
@@ -98,11 +98,8 @@ export class CanvasRenderer extends EditorComponent {
       // Use the identity matrix while clearing the canvas
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-      // scale
-      this.ctx.scale(this.scale, this.scale);
-
-      // translate
-      this.ctx.translate(this.offset.x, this.offset.y);
+      // transform
+      this.ctx.setTransform(this.scale, 0, 0, this.scale, this.offset.x, this.offset.y);
 
       this.renderTiles();
     }
@@ -114,15 +111,18 @@ export class CanvasRenderer extends EditorComponent {
     const currentScale = this.scale;
     this._scale = MathConst.clamp(value, this.minScale, this.maxScale);
     const scaleDelta = this.scale - currentScale;
-    const baseOffsetX = this._offset.x / (this.ctx.canvas.width * currentScale);
-    const baseOffsetY = this._offset.y / (this.ctx.canvas.height * currentScale);
+    const deltaOffset = -1.0 / scaleDelta;
 
-    const newOffset = new vec2(
-      baseOffsetX * this.ctx.canvas.width * this._scale,
-      baseOffsetY * this.ctx.canvas.height * this._scale
-    );
+    const x = this.offset.x / this.scale - this.offset.x;
+    const y = this.offset.y / this.scale - this.offset.y;
 
-    this.setOffset(newOffset);
+    //const scaledOffsetX = this.offset.x / (this.ctx.canvas.width * this._scale);
+    //const scaledOffsetY = this.offset.y / (this.ctx.canvas.height * this._scale);
+
+    const newOffset = new vec2(x, y);
+
+    //TODO
+    //this.setOffset(newOffset);
     this.dirty = true;
   }
 
@@ -181,8 +181,8 @@ export class CanvasRenderer extends EditorComponent {
   public select(left: number, top: number, place: boolean): void {
     this.ctx.beginPath();
     this.ctx.fillStyle = '#00ff00';
-    const x = left / this.scale - this.offset.x;
-    const y = top / this.scale - this.offset.y;
+    const x = (left - this.offset.x) / this.scale;
+    const y = (top - this.offset.y) / this.scale;
     const koffset = this._activeLayer;
     const w = 32 * this.scale;
     const h = 32 * this.scale;
