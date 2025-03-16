@@ -324,10 +324,10 @@ export class PlayerController extends TileComponent {
 
     // toggle and animation. This can happen when not walking too.
     if (this._walkAnimation.getValue() == 0) {
-      this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
+      this._spriteController.flip(this._spriteFlip ? SpriteFlip.FlipX : SpriteFlip.None);
       this._spriteController.setSprite(this._sprites[0]);
     } else if (this._walkAnimation.getValue() == 1) {
-      this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
+      this._spriteController.flip(this._spriteFlip ? SpriteFlip.FlipX : SpriteFlip.None);
       this._spriteController.setSprite(this._sprites[1]);
     }
 

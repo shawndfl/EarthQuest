@@ -83,7 +83,7 @@ export class PlayerBattleTileComponent extends TileComponent {
       this._spriteFlip = false;
     }
 
-    this._spriteController.flip(this._spriteFlip ? SpriteFlip.XFlip : SpriteFlip.None);
+    this._spriteController.flip(this._spriteFlip ? SpriteFlip.FlipX : SpriteFlip.None);
     this._spriteController.setSprite(this._sprites[index]);
   }
 

@@ -1,3 +1,4 @@
+import { SpriteFlip } from '../graphics/Sprite';
 import { IEditor } from './IEditor';
 import { Job } from './Job';
 
@@ -24,6 +25,8 @@ export class SelectTileBrowserData {
   spriteIndex: number;
   /** Used when saving the level data */
   typeIndex: number;
+  /** flip the image */
+  flip: SpriteFlip;
 
   clone(): SelectTileBrowserData {
     const newData = new SelectTileBrowserData();
@@ -36,6 +39,7 @@ export class SelectTileBrowserData {
     newData.offsetY = this.offsetY;
     newData.spriteIndex = this.spriteIndex;
     newData.typeIndex = this.typeIndex;
+    newData.flip = this.flip;
 
     return newData;
   }

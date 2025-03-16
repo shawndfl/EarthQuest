@@ -10,14 +10,14 @@ export interface ITileData {
   index?: [number, number];
 
   /**
-   * Rotation in degrees 0, 90, 180, 270
-   */
-  rotate?: number;
-
-  /**
    * Flip the image horizontal
    */
-  flip?: boolean;
+  flipX?: boolean;
+
+  /**
+   * Flip vertically
+   */
+  flipY?: boolean;
 
   /**
    * Offset the the image
@@ -26,7 +26,7 @@ export interface ITileData {
 
   /**
    * the location of the sprite data in the sprite sheet. This will
-   * override what ever is in the index field. This is in pixels of
+   * override whatever is in the index field. This is in pixels of
    * the sprite sheet [x,y, width, height]
    */
   loc?: [number, number, number, number];

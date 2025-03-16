@@ -4,7 +4,13 @@
   "controllerType": "world",
   "sheet": "isometricTile.json",
   "tiles": [
-    "---",
+    {
+      "id": 1,
+      "tileId": "block.grass",
+      "type": "open",
+      "flipX": false,
+      "flipY": false
+    },
     "open|block.grass|",
     "block.half|slop.left|",
     "block.half|slop.right|",
@@ -39,9 +45,7 @@
     "open|street.bottom.dash|",
     "open|street.bottom|",
     "open|street.top.dash|",
-    "open|street.top|",
-    "open|street.top.flipX|"
-
+    "open|street.top|"
   ],
   "encode": [
     [

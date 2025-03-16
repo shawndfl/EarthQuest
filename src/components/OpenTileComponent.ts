@@ -5,6 +5,7 @@ import { TileComponent } from './TileComponent';
 import { TileContext } from './TileContext';
 import { SpritController } from '../graphics/SpriteController';
 import { ITileCreationArgs } from './ITileCreationArgs';
+import { SpriteFlip } from '../graphics/Sprite';
 
 /**
  * This is any thing that the player or some NPC can walk on

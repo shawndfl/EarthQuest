@@ -27,6 +27,7 @@ import { SelectTileBrowserData } from './JobPlaceTile';
 import { TileFactory } from '../systems/TileFactory';
 
 import NewLevel from '../assets/levels/newLevel.json';
+import { SpriteFlip } from '../graphics/Sprite';
 
 /**
  * Editor class manages all the components of the editor
@@ -122,6 +123,14 @@ export class Editor extends Component implements IEditor {
             tileData.offsetY = spriteData.tileData.offset[1];
             tileData.typeIndex = tileTypeData.typeIndex;
             tileData.spriteIndex = spriteData.spriteIndex;
+            // flip the sprite if needed
+            if (spriteData.tileData.flipX && spriteData.tileData.flipY) {
+              tileData.flip = SpriteFlip.FlipBoth;
+            } else if (spriteData.tileData.flipY) {
+              tileData.flip = SpriteFlip.FlipY;
+            } else if (spriteData.tileData.flipX) {
+              tileData.flip = SpriteFlip.FlipX;
+            }
 
             if (spriteData.tileData.id == 'empty') {
               this.editorCanvas.canvasRenderer.setTile(null, i, j, k);

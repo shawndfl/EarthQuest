@@ -216,6 +216,16 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
           spriteHeight: this._spriteData.tileHeight,
         });
       }
+
+      // flip the sprite if needed
+      if (sprite.flipX && sprite.flipY) {
+        this.sprite.setSpriteFlip(SpriteFlip.FlipBoth);
+      } else if (sprite.flipY) {
+        this.sprite.setSpriteFlip(SpriteFlip.FlipY);
+      } else if (sprite.flipX) {
+        this.sprite.setSpriteFlip(SpriteFlip.FlipX);
+      }
+
       this._dirty = true;
       //console.debug('Sprite: set sprite');
     } else {

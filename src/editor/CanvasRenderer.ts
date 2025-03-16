@@ -5,6 +5,8 @@ import { EditorComponent } from './EditorComponent';
 import { IEditor } from './IEditor';
 import { JobPlaceTile, SelectTileBrowserData, TilePlaceLocation } from './JobPlaceTile';
 import { ToolbarOptions } from './ToolbarOptions';
+import { SpriteFlip } from '../graphics/Sprite';
+import { FlipCanvas } from './FlipCanvas';
 
 /**
  * Render to the canvas editor
@@ -18,6 +20,7 @@ export class CanvasRenderer extends EditorComponent {
   private dirty: boolean;
   private selectedTile: { i: number; j: number };
   private _activeLayer: number;
+  private _flipCanvas: FlipCanvas;
 
   readonly MaxI = 50;
   readonly MaxJ = 50;
@@ -56,6 +59,7 @@ export class CanvasRenderer extends EditorComponent {
     this.tiles = [];
     this.selectedTile = { i: -1, j: -1 };
     this._activeLayer = 0;
+    this._flipCanvas = new FlipCanvas();
 
     // allocate 3 dimensions of tiles
     for (let k = 0; k < this.MaxK; k++) {
@@ -73,9 +77,16 @@ export class CanvasRenderer extends EditorComponent {
     }
   }
 
-  setTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
+  async setTile(data: SelectTileBrowserData, i: number, j: number, k: number): Promise<void> {
     if (i >= this.MaxI || j >= this.MaxJ || k >= this.MaxK) {
       return;
+    }
+    if (data?.flip) {
+      try {
+        data.image = await this._flipCanvas.flipImage(data);
+      } catch (e) {
+        console.error('error loading image ', data);
+      }
     }
     this.tiles[k][j][i] = data;
     this.dirty = true;
@@ -108,21 +119,7 @@ export class CanvasRenderer extends EditorComponent {
   }
 
   setScale(value: number) {
-    const currentScale = this.scale;
     this._scale = MathConst.clamp(value, this.minScale, this.maxScale);
-    const scaleDelta = this.scale - currentScale;
-    const deltaOffset = -1.0 / scaleDelta;
-
-    const x = this.offset.x / this.scale - this.offset.x;
-    const y = this.offset.y / this.scale - this.offset.y;
-
-    //const scaledOffsetX = this.offset.x / (this.ctx.canvas.width * this._scale);
-    //const scaledOffsetY = this.offset.y / (this.ctx.canvas.height * this._scale);
-
-    const newOffset = new vec2(x, y);
-
-    //TODO
-    //this.setOffset(newOffset);
     this.dirty = true;
   }
 
@@ -167,10 +164,10 @@ export class CanvasRenderer extends EditorComponent {
   private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
     const screen = this.eng.tileHelper.toScreenLoc(i + 0.5, j + 0.5, k, true);
     const img = data.image;
-    const x = data.sx + 1;
-    const y = data.sy + 1;
-    const w = data.srcWidth - 2;
-    const h = data.srcHeight - 2;
+    const x = data.sx;
+    const y = data.sy;
+    const w = data.srcWidth;
+    const h = data.srcHeight;
 
     const destX = -screen.x + data.offsetX;
     const destY = screen.y - data.offsetY - h * 2;
@@ -211,6 +208,15 @@ export class CanvasRenderer extends EditorComponent {
         selected.offsetY = selectedSprite.tileData.offset[1];
         selected.typeIndex = selectedTileTypeIndex;
         selected.spriteIndex = selectedSprite.spriteIndex;
+
+        // flip the sprite if needed
+        if (selectedSprite.tileData.flipX && selectedSprite.tileData.flipY) {
+          selected.flip = SpriteFlip.FlipBoth;
+        } else if (selectedSprite.tileData.flipY) {
+          selected.flip = SpriteFlip.FlipY;
+        } else if (selectedSprite.tileData.flipX) {
+          selected.flip = SpriteFlip.FlipX;
+        }
 
         const location = new TilePlaceLocation(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
         const placeJob = new JobPlaceTile(this.editor, selected, location);

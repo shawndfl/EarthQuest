@@ -7,9 +7,9 @@ import vec3 from '../math/vec3';
 
 export enum SpriteFlip {
   None,
-  XFlip,
-  YFlip,
-  Both,
+  FlipX,
+  FlipY,
+  FlipBoth,
 }
 
 /**
@@ -93,11 +93,7 @@ export class Sprite {
    * @param screenWidth
    * @param screenHeight
    */
-  initialize(
-    spriteSheetSize: { width: number; height: number },
-    screenWidth: number,
-    screenHeight: number
-  ) {
+  initialize(spriteSheetSize: { width: number; height: number }, screenWidth: number, screenHeight: number) {
     this._quad = {
       min: new vec3([-1, -1, -1]),
       max: new vec3([1, 1, 1]),
@@ -122,12 +118,7 @@ export class Sprite {
   /**
    * This function is used to select a sprite from the sprite sheet
    */
-  setSprite(opt: {
-    pixelXOffset: number;
-    pixelYOffset: number;
-    spriteWidth: number;
-    spriteHeight: number;
-  }) {
+  setSprite(opt: { pixelXOffset: number; pixelYOffset: number; spriteWidth: number; spriteHeight: number }) {
     this._spriteLoc.x = opt.pixelXOffset;
     this._spriteLoc.y = opt.pixelYOffset;
     this._spriteLoc.width = opt.spriteWidth;
@@ -205,17 +196,17 @@ export class Sprite {
     let maxX = (this._spriteLoc.x + this._spriteLoc.width) / sheetW;
     let maxY = 1.0 - (this._spriteLoc.y + this._spriteLoc.height) / sheetH;
 
-    if (this._spriteFlip == SpriteFlip.XFlip) {
+    if (this._spriteFlip == SpriteFlip.FlipX) {
       this._quad.minTex.x = maxX;
       this._quad.minTex.y = minY;
       this._quad.maxTex.x = minX;
       this._quad.maxTex.y = maxY;
-    } else if (this._spriteFlip == SpriteFlip.YFlip) {
+    } else if (this._spriteFlip == SpriteFlip.FlipY) {
       this._quad.minTex.x = minX;
       this._quad.minTex.y = maxY;
       this._quad.maxTex.x = maxX;
       this._quad.maxTex.y = minY;
-    } else if (this._spriteFlip == SpriteFlip.Both) {
+    } else if (this._spriteFlip == SpriteFlip.FlipBoth) {
       this._quad.minTex.x = maxX;
       this._quad.minTex.y = maxY;
       this._quad.maxTex.x = minX;
