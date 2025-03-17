@@ -118,16 +118,28 @@ export class TileHelper {
     return normalizedDepth;
   }
 
-  toScreenLoc(i: number, j: number, k: number, invertYAxis: boolean = false, target?: vec3): vec3 {
+  /**
+   * Converts tile coordinates to screen coordinates
+   * @param i
+   * @param j
+   * @param k
+   * @param invertYAxis
+   * @param target
+   * @param halfTile is the tile a 16 px tile or a full isometric 32px cube
+   * @returns
+   */
+  toScreenLoc(i: number, j: number, k: number, invertYAxis: boolean = false, target?: vec3, halfTile?: boolean): vec3 {
     if (!target) {
       target = new vec3();
     }
     const cell = new vec3([i, j, k]);
     if (invertYAxis) {
       this._toScreenFlipped.multiplyVec3(cell, target);
+      target.y -= halfTile ? (invertYAxis ? 32 : -32) : 0;
       return target;
     } else {
       this._toScreen.multiplyVec3(cell, target);
+      target.y -= halfTile ? (invertYAxis ? 32 : -32) : 0;
       return target;
     }
   }

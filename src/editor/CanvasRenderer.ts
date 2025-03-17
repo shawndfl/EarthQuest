@@ -162,7 +162,7 @@ export class CanvasRenderer extends EditorComponent {
    * @param top
    */
   private drawTile(data: SelectTileBrowserData, i: number, j: number, k: number): void {
-    const screen = this.eng.tileHelper.toScreenLoc(i + 0.5, j + 0.5, k, true);
+    const screen = this.eng.tileHelper.toScreenLoc(i + 0.5, j + 0.5, k, true, undefined, data.srcHeight === 16);
     const img = data.image;
     const x = data.sx;
     const y = data.sy;

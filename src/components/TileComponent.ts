@@ -243,13 +243,20 @@ export abstract class TileComponent extends Component {
    * Updates the sprite's position
    */
   protected updateSpritePosition() {
+    let halfTile = false;
+    const spriteData = this.eng.assetManager.getImageFrom(this.spriteId);
+    if (spriteData) {
+      halfTile = spriteData.tileData.loc[3] === 16;
+    }
+
     // Get the screen depth using the tile index not position of this tile
     this._screenDepthPos = this.eng.tileHelper.toScreenLoc(
       this._tileIndex.x,
       this._tileIndex.y,
       this._tileIndex.z,
       false,
-      this._screenDepthPos
+      this._screenDepthPos,
+      halfTile
     );
 
     // Get the screen position of this tile using the position
@@ -258,7 +265,8 @@ export abstract class TileComponent extends Component {
       this._tilePosition.y,
       this._tilePosition.z,
       false,
-      this._screenPosition
+      this._screenPosition,
+      halfTile
     );
 
     // move the sprite if there is one. some tiles like empty

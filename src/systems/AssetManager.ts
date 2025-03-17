@@ -94,6 +94,10 @@ export class AssetManager extends Component {
    * @returns
    */
   getImageFrom(id: string): ISpriteDataAndImage {
+    // might be an empty tile
+    if (!id) {
+      return null;
+    }
     // check the tileData
     let spriteData = TileSheetData as ISpriteData;
     let index = 0;
