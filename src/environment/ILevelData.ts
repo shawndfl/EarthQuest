@@ -1,3 +1,5 @@
+import { ITileData } from '../graphics/ISpriteData';
+import { ITileTypeData } from '../systems/TileFactory';
 import { SceneControllerType } from './SceneControllerType';
 
 /**
@@ -26,6 +28,8 @@ export interface ILevelData {
    *     tileType | sprite sheet tile Id | other parameters
    */
   tiles: string[];
+
+  tiles2: ITileTypeData[];
 
   /**
    * The index returned by the cells is offset by 10 to make it easier to align number in the json.

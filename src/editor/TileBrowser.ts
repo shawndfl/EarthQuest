@@ -1,200 +1,250 @@
 import '../css/TileBrowser.scss';
-import TileImage from '../assets/isometricTile.png';
-import CharacterImage from '../assets/characters.png';
 import { EditorComponent } from './EditorComponent';
 import { Editor } from './Editor';
-
-export interface Point {
-  x: number;
-  y: number;
-}
-
-export interface Rect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-export interface TileImageSrc {
-  src: string;
-  w: number;
-  h: number;
-}
+import { ILevelData } from '../environment/ILevelData';
+import { ISpriteDataAndImage } from '../systems/AssetManager';
+import { ITileTypeData, TileFactory } from '../systems/TileFactory';
+import Edit from '../assets/editor/edit.svg';
 
 /**
- * The loaded image with the tile's width and height
+ * The selected tile
  */
-export interface TileImageElement {
-  img: HTMLImageElement;
-  w: number;
-  h: number;
+export interface ITile {
+  tileTypeData: ITileTypeData;
+  spriteData: ISpriteDataAndImage;
 }
 
 export class TileBrowser extends EditorComponent {
-  container: HTMLElement;
-  tileCanvas: HTMLCanvasElement;
-  context: CanvasRenderingContext2D;
-  images: TileImageElement[];
-  activeImage: number;
-  ready: boolean;
+  entityContainer: HTMLDivElement;
+  list: HTMLDivElement;
+  activeTile: number;
+  editButton: HTMLElement;
 
-  private canvasScale: number;
-  private invCanvasScale: number;
-  private selectionPoint: Point;
-  private selectionRect: Rect;
+  /**
+   * Seleced index
+   */
+  selectedIndex: number;
 
-  get selectedTile(): Rect | undefined {
-    return this.selectionRect;
+  /**
+   * Currently selected tile
+   */
+  get selectedItem(): ITile {
+    return this.tileList[this.selectedIndex];
   }
+
+  /**
+   * List of tiles. Images, x, y, w, h, type info, etc.
+   */
+  tileList: ITile[];
+
+  details: HTMLElement[];
+  titles: HTMLElement[];
 
   constructor(editor: Editor) {
     super(editor);
-    this.tileCanvas = document.createElement('canvas');
-    this.tileCanvas.classList.add('editor-tile-image');
-    this.tileCanvas.addEventListener('click', (e: MouseEvent) => {
-      var rect = this.tileCanvas.getBoundingClientRect();
-      const scaleX = this.tileCanvas.width / rect.width; // relationship bitmap vs. element for x
-      const scaleY = this.tileCanvas.height / rect.height; // relationship bitmap vs. element for y
+    this.tileList = [];
+    this.selectedIndex = -1;
+    console.debug('selected ', this.selectedItem);
+  }
 
-      this.selectionPoint = { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-      this.refreshCanvas();
-    });
+  async initialize(): Promise<void> {}
 
-    this.context = this.tileCanvas.getContext('2d');
-    this.activeImage = -1;
-    this.setZoom(2.0);
+  /**
+   * Add a tile to the browser list
+   * @param tileData
+   */
+  private addTileItem(index: number, tileTypeData: ITileTypeData, tileData: ISpriteDataAndImage) {
+    const item = document.createElement('div');
+
+    // gray out if no tile type
+    if (!tileTypeData) {
+      item.classList.add('grayscale');
+    }
+    item.classList.add('item');
+    item.dataset.index = index.toString();
+
+    // set up the sprite preview
+    const itemContainer = document.createElement('div');
+    itemContainer.classList.add('tile-item-container');
+
+    // image preview
+    const imagePreview = document.createElement('div');
+    imagePreview.classList.add('tile-preview');
+    const imageContainer = document.createElement('div');
+    imageContainer.style.width = tileData.tileData.loc[2].toString() + 'px';
+    imageContainer.style.height = tileData.tileData.loc[3].toString() + 'px';
+    tileData.image.style.marginLeft = '-' + tileData.tileData.loc[0].toString() + 'px';
+    tileData.image.style.marginTop = '-' + tileData.tileData.loc[1].toString() + 'px';
+    imageContainer.append(tileData.image.cloneNode());
+    imagePreview.append(imageContainer);
+    itemContainer.append(imagePreview);
+
+    // text block for tile type, sprite
+    const textContainer = document.createElement('div');
+    textContainer.classList.add('text');
+
+    // tile type
+    const tileText = document.createElement('div');
+    tileText.classList.add('tile-text');
+    tileText.innerHTML = tileTypeData.tileType;
+    this.titles.push(tileText);
+    textContainer.append(tileText);
+
+    // sprite id
+    const spriteText = document.createElement('div');
+    spriteText.classList.add('sprite-text');
+    spriteText.innerHTML = tileData.tileData.id;
+    this.details.push(spriteText);
+    textContainer.append(spriteText);
+
+    itemContainer.append(textContainer);
+    item.append(itemContainer);
+
+    this.registerClick(item);
+    this.list.append(item);
+  }
+
+  /**
+   * Adjust the visible items in the list as it gets resized
+   * @param width
+   */
+  updateItemList(width: number): void {
+    const items = Array.from(this.list.children);
+    if (width < 200) {
+      for (let item of this.details) {
+        item.classList.add('hidden');
+      }
+      for (let item of this.titles) {
+        item.classList.add('hidden');
+      }
+    } else if (width < 300) {
+      for (let item of this.details) {
+        item.classList.add('hidden');
+      }
+      for (let item of this.titles) {
+        item.classList.remove('hidden');
+      }
+    } else {
+      for (let item of this.details) {
+        item.classList.remove('hidden');
+      }
+      for (let item of this.titles) {
+        item.classList.remove('hidden');
+      }
+    }
+  }
+
+  /**
+   * Clears the broswer list and add in the tiles from the level
+   * @param level
+   */
+  async refreshLevel(level: ILevelData): Promise<void> {
+    const listIds = this.eng.assetManager.getTileAssetList();
+    // recreate the list
+    this.list.innerHTML = '';
+    this.tileList = [];
+    this.titles = [];
+    this.details = [];
+    const levelData = level;
+
+    // add in all the tiles form the level data
+    for (let i = 0; i < levelData.tiles.length; i++) {
+      let tile = levelData.tiles[i];
+
+      // --- is a short cut to error.
+      if (tile == '---' && !this.tileList.find((x) => x.tileTypeData.tileType == 'empty')) {
+        tile = 'empty|empty|';
+      }
+
+      // get the tile data
+      let tileTypeData = TileFactory.parseTile(tile);
+      if (!tileTypeData) {
+        console.error(
+          "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
+        );
+        continue;
+      }
+
+      tileTypeData.typeIndex = i;
+
+      const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
+      if (!spriteData) {
+        // error message is in getImageFrom()
+        continue;
+      }
+
+      // add the item
+      this.addTileItem(this.tileList.length, tileTypeData, spriteData);
+
+      // set the selected to the first one that is not empty
+      if (this.selectedIndex == -1 && tile != 'empty|empty|') {
+        this.setSelected(i);
+      }
+
+      // add tile list
+      this.tileList.push({ tileTypeData, spriteData });
+    }
   }
 
   /**
    * Create the view for the tile browser
    */
-  private createView() {
-    const buttonGroup = document.createElement('div');
-    buttonGroup.classList.add('tile-browser-button-group');
+  public buildHtml(): HTMLElement {
+    this.entityContainer = document.createElement('div');
+    this.entityContainer.classList.add('editor-tile-container');
+    this.entityContainer.style.width = '300px';
 
-    const divNext = document.createElement('div');
-    divNext.innerHTML = '>';
-    divNext.classList.add('btn');
-    divNext.addEventListener('click', () => {
-      if (this.ready) {
-        this.activeImage = Math.min(++this.activeImage, this.images.length);
-        this.refreshCanvas();
+    const container = document.createElement('div');
+    container.classList.add('tile-list-container');
+
+    this.list = document.createElement('div');
+    this.list.classList.add('tile-list');
+
+    container.append(this.list);
+
+    this.editButton = document.createElement('button');
+    this.editButton.classList.add('btn');
+    const img = document.createElement('img');
+    img.src = Edit;
+    this.editButton.append(img);
+
+    this.entityContainer.append(container, this.editButton);
+    return this.entityContainer;
+  }
+
+  /**
+   * Registers the click event for an item
+   * @param item
+   */
+  registerClick(item: HTMLElement): void {
+    item.addEventListener('click', (e: MouseEvent) => {
+      const items = Array.from(this.list.getElementsByClassName('item'));
+      items.forEach((it) => {
+        if (it != item) {
+          it.classList.remove('tile-item-selected');
+        } else {
+          this.selectedIndex = parseInt((it as HTMLElement).dataset?.index);
+          item.classList.add('tile-item-selected');
+          console.debug('selected ', this.selectedItem);
+        }
+      });
+    });
+  }
+
+  /**
+   * Set the selected index
+   * @param index
+   */
+  setSelected(index: number): void {
+    const items = Array.from(this.list.getElementsByClassName('item'));
+    items.forEach((it, i) => {
+      if (i != index) {
+        it.classList.remove('tile-item-selected');
+      } else {
+        this.selectedIndex = parseInt((it as HTMLElement).dataset?.index);
+        it.classList.add('tile-item-selected');
+        console.debug('selected ', this.selectedItem);
       }
     });
-
-    const divPrev = document.createElement('div');
-    divPrev.innerHTML = '<';
-    divPrev.classList.add('btn');
-    divPrev.addEventListener('click', () => {
-      if (this.ready) {
-        this.activeImage = Math.max(--this.activeImage, 0);
-        this.refreshCanvas();
-      }
-    });
-
-    buttonGroup.append(divPrev, divNext);
-
-    this.container.append(buttonGroup);
-  }
-
-  /**
-   * Loads an tile image. This is called from loadTiles()
-   * @param resolve The promise resolve function
-   * @param img The html image element
-   * @param tileImageSrc Source image data
-   */
-  async loadImage(
-    resolve: (value: HTMLImageElement) => void,
-    img: HTMLImageElement,
-    tileImageSrc: TileImageSrc
-  ): Promise<void> {
-    img.onload = () => {
-      const tileImage: TileImageElement = { img, w: tileImageSrc.w, h: tileImageSrc.h };
-      this.images.push(tileImage);
-
-      resolve(img);
-    };
-    img.src = tileImageSrc.src;
-  }
-
-  /**
-   * Loads all the tiles into memory. Once this is done the
-   * user will be able to switch between tiles sets.
-   */
-  async loadTiles(): Promise<void> {
-    const promises = [];
-    const imgSrc: TileImageSrc[] = [
-      { src: TileImage, w: 32, h: 32 },
-      { src: CharacterImage, w: 16, h: 24 },
-    ];
-
-    this.images = [];
-
-    for (let i = 0; i < imgSrc.length; i++) {
-      promises.push(
-        new Promise((resolve) => {
-          const img = new Image();
-          this.loadImage(resolve, img, imgSrc[i]);
-        })
-      );
-    }
-
-    Promise.all(promises).then((images: HTMLImageElement[]) => {
-      this.activeImage = 0;
-      this.refreshCanvas();
-      this.ready = true;
-      this.container.append(this.tileCanvas);
-    });
-  }
-
-  buildHtml(): HTMLElement {
-    this.container = document.createElement('div');
-    this.container.classList.add('editor-tile-browser');
-    this.loadTiles();
-    this.createView();
-    return this.container;
-  }
-
-  /**
-   * Sets the zoom factor
-   * @param value
-   */
-  setZoom(value: number) {
-    this.canvasScale = Math.min(Math.max(value, 0.0), 5.0);
-    this.invCanvasScale = 1 / this.canvasScale;
-  }
-
-  /**
-   * redraws the canvas with the correct image
-   */
-  refreshCanvas(): void {
-    const ctx = this.context;
-
-    // get the active image
-    const imgData = this.images[this.activeImage];
-
-    this.tileCanvas.width = imgData.img.naturalWidth;
-    this.tileCanvas.height = imgData.img.naturalHeight;
-    ctx.clearRect(0, 0, this.tileCanvas.width, this.tileCanvas.height);
-    ctx.scale(this.canvasScale, this.canvasScale);
-    ctx.drawImage(imgData.img, 0, 0);
-    const tileW = imgData.w;
-    const tileH = imgData.h;
-
-    if (this.selectionPoint) {
-      const x = Math.floor((this.selectionPoint.x * this.invCanvasScale) / tileW) * tileW;
-      const y = Math.floor((this.selectionPoint.y * this.invCanvasScale) / tileH) * tileH;
-      const w = tileW;
-      const h = tileH;
-
-      this.selectionRect = { x, y, w, h };
-
-      ctx.beginPath();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#00ff0064';
-      ctx.rect(x, y, w, h);
-      ctx.stroke();
-    }
   }
 }

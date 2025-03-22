@@ -18,11 +18,10 @@ import { PlayerBattleTileComponent } from '../components/PlayerBattleTileCompone
 import { PlayerController } from '../components/PlayerController';
 
 export interface ITileTypeData {
-  tile: string;
+  typeIndex: number; /// The index of the type
   tileType: string;
   spriteId: string;
   flags: string[];
-  typeIndex: number; /// The index of the type
 }
 
 export class TileFactory extends Component {
@@ -69,7 +68,6 @@ export class TileFactory extends Component {
     }
 
     const TileData: ITileTypeData = {
-      tile,
       tileType: '',
       spriteId: '',
       flags: null,

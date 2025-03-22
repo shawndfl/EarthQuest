@@ -132,6 +132,55 @@
       "loc": [256, 96, 32, 32],
       "offset": [-32, -48]
     },
+
+    {
+      "id": "sidewalk.crack.flip",
+      "loc": [192, 128, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "sidewalk.flip",
+      "loc": [224, 128, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "sidewalk.crack.curb.flip",
+      "loc": [192, 144, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "sidewalk.curb.flip",
+      "loc": [224, 144, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "street.bottom.dash.flip",
+      "loc": [256, 144, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "street.bottom.flip",
+      "loc": [288, 144, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "street.top.dash.flip",
+      "loc": [256, 128, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
+    {
+      "id": "street.top.flip",
+      "loc": [288, 128, 32, 16],
+      "offset": [-32, -48],
+      "flipX": true
+    },
     {
       "id": "sidewalk.crack",
       "loc": [192, 128, 32, 16],
@@ -171,12 +220,6 @@
       "id": "street.top",
       "loc": [288, 128, 32, 16],
       "offset": [-32, -48]
-    },
-    {
-      "id": "street.top.flipX",
-      "loc": [288, 128, 32, 16],
-      "offset": [-32, -48],
-      "flipX": true
     }
   ]
 }

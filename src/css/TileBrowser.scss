@@ -13,10 +13,24 @@
 }
 
 .editor-tile-container {
-  overflow: auto;
+  width: 500px;
+  min-width: 100px;
+  max-width: 700px;
+  height: calc(100vh - 85px);
   width: 100%;
   height: 100%;
   margin: 5px;
+  position: relative;
+
+  .tile-list-container {
+    width: 100%;
+    height: calc(100vh - 85px);
+    overflow-y: auto;
+    .tile-list {
+      position: relative;
+      flex-wrap: wrap;
+    }
+  }
 }
 
 .tile-browser-button-group {
@@ -33,6 +47,16 @@
     height: 20px;
     margin: 0px 3px 0px 0px;
   }
+}
+
+.btn {
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3921568627);
+  margin: 0px 3px 0px 0px;
+  position: absolute;
+  right: -2px;
+  bottom: -10px;
+  z-index: 10;
+  padding: 0px;
 }
 
 /** NEW */
@@ -64,10 +88,13 @@
 
       .tile-preview {
         margin: 5px;
+        height: 64px;
         width: 64px;
-
+        min-width: 64px;
+        background: rgb(53 53 53);
         div {
           overflow: hidden;
+          margin: auto;
         }
       }
 

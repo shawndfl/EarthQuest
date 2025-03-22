@@ -14,14 +14,6 @@ img {
   .editor-main {
     display: inline-flex;
 
-    .editor-entity-container {
-      width: 500px;
-      min-width: 100px;
-      max-width: 700px;
-      height: calc(100vh - 85px);
-      overflow-y: auto;
-    }
-
     .editor-h-resize {
       width: 5px;
       height: auto;
@@ -31,13 +23,5 @@ img {
       margin: 5px;
       cursor: col-resize;
     }
-  }
-}
-
-.tile-list-container {
-  width: 100%;
-  .tile-list {
-    position: relative;
-    flex-wrap: wrap;
   }
 }

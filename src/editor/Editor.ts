@@ -12,6 +12,9 @@ import ZoomIn from '../assets/editor/zoom_in.svg';
 import ZoomOut from '../assets/editor/zoom_out.svg';
 import Place from '../assets/editor/place_item.svg';
 import PanTool from '../assets/editor/pan_tool.svg';
+import Settings from '../assets/editor/settings.svg';
+import ImageIcon from '../assets/editor/image.svg';
+import Edit from '../assets/editor/edit.svg';
 
 import { EditorCanvas } from './EditorCanvas';
 import { IEditor } from './IEditor';
@@ -22,9 +25,9 @@ import { ToolbarOptions } from './ToolbarOptions';
 import { ILevelData } from '../environment/ILevelData';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
-import { TileBrowser2 } from './TileBrowser2';
+import { TileBrowser } from './TileBrowser';
 import { SelectTileBrowserData } from './JobPlaceTile';
-import { TileFactory } from '../systems/TileFactory';
+import { ITileTypeData, TileFactory } from '../systems/TileFactory';
 
 import NewLevel from '../assets/levels/newLevel.json';
 import { SpriteFlip } from '../graphics/Sprite';
@@ -35,7 +38,7 @@ import { SpriteFlip } from '../graphics/Sprite';
 export class Editor extends Component implements IEditor {
   private _parent: HTMLElement;
   readonly toolbar: Toolbar;
-  readonly tileBrowser: TileBrowser2;
+  readonly tileBrowser: TileBrowser;
   readonly editorCanvas: EditorCanvas;
   readonly statusBar: StatusBar;
   readonly menuBar: MenuBar;
@@ -57,7 +60,7 @@ export class Editor extends Component implements IEditor {
   constructor(eng: Engine) {
     super(eng);
     this.toolbar = new Toolbar(this);
-    this.tileBrowser = new TileBrowser2(this);
+    this.tileBrowser = new TileBrowser(this);
     this.statusBar = new StatusBar(this);
     this.menuBar = new MenuBar(this);
     this.editorCanvas = new EditorCanvas(this);
@@ -85,6 +88,26 @@ export class Editor extends Component implements IEditor {
   async loadLevel(level: ILevelData): Promise<void> {
     this.levelData = level;
 
+    // transform old tiles to tiles2
+    for (let i = 0; i < this.levelData.tiles.length; i++) {
+      let tileTypeData = this.levelData.tiles2?.[i];
+      if (!tileTypeData) {
+        const tile = this.levelData.tiles[i];
+        tileTypeData = TileFactory.parseTile(tile);
+        if (!tileTypeData) {
+          console.warn(
+            "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
+          );
+          continue;
+        }
+        if (!this.levelData.tiles2) {
+          this.levelData.tiles2 = [];
+        }
+        this.levelData.tiles2.push(tileTypeData);
+        tileTypeData.typeIndex = i;
+      }
+    }
+
     this.tileBrowser.refreshLevel(level);
 
     for (let k = 0; k < level.encode.length; k++) {
@@ -94,22 +117,12 @@ export class Editor extends Component implements IEditor {
         for (let s = 0; s < row.length; s += 2) {
           const element = row[s] + row[s + 1];
           const index = parseInt(element, 16);
-          const tile = level.tiles[index];
+          const tileTypeData = level.tiles2[index];
 
-          if (!tile) {
+          if (!tileTypeData) {
             console.error('invalid index ' + i + ', ' + j + ', ' + k);
             continue;
           }
-
-          let tileTypeData = TileFactory.parseTile(tile);
-          if (!tileTypeData) {
-            console.warn(
-              "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
-            );
-            continue;
-          }
-
-          tileTypeData.typeIndex = index;
 
           const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
           if (spriteData) {
@@ -174,10 +187,7 @@ export class Editor extends Component implements IEditor {
 
     this._parent.append(this.toolbar.buildHtml());
 
-    const entityContainer = document.createElement('div');
-    entityContainer.classList.add('editor-entity-container');
-    entityContainer.append(this.tileBrowser.container);
-    entityContainer.style.width = '300px';
+    const tileBrowserElement = this.tileBrowser.buildHtml();
 
     let lastX = 0;
     let mouseDown = false;
@@ -188,8 +198,8 @@ export class Editor extends Component implements IEditor {
       if (mouseDown) {
         const dx = e.x - lastX;
         lastX = e.x;
-        const width = parseInt(entityContainer.style.width);
-        entityContainer.style.width = width + dx + 'px';
+        const width = parseInt(tileBrowserElement.style.width);
+        tileBrowserElement.style.width = width + dx + 'px';
 
         this.tileBrowser.updateItemList(width + dx);
 
@@ -211,7 +221,7 @@ export class Editor extends Component implements IEditor {
 
     resizable.classList.add('editor-h-resize');
 
-    main.append(entityContainer, resizable, this.editorCanvas.container);
+    main.append(tileBrowserElement, resizable, this.editorCanvas.container);
 
     this._parent.append(main);
   }
@@ -243,6 +253,7 @@ export class Editor extends Component implements IEditor {
         tiles[k].push(row);
       }
     }
+
     this.levelData.encode = tiles;
 
     // save in local cache
@@ -349,6 +360,10 @@ export class Editor extends Component implements IEditor {
       pan.classList.add('active');
       place.classList.remove('active');
       this.toolbar.selectedTool = ToolbarOptions.Pan;
+    });
+
+    this.toolbar.addButton('settings', Settings, 'Settings', () => {
+      // TODO show settings dialog
     });
 
     // set default

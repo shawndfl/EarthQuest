@@ -36,6 +36,13 @@
     border: none;
     border-radius: unset;
     width: unset;
+    position: relative;
+    margin: 5px;
+    padding: unset;
+    bottom: 0px;
+    z-index: 0;
+    right: 0;
+    box-shadow: unset;
     img {
       // https://isotropic.co/tool/hex-color-to-css-filter/
       filter: invert(99%) sepia(2%) saturate(0%) hue-rotate(290deg) brightness(200%) contrast(101%);
