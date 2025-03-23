@@ -22,18 +22,12 @@ export interface ILevelData {
   spriteDataUrl: string;
 
   /**
-   * These are cell types that are used by the Ground class
-   * to make interesting levels. These tiles types will map to a sprite sheet.
-   * format:
-   *     tileType | sprite sheet tile Id | other parameters
+   * The tiles that make up the scene
    */
-  tiles: string[];
-
-  tiles2: ITileTypeData[];
+  tiles: { [id: string]: ITileTypeData };
 
   /**
-   * The index returned by the cells is offset by 10 to make it easier to align number in the json.
-   * The array is height, column, row and the value is an index into tiles.
+   * Map is an array of locations that map to a tile
    */
-  encode: string[][];
+  map: { [loc: string]: string };
 }

@@ -18,7 +18,7 @@ import { PlayerBattleTileComponent } from '../components/PlayerBattleTileCompone
 import { PlayerController } from '../components/PlayerController';
 
 export interface ITileTypeData {
-  typeIndex: number; /// The index of the type
+  id: string; /// The index of the type
   tileType: string;
   spriteId: string;
   flags: string[];
@@ -57,38 +57,6 @@ export class TileFactory extends Component {
   }
 
   /**
-   * Parses the tileType. This is an encoded string that is in the format of
-   * <tile type>|<sprint id>|[option1,options2,...]
-   * @param Tile
-   * @returns
-   */
-  static parseTile(tile: string): ITileTypeData {
-    if (tile == '---') {
-      tile = 'empty|empty|';
-    }
-
-    const TileData: ITileTypeData = {
-      tileType: '',
-      spriteId: '',
-      flags: null,
-      typeIndex: -1,
-    };
-
-    const typeSpriteParams = tile.split('|');
-
-    if (typeSpriteParams.length != 3) {
-      console.error("Error parsing tile '" + tile + "'. Should be in the format of type|sprite id|[flags]");
-      return null;
-    }
-
-    TileData.tileType = typeSpriteParams[0];
-    TileData.spriteId = typeSpriteParams[1];
-    TileData.flags = typeSpriteParams[2].split(',');
-
-    return TileData;
-  }
-
-  /**
    * Create static tiles
    * @param type
    * @param i
@@ -96,39 +64,21 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  createStaticTile(tile: string, i: number, j: number, k: number): TileComponent {
-    if (!tile || tile == '---' || tile == 'empty') {
+  createStaticTile(tile: ITileTypeData, i: number, j: number, k: number): TileComponent {
+    if (!tile) {
       return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
-
-    const data = TileFactory.parseTile(tile);
-    if (!data) {
-      console.error(
-        "invalid tile: '" +
-          tile +
-          "' @ (" +
-          i +
-          ', ' +
-          j +
-          ', ' +
-          k +
-          ')' +
-          ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
-      );
-      return new EmptyTile(this.eng, this.groundManager, i, j, k);
-    }
-    const tileType = data.tileType;
 
     const args: ITileCreationArgs = {
       i,
       j,
       k,
       groundManager: this.groundManager,
-      type: data.tileType,
-      sprite: data.spriteId,
-      flags: data.flags,
+      type: tile.tileType,
+      sprite: tile.spriteId,
+      flags: tile.flags,
     };
-
+    const tileType = tile.tileType;
     if (tileType == 'block.half') {
       return new HalfStepTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'open') {
@@ -157,7 +107,7 @@ export class TileFactory extends Component {
     } else if (tileType == 'portal') {
       return new PortalTileComponent(this.eng, this.spriteBatch, args);
     } else {
-      console.error("Unknown tile type '" + tile + "' @ (" + i + ', ' + j + ', ' + k + ')');
+      console.error("Unknown tile type '" + tile.tileType + "' @ (" + i + ', ' + j + ', ' + k + ')');
       return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
   }

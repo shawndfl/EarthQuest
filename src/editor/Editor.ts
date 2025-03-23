@@ -88,73 +88,61 @@ export class Editor extends Component implements IEditor {
   async loadLevel(level: ILevelData): Promise<void> {
     this.levelData = level;
 
-    // transform old tiles to tiles2
-    for (let i = 0; i < this.levelData.tiles.length; i++) {
-      let tileTypeData = this.levelData.tiles2?.[i];
-      if (!tileTypeData) {
-        const tile = this.levelData.tiles[i];
-        tileTypeData = TileFactory.parseTile(tile);
-        if (!tileTypeData) {
-          console.warn(
-            "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
-          );
-          continue;
-        }
-        if (!this.levelData.tiles2) {
-          this.levelData.tiles2 = [];
-        }
-        this.levelData.tiles2.push(tileTypeData);
-        tileTypeData.typeIndex = i;
-      }
-    }
-
     this.tileBrowser.refreshLevel(level);
 
-    for (let k = 0; k < level.encode.length; k++) {
-      for (let j = 0; j < level.encode[k].length; j++) {
-        const row = level.encode[k][j];
-        let i = 0;
-        for (let s = 0; s < row.length; s += 2) {
-          const element = row[s] + row[s + 1];
-          const index = parseInt(element, 16);
-          const tileTypeData = level.tiles2[index];
+    if (!level.map) {
+      return;
+    }
+    Object.keys(level.map).forEach((m) => {
+      const [i, j, k] = m.split(',').map((i) => Number.parseInt(i));
 
-          if (!tileTypeData) {
-            console.error('invalid index ' + i + ', ' + j + ', ' + k);
-            continue;
-          }
+      if (
+        i === undefined ||
+        j === undefined ||
+        k === undefined ||
+        Number.isNaN(i) ||
+        Number.isNaN(j) ||
+        Number.isNaN(k)
+      ) {
+        console.error('map keys should be in the form of <i,j,k> not: ' + m);
+        return;
+      }
 
-          const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
-          if (spriteData) {
-            const tileData = new SelectTileBrowserData();
-            tileData.sx = spriteData.tileData.loc[0];
-            tileData.sy = spriteData.tileData.loc[1];
-            tileData.srcWidth = spriteData.tileData.loc[2];
-            tileData.srcHeight = spriteData.tileData.loc[3];
-            tileData.image = spriteData.image;
-            tileData.offsetX = spriteData.tileData.offset[0];
-            tileData.offsetY = spriteData.tileData.offset[1];
-            tileData.typeIndex = tileTypeData.typeIndex;
-            tileData.spriteIndex = spriteData.spriteIndex;
-            // flip the sprite if needed
-            if (spriteData.tileData.flipX && spriteData.tileData.flipY) {
-              tileData.flip = SpriteFlip.FlipBoth;
-            } else if (spriteData.tileData.flipY) {
-              tileData.flip = SpriteFlip.FlipY;
-            } else if (spriteData.tileData.flipX) {
-              tileData.flip = SpriteFlip.FlipX;
-            }
+      const tileTypeData = level.tiles[level.map[m]];
 
-            if (spriteData.tileData.id == 'empty') {
-              this.editorCanvas.canvasRenderer.setTile(null, i, j, k);
-            } else {
-              this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
-            }
-            i++;
-          }
+      if (!tileTypeData) {
+        console.error('invalid index ' + i + ', ' + j + ', ' + k);
+        return;
+      }
+
+      const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
+      if (spriteData) {
+        const tileData = new SelectTileBrowserData();
+        tileData.sx = spriteData.tileData.loc[0];
+        tileData.sy = spriteData.tileData.loc[1];
+        tileData.srcWidth = spriteData.tileData.loc[2];
+        tileData.srcHeight = spriteData.tileData.loc[3];
+        tileData.image = spriteData.image;
+        tileData.offsetX = spriteData.tileData.offset[0];
+        tileData.offsetY = spriteData.tileData.offset[1];
+        tileData.id = tileTypeData.id;
+        tileData.spriteIndex = spriteData.spriteIndex;
+        // flip the sprite if needed
+        if (spriteData.tileData.flipX && spriteData.tileData.flipY) {
+          tileData.flip = SpriteFlip.FlipBoth;
+        } else if (spriteData.tileData.flipY) {
+          tileData.flip = SpriteFlip.FlipY;
+        } else if (spriteData.tileData.flipX) {
+          tileData.flip = SpriteFlip.FlipX;
+        }
+
+        if (spriteData.tileData.id == 'empty') {
+          this.editorCanvas.canvasRenderer.setTile(null, i, j, k);
+        } else {
+          this.editorCanvas.canvasRenderer.setTile(tileData, i, j, k);
         }
       }
-    }
+    });
   }
 
   /**
@@ -233,28 +221,18 @@ export class Editor extends Component implements IEditor {
     const maxI = this.editorCanvas.canvasRenderer.MaxI;
     const maxJ = this.editorCanvas.canvasRenderer.MaxJ;
     const maxK = this.editorCanvas.canvasRenderer.MaxK;
-    const tiles: string[][] = [[]];
+    this.levelData.map = {};
+
     for (let k = 0; k < maxK; k++) {
-      tiles.push([]);
       for (let j = 0; j < maxJ; j++) {
-        if (tiles[k] == undefined) {
-          tiles[k] = [];
-        }
-        let row = '';
         for (let i = 0; i < maxI; i++) {
           const tile = this.editorCanvas.canvasRenderer.getTile(i, j, k);
           if (tile) {
-            const index = tile.typeIndex;
-            row += index.toString(16).padStart(2, '0');
-          } else {
-            row += '00';
+            this.levelData.map[i + ',' + j + ',' + k] = tile.id;
           }
         }
-        tiles[k].push(row);
       }
     }
-
-    this.levelData.encode = tiles;
 
     // save in local cache
     window.localStorage.setItem('lastLevel', JSON.stringify(this.levelData));

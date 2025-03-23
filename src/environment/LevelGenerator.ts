@@ -5,8 +5,6 @@ import { Engine } from '../core/Engine';
 import vec2 from '../math/vec2';
 import { TileFactory } from '../systems/TileFactory';
 import { Random } from '../utilities/Random';
-import { Timer } from '../utilities/Timer';
-import { HillGenerator } from './HillGenerator';
 import { LevelConstructionParams } from './LevelConstructionParams';
 import { LevelGeneratorState } from './LevelGeneratorState';
 
@@ -17,7 +15,6 @@ export class LevelGenerator extends Component {
   private _levelState: LevelGeneratorState;
   private _creationParams: LevelConstructionParams;
   private _random: Random;
-  private _hillGenerator: HillGenerator;
   protected _tiles: TileComponent[][][];
 
   /**
@@ -41,51 +38,6 @@ export class LevelGenerator extends Component {
   constructor(eng: Engine, protected _tileFactory: TileFactory) {
     super(eng);
     this._tiles = [[[]]];
-    this._hillGenerator = new HillGenerator(eng);
-  }
-
-  /**
-   * Simple level generator
-   * @param opt
-   * @returns
-   */
-  Generate(param: LevelConstructionParams): TileComponent[][][] {
-    this._creationParams = param;
-    this._random = new Random(this._creationParams.seed);
-
-    // allocate empty scene
-    this.createEmpty();
-
-    // position the character
-    let characterPos = param.playerPos;
-    if (!characterPos) {
-      characterPos = this.getRandomPoint();
-    }
-    // this will just set the player's position
-    this._tileFactory.createStaticTile('player|', characterPos.x, characterPos.y, 1);
-
-    const timer = new Timer();
-    console.debug('creation params', param);
-    const tiles = this._tiles;
-
-    // set up your component generators
-    this._hillGenerator.initialize(this);
-
-    // generate ground
-    this.generateGround();
-
-    // create a hill
-    this._hillGenerator.generate();
-
-    const npcPos = this.getRandomPoint(new vec2(1, 1), new vec2(param.width - 2, param.length - 2));
-    const npc = this._tileFactory.createStaticTile('npc|poo', npcPos.x, npcPos.y, 1);
-    this._tiles[1][npcPos.y][npcPos.x] = npc;
-    console.debug('poos position ' + npcPos.toString());
-
-    this.generateLevel1();
-
-    console.debug('built level in ' + timer.elapsed.toFixed(2) + 'ms');
-    return tiles;
   }
 
   /**
@@ -163,89 +115,6 @@ export class LevelGenerator extends Component {
       }
     }
     return true;
-  }
-
-  /**
-   * Create ground
-   */
-  generateGround() {
-    const tiles = this._tiles;
-    const groundIndex = 0;
-
-    const param = this._creationParams;
-
-    // when creating the ground add padding so we can add in portals
-    for (let j = 1; j < param.length - 1; j++) {
-      for (let i = 1; i < param.width - 1; i++) {
-        const option = Math.floor(this.ran * 50);
-
-        // get the type and sprite id
-        let tileTypeAndSprite = this.getFloorTile();
-        const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, groundIndex);
-        // add the new tile
-        tiles[groundIndex][j][i] = newTile;
-      }
-    }
-
-    {
-      // create a portal
-      const portalLoc = this.getRandomPoint(new vec2(param.width - 1, 1), new vec2(0, param.length - 2));
-      const i = portalLoc.x;
-      const j = portalLoc.y;
-
-      // add portal
-      const tilePortalSprite = this.getPortalTile();
-
-      const tilePortal1 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 0, groundIndex);
-      const tilePortal2 = this._tileFactory.createStaticTile(tilePortalSprite, i, j + 1, groundIndex);
-      // add the new tile
-      tiles[groundIndex][j + 0][i] = tilePortal1;
-      tiles[groundIndex][j + 1][i] = tilePortal2;
-    }
-  }
-
-  /**
-   * Sets a tile to a given location and type type
-   * @param tileType string in the format of <type|sprite|...>
-   * @param i lower left
-   * @param j lower right
-   * @param k height
-   */
-  createTile(tileType: string, i: number, j: number, k: number) {
-    const tile = this._tileFactory.createStaticTile(tileType, i, j, k);
-    this._tiles[k][j][i] = tile;
-  }
-
-  /**
-   * Create stuff above the ground
-   */
-  generateLevel1() {
-    const tiles = this._tiles;
-    const baseLevel = 1;
-
-    const param = this._creationParams;
-
-    for (let j = 0; j < param.length; j += 5) {
-      for (let i = 0; i < param.width; i += 5) {
-        const option = Math.floor(this.ran * 100);
-
-        let tileTypeAndSprite = EmptyTileId;
-        if (option > 0 && option < 50) {
-          if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
-            tileTypeAndSprite = this.getCollision();
-          }
-        } else if (option >= 50) {
-          if (this.HasSpace({ startI: i - 5, startJ: j - 5, startK: 1, width: 10, height: 2, length: 10 })) {
-            tileTypeAndSprite = this.getCoin();
-          }
-        }
-        const newTile = this._tileFactory.createStaticTile(tileTypeAndSprite, i, j, baseLevel);
-        // add the new tile
-        if (tiles[baseLevel][j][i].empty) {
-          tiles[baseLevel][j][i] = newTile;
-        }
-      }
-    }
   }
 
   /**

@@ -24,7 +24,7 @@ export class SelectTileBrowserData {
   /** Sprite index */
   spriteIndex: number;
   /** Used when saving the level data */
-  typeIndex: number;
+  id: string;
   /** flip the image */
   flip: SpriteFlip;
 
@@ -38,7 +38,7 @@ export class SelectTileBrowserData {
     newData.offsetX = this.offsetX;
     newData.offsetY = this.offsetY;
     newData.spriteIndex = this.spriteIndex;
-    newData.typeIndex = this.typeIndex;
+    newData.id = this.id;
     newData.flip = this.flip;
 
     return newData;

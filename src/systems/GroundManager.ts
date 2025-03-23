@@ -330,6 +330,12 @@ export class GroundManager extends Component {
     // did the tile index change
     if (k != last.z || j != last.y || i != last.x) {
       this._tiles[last.z][last.y][last.x] = this._tileFactory.empty;
+      if (!this._tiles[k]) {
+        this._tiles[k] = [];
+      }
+      if (!this._tiles[k][j]) {
+        this._tiles[k][j] = [];
+      }
       this._tiles[k][j][i] = tileComponent;
     }
   }

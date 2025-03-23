@@ -22,21 +22,40 @@ export class LevelLoader extends Component {
     const uuid = this.eng.random.getUuid();
     console.debug('uuid ' + uuid);
 
-    for (let k = 0; k < levelData.encode.length; k++) {
-      tiles.push([]);
-      for (let j = 0; j < levelData.encode[k].length; j++) {
-        tiles[k].push([]);
-
-        const row = levelData.encode[k][j];
-        let i = 0;
-        for (let s = 0; s < row.length; s += 2) {
-          const element = row[s] + row[s + 1];
-          const index = parseInt(element, 16);
-          const type = levelData.tiles[index];
-          const tile = tileFactory.createStaticTile(type, i++, j, k);
-          tiles[k][j].push(tile);
-        }
-      }
+    if (!levelData.map) {
+      return;
     }
+
+    Object.keys(levelData.map).forEach((m) => {
+      const [i, j, k] = m.split(',').map((i) => Number.parseInt(i));
+
+      if (
+        i === undefined ||
+        j === undefined ||
+        k === undefined ||
+        Number.isNaN(i) ||
+        Number.isNaN(j) ||
+        Number.isNaN(k)
+      ) {
+        console.error('map keys should be in the form of <i,j,k> not: ' + m);
+        return;
+      }
+
+      const tileTypeData = levelData.tiles[levelData.map[m]];
+
+      if (!tileTypeData) {
+        console.error('invalid index ' + i + ', ' + j + ', ' + k);
+        return;
+      }
+
+      const tile = tileFactory.createStaticTile(tileTypeData, i, j, k);
+      if (!tiles[k]) {
+        tiles[k] = [];
+      }
+      if (!tiles[k][j]) {
+        tiles[k][j] = [];
+      }
+      tiles[k][j].push(tile);
+    });
   }
 }

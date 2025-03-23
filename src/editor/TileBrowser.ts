@@ -19,19 +19,6 @@ export class TileBrowser extends EditorComponent {
   list: HTMLDivElement;
   activeTile: number;
   editButton: HTMLElement;
-
-  /**
-   * Seleced index
-   */
-  selectedIndex: number;
-
-  /**
-   * Currently selected tile
-   */
-  get selectedItem(): ITile {
-    return this.tileList[this.selectedIndex];
-  }
-
   /**
    * List of tiles. Images, x, y, w, h, type info, etc.
    */
@@ -40,11 +27,23 @@ export class TileBrowser extends EditorComponent {
   details: HTMLElement[];
   titles: HTMLElement[];
 
+  /**
+   * Selected id
+   */
+  selectedId: string;
+
+  /**
+   * Currently selected tile
+   */
+  get selectedItem(): ITile {
+    const tile = this.tileList.find((t) => t.tileTypeData.id == this.selectedId);
+    return tile;
+  }
+
   constructor(editor: Editor) {
     super(editor);
     this.tileList = [];
-    this.selectedIndex = -1;
-    console.debug('selected ', this.selectedItem);
+    this.selectedId = null;
   }
 
   async initialize(): Promise<void> {}
@@ -53,7 +52,7 @@ export class TileBrowser extends EditorComponent {
    * Add a tile to the browser list
    * @param tileData
    */
-  private addTileItem(index: number, tileTypeData: ITileTypeData, tileData: ISpriteDataAndImage) {
+  private addTileItem(tileTypeData: ITileTypeData, tileData: ISpriteDataAndImage) {
     const item = document.createElement('div');
 
     // gray out if no tile type
@@ -61,7 +60,8 @@ export class TileBrowser extends EditorComponent {
       item.classList.add('grayscale');
     }
     item.classList.add('item');
-    item.dataset.index = index.toString();
+    // Add data sets for tile data
+    item.dataset.id = tileTypeData.id;
 
     // set up the sprite preview
     const itemContainer = document.createElement('div');
@@ -80,6 +80,7 @@ export class TileBrowser extends EditorComponent {
     itemContainer.append(imagePreview);
 
     // text block for tile type, sprite
+    /*
     const textContainer = document.createElement('div');
     textContainer.classList.add('text');
 
@@ -96,8 +97,8 @@ export class TileBrowser extends EditorComponent {
     spriteText.innerHTML = tileData.tileData.id;
     this.details.push(spriteText);
     textContainer.append(spriteText);
-
-    itemContainer.append(textContainer);
+*/
+    //itemContainer.append(textContainer);
     item.append(itemContainer);
 
     this.registerClick(item);
@@ -148,25 +149,9 @@ export class TileBrowser extends EditorComponent {
     const levelData = level;
 
     // add in all the tiles form the level data
-    for (let i = 0; i < levelData.tiles.length; i++) {
-      let tile = levelData.tiles[i];
-
-      // --- is a short cut to error.
-      if (tile == '---' && !this.tileList.find((x) => x.tileTypeData.tileType == 'empty')) {
-        tile = 'empty|empty|';
-      }
-
-      // get the tile data
-      let tileTypeData = TileFactory.parseTile(tile);
-      if (!tileTypeData) {
-        console.error(
-          "invalid tile: '" + tile + "'" + ' Format should be <tile type>|<sprint id>|[option1,options2,...] '
-        );
-        continue;
-      }
-
-      tileTypeData.typeIndex = i;
-
+    const tileKeys = Object.keys(levelData.tiles);
+    for (let i of tileKeys) {
+      let tileTypeData = levelData.tiles[i];
       const spriteData = this.eng.assetManager.getImageFrom(tileTypeData.spriteId);
       if (!spriteData) {
         // error message is in getImageFrom()
@@ -174,10 +159,10 @@ export class TileBrowser extends EditorComponent {
       }
 
       // add the item
-      this.addTileItem(this.tileList.length, tileTypeData, spriteData);
+      this.addTileItem(tileTypeData, spriteData);
 
       // set the selected to the first one that is not empty
-      if (this.selectedIndex == -1 && tile != 'empty|empty|') {
+      if (this.selectedId && tileTypeData.tileType != 'empty') {
         this.setSelected(i);
       }
 
@@ -218,14 +203,13 @@ export class TileBrowser extends EditorComponent {
    */
   registerClick(item: HTMLElement): void {
     item.addEventListener('click', (e: MouseEvent) => {
-      const items = Array.from(this.list.getElementsByClassName('item'));
-      items.forEach((it) => {
-        if (it != item) {
-          it.classList.remove('tile-item-selected');
+      const items = Array.from(this.list.getElementsByClassName('item')) as HTMLElement[];
+      items.forEach((elem) => {
+        if (elem != item) {
+          elem.classList.remove('tile-item-selected');
         } else {
-          this.selectedIndex = parseInt((it as HTMLElement).dataset?.index);
+          this.selectedId = elem.dataset.id;
           item.classList.add('tile-item-selected');
-          console.debug('selected ', this.selectedItem);
         }
       });
     });
@@ -235,14 +219,14 @@ export class TileBrowser extends EditorComponent {
    * Set the selected index
    * @param index
    */
-  setSelected(index: number): void {
-    const items = Array.from(this.list.getElementsByClassName('item'));
-    items.forEach((it, i) => {
-      if (i != index) {
-        it.classList.remove('tile-item-selected');
+  setSelected(id: string): void {
+    const items = Array.from(this.list.getElementsByClassName('item')) as HTMLElement[];
+    items.forEach((elem) => {
+      if (elem.dataset.id != id) {
+        elem.classList.remove('tile-item-selected');
       } else {
-        this.selectedIndex = parseInt((it as HTMLElement).dataset?.index);
-        it.classList.add('tile-item-selected');
+        this.selectedId = elem.dataset.id;
+        elem.classList.add('tile-item-selected');
         console.debug('selected ', this.selectedItem);
       }
     });

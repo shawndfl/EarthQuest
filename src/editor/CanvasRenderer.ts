@@ -78,7 +78,7 @@ export class CanvasRenderer extends EditorComponent {
   }
 
   async setTile(data: SelectTileBrowserData, i: number, j: number, k: number): Promise<void> {
-    if (i >= this.MaxI || j >= this.MaxJ || k >= this.MaxK) {
+    if (i >= this.MaxI || j >= this.MaxJ || k >= this.MaxK || i < 0 || j < 0 || k < 0) {
       return;
     }
     if (data?.flip) {
@@ -193,11 +193,11 @@ export class CanvasRenderer extends EditorComponent {
 
     if (place) {
       let selected: SelectTileBrowserData = null;
-      const selectedTileTypeIndex = this.editor.tileBrowser.selectedItem?.tileTypeData.typeIndex;
+      const selectedTileTypeIndex = this.editor.tileBrowser.selectedItem?.tileTypeData.id;
       const selectedSprite = this.editor.tileBrowser.selectedItem?.spriteData;
       const currentTile = this.getTile(this.selectedTile.j, this.selectedTile.i, this._activeLayer);
       // make sure there is a sprite and it is a different tile
-      if (selectedSprite && (!currentTile || currentTile.typeIndex != selectedTileTypeIndex)) {
+      if (selectedSprite && (!currentTile || currentTile.id != selectedTileTypeIndex)) {
         selected = new SelectTileBrowserData();
         selected.sx = selectedSprite.tileData.loc[0];
         selected.sy = selectedSprite.tileData.loc[1];
@@ -206,7 +206,7 @@ export class CanvasRenderer extends EditorComponent {
         selected.image = selectedSprite.image;
         selected.offsetX = selectedSprite.tileData.offset[0];
         selected.offsetY = selectedSprite.tileData.offset[1];
-        selected.typeIndex = selectedTileTypeIndex;
+        selected.id = selectedTileTypeIndex;
         selected.spriteIndex = selectedSprite.spriteIndex;
 
         // flip the sprite if needed
