@@ -19,6 +19,12 @@ export class TileBrowser extends EditorComponent {
   list: HTMLDivElement;
   activeTile: number;
   editButton: HTMLElement;
+  infoElement: HTMLElement;
+
+  private hideTimer: number;
+  private displayNoneTimer: number;
+  private overInfo: boolean;
+
   /**
    * List of tiles. Images, x, y, w, h, type info, etc.
    */
@@ -175,9 +181,31 @@ export class TileBrowser extends EditorComponent {
    * Create the view for the tile browser
    */
   public buildHtml(): HTMLElement {
+    this.infoElement = document.createElement('div');
+    this.infoElement.classList.add('tile-info');
+    this.infoElement.classList.add('hidden');
+
+    this.infoElement.addEventListener('mouseenter', (e: MouseEvent) => {
+      if (this.hideTimer) {
+        window.clearTimeout(this.hideTimer);
+        this.hideTimer = null;
+      }
+      this.overInfo = true;
+    });
+
+    this.infoElement.addEventListener('mouseleave', (e: MouseEvent) => {
+      this.overInfo = false;
+      this.hideInfo();
+    });
+
     this.entityContainer = document.createElement('div');
     this.entityContainer.classList.add('editor-tile-container');
     this.entityContainer.style.width = '300px';
+    this.entityContainer.addEventListener('mouseleave', (e: MouseEvent) => {
+      if (!this.overInfo) {
+        this.hideInfo();
+      }
+    });
 
     const container = document.createElement('div');
     container.classList.add('tile-list-container');
@@ -193,7 +221,7 @@ export class TileBrowser extends EditorComponent {
     img.src = Edit;
     this.editButton.append(img);
 
-    this.entityContainer.append(container, this.editButton);
+    this.entityContainer.append(container, this.editButton, this.infoElement);
     return this.entityContainer;
   }
 
@@ -202,6 +230,25 @@ export class TileBrowser extends EditorComponent {
    * @param item
    */
   registerClick(item: HTMLElement): void {
+    const [tilePreview] = item.getElementsByClassName('tile-preview');
+    tilePreview?.addEventListener('mouseover', (e: MouseEvent) => {
+      const items = Array.from(this.list.getElementsByClassName('item')) as HTMLElement[];
+      items.forEach((elem) => {
+        if (elem == item) {
+          const padding = 15;
+          const itemBounds = elem.getBoundingClientRect();
+          // the parent of the info dialog
+          const containerBounds = this.entityContainer.getBoundingClientRect();
+          const deltaX = itemBounds.right - padding - containerBounds.x;
+          const deltaY = itemBounds.bottom - padding - containerBounds.y;
+          const x = deltaX;
+          const y = deltaY;
+
+          this.showInfo(elem.dataset.id, x, y);
+        }
+      });
+    });
+
     item.addEventListener('click', (e: MouseEvent) => {
       const items = Array.from(this.list.getElementsByClassName('item')) as HTMLElement[];
       items.forEach((elem) => {
@@ -213,6 +260,88 @@ export class TileBrowser extends EditorComponent {
         }
       });
     });
+  }
+
+  /**
+   * Add an item to the info dialog
+   * @param title
+   * @param value
+   * @returns
+   */
+  private createInfoItem(title: string, value: string): HTMLElement {
+    let titleElem = document.createElement('div');
+    titleElem.classList.add('info-title');
+    titleElem.innerText = title;
+
+    const valueElem = document.createElement('div');
+    valueElem.classList.add('info-value');
+    valueElem.innerText = value;
+
+    const container = document.createElement('div');
+    container.classList.add('info-row');
+
+    container.append(titleElem, valueElem);
+    return container;
+  }
+
+  private showInfo(id: string, x: number, y: number): void {
+    const typeData = this.tileList.find((t) => t.tileTypeData.id == id);
+    if (!typeData) {
+      return;
+    }
+
+    this.infoElement.style.display = 'block';
+
+    this.infoElement.style.left = x.toString() + 'px';
+    this.infoElement.style.top = y.toString() + 'px';
+
+    this.infoElement.style.opacity = '1';
+    this.infoElement.classList.remove('hidden');
+    this.infoElement.innerHTML = '';
+
+    this.infoElement.append(this.createInfoItem('id', typeData.tileTypeData.id));
+    this.infoElement.append(this.createInfoItem('spriteId', typeData.tileTypeData.spriteId));
+    this.infoElement.append(this.createInfoItem('type', typeData.tileTypeData.tileType));
+    this.infoElement.append(this.createInfoItem('flipX', typeData.spriteData.tileData.flipX ? 'true' : 'false'));
+    this.infoElement.append(this.createInfoItem('flipY', typeData.spriteData.tileData.flipY ? 'true' : 'false'));
+
+    for (let i = 0; i < typeData.tileTypeData.flags?.length; i++) {
+      if (typeData.tileTypeData.flags[i] && typeData.tileTypeData.flags[i].length > 0) {
+        this.infoElement.append(this.createInfoItem('flag ' + i, typeData.tileTypeData.flags[i]));
+      }
+    }
+
+    const bounds = this.infoElement.getBoundingClientRect();
+    if (bounds.bottom > window.innerHeight) {
+      const diff = bounds.bottom - window.innerHeight;
+
+      this.infoElement.style.top = (y - diff).toString() + 'px';
+    }
+
+    // reset timers
+    if (this.displayNoneTimer) {
+      window.clearTimeout(this.displayNoneTimer);
+      this.displayNoneTimer = null;
+    }
+    if (this.hideTimer) {
+      window.clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
+
+    // timeout after 5 seconds
+    //this.hideTimer = window.setTimeout(() => {
+    //  this.hideInfo();
+    //}, 5000);
+  }
+
+  private hideInfo(): void {
+    this.infoElement.style.opacity = '0';
+    this.overInfo = false;
+    if (this.displayNoneTimer) {
+      window.clearTimeout(this.displayNoneTimer);
+      this.displayNoneTimer = null;
+    }
+    this.displayNoneTimer = window.setTimeout(() => (this.infoElement.style.display = 'none'), 500);
   }
 
   /**
