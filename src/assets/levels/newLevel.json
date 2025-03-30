@@ -4,9 +4,9 @@
   "controllerType": "world",
   "sheet": "isometricTile.json",
   "tiles": { 
-    "0" : { "tileType": "empty", "spriteId": "empty", "flags": [""] },
-   "1": { "tileType": "open", "spriteId": "block.grass", "flags": [""], "id": 1 },
-   "2": { "tileType": "block.half", "spriteId": "slop.left", "flags": [""], "id": 2 },
+   "0" : { "tileType": "empty", "spriteId": "empty", "flags": [""] },
+   "1": { "tileType": "open", "spriteId": "block.grass", "flags": [""] },
+   "2": { "tileType": "block.half", "spriteId": "slop.left", "flags": [""] },
    "3": { "tileType": "block.half", "spriteId": "slop.right", "flags": [""], "id": 3 },
    "4": { "tileType": "block.half", "spriteId": "block.half", "flags": [""], "id": 4 },
    "5": { "tileType": "block.half", "spriteId": "block.half.highlight", "flags": [""], "id": 5 },
@@ -23,7 +23,6 @@
    "17": { "tileType": "open", "spriteId": "block.grass.edge.left", "flags": [""], "id": 17 },
    "18": { "tileType": "open", "spriteId": "block.grass.edge.right", "flags": [""], "id": 18 },
    "19": { "tileType": "open", "spriteId": "block.grass.edge.both", "flags": [""], "id": 19 },
-   "20": { "tileType": "empty", "spriteId": "empty", "flags": [""], "id": 20 },
    "21": { "tileType": "enemy", "spriteId": "swamp.enemy.down", "flags": [""], "id": 21 },
    "22": { "tileType": "open", "spriteId": "highlight", "flags": [""], "id": 22 },
    "23": { "tileType": "free", "spriteId": "shadow", "flags": [""], "id": 23 },
@@ -33,13 +32,19 @@
    "27": { "tileType": "collide", "spriteId": "tree.winter", "flags": [""], "id": 27 },
    "28": { "tileType": "open", "spriteId": "sidewalk", "flags": [""], "id": 28 },
    "29": { "tileType": "open", "spriteId": "sidewalk.crack.curb", "flags": [""], "id": 29 },
-   "30": { "tileType": "empty", "spriteId": "empty", "flags": [""], "id": 30 },
    "31": { "tileType": "open", "spriteId": "sidewalk.curb", "flags": [""], "id": 31 },
    "32": { "tileType": "open", "spriteId": "street.bottom.dash", "flags": [""], "id": 32 },
    "33": { "tileType": "open", "spriteId": "street.bottom", "flags": [""], "id": 33 },
    "34": { "tileType": "open", "spriteId": "street.top.dash", "flags": [""], "id": 34 },
    "35": { "tileType": "open", "spriteId": "street.top", "flags": [""], "id": 35 },
-   "36": { "tileType": "open", "spriteId": "street.top.flipX", "flags": [""], "id": 36 }
+
+   "36": { "tileType": "open", "spriteId": "sidewalk.flipX", "flags": [""], "id": 28 },
+   "37": { "tileType": "open", "spriteId": "sidewalk.crack.curb.flipX", "flags": [""], "id": 29 },
+   "38": { "tileType": "open", "spriteId": "sidewalk.curb.flipX", "flags": [""], "id": 31 },
+   "39": { "tileType": "open", "spriteId": "street.bottom.dash.flipX", "flags": [""], "id": 32 },
+   "40": { "tileType": "open", "spriteId": "street.bottom.flipX", "flags": [""], "id": 33 },
+   "41": { "tileType": "open", "spriteId": "street.top.dash.flipX", "flags": [""], "id": 34 },
+   "42": { "tileType": "open", "spriteId": "street.top.flipX", "flags": [""], "id": 35 }
 },
   "map": {
     "0,0,0": 1,

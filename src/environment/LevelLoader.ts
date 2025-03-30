@@ -55,7 +55,7 @@ export class LevelLoader extends Component {
       if (!tiles[k][j]) {
         tiles[k][j] = [];
       }
-      tiles[k][j].push(tile);
+      tiles[k][j][i] = tile;
     });
   }
 }

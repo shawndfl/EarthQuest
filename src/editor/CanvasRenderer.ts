@@ -61,6 +61,11 @@ export class CanvasRenderer extends EditorComponent {
     this._activeLayer = 0;
     this._flipCanvas = new FlipCanvas();
 
+    this.resetTiles();
+  }
+
+  resetTiles(): void {
+    this.tiles = [];
     // allocate 3 dimensions of tiles
     for (let k = 0; k < this.MaxK; k++) {
       this.tiles.push([]);
@@ -138,7 +143,7 @@ export class CanvasRenderer extends EditorComponent {
       if (k != this._activeLayer) {
         alpha = Math.max(0, 1 - Math.abs(k - this._activeLayer) / this.MaxK - 0.5);
       }
-      this.context.globalAlpha = alpha;
+      //this.context.globalAlpha = alpha;
 
       for (let j = 0; j < this.MaxJ; j++) {
         for (let i = 0; i < this.MaxI; i++) {
@@ -149,10 +154,12 @@ export class CanvasRenderer extends EditorComponent {
         }
       }
       if (k == this._activeLayer) {
-        this.context.globalAlpha = 0.5;
-        this.renderGrid();
+        //this.context.globalAlpha = 0.5;
+        //this.renderGrid();
       }
     }
+
+    this.renderGrid();
   }
 
   /**
@@ -186,6 +193,8 @@ export class CanvasRenderer extends EditorComponent {
 
     const tileI = (x * -1) / 64 + (y * 1) / 32;
     const tileJ = x / 64 + (y * 1) / 32;
+
+    const fractionI = tileI;
 
     this.selectedTile.i = Math.floor(tileI + koffset);
     this.selectedTile.j = Math.floor(tileJ + koffset);
@@ -237,6 +246,7 @@ export class CanvasRenderer extends EditorComponent {
     const maxI = 50;
     const maxJ = 50;
     const kOffset = -this._activeLayer * stepY * 2;
+
     for (let i = 0; i < this.MaxI; i++) {
       const x1 = -i * stepX * 2;
       const y1 = i * stepY + kOffset;
@@ -271,14 +281,31 @@ export class CanvasRenderer extends EditorComponent {
       // bottom
       const p3 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + stepY * 2 + kOffset };
 
+      // bottom right
+      const p4 = { x: -i * stepX * 2 + j * stepY * 2 + stepX * 2, y: i * stepX + j * stepY + stepY * 3 + kOffset };
+
+      // bottom left
+      const p5 = { x: -i * stepX * 2 + j * stepY * 2 - stepX * 2, y: i * stepX + j * stepY + stepY * 3 + kOffset };
+
+      // bottom center
+      const p6 = { x: -i * stepX * 2 + j * stepY * 2, y: i * stepX + j * stepY + stepY * 4 + kOffset };
+
       this.ctx.beginPath();
       this.ctx.strokeStyle = 'rgb(0,255,0)';
       this.ctx.lineWidth = 2;
+      // top tile
       this.ctx.moveTo(p0.x, p0.y);
       this.ctx.lineTo(p1.x, p1.y);
       this.ctx.lineTo(p3.x, p3.y);
       this.ctx.lineTo(p2.x, p2.y);
       this.ctx.closePath();
+
+      this.ctx.moveTo(p2.x, p2.y);
+      this.ctx.lineTo(p5.x, p5.y);
+      this.ctx.lineTo(p6.x, p6.y);
+      this.ctx.lineTo(p4.x, p4.y);
+      this.ctx.lineTo(p1.x, p1.y);
+
       this.ctx.stroke();
     }
   }

@@ -81,6 +81,8 @@ export class TileFactory extends Component {
     const tileType = tile.tileType;
     if (tileType == 'block.half') {
       return new HalfStepTileComponent(this.eng, this.spriteBatch, args);
+    } else if (tileType == 'empty') {
+      return new EmptyTile(this.eng, this.groundManager, i, j, k);
     } else if (tileType == 'open') {
       return new OpenTileComponent(this.eng, this.spriteBatch, args);
     } else if (tileType == 'free') {

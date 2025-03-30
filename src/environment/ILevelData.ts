@@ -31,3 +31,8 @@ export interface ILevelData {
    */
   map: { [loc: string]: string };
 }
+
+export function cloneLevel(src: ILevelData): ILevelData {
+  const result = JSON.parse(JSON.stringify(src));
+  return result;
+}

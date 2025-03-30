@@ -22,7 +22,7 @@ import { StatusBar } from './StatusBar';
 import { MenuBar } from './MenuBar';
 import { JobManager } from './JobManager';
 import { ToolbarOptions } from './ToolbarOptions';
-import { ILevelData } from '../environment/ILevelData';
+import { cloneLevel, ILevelData } from '../environment/ILevelData';
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { TileBrowser } from './TileBrowser';
@@ -93,6 +93,10 @@ export class Editor extends Component implements IEditor {
     if (!level.map) {
       return;
     }
+
+    // reset the canvas map
+    this.editorCanvas.canvasRenderer.resetTiles();
+
     Object.keys(level.map).forEach((m) => {
       const [i, j, k] = m.split(',').map((i) => Number.parseInt(i));
 
@@ -109,7 +113,6 @@ export class Editor extends Component implements IEditor {
       }
 
       const tileTypeData = level.tiles[level.map[m]];
-
       if (!tileTypeData) {
         console.error('invalid index ' + i + ', ' + j + ', ' + k);
         return;

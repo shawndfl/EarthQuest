@@ -163,7 +163,7 @@ export class TileBrowser extends EditorComponent {
         // error message is in getImageFrom()
         continue;
       }
-
+      tileTypeData.id = i;
       // add the item
       this.addTileItem(tileTypeData, spriteData);
 
