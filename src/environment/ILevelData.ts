@@ -1,5 +1,4 @@
-import { ITileData } from '../graphics/ISpriteData';
-import { ITileTypeData } from '../systems/TileFactory';
+import { ITileTypeData } from '../systems/ITileTypeData';
 import { SceneControllerType } from './SceneControllerType';
 
 /**
@@ -30,6 +29,8 @@ export interface ILevelData {
    * Map is an array of locations that map to a tile
    */
   map: { [loc: string]: string };
+
+  flags: { [loc: string]: string };
 }
 
 export function cloneLevel(src: ILevelData): ILevelData {

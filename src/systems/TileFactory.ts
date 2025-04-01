@@ -16,13 +16,7 @@ import { GroundManager } from './GroundManager';
 import { ITileCreationArgs } from '../components/ITileCreationArgs';
 import { PlayerBattleTileComponent } from '../components/PlayerBattleTileComponent';
 import { PlayerController } from '../components/PlayerController';
-
-export interface ITileTypeData {
-  id: string; /// The index of the type
-  tileType: string;
-  spriteId: string;
-  flags: string[];
-}
+import { ITileTypeData } from './ITileTypeData';
 
 export class TileFactory extends Component {
   private _player: PlayerController;
@@ -64,7 +58,7 @@ export class TileFactory extends Component {
    * @param k
    * @returns
    */
-  createStaticTile(tile: ITileTypeData, i: number, j: number, k: number): TileComponent {
+  createStaticTile(tile: ITileTypeData, i: number, j: number, k: number, flags: string[]): TileComponent {
     if (!tile) {
       return new EmptyTile(this.eng, this.groundManager, i, j, k);
     }
@@ -76,7 +70,7 @@ export class TileFactory extends Component {
       groundManager: this.groundManager,
       type: tile.tileType,
       sprite: tile.spriteId,
-      flags: tile.flags,
+      flags: flags,
     };
     const tileType = tile.tileType;
     if (tileType == 'block.half') {

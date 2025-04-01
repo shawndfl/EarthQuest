@@ -141,9 +141,10 @@ export class CanvasRenderer extends EditorComponent {
 
       // make all the layers fade out
       if (k != this._activeLayer) {
-        alpha = Math.max(0, 1 - Math.abs(k - this._activeLayer) / this.MaxK - 0.5);
+        //alpha = Math.max(0, 1 - Math.abs(k - this._activeLayer) / this.MaxK - 0.5);
+        alpha = 0.3; //Math.max(0, 1 - Math.abs(k - this._activeLayer) / this.MaxK - 0.5);
       }
-      //this.context.globalAlpha = alpha;
+      this.context.globalAlpha = alpha;
 
       for (let j = 0; j < this.MaxJ; j++) {
         for (let i = 0; i < this.MaxI; i++) {
@@ -154,7 +155,7 @@ export class CanvasRenderer extends EditorComponent {
         }
       }
       if (k == this._activeLayer) {
-        //this.context.globalAlpha = 0.5;
+        this.context.globalAlpha = 1;
         //this.renderGrid();
       }
     }
@@ -245,7 +246,7 @@ export class CanvasRenderer extends EditorComponent {
     this.ctx.fillStyle = '#c4c4c4';
     const maxI = 50;
     const maxJ = 50;
-    const kOffset = -this._activeLayer * stepY * 2;
+    let kOffset = 0;
 
     for (let i = 0; i < this.MaxI; i++) {
       const x1 = -i * stepX * 2;
@@ -269,6 +270,7 @@ export class CanvasRenderer extends EditorComponent {
 
     this.ctx.stroke();
 
+    kOffset = -this._activeLayer * stepY * 2;
     if (this.selectedTile.i >= 0 && this.selectedTile.j >= 0) {
       const i = this.selectedTile.i;
       const j = this.selectedTile.j;

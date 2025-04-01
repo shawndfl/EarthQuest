@@ -3,16 +3,14 @@ import { EditorComponent } from './EditorComponent';
 import { Editor } from './Editor';
 import { ILevelData } from '../environment/ILevelData';
 import { ISpriteDataAndImage } from '../systems/AssetManager';
-import { ITileTypeData, TileFactory } from '../systems/TileFactory';
 import Edit from '../assets/editor/edit.svg';
+import { IBrowserTile } from './IBrowserTile';
+import { ITileData } from '../graphics/ISpriteData';
+import { ITileTypeData } from '../systems/ITileTypeData';
 
 /**
  * The selected tile
  */
-export interface ITile {
-  tileTypeData: ITileTypeData;
-  spriteData: ISpriteDataAndImage;
-}
 
 export class TileBrowser extends EditorComponent {
   entityContainer: HTMLDivElement;
@@ -28,7 +26,7 @@ export class TileBrowser extends EditorComponent {
   /**
    * List of tiles. Images, x, y, w, h, type info, etc.
    */
-  tileList: ITile[];
+  tileList: IBrowserTile[];
 
   details: HTMLElement[];
   titles: HTMLElement[];
@@ -41,7 +39,7 @@ export class TileBrowser extends EditorComponent {
   /**
    * Currently selected tile
    */
-  get selectedItem(): ITile {
+  get selectedItem(): IBrowserTile {
     const tile = this.tileList.find((t) => t.tileTypeData.id == this.selectedId);
     return tile;
   }
@@ -173,7 +171,7 @@ export class TileBrowser extends EditorComponent {
       }
 
       // add tile list
-      this.tileList.push({ tileTypeData, spriteData });
+      this.tileList.push({ tileTypeData, spriteData, flags: [] });
     }
   }
 
@@ -305,9 +303,9 @@ export class TileBrowser extends EditorComponent {
     this.infoElement.append(this.createInfoItem('flipX', typeData.spriteData.tileData.flipX ? 'true' : 'false'));
     this.infoElement.append(this.createInfoItem('flipY', typeData.spriteData.tileData.flipY ? 'true' : 'false'));
 
-    for (let i = 0; i < typeData.tileTypeData.flags?.length; i++) {
-      if (typeData.tileTypeData.flags[i] && typeData.tileTypeData.flags[i].length > 0) {
-        this.infoElement.append(this.createInfoItem('flag ' + i, typeData.tileTypeData.flags[i]));
+    for (let i = 0; i < typeData.flags?.length; i++) {
+      if (typeData.flags[i] && typeData.flags[i].length > 0) {
+        this.infoElement.append(this.createInfoItem('flag ' + i, typeData.flags[i]));
       }
     }
 

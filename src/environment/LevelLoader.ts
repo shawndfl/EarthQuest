@@ -42,13 +42,15 @@ export class LevelLoader extends Component {
       }
 
       const tileTypeData = levelData.tiles[levelData.map[m]];
+      const flagsString: string = levelData.flags?.[m];
+      const flags = flagsString?.split(',') ?? [];
 
       if (!tileTypeData) {
         console.error('invalid index ' + i + ', ' + j + ', ' + k);
         return;
       }
 
-      const tile = tileFactory.createStaticTile(tileTypeData, i, j, k);
+      const tile = tileFactory.createStaticTile(tileTypeData, i, j, k, flags);
       if (!tiles[k]) {
         tiles[k] = [];
       }

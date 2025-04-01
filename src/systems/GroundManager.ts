@@ -252,8 +252,8 @@ export class GroundManager extends Component {
       return found;
     }
     for (let k = 0; k < this._tiles.length; k++) {
-      for (let j = 0; j < this._tiles[k].length; j++) {
-        for (let i = 0; i < this._tiles[k][j].length; i++) {
+      for (let j = 0; j < this._tiles[k]?.length; j++) {
+        for (let i = 0; i < this._tiles[k][j]?.length; i++) {
           const tile = this._tiles[k][j][i];
           if (predicate(tile, i, j, k)) {
             found.push(tile);

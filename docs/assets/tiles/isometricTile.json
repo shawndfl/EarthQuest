@@ -134,53 +134,55 @@
     },
 
     {
-      "id": "sidewalk.crack.flip",
+      "id": "sidewalk.crack.flipX",
       "loc": [192, 128, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "sidewalk.flip",
+      "id": "sidewalk.flipX",
       "loc": [224, 128, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "sidewalk.crack.curb.flip",
+      "id": "sidewalk.crack.curb.flipX",
       "loc": [192, 144, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "sidewalk.curb.flip",
+      "id": "sidewalk.curb.flipX",
       "loc": [224, 144, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "street.bottom.dash.flip",
+      "id": "street.bottom.dash.flipX",
       "loc": [256, 144, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "street.bottom.flip",
+      "id": "street.bottom.flipX",
       "loc": [288, 144, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "street.top.dash.flip",
+      "id": "street.top.dash.flipX",
       "loc": [256, 128, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
     {
-      "id": "street.top.flip",
+      "id": "street.top.flipX",
       "loc": [288, 128, 32, 16],
       "offset": [-32, -48],
       "flipX": true
     },
+
+
     {
       "id": "sidewalk.crack",
       "loc": [192, 128, 32, 16],
@@ -220,6 +222,31 @@
       "id": "street.top",
       "loc": [288, 128, 32, 16],
       "offset": [-32, -48]
+    },
+    {
+      "id": "frontDoor",
+      "loc": [224, 48, 32, 48],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "bricks.dark",
+      "loc": [256, 32, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "bricks.light",
+      "loc": [256, 64, 32, 32],
+      "offset": [-32, -48]
+    },
+    {
+      "id": "wall.south",
+      "loc": [0, 215, 32, 48],
+      "offset": [-32, -62]
+    },
+    {
+      "id": "wall.south.door",
+      "loc": [32, 215, 32, 48],
+      "offset": [-32, -62]
     }
   ]
 }

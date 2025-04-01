@@ -4,6 +4,7 @@
 export enum ToolbarOptions {
   None,
   Select,
+  Fill,
   Place,
   Pan,
   Zoom,

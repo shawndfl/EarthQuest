@@ -13,6 +13,8 @@ import ZoomOut from '../assets/editor/zoom_out.svg';
 import Place from '../assets/editor/place_item.svg';
 import PanTool from '../assets/editor/pan_tool.svg';
 import Settings from '../assets/editor/settings.svg';
+import ColorSample from '../assets/editor/color_sample.svg';
+import ColorFill from '../assets/editor/color_fill.svg';
 import ImageIcon from '../assets/editor/image.svg';
 import Edit from '../assets/editor/edit.svg';
 
@@ -27,7 +29,6 @@ import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { TileBrowser } from './TileBrowser';
 import { SelectTileBrowserData } from './JobPlaceTile';
-import { ITileTypeData, TileFactory } from '../systems/TileFactory';
 
 import NewLevel from '../assets/levels/newLevel.json';
 import { SpriteFlip } from '../graphics/Sprite';
@@ -341,6 +342,12 @@ export class Editor extends Component implements IEditor {
       pan.classList.add('active');
       place.classList.remove('active');
       this.toolbar.selectedTool = ToolbarOptions.Pan;
+    });
+
+    this.toolbar.addButton('sample', ColorSample, 'Sample', (e: MouseEvent) => {
+      const place = this.toolbar.getButton('place');
+      place.classList.remove('active');
+      this.toolbar.selectedTool = ToolbarOptions.Select;
     });
 
     this.toolbar.addButton('settings', Settings, 'Settings', () => {
