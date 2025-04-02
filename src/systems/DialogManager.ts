@@ -6,6 +6,7 @@ import { InputState } from '../core/InputHandler';
 import { GameMenuComponent } from '../menus/GameMenuComponent';
 import { DialogBuilder } from '../menus/DialogBuilder';
 import { GameMenuBuilder } from '../menus/GameMenuBuilder';
+import { DialogBattleInfoComponent } from '../menus/DialogBattleInfoComponent';
 
 export const defaultDialogDepth = -0.5;
 
@@ -35,19 +36,24 @@ export class DialogManager extends Component {
   protected _gameMenu: GameMenuComponent;
   protected _dialogBuild: DialogBuilder;
   protected _gameMenuBuilder: GameMenuBuilder;
+  protected _battleInfo: DialogBattleInfoComponent;
   protected _dialogIndex: number = -1;
 
   /**
    * Get the game menu
    */
-  get gameMenu() {
+  get gameMenu(): GameMenuComponent {
     return this._gameMenu;
+  }
+
+  get battleInfo(): DialogBattleInfoComponent {
+    return this._battleInfo;
   }
 
   /**
    * Get the dialog menu
    */
-  get dialog() {
+  get dialog(): DialogComponent {
     return this._dialogIndex < 0 || this._dialogIndex > this._dialogQueue.length - 1
       ? null
       : this._dialogQueue[this._dialogIndex];
@@ -65,6 +71,8 @@ export class DialogManager extends Component {
     }
 
     this._gameMenu = new GameMenuComponent(this.eng, 'gameMenu', this._gameMenuBuilder);
+
+    this._battleInfo = new DialogBattleInfoComponent(this.eng, this._dialogBuild, 'battleInfo');
   }
 
   async initialize() {
@@ -142,6 +150,7 @@ export class DialogManager extends Component {
       this._dialogQueue[i].update(dt);
     }
     this._gameMenu.update(dt);
+    this._battleInfo.update(dt);
     this._spriteController.update(dt);
   }
 

@@ -68,6 +68,8 @@ export class BattleScene extends SceneComponent {
     this._backgroundEngine.layers[0].loadEntry(Math.floor(this.eng.random.mathRand() * 325));
     this._backgroundEngine.layers[1].loadEntry(Math.floor(this.eng.random.mathRand() * 325));
 
+    this.eng.dialogManager.battleInfo.show();
+    this.eng.dialogManager.battleInfo.setText('Fight!!');
     this.eng.dialogManager.showDialog({
       x: 20,
       y: 400,
@@ -113,6 +115,7 @@ export class BattleScene extends SceneComponent {
 
   override endBattle(): void {
     //Do not use. This is not called from scene manager
+    // use closeLevel()
   }
 
   /**
@@ -126,6 +129,7 @@ export class BattleScene extends SceneComponent {
 
   override closeLevel(): void {
     this.eng.viewManager.popTarget();
+    this.eng.dialogManager.battleInfo.hide();
   }
 
   /**
