@@ -142,7 +142,6 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   rotate(angle: number): void {
     this.sprite.setSpriteRotate(angle);
     this._dirty = true;
-    //console.debug('Sprite: rotate');
   }
 
   /**
@@ -153,7 +152,6 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
   viewOffset(offset?: vec2) {
     this._viewOffset = offset;
     this._dirty = true;
-    //console.debug('Sprite: view offset');
   }
 
   /**

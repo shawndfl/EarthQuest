@@ -6,6 +6,7 @@ import { ILevelData } from '../environment/ILevelData';
 import { ILevelRequest, LevelRequest } from '../core/ILevelRequest';
 import NewLevel from '../assets/levels/newLevel.json';
 import { SceneFactory } from '../core/SceneFactory';
+import { TileScene } from '../scenes/TileScene';
 
 /**
  * Manages the active scene and switching from scene to scene.
@@ -14,6 +15,7 @@ export class SceneManager extends Component {
   private _worldScene: SceneComponent;
   private _battleScene: SceneComponent;
   private _sceneFactory: ISceneFactory;
+  private _tileScene: TileScene;
 
   private _levelRequest: ILevelRequest;
   private _currentLevel: ILevelData;

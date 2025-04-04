@@ -18,11 +18,9 @@ import { SceneManager } from '../systems/SceneManager';
 
 import { Editor } from '../editor/Editor';
 import { NotificationManager } from './NotificationManager';
-import { GroundManager } from '../systems/GroundManager';
-import { PlayerController } from '../components/PlayerController';
 import { BattleManager } from '../systems/BattleManager';
-import { SceneControllerType } from '../environment/SceneControllerType';
 import { LevelRequest } from './ILevelRequest';
+import { TileManager } from '../systems/TileManager';
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -46,6 +44,7 @@ export class Engine {
   readonly editor: Editor;
   readonly notificationManager: NotificationManager;
   readonly battleManager: BattleManager;
+  readonly tileManager: TileManager;
 
   /**
    * the render context

@@ -3,6 +3,7 @@ import { Engine } from '../core/Engine';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import vec3 from '../math/vec3';
 import { GroundManager } from '../systems/GroundManager';
+import { IGroundManager } from '../systems/IGroundManager';
 import { TileFactory } from '../systems/TileFactory';
 import { Component } from './Component';
 import { ITileCreationArgs } from './ITileCreationArgs';
@@ -66,7 +67,7 @@ export abstract class TileComponent extends Component {
   /**
    * Easy access to ground
    */
-  get groundManager(): GroundManager {
+  get groundManager(): IGroundManager {
     return this._options.groundManager;
   }
 

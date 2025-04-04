@@ -11,13 +11,14 @@ import { LevelLoader } from '../environment/LevelLoader';
 import vec3 from '../math/vec3';
 import { SceneControllerType } from '../environment/SceneControllerType';
 import { PlayerController } from '../components/PlayerController';
+import { IGroundManager } from './IGroundManager';
 
 /**
  * The ground class is the cell environment the player interacts with. Cells are block that
  * that different tile components interact with. Think of it as the world tile components live in.
  * This class is driven by Tile image data and LevelData.
  */
-export class GroundManager extends Component {
+export class GroundManager extends Component implements IGroundManager {
   /** Used to render all the tiles */
   protected _spriteController: SpritBatchController;
   /** model data for the level */

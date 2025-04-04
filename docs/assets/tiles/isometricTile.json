@@ -247,6 +247,11 @@
       "id": "wall.south.door",
       "loc": [32, 215, 32, 48],
       "offset": [-32, -62]
+    },
+    {
+      "id": "shadow.half",
+      "loc": [288, 0, 32, 32],
+      "offset": [-32, -48]
     }
   ]
 }
