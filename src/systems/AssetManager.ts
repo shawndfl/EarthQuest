@@ -93,6 +93,7 @@ export class AssetManager extends Component {
     const texture = new Texture(this.gl);
     await texture.loadImage(path);
     this.textureCache.set(path, texture);
+    return texture;
   }
 
   /**

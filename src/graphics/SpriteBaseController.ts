@@ -29,7 +29,7 @@ export abstract class SpritBaseController extends Component implements ISpriteCo
     return this.sprite.rotation;
   }
 
-  protected get buffer() {
+  get buffer() {
     return this._buffer;
   }
 

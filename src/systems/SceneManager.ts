@@ -152,7 +152,7 @@ export class SceneManager extends Component {
     this._worldScene.initialize();
 
     // load the level
-    this._worldScene.loadLevel(level);
+    await this._worldScene.loadLevel(level);
   }
 
   async loadBattle(level: ILevelData): Promise<void> {

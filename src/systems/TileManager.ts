@@ -2,11 +2,12 @@ import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import { ILevelData } from '../environment/ILevelData';
 import { ILevelData2 } from '../environment/ILevelData2';
-import { GlBuffer } from '../graphics/GlBuffer';
+import { GlBuffer, IQuadModel } from '../graphics/GlBuffer';
 import { SpritBaseController } from '../graphics/SpriteBaseController';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
+import vec3 from '../math/vec3';
 
 /**
  * Tiles are 8x8 images
@@ -55,7 +56,9 @@ export class TileManager extends Component {
   /** Used to render all the tiles */
   protected _tileTexture: Texture;
   protected _graphicsBuffer: GlBuffer;
+  protected _quads: IQuadModel[];
 
+  // Testing
   protected _spriteController: SpritBatchController;
 
   /** model data for the level */
@@ -97,23 +100,23 @@ export class TileManager extends Component {
   async loadLevel(level: ILevelData): Promise<void> {
     const levelData = level as any as ILevelData2;
 
-    this._tileTexture = await this.eng.assetManager.getTexture(levelData.spriteSheet);
+    this._tileTexture = await this.eng.assetManager.getTexture(levelData.tileSheet);
     this._graphicsBuffer.createBuffer();
-  }
 
-  update(dt: number): void {
-    /*
-    if (this._quads.length < this._sprites.size) {
-      this._quads = new Array(this._sprites.size);
-    }
-
-    let i = 0;
-    this._sprites.forEach((sprite) => {
-      this._quads[i++] = sprite.quad;
+    this._quads = [];
+    this._quads.push({
+      min: new vec3(10, 10, 0),
+      max: new vec3(790, 590, 0),
+      minTex: new vec2(0, 1),
+      maxTex: new vec2(1, 0),
     });
 
+    this._graphicsBuffer.setBuffers(this._quads, false);
+  }
+
+  private dumpOnce = true;
+  update(dt: number): void {
     // update the buffer
-    this._graphicsBuffer.setBuffers(this._quads, false, undefined, this._sprites.size);
 
     this._graphicsBuffer.enable();
     this.eng.spritePerspectiveShader.setSpriteSheet(this._tileTexture);
@@ -122,14 +125,26 @@ export class TileManager extends Component {
     const view = this.eng.viewManager;
 
     let projection = view.projection;
-    if (this._viewOffset && this._viewScale) {
-      projection = view.calculateProjection(this._viewOffset, this._viewScale);
+    projection = view.calculateProjection(new vec2(0, 0), 1);
+    //if (this._viewOffset && this._viewScale) {
+    //  projection = view.calculateProjection(this._viewOffset, this._viewScale);
+    // }
+
+    if (this.dumpOnce) {
+      console.debug('new buffer', this._graphicsBuffer);
+      console.debug('old buffer', this._spriteController.buffer);
+      this.dumpOnce = false;
     }
 
     // set the project
     this.eng.spritePerspectiveShader.setProj(projection);
 
-    this.render();
-  */
+    const vertexCount = this._graphicsBuffer.indexCount;
+    const type = this.gl.UNSIGNED_SHORT;
+    const offset = 0;
+    this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+
+    // testing
+    this._spriteController.update(dt);
   }
 }
