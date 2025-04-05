@@ -37,6 +37,8 @@ export class AssetManager extends Component {
 
   private _battleBg1: Texture;
 
+  private textureCache: Map<string, Texture> = new Map();
+
   get font(): { texture: Texture; data: IFontData[] } {
     return { texture: this._font, data: FontData };
   }
@@ -76,6 +78,21 @@ export class AssetManager extends Component {
 
     this._battleBg1 = new Texture(this.gl);
     await this._battleBg1.loadImage(BattleBg1);
+  }
+
+  /**
+   * Get a texture
+   * @param path
+   * @returns
+   */
+  async getTexture(path: string): Promise<Texture> {
+    if (this.textureCache.has(path)) {
+      return this.textureCache.get(path);
+    }
+
+    const texture = new Texture(this.gl);
+    await texture.loadImage(path);
+    this.textureCache.set(path, texture);
   }
 
   /**
