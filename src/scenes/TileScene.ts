@@ -2,6 +2,7 @@ import { SceneComponent } from '../components/SceneComponent';
 import { Engine } from '../core/Engine';
 import { InputState } from '../core/InputHandler';
 import { ILevelData } from '../environment/ILevelData';
+import { SpriteManager } from '../systems/SpriteManager';
 import { TileManager } from '../systems/TileManager';
 
 /**
@@ -10,8 +11,15 @@ import { TileManager } from '../systems/TileManager';
  *
  */
 export class TileScene extends SceneComponent {
-  protected tileManager: TileManager;
+  protected _tileManager: TileManager;
+  protected _spriteManager: SpriteManager;
 
+  get tileManager(): TileManager {
+    return this._tileManager;
+  }
+  get spriteManager(): SpriteManager {
+    return this._spriteManager;
+  }
   get type(): string {
     return this.constructor.name;
   }
@@ -22,19 +30,23 @@ export class TileScene extends SceneComponent {
    */
   constructor(eng: Engine) {
     super(eng);
-    this.tileManager = new TileManager(eng);
+    this._tileManager = new TileManager(eng);
+    this._spriteManager = new SpriteManager(eng);
   }
 
   initialize(): void {
     this.tileManager.initialize();
+    this.spriteManager.initialize();
   }
 
   async loadLevel(level: ILevelData): Promise<void> {
     await this.tileManager.loadLevel(level);
+    await this.spriteManager.loadLevel(level);
   }
 
   async loadBattle(level: ILevelData): Promise<void> {
     await this.tileManager.loadBattle(level);
+    await this.spriteManager.loadBattle(level);
   }
 
   /**
@@ -43,7 +55,7 @@ export class TileScene extends SceneComponent {
    * @returns True if the action was handled else false
    */
   handleUserAction(state: InputState): boolean {
-    return false;
+    return this.spriteManager.handleUserAction(state);
   }
 
   /**
@@ -54,6 +66,7 @@ export class TileScene extends SceneComponent {
     // Clear the canvas before we start drawing on it.
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.tileManager.update(dt);
+    this.spriteManager.update(dt);
   }
 
   closeLevel(): void {}

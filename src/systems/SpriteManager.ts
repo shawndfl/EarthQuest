@@ -1,5 +1,6 @@
 import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
+import { InputState } from '../core/InputHandler';
 import { ILevelData } from '../environment/ILevelData';
 import { ILevelData2 } from '../environment/ILevelData2';
 import { GlBuffer, IQuadModel } from '../graphics/GlBuffer';
@@ -8,56 +9,15 @@ import { SpritBaseController } from '../graphics/SpriteBaseController';
 
 import { Texture } from '../graphics/Texture';
 import { clamp } from '../math/constants';
-import { Curve, CurveType } from '../math/Curve';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 
 /**
- * Tiles are 8x8 images
- */
-export interface ITile {
-  /**
-   *  the id of the sprite data
-   */
-  id: string;
-
-  /**
-   * row in the tilesheet. Times 8 is the pixel offset.
-   */
-  row: number;
-  /**
-   * column in the tilesheet. Times 8 is the pixel offset.
-   */
-  column: number;
-
-  /**
-   * Flip the image horizontal
-   */
-  flipX?: boolean;
-
-  /**
-   * Flip vertically
-   */
-  flipY?: boolean;
-
-  /**
-   * How many times to rotate 90 degrees
-   */
-  rotate90DegreesCW: number;
-}
-
-export class TileSheet {
-  image: SpritBaseController;
-}
-
-/**
  * Manages 8x8
  */
-export class TileManager extends Component {
-  tiles: number[][][];
-
-  /** Used to render all the tiles */
-  protected _tileTexture: Texture;
+export class SpriteManager extends Component {
+  /** Used to render all the sprites */
+  protected _spriteTexture: Texture;
   protected _graphicsBuffer: GlBuffer;
   protected _quadHelper: QuadHelper;
   protected _quads: IQuadModel[];
@@ -102,18 +62,23 @@ export class TileManager extends Component {
   async loadLevel(level: ILevelData): Promise<void> {
     const levelData = level as any as ILevelData2;
 
-    this._tileTexture = await this.eng.assetManager.getTexture(levelData.tileSheet);
+    this._spriteTexture = await this.eng.assetManager.getTexture(levelData.spriteSheet);
     this._graphicsBuffer.createBuffer();
 
-    this._quads = this._quadHelper.createQuads(levelData.tiles, this._tileTexture, levelData.tileScale);
+    this._quads = this._quadHelper.createQuads(levelData.sprites, this._spriteTexture, levelData.tileScale);
+
     this._graphicsBuffer.setBuffers(this._quads, false);
+  }
+
+  handleUserAction(state: InputState): boolean {
+    return false;
   }
 
   update(dt: number): void {
     // update the buffer
 
     this._graphicsBuffer.enable();
-    this.eng.spritePerspectiveShader.setSpriteSheet(this._tileTexture);
+    this.eng.spritePerspectiveShader.setSpriteSheet(this._spriteTexture);
     this.eng.spritePerspectiveShader.enable();
 
     const view = this.eng.viewManager;

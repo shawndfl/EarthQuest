@@ -22,6 +22,11 @@ export interface ILevelData2 {
   tileSheet: string;
 
   /**
+   * pixel size of a tile is 8 X tileScale
+   */
+  tileScale: number;
+
+  /**
    * The tiles that make up the scene
    */
   tiles: { [id: string]: string };
