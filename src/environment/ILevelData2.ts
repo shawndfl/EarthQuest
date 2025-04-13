@@ -2,6 +2,25 @@ import { ITileTypeData } from '../systems/ITileTypeData';
 import { ILevelData } from './ILevelData';
 import { SceneControllerType } from './SceneControllerType';
 
+export enum CollisionSide {
+  All = '*',
+  N = 'N',
+  E = 'E',
+  S = 'S',
+  W = 'W',
+}
+
+export interface SpriteData {
+  type: string;
+  texture: string;
+  rotateDegrees?: number;
+  flipX?: boolean;
+  flipY?: boolean;
+  options?: string;
+  /** The images mapped to a location (x,y,w,h) in the texture */
+  images: { [name: string]: string };
+}
+
 /**
  * This interface is used to build levels.
  */
@@ -13,13 +32,9 @@ export interface ILevelData2 {
   controllerType: SceneControllerType;
 
   /**
-   * The url of the sprite sheet.
+   * url for textures
    */
-  spriteSheet: string;
-  /**
-   * url for the tile sheet
-   */
-  tileSheet: string;
+  textures: { [id: string]: string };
 
   /**
    * pixel size of a tile is 8 X tileScale
@@ -27,17 +42,20 @@ export interface ILevelData2 {
   tileScale: number;
 
   /**
-   * The tiles that make up the scene
+   * The tiles that make up the scene,
+   * The value is a location (x,y,w,h) or id in the sprites
    */
   tiles: { [id: string]: string };
 
   /**
-   * Map is an array of locations that map to a tile
+   * Collision location throughout the world
    */
-  sprites: { [loc: string]: string };
+  collisions: { [id: string]: CollisionSide };
 
-  spriteMeta: { [loc: string]: string };
-  tileMeta: { [loc: string]: string };
+  /**
+   * The tiles can reference an id to customize a tile
+   */
+  sprites: { [id: string]: SpriteData };
 }
 
 export function cloneLevel(src: ILevelData2): ILevelData2 {
