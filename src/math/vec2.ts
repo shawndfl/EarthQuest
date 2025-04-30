@@ -103,7 +103,7 @@ export default class vec2 {
     return x * x + y * y;
   }
 
-  add(vector: vec2): vec2 {
+  add(vector: vec2 | vec3): vec2 {
     this.x += vector.x;
     this.y += vector.y;
 

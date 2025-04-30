@@ -1,0 +1,25 @@
+{
+  "comment1":" Key format is x,y,z pixel location. z is the depth 0 near 1 far",
+  "comment2":" sprites and tiles map to pixel locations in either the ",
+  "name": "TileScene",
+  "controllerType": "tile",
+  "tileSheet": "assets/tiles/OnettMap.png",
+  "spriteSheet": "assets/sprites/characters.png",
+
+  "sprites": {
+    "0,0,0": "0,0,16,24"
+  },
+  "map": {
+    "0,0,0": "0,0,8,8",
+    "0,1,0": "0,0,8,8"
+  },
+
+  "spriteMeta":{
+    "0,0,0": "player,flipX"
+  },
+
+  "tileMeta":{
+    "0,0,0": "flipX"
+  }
+
+}

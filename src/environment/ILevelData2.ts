@@ -1,3 +1,6 @@
+import { IQuadModel } from '../graphics/GlBuffer';
+import { Texture } from '../graphics/Texture';
+import vec2 from '../math/vec2';
 import { ITileTypeData } from '../systems/ITileTypeData';
 import { ILevelData } from './ILevelData';
 import { SceneControllerType } from './SceneControllerType';
@@ -11,14 +14,28 @@ export enum CollisionSide {
 }
 
 export interface SpriteData {
+  id: string;
   type: string;
-  texture: string;
-  rotateDegrees?: number;
+  textureId: string;
+  rotate?: number;
   flipX?: boolean;
   flipY?: boolean;
-  options?: string;
+  options?: string[];
   /** The images mapped to a location (x,y,w,h) in the texture */
   images: { [name: string]: string };
+
+  texture: Texture;
+
+  /**
+   * This quad maps to the quad in the spriteMesh
+   */
+  quad: IQuadModel;
+
+  /**
+   * Other quads that are controlled by this sprite data.
+   * This happens when the scene file uses a range for placing tiles
+   */
+  otherQuads: IQuadModel[];
 }
 
 /**

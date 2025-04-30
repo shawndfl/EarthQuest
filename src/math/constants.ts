@@ -44,7 +44,7 @@ export function toRadian(a: number): number {
  * @param {Number} b The second number to test.
  * @returns {Boolean} True if the numbers are approximately equal, false otherwise.
  */
-export function equals(a: number, b: number): boolean {
+export function equals(a: number, b: number, eps: number = epsilon): boolean {
   return Math.abs(a - b) <= epsilon * Math.max(1.0, Math.abs(a), Math.abs(b));
 }
 

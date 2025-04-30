@@ -1,22 +1,28 @@
-import vec2 from "../math/vec2";
-import vec3 from "../math/vec3";
-import vec4 from "../math/vec4";
+import vec2 from '../math/vec2';
+import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
 
 /**
  * This is the model data that represents a quad
  */
 export interface IQuadModel {
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  min: vec3
+  min: vec3;
 
   /**min (x,y) corner of the quad in screen space -1 t0 1 */
-  max: vec3
+  max: vec3;
 
   /** min texture (u,v) in uv space -1 to 1 */
   minTex: vec2;
 
   /** max texture (u,v) in uv space -1 to 1 */
   maxTex: vec2;
+
+  /**
+   * Instead of using min and max use four points.
+   * This will allow for rotations and shearing
+   */
+  points?: vec2[];
 }
 
 /**
@@ -69,13 +75,7 @@ export class GlBuffer {
    * @param isStatic Is this buffer static
    * @returns
    */
-  setBuffers(
-    quads: IQuadModel[],
-    isStatic: boolean = true,
-    bufferIndex: number = 0,
-    quadLength?: number
-  ) {
-
+  setBuffers(quads: IQuadModel[], isStatic: boolean = true, bufferIndex: number = 0, quadLength?: number) {
     const length = quadLength ?? quads.length;
 
     // check if we have buffer
@@ -110,26 +110,26 @@ export class GlBuffer {
     let indexIndex = 0;
     for (let i = 0; i < length; i++) {
       const quad = quads[i];
-      this.verts[vertIndex++] = quad.min.x;
-      this.verts[vertIndex++] = quad.min.y;
+      this.verts[vertIndex++] = quad.points?.[3]?.x ?? quad.min.x;
+      this.verts[vertIndex++] = quad.points?.[3]?.y ?? quad.min.y;
       this.verts[vertIndex++] = quad.min.z;
       this.verts[vertIndex++] = quad.minTex.x;
       this.verts[vertIndex++] = quad.maxTex.y;
 
-      this.verts[vertIndex++] = quad.max.x;
-      this.verts[vertIndex++] = quad.min.y;
+      this.verts[vertIndex++] = quad.points?.[2]?.x ?? quad.max.x;
+      this.verts[vertIndex++] = quad.points?.[2]?.y ?? quad.min.y;
       this.verts[vertIndex++] = quad.min.z;
       this.verts[vertIndex++] = quad.maxTex.x;
       this.verts[vertIndex++] = quad.maxTex.y;
 
-      this.verts[vertIndex++] = quad.max.x;
-      this.verts[vertIndex++] = quad.max.y;
+      this.verts[vertIndex++] = quad.points?.[1]?.x ?? quad.max.x;
+      this.verts[vertIndex++] = quad.points?.[1]?.y ?? quad.max.y;
       this.verts[vertIndex++] = quad.max.z;
       this.verts[vertIndex++] = quad.maxTex.x;
       this.verts[vertIndex++] = quad.minTex.y;
 
-      this.verts[vertIndex++] = quad.min.x;
-      this.verts[vertIndex++] = quad.max.y;
+      this.verts[vertIndex++] = quad.points?.[0]?.x ?? quad.min.x;
+      this.verts[vertIndex++] = quad.points?.[0]?.y ?? quad.max.y;
       this.verts[vertIndex++] = quad.max.z;
       this.verts[vertIndex++] = quad.minTex.x;
       this.verts[vertIndex++] = quad.minTex.y;
@@ -143,7 +143,7 @@ export class GlBuffer {
       this.index[indexIndex++] = vertCount + 3;
 
       vertCount += 4;
-    };
+    }
 
     // bind the array buffer
     this.gl.bindVertexArray(this.vertArrayBuffer);
@@ -175,14 +175,7 @@ export class GlBuffer {
       const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
       const offset = 0;
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
-      this.gl.vertexAttribPointer(
-        positionAttribute,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset
-      );
+      this.gl.vertexAttribPointer(positionAttribute, numComponents, type, normalize, stride, offset);
       this.gl.enableVertexAttribArray(positionAttribute);
     }
 
@@ -195,14 +188,7 @@ export class GlBuffer {
       const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
       const offset = 3 * 4; // start after the position
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
-      this.gl.vertexAttribPointer(
-        textureAttribute,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset
-      );
+      this.gl.vertexAttribPointer(textureAttribute, numComponents, type, normalize, stride, offset);
       this.gl.enableVertexAttribArray(textureAttribute);
     }
 

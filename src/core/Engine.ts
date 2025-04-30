@@ -260,7 +260,9 @@ export class Engine {
         this.soundManager.UserReady();
         const inputState = this.input.getInputState();
         // handle dialog input first
-        this.dialogManager.handleUserAction(inputState) || this.scene?.ground.worldPlayer?.handleUserAction(inputState);
+        this.dialogManager.handleUserAction(inputState) ||
+          this.scene.handleUserAction(inputState) ||
+          this.scene?.ground.worldPlayer?.handleUserAction(inputState);
       }
 
       // update time for game manager
