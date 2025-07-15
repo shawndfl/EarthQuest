@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import vec4 from '../math/vec4';
 import { Engine } from '../core/Engine';
 import { GlBuffer, IQuadModel } from './GlBuffer';
@@ -120,5 +120,4 @@ export class TextController extends Component {
       this.buffer.dispose();
     }
   }
-
 }

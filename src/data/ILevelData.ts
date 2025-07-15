@@ -1,9 +1,5 @@
 import { IQuadModel } from '../graphics/GlBuffer';
 import { Texture } from '../graphics/Texture';
-import vec2 from '../math/vec2';
-import { ITileTypeData } from '../systems/ITileTypeData';
-import { ILevelData } from './ILevelData';
-import { SceneControllerType } from './SceneControllerType';
 
 export enum CollisionSide {
   All = '*',
@@ -41,12 +37,12 @@ export interface SpriteData {
 /**
  * This interface is used to build levels.
  */
-export interface ILevelData2 {
+export interface ILevelData {
   name: string;
   /**
    * The scene component that uses this data.
    */
-  controllerType: SceneControllerType;
+  controllerType: string;
 
   /**
    * url for textures
@@ -75,7 +71,7 @@ export interface ILevelData2 {
   sprites: { [id: string]: SpriteData };
 }
 
-export function cloneLevel(src: ILevelData2): ILevelData2 {
+export function cloneLevel(src: ILevelData): ILevelData {
   const result = JSON.parse(JSON.stringify(src));
   return result;
 }

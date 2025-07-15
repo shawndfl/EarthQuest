@@ -1,6 +1,5 @@
-import { IEditor } from '../src/editor/IEditor';
-import { NotificationManager } from '../src/core/NotificationManager';
 import { Engine } from '../src/core/Engine';
+import { NotificationManager } from '../src/core/NotificationManager';
 import { MockEngine } from '../src/testSupport/MockEngine';
 
 test('notification', () => {

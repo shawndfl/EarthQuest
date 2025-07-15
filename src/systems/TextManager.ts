@@ -4,8 +4,7 @@ import { ITextModel } from '../graphics/ITextModel';
 import { ShaderController } from '../graphics/ShaderController';
 import { Texture } from '../graphics/Texture';
 import { Engine } from '../core/Engine';
-import { Component } from '../components/Component';
-import { ILevelData } from '../environment/ILevelData';
+import { Component } from '../core/Component';
 
 /**
  * Vertex shader for Font

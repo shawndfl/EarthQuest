@@ -2,8 +2,6 @@ import { Engine } from '../core/Engine';
 import { Curve, CurveType } from '../math/Curve';
 import { DialogBuilder } from './DialogBuilder';
 import { PanelComponent } from './PanelComponent';
-import { InputState } from '../core/InputHandler';
-import { UserAction } from '../core/UserAction';
 
 /**
  * A dialog component that can be sized and display text in the game.
@@ -27,20 +25,6 @@ export class DialogBattleInfoComponent extends PanelComponent {
       { t: 250, p: 1 },
       { t: 500, p: 2 },
     ]);
-  }
-
-  /**
-   * Handle user interaction with the dialog
-   * @param state
-   * @returns
-   */
-  handleUserAction(state: InputState): boolean {
-    const active = this.visible;
-    if (active && state.isReleased(UserAction.A)) {
-      //if more data
-      //this.hide();
-    }
-    return active;
   }
 
   show() {

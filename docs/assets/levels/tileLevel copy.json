@@ -1,40 +1,16 @@
 {
-  "comment1": " Key format is x,y,z pixel location. z is the depth 0 near 1 far",
-  "comment2": " sprites and tiles map to pixel locations in either the ",
+  "comment1":" Key format is x,y,z pixel location. z is the depth 0 near 1 far",
+  "comment2":" sprites and tiles map to pixel locations in either the ",
   "name": "TileScene",
   "controllerType": "tile",
-  "textures": {
-    "main": "assets/tiles/OnettMap.png",
-    "sprites": "assets/sprites/characters.png"
-  },
+  "tileSheet": "assets/tiles/OnettMap.png",
+  "spriteSheet": "assets/sprites/characters.png",
   "tileScale": 4,
   "sprites": {
-    "player": {
-      "type": "player",
-      "textureId": "sprites",
-      "flipX": false,
-      "flipY": false,
-      "rotate": 0,
-      "images": {
-         "down": "0,25,16,24" ,
-         "down_step": "17,25,16,24" ,
-         "up": "34,25,16,24" ,
-         "left": "51,25,16,24" ,
-         "left_step": "68,25,16,24" ,
-         "shock": "119,25,16,24" ,
-         "sit": "153,25,16,24" ,
-         "down_left": "170,25,16,24" ,
-         "down_left_step": "187,25,16,24" ,
-         "up_left": "204,25,16,24" ,
-         "up_left_step": "221,25,16,24" ,
-         "win": "238,25,16,24" ,
-         "dead": "255,25,16,24" 
-      }
-    }
+    "11.5,5.4": "0,25,16,24"
   },
   "tiles": {
-    "10,7,0": "player",
-    "0,0,-1,20,20": "1880,352,8,8,grass",
+    "0,0,?,20,20": "1880,352,8,8,grass",
 
     "10,0,0": "1792,344,8,8, top diagonal fence",
     "10,1,0": "1792,352,8,8, mid diagonal fence",
@@ -43,7 +19,7 @@
     "9,1": "1792,344,8,8, top diagonal fence",
     "9,2": "1792,352,8,8, mid diagonal fence",
     "9,3": "1792,360,8,8, bottom diagonal fence",
-
+    
     "8,2": "1792,344,8,8, top diagonal fence",
     "8,3": "1792,352,8,8, mid diagonal fence",
     "8,4": "1792,360,8,8, bottom diagonal fence",
@@ -58,8 +34,8 @@
 
     "5,5": "1752,384,8,8, lead top small fence",
     "5,6": "1752,392,8,8, lead bottom small fence",
-    "6,5,1,15,5": "1784,384,8,8, top small fence",
-    "6,6,0,15,6": "1784,392,8,8, bottom small fence",
+    "6,5,6,15,5": "1784,384,8,8, top small fence",
+    "6,6,2,15,6": "1784,392,8,8, bottom small fence",
 
     "16,4": "1792,344,8,8, top diagonal fence",
     "16,5": "1792,352,8,8, mid diagonal fence",
@@ -76,8 +52,16 @@
     "19,1": "1792,344,8,8, top diagonal fence",
     "19,2": "1792,352,8,8, mid diagonal fence",
     "19,3": "1792,360,8,8, bottom diagonal fence"
+
+
   },
-  "collisions": {
-    "9,3": "*"
+
+  "spriteMeta":{
+    "0,0,0": "player,flipX"
+  },
+
+  "tileMeta":{
+    "0,0,0": "flipX"
   }
+
 }

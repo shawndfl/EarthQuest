@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { GameData } from '../data/GameData';
 
@@ -40,6 +40,8 @@ export class GameManager extends Component {
    * @param dt
    */
   update(dt: number) {
+    //TODO update player time. Need to add player data to game data.
+    /*
     const t = this.data.player.timePlayed;
     this._timeCounter += dt;
     if (this._timeCounter > 1000) {
@@ -55,5 +57,6 @@ export class GameManager extends Component {
         t.h++;
       }
     }
+      */
   }
 }

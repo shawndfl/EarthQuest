@@ -1,7 +1,5 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
-import { ISpriteData } from '../graphics/ISpriteData';
-import { UserAction } from '../core/UserAction';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 
 /**
@@ -31,15 +29,6 @@ export class DialogMenu extends Component {
     //this._spriteBatch.setSpritePosition('sprite_' + i, x, y, 5, 0.5);
 
     this._spriteBatch.commitToBuffer();
-  }
-
-  /**
-   * Handles user input. The logic goes through a chain of command.
-   * @param action the action from keyboard or gamepad
-   * @returns True if the action was handled else false
-   */
-  handleUserAction(action: UserAction): boolean {
-    return false;
   }
 
   /**

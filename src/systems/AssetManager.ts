@@ -1,4 +1,3 @@
-import { Component } from '../components/Component';
 import { Engine } from '../core/Engine';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
@@ -12,6 +11,7 @@ import MenuData from '../assets/menu.json';
 import { Texture } from '../graphics/Texture';
 import { IFontData } from '../graphics/IFontData';
 import { ISpriteData, ITileData } from '../graphics/ISpriteData';
+import { Component } from '../core/Component';
 
 export interface ISpriteDataAndImage {
   tileData: ITileData;

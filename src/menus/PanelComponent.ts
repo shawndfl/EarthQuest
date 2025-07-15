@@ -1,3 +1,4 @@
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve, CurveType } from '../math/Curve';
@@ -5,7 +6,6 @@ import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 import { DialogBuilder } from './DialogBuilder';
 import { IDialogParams } from './IDialogParams';
-import { Component } from '../components/Component';
 
 export class PanelComponent extends Component {
   protected _id: string;

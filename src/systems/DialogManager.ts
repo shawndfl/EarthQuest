@@ -1,12 +1,10 @@
-import { Component } from '../components/Component';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Engine } from '../core/Engine';
 import { DialogComponent } from '../menus/DialogComponent';
-import { InputState } from '../core/InputHandler';
-import { GameMenuComponent } from '../menus/GameMenuComponent';
 import { DialogBuilder } from '../menus/DialogBuilder';
 import { GameMenuBuilder } from '../menus/GameMenuBuilder';
 import { DialogBattleInfoComponent } from '../menus/DialogBattleInfoComponent';
+import { Component } from '../core/Component';
 
 export const defaultDialogDepth = -0.5;
 
@@ -33,18 +31,10 @@ export const MaxDialogCount = 5;
 export class DialogManager extends Component {
   protected _spriteController: SpritBatchController;
   protected _dialogQueue: DialogComponent[] = [];
-  protected _gameMenu: GameMenuComponent;
   protected _dialogBuild: DialogBuilder;
   protected _gameMenuBuilder: GameMenuBuilder;
   protected _battleInfo: DialogBattleInfoComponent;
   protected _dialogIndex: number = -1;
-
-  /**
-   * Get the game menu
-   */
-  get gameMenu(): GameMenuComponent {
-    return this._gameMenu;
-  }
 
   get battleInfo(): DialogBattleInfoComponent {
     return this._battleInfo;
@@ -70,8 +60,6 @@ export class DialogManager extends Component {
       this._dialogQueue.push(new DialogComponent(this.eng, this._dialogBuild, 'dialog' + i));
     }
 
-    this._gameMenu = new GameMenuComponent(this.eng, 'gameMenu', this._gameMenuBuilder);
-
     this._battleInfo = new DialogBattleInfoComponent(this.eng, this._dialogBuild, 'battleInfo');
   }
 
@@ -82,21 +70,7 @@ export class DialogManager extends Component {
     for (let i = 0; i < MaxDialogCount; i++) {
       this._dialogQueue[i].initialize(this._spriteController);
     }
-    this._gameMenu.initialize(this._spriteController);
     this._spriteController.commitToBuffer();
-  }
-
-  /**
-   * Handles user actions for the menu
-   * @param action
-   * @returns
-   */
-  handleUserAction(state: InputState): boolean {
-    if (this.dialog) {
-      return this.dialog.handleUserAction(state) || this._gameMenu.handleUserAction(state);
-    } else {
-      return this._gameMenu.handleUserAction(state);
-    }
   }
 
   /**
@@ -135,11 +109,6 @@ export class DialogManager extends Component {
     this.dialog.activate(true);
   }
 
-  showGameMenu(onHide?: (dialog: GameMenuComponent) => boolean) {
-    this._gameMenu.onHide = onHide;
-    this._gameMenu.show();
-  }
-
   /**
    * Updates the dialog box
    * @param dt
@@ -149,14 +118,12 @@ export class DialogManager extends Component {
     for (let i = 0; i < this._dialogIndex + 1; i++) {
       this._dialogQueue[i].update(dt);
     }
-    this._gameMenu.update(dt);
+
     this._battleInfo.update(dt);
     this._spriteController.update(dt);
   }
 
   closeLevel(): void {
-    this._gameMenu.hide();
-
     // hide all dialogs
     for (let i = 0; i < this._dialogIndex + 1; i++) {
       this._dialogQueue[i].hide();

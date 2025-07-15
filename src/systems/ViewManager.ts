@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import * as MathConst from '../math/constants';
 import mat4 from '../math/mat4';

@@ -1,5 +1,5 @@
 import { Engine } from '../core/Engine';
-import { ILevelData } from '../environment/ILevelData';
+import { ILevelData } from '../data/ILevelData';
 
 /**
  * A component is something that is part of the game engine and has a reference
@@ -30,17 +30,6 @@ export class Component {
    * @param level
    */
   async loadLevel(level: ILevelData): Promise<void> {}
-
-  /**
-   * Loads a battle scene
-   * @param level
-   */
-  async loadBattle(level: ILevelData): Promise<void> {}
-
-  /**
-   * Switching from the battle to the active level
-   */
-  endBattle(): void {}
 
   /**
    * When the window is resized

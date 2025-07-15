@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { SpritBatchController } from '../graphics/SpriteBatchController';
 import { Curve, CurveType } from '../math/Curve';

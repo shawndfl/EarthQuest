@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';

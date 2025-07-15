@@ -2,8 +2,6 @@ import { Engine } from '../core/Engine';
 import { Curve, CurveType } from '../math/Curve';
 import { DialogBuilder } from './DialogBuilder';
 import { PanelComponent } from './PanelComponent';
-import { InputState } from '../core/InputHandler';
-import { UserAction } from '../core/UserAction';
 import { DialogCursor } from './DialogCursor';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
@@ -66,54 +64,6 @@ export class DialogComponent extends PanelComponent {
    */
   setOptions(options: string[]): void {
     this._options = options;
-  }
-
-  /**
-   * Handle user interaction with the dialog
-   * @param state
-   * @returns
-   */
-  handleUserAction(state: InputState): boolean {
-    const active = this.visible;
-    if (active && state.isReleased(UserAction.A)) {
-      let canHide = true;
-
-      if (this.onClosing) {
-        canHide = this.onClosing(this);
-      }
-
-      this._cursor.select();
-
-      if (canHide) {
-        this.hide();
-
-        if (this.onClosed) {
-          this.onClosed(this);
-        }
-      }
-    }
-
-    if (this._options?.length > 0) {
-      // select next option
-      if (state.isReleased(UserAction.Down)) {
-        if (this._cursor.index < this._cursor.indexCount - 1) {
-          this._cursor.index++;
-        } else {
-          this._cursor.index = 0;
-        }
-        this._cursor.select();
-      }
-      // select previous option
-      if (state.isReleased(UserAction.Up)) {
-        if (this._cursor.index > 0) {
-          this._cursor.index--;
-        } else {
-          this._cursor.index = this._cursor.indexCount - 1;
-        }
-        this._cursor.select();
-      }
-    }
-    return active;
   }
 
   show() {

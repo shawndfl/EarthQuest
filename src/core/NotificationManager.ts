@@ -1,5 +1,5 @@
-import { Component } from "../components/Component";
-import { Engine } from "./Engine";
+import { Component } from './Component';
+import { Engine } from './Engine';
 
 /**
  * Manages notifications

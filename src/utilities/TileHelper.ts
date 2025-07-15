@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import mat4 from '../math/mat4';
 import vec3 from '../math/vec3';
 import { Engine } from '../core/Engine';

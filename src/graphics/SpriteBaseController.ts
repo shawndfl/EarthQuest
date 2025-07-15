@@ -1,4 +1,4 @@
-import { Component } from '../components/Component';
+import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { GlBuffer, IQuadModel } from './GlBuffer';
 import { ISpriteData } from './ISpriteData';
