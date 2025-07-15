@@ -1,9 +1,7 @@
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { AssetManager } from '../systems/AssetManager';
-import { DialogManager } from '../systems/DialogManager';
 import { GameManager } from '../systems/GameManager';
 import { SoundManager } from '../systems/SoundManager';
-import { TextManager } from '../systems/TextManager';
 import { ViewManager } from '../systems/ViewManager';
 import { Random } from '../utilities/Random';
 import { NotificationManager } from './NotificationManager';
@@ -19,8 +17,6 @@ export class Engine {
   readonly spritePerspectiveShader: SpritePerspectiveShader;
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
-  readonly textManager: TextManager;
-  readonly dialogManager: DialogManager;
   readonly gameManager: GameManager;
   readonly random: Random;
   readonly assetManager: AssetManager;
@@ -112,7 +108,7 @@ export class Engine {
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.BACK);
+    this.gl.cullFace(this.gl.FRONT);
 
     this.gl.enable(this.gl.BLEND);
 
@@ -125,6 +121,7 @@ export class Engine {
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
 
     // initialize all systems
+    await this.scene.initialize();
   }
 
   update(dt: number) {

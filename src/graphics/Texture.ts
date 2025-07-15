@@ -2,15 +2,23 @@
  * OpenGL texture
  */
 export class Texture {
-  glTexture: WebGLTexture;
-  texturePath: string;
-  width: number;
-  height: number;
-  level: number;
-  internalFormat: number;
-  border: number;
-  srcFormat: number;
-  srcType: number;
+  private glTexture: WebGLTexture;
+  private texturePath: string;
+  private _width: number;
+  private _height: number;
+  private level: number;
+  private internalFormat: number;
+  private border: number;
+  private srcFormat: number;
+  private srcType: number;
+
+  get width(): number {
+    return this.width;
+  }
+
+  get heigh(): number {
+    return this._height;
+  }
 
   constructor(private gl: WebGL2RenderingContext) {
     this.glTexture = 0;
@@ -30,7 +38,10 @@ export class Texture {
     this.gl.uniform1i(uniformIndex, slot);
   }
 
-  initializePixel(): void {
+  /**
+   * Set the image to a single pixel until the correct image can be loaded
+   */
+  private initializePixel(): void {
     this.glTexture = this.gl.createTexture();
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
 
@@ -41,8 +52,8 @@ export class Texture {
     // we'll update the texture with the contents of the image.
     this.level = 0;
     this.internalFormat = this.gl.RGBA;
-    this.width = 1;
-    this.height = 1;
+    this._width = 1;
+    this._height = 1;
     this.border = 0;
     this.srcFormat = this.gl.RGBA;
     this.srcType = this.gl.UNSIGNED_BYTE;
@@ -51,8 +62,8 @@ export class Texture {
       this.gl.TEXTURE_2D,
       this.level,
       this.internalFormat,
-      this.width,
-      this.height,
+      this._width,
+      this._height,
       this.border,
       this.srcFormat,
       this.srcType,
@@ -91,25 +102,25 @@ export class Texture {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
-        this.width = image.width;
-        this.height = image.height;
+        this._width = image.width;
+        this._height = image.height;
         this.updateTexture(image);
         return resolve(image);
       };
-      image.onerror = (event: string) => {
-        console.error(event);
+      image.onerror = (event: Event) => {
+        console.error('error loading ' + imagePath);
         return reject();
       };
       image.src = imagePath;
     });
   }
 
-  isPowerOf2(value: number) {
-    return (value & (value - 1)) == 0;
-  }
-
   dispose(): void {
     this.gl.deleteTexture(this.glTexture);
     this.glTexture = null;
+  }
+
+  private isPowerOf2(value: number): boolean {
+    return (value & (value - 1)) == 0;
   }
 }

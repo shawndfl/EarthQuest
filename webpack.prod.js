@@ -18,7 +18,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'assets/levels/*.json', context: '.' },
-        { from: 'assets/tiles/*', context: './src' },
+        { from: 'assets/tiles/*', context: './' },
+        { from: 'assets/sprites/*', context: './' },
       ],
     }),
   ],

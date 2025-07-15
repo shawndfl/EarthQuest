@@ -1,5 +1,5 @@
-import { IQuadModel } from '../graphics/GlBuffer';
 import { Texture } from '../graphics/Texture';
+import vec2 from '../math/vec2';
 
 export enum CollisionSide {
   All = '*',
@@ -22,16 +22,10 @@ export interface SpriteData {
 
   texture: Texture;
 
-  /**
-   * This quad maps to the quad in the spriteMesh
-   */
-  quad: IQuadModel;
-
-  /**
-   * Other quads that are controlled by this sprite data.
-   * This happens when the scene file uses a range for placing tiles
-   */
-  otherQuads: IQuadModel[];
+  width: number;
+  height: number;
+  position: vec2;
+  scale: vec2;
 }
 
 /**
