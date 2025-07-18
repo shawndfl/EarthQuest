@@ -376,6 +376,18 @@ export default class mat4 {
     return this;
   }
 
+  setTranslation(vector: vec3): mat4 {
+    const x = vector.x;
+    const y = vector.y;
+    const z = vector.z;
+
+    this.values[12] = x;
+    this.values[13] = y;
+    this.values[14] = z;
+
+    return this;
+  }
+
   scale(vector: vec3): mat4 {
     const x = vector.x;
     const y = vector.y;

@@ -1,7 +1,7 @@
 import { Texture } from '../graphics/Texture';
 import { Component } from '../core/Component';
 import { ILevelData } from '../data/ILevelData';
-import { GlBuffer } from '../graphics/GlBuffer';
+import { Geometry, GlBuffer } from '../graphics/GlBuffer';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { QuadGeometry } from '../graphics/QuadGeometry';
 import mat4 from '../math/mat4';
@@ -42,26 +42,38 @@ export class Scene extends Component {
     // get the texture
     await this.spriteSheetTexture.loadImage('./assets/tiles/OnettMap.png');
 
-    // setup the shader
-    this._shader.setSpriteSheet(this.spriteSheetTexture);
-
-    const transform = new mat4();
-    transform.setIdentity();
-    transform.translate(new vec3(400, 300, 0));
-    //transform.rotate(Math.PI / 2, vec3.forward);
-    transform.scale(new vec3(5, 5, 5));
-
-    const uvTransform = new mat3();
-    uvTransform.setIdentity();
-    uvTransform.scale(new vec2(0.5, 0.5));
-
-    // create a quad
-    const geo = QuadGeometry.CreateQuad([
-      { width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false },
-    ]);
+    let geo: Geometry = this.placeQuad(400, 300, -1, 16, 0);
+    geo = this.placeQuad(450, 350, 0, 1824, 368, geo);
 
     // set the openGL buffers
     this._buffer.setBuffers(geo);
+
+    // setup the shader
+    this._shader.setSpriteSheet(this.spriteSheetTexture);
+  }
+
+  placeQuad(posX: number, posY: number, posZ: number, u: number, v: number, dest?: Geometry): Geometry {
+    const transform = new mat4();
+    transform.setIdentity();
+    transform.translate(new vec3(posX, posY, posZ));
+    transform.scale(new vec3(1, 1, 1));
+
+    const uvTransform = new mat3();
+    const scaleX = 8 / this.spriteSheetTexture.width;
+    const scaleY = 8 / this.spriteSheetTexture.height;
+    const offsetX = u / this.spriteSheetTexture.width;
+    const offsetY = v / this.spriteSheetTexture.height;
+    uvTransform.setIdentity();
+    uvTransform.scale(new vec2(scaleX, scaleY));
+    uvTransform.setTranslation(new vec2(offsetX, 1 - scaleY - offsetY));
+
+    // create a quad
+    const geo = QuadGeometry.CreateQuad(
+      [{ width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false }],
+      dest
+    );
+
+    return geo;
   }
 
   async loadLevel(level: ILevelData): Promise<void> {}
@@ -83,11 +95,12 @@ export class Scene extends Component {
 
     this._shader.setProj(proj);
     this._buffer.enable();
+    this._shader.setHue(0);
 
     if (this.hueTimer.elapsed > 50) {
       this.hueTimer.start();
       this.hueValue += 0.1;
-      this._shader.setHue(this.hueValue);
+      //this._shader.setHue(this.hueValue);
       if (this.hueValue > 360) {
         this.hueValue -= 360;
       }

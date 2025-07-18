@@ -2,6 +2,16 @@ import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
+import { Geometry } from './GlBuffer';
+
+export interface Quad {
+  width: number;
+  height: number;
+  transform: mat4;
+  uvTransform: mat3;
+  mirrorX?: boolean;
+  mirrorY?: boolean;
+}
 
 export class QuadGeometry {
   /**
@@ -9,14 +19,17 @@ export class QuadGeometry {
    * @param quads
    * @returns
    */
-  static CreateQuad(
-    quads: { width: number; height: number; transform: mat4; uvTransform: mat3; mirrorX?: boolean; mirrorY?: boolean }[]
-  ): {
-    verts: Float32Array;
-    indices: Uint16Array;
-  } {
-    const verts: Float32Array = new Float32Array(quads.length * 5 * 4);
-    const indices: Uint16Array = new Uint16Array(quads.length * 6);
+  static CreateQuad(quads: Quad[], dest?: Geometry): Geometry {
+    let vertCount = 0;
+    let vertIndex = 0;
+    let indexIndex = 0;
+
+    const verts = new Float32Array(quads.length * 4 * 5);
+    const indices = new Uint16Array(quads.length * 6);
+
+    if (dest?.verts) {
+      vertCount = verts.length / 5;
+    }
 
     //               Building a quad
     //
@@ -30,9 +43,6 @@ export class QuadGeometry {
     //  (min)                      (min)
     //
 
-    let vertCount = 0;
-    let vertIndex = 0;
-    let indexIndex = 0;
     const p0 = new vec3();
     const p1 = new vec3();
     const p2 = new vec3();
@@ -110,7 +120,16 @@ export class QuadGeometry {
       vertCount += 4;
     }
 
-    const geo = { verts, indices };
-    return geo;
+    if (!dest) {
+      dest = {
+        verts,
+        indices,
+      };
+    } else {
+      dest.verts = Float32Array.of(...dest.verts, ...verts);
+      dest.indices = Uint16Array.of(...dest.indices, ...indices);
+    }
+
+    return dest;
   }
 }

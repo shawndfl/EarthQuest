@@ -360,6 +360,27 @@ export default class mat3 {
     return result;
   }
 
+  translate(vector: vec2): mat3 {
+    const x = vector.x;
+    const y = vector.y;
+
+    this.values[6] += this.values[0] * x + this.values[3] * y;
+    this.values[7] += this.values[1] * x + this.values[4] * y;
+    this.values[8] += this.values[2] * x + this.values[5] * y;
+
+    return this;
+  }
+
+  setTranslation(vector: vec2): mat3 {
+    const x = vector.x;
+    const y = vector.y;
+
+    this.values[6] = x;
+    this.values[7] = y;
+
+    return this;
+  }
+
   scale(vector: vec2): mat3 {
     const x = vector.x;
     const y = vector.y;

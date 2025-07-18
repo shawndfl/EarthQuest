@@ -66,7 +66,7 @@ void main() {
   mediump vec3 axis = vec3(1.0/sqrt(3.0));
   mediump float angle = 30.0;
   mediump vec4 color = texture2D(uSampler, vTex);
-  if(color.a < .001) {
+  if(color.a < .1) {
     discard;
   } 
 
