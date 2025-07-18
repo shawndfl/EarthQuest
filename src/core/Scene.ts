@@ -8,6 +8,7 @@ import mat4 from '../math/mat4';
 import mat3 from '../math/mat3';
 import vec3 from '../math/vec3';
 import vec2 from '../math/vec2';
+import { Timer } from '../utilities/Timer';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -18,6 +19,8 @@ export class Scene extends Component {
   private _spriteSheetTexture: Texture;
   private _buffer: GlBuffer;
   private _shader: SpritePerspectiveShader;
+  private hueTimer: Timer;
+  private hueValue: number;
 
   get spriteSheetTexture(): Texture {
     return this._spriteSheetTexture;
@@ -28,6 +31,10 @@ export class Scene extends Component {
   }
 
   async initialize(): Promise<void> {
+    this.hueTimer = new Timer();
+    this.hueTimer.start();
+    this.hueValue = 0;
+
     this._spriteSheetTexture = new Texture(this.gl);
     this._buffer = new GlBuffer(this.gl);
     this._shader = new SpritePerspectiveShader(this.gl, 'scene');
@@ -41,15 +48,17 @@ export class Scene extends Component {
     const transform = new mat4();
     transform.setIdentity();
     transform.translate(new vec3(400, 300, 0));
+    //transform.rotate(Math.PI / 2, vec3.forward);
     transform.scale(new vec3(5, 5, 5));
-    transform.rotate(Math.PI / 2, vec3.forward);
 
     const uvTransform = new mat3();
     uvTransform.setIdentity();
     uvTransform.scale(new vec2(0.5, 0.5));
 
     // create a quad
-    const geo = QuadGeometry.CreateQuad([{ width: 800, height: 600, transform, uvTransform }]);
+    const geo = QuadGeometry.CreateQuad([
+      { width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false },
+    ]);
 
     // set the openGL buffers
     this._buffer.setBuffers(geo);
@@ -74,6 +83,15 @@ export class Scene extends Component {
 
     this._shader.setProj(proj);
     this._buffer.enable();
+
+    if (this.hueTimer.elapsed > 50) {
+      this.hueTimer.start();
+      this.hueValue += 0.1;
+      this._shader.setHue(this.hueValue);
+      if (this.hueValue > 360) {
+        this.hueValue -= 360;
+      }
+    }
 
     const count = this._buffer.indexCount;
     const type = this.gl.UNSIGNED_SHORT;

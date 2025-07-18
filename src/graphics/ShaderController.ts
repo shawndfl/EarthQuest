@@ -13,7 +13,7 @@ export class ShaderController {
    * @param {WebGL2RenderingContext} gl GL Context
    * @param {string} shaderName The name of the shader. This is just a way to id different shader for debugging
    */
-  constructor(private gl: WebGL2RenderingContext, private shaderName: string) { }
+  constructor(private gl: WebGL2RenderingContext, private shaderName: string) {}
 
   /**
    * Initialize a shader program, so WebGL knows how to draw our data
@@ -44,11 +44,7 @@ export class ShaderController {
 
     // If creating the shader program failed, alert
     if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
-      console.error(
-        `Unable to initialize the shader program: ${this.gl.getProgramInfoLog(
-          this.shaderProgram
-        )}`
-      );
+      console.error(`Unable to initialize the shader program: ${this.gl.getProgramInfoLog(this.shaderProgram)}`);
     }
   }
 
@@ -62,9 +58,7 @@ export class ShaderController {
 
     const loc = this.gl.getAttribLocation(this.shaderProgram, name);
     if (loc === null) {
-      console.error(
-        'can not find attribute: ' + name + ' in shader ' + this.shaderName
-      );
+      console.error('can not find attribute: ' + name + ' in shader ' + this.shaderName);
     }
     return loc;
   }
@@ -79,9 +73,7 @@ export class ShaderController {
 
     const loc = this.gl.getUniformLocation(this.shaderProgram, name);
     if (loc === null) {
-      console.error(
-        'can not find uniform: ' + name + ' in shader ' + this.shaderName
-      );
+      console.error('can not find uniform: ' + name + ' in shader ' + this.shaderName);
     }
     return loc as number;
   }
@@ -100,7 +92,7 @@ export class ShaderController {
    * @param loc
    * @param value
    */
-  setMat4(loc: number, value: mat4) {
+  setMat4(loc: number, value: mat4): void {
     this.gl.uniformMatrix4fv(loc, false, value.getValues());
   }
 
@@ -109,14 +101,23 @@ export class ShaderController {
    * @param loc
    * @param value
    */
-  setVec3(loc: number, value: vec3) {
+  setVec3(loc: number, value: vec3): void {
     this.gl.uniform3f(loc, value.x, value.y, value.z);
+  }
+
+  /**
+   * Sets the float
+   * @param loc
+   * @param value
+   */
+  setFloat(loc: number, value: number): void {
+    this.gl.uniform1f(loc, value);
   }
 
   /**
    * Enable the shader
    */
-  enable() {
+  enable(): void {
     // Tell WebGL to use our program when drawing
     this.gl.useProgram(this.shaderProgram);
   }
@@ -141,8 +142,9 @@ export class ShaderController {
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
       const typeString = type == this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
       console.error(
-        `An error occurred compiling the ${typeString} shaders in ${this.shaderName
-        }: ${this.gl.getShaderInfoLog(shader)}`
+        `An error occurred compiling the ${typeString} shaders in ${this.shaderName}: ${this.gl.getShaderInfoLog(
+          shader
+        )}`
       );
       this.gl.deleteShader(shader);
       return null;
