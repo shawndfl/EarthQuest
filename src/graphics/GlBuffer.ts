@@ -76,9 +76,13 @@ export class GlBuffer {
     // need to have position
     //  vec3 aPos;
     //  vec2 aTex;
+    //  float aHueAngle;
+    //  float aAlpha
     //
     const positionAttribute = 0;
     const textureAttribute = 1;
+    const hueAttribute = 2;
+    const alphaAttribute = 3;
 
     // Tell WebGL how to pull out the positions from the position
     // buffer into the vertexPosition attribute
@@ -86,7 +90,7 @@ export class GlBuffer {
       const numComponents = 3; // position x, y, z
       const type = this.gl.FLOAT;
       const normalize = false;
-      const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
+      const stride = 7 * 4; // pos(x,y,x) + tex(u,v) + hua + alpha * 4 byte float
       const offset = 0;
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
       this.gl.vertexAttribPointer(positionAttribute, numComponents, type, normalize, stride, offset);
@@ -99,11 +103,34 @@ export class GlBuffer {
       const numComponents = 2;
       const type = this.gl.FLOAT;
       const normalize = false;
-      const stride = 5 * 4; // pos(x,y,x) + tex(u,v) * 4 byte float
+      const stride = 7 * 4; // pos(x,y,x) + tex(u,v) + hua + alpha * 4 byte float
       const offset = 3 * 4; // start after the position
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
       this.gl.vertexAttribPointer(textureAttribute, numComponents, type, normalize, stride, offset);
       this.gl.enableVertexAttribArray(textureAttribute);
+    }
+
+    // the hue rotation attribute
+    {
+      const numComponents = 1;
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + tex(u,v) + hua + alpha * 4 byte float
+      const offset = 5 * 4; // start after the texture
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(hueAttribute, numComponents, type, normalize, stride, offset);
+      this.gl.enableVertexAttribArray(hueAttribute);
+    }
+
+    {
+      const numComponents = 1;
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + tex(u,v) + hua + alpha * 4 byte float
+      const offset = 6 * 4; // start after the hue
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(alphaAttribute, numComponents, type, normalize, stride, offset);
+      this.gl.enableVertexAttribArray(alphaAttribute);
     }
 
     // index buffer

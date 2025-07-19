@@ -7,6 +7,8 @@ import { Geometry } from './GlBuffer';
 export interface Quad {
   width: number;
   height: number;
+  hueAngle: number;
+  alpha: number;
   transform: mat4;
   uvTransform: mat3;
   mirrorX?: boolean;
@@ -24,11 +26,11 @@ export class QuadGeometry {
     let vertIndex = 0;
     let indexIndex = 0;
 
-    const verts = new Float32Array(quads.length * 4 * 5);
+    const verts = new Float32Array(quads.length * 4 * 7);
     const indices = new Uint16Array(quads.length * 6);
 
     if (dest?.verts) {
-      vertCount = verts.length / 5;
+      vertCount = verts.length / 7;
     }
 
     //               Building a quad
@@ -90,24 +92,32 @@ export class QuadGeometry {
       verts[vertIndex++] = p0.z;
       verts[vertIndex++] = t0.x;
       verts[vertIndex++] = t0.y;
+      verts[vertIndex++] = quad.hueAngle;
+      verts[vertIndex++] = quad.alpha;
 
       verts[vertIndex++] = p1.x;
       verts[vertIndex++] = p1.y;
       verts[vertIndex++] = p1.z;
       verts[vertIndex++] = t1.x;
       verts[vertIndex++] = t1.y;
+      verts[vertIndex++] = quad.hueAngle;
+      verts[vertIndex++] = quad.alpha;
 
       verts[vertIndex++] = p2.x;
       verts[vertIndex++] = p2.y;
       verts[vertIndex++] = p2.z;
       verts[vertIndex++] = t2.x;
       verts[vertIndex++] = t2.y;
+      verts[vertIndex++] = quad.hueAngle;
+      verts[vertIndex++] = quad.alpha;
 
       verts[vertIndex++] = p3.x;
       verts[vertIndex++] = p3.y;
       verts[vertIndex++] = p3.z;
       verts[vertIndex++] = t3.x;
       verts[vertIndex++] = t3.y;
+      verts[vertIndex++] = quad.hueAngle;
+      verts[vertIndex++] = quad.alpha;
 
       indices[indexIndex++] = vertCount + 0;
       indices[indexIndex++] = vertCount + 1;

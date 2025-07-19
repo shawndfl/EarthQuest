@@ -42,8 +42,8 @@ export class Scene extends Component {
     // get the texture
     await this.spriteSheetTexture.loadImage('./assets/tiles/OnettMap.png');
 
-    let geo: Geometry = this.placeQuad(400, 300, -1, 16, 0);
-    geo = this.placeQuad(450, 350, 0, 1824, 368, geo);
+    let geo: Geometry = this.placeQuad(400, 300, -1, 16, 0, 0, 1.0);
+    geo = this.placeQuad(450, 350, 0, 1824, 368, 90, 0.5, geo);
 
     // set the openGL buffers
     this._buffer.setBuffers(geo);
@@ -52,7 +52,16 @@ export class Scene extends Component {
     this._shader.setSpriteSheet(this.spriteSheetTexture);
   }
 
-  placeQuad(posX: number, posY: number, posZ: number, u: number, v: number, dest?: Geometry): Geometry {
+  placeQuad(
+    posX: number,
+    posY: number,
+    posZ: number,
+    u: number,
+    v: number,
+    hue: number,
+    alpha: number,
+    dest?: Geometry
+  ): Geometry {
     const transform = new mat4();
     transform.setIdentity();
     transform.translate(new vec3(posX, posY, posZ));
@@ -69,7 +78,7 @@ export class Scene extends Component {
 
     // create a quad
     const geo = QuadGeometry.CreateQuad(
-      [{ width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false }],
+      [{ width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false, alpha, hueAngle: hue }],
       dest
     );
 
@@ -95,7 +104,6 @@ export class Scene extends Component {
 
     this._shader.setProj(proj);
     this._buffer.enable();
-    this._shader.setHue(0);
 
     if (this.hueTimer.elapsed > 50) {
       this.hueTimer.start();

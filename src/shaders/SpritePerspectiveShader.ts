@@ -8,15 +8,22 @@ import mat4 from '../math/mat4';
 const vsSource = `
 attribute vec3 aPos;
 attribute vec2 aTex;
+attribute float aHueAngle;
+attribute float aAlpha;
+
 uniform mat4 uProj;
 varying mediump vec2 vTex;
 varying mediump vec3 depth;
+varying mediump float hueAngle;
+varying mediump float alpha;
 
 void main() {
     vTex = aTex;
     vec4 pos = uProj * vec4(aPos.xyz, 1.0);
     gl_Position =  pos;
     depth = vec3(pos.z *.1);
+    hueAngle = aHueAngle;
+    alpha = aAlpha;
 }
 `;
 
@@ -25,9 +32,10 @@ void main() {
 //
 const fsSource = `
 varying mediump vec2 vTex;
-varying mediump  vec3 depth;
+varying mediump vec3 depth;
+varying mediump float hueAngle;
+varying mediump float alpha;
 uniform sampler2D uSampler;
-uniform mediump float hueAdjust;
 
 mediump vec4 hueShift(mediump vec4 color) {
   const mediump vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);
@@ -48,7 +56,7 @@ mediump vec4 hueShift(mediump vec4 color) {
   mediump float   chroma  = sqrt (I * I + Q * Q);
 
   // Make the user's adjustments
-  hue += hueAdjust;
+  hue += hueAngle;
 
   // Convert back to YIQ
   Q = chroma * sin (hue);
@@ -66,13 +74,14 @@ void main() {
   mediump vec3 axis = vec3(1.0/sqrt(3.0));
   mediump float angle = 30.0;
   mediump vec4 color = texture2D(uSampler, vTex);
-  if(color.a < .1) {
+  if(color.a < .0001) {
     discard;
   } 
 
   // uncomment to show depth
   //gl_FragColor = vec4(depth.xyz, 1.0);
   color = hueShift(color);
+  color.a *= alpha;
   gl_FragColor = color;
 
 }
@@ -86,10 +95,11 @@ export class SpritePerspectiveShader {
 
   private _aPos: number;
   private _aTex: number;
+  private _aHueAngle: number;
+  private _aAlpha: number;
   private _uSampler: number;
   private _texture: Texture;
   private _uProj: number;
-  private _hueAdjust: number;
 
   constructor(private gl: WebGL2RenderingContext, shaderId: string) {
     this._shader = new ShaderController(this.gl, shaderId);
@@ -98,13 +108,11 @@ export class SpritePerspectiveShader {
     // set the info
     this._aPos = this._shader.getAttribute('aPos');
     this._aTex = this._shader.getAttribute('aTex');
+    this._aHueAngle = this._shader.getAttribute('aHueAngle');
+    this._aAlpha = this._shader.getAttribute('aAlpha');
+
     this._uSampler = this._shader.getUniform('uSampler');
     this._uProj = this._shader.getUniform('uProj');
-    this._hueAdjust = this._shader.getUniform('hueAdjust');
-  }
-
-  setHue(hueAngle: number): void {
-    this._shader.setFloat(this._hueAdjust, hueAngle);
   }
 
   setProj(proj: mat4): void {

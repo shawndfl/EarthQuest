@@ -57,7 +57,7 @@ export class ShaderController {
     this.gl.useProgram(this.shaderProgram);
 
     const loc = this.gl.getAttribLocation(this.shaderProgram, name);
-    if (loc === null) {
+    if (loc === null || loc === -1) {
       console.error('can not find attribute: ' + name + ' in shader ' + this.shaderName);
     }
     return loc;
