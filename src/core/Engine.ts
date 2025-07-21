@@ -6,6 +6,12 @@ import { ViewManager } from '../systems/ViewManager';
 import { Random } from '../utilities/Random';
 import { NotificationManager } from './NotificationManager';
 import { Scene } from './Scene';
+import '../css/canvas.scss';
+import { TileManager } from '../systems/TileManager';
+import { ILevelData } from '../data/ILevelData';
+
+export const CanvasWidth = 512;
+export const CanvasHeight = 450;
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -14,7 +20,6 @@ import { Scene } from './Scene';
 export class Engine {
   private _glContext: WebGL2RenderingContext;
   private _canvasGL: HTMLCanvasElement;
-  readonly spritePerspectiveShader: SpritePerspectiveShader;
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
   readonly gameManager: GameManager;
@@ -23,6 +28,7 @@ export class Engine {
   readonly rootElement: HTMLElement;
   readonly notificationManager: NotificationManager;
   readonly scene: Scene;
+  readonly tileManager: TileManager;
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -48,6 +54,10 @@ export class Engine {
    */
   constructor() {
     this.scene = new Scene(this);
+    this.tileManager = new TileManager(this);
+    this.assetManager = new AssetManager(this);
+    //TODO make this configurable, maybe per level
+    this.random = new Random(122344);
   }
 
   /**
@@ -59,9 +69,8 @@ export class Engine {
     container.classList.add('canvas-container');
 
     this._canvasGL = document.createElement('canvas');
-    this._canvasGL.width = 800;
-    this._canvasGL.height = 600;
-    this._canvasGL.classList.add('this._canvas');
+    this._canvasGL.width = CanvasWidth;
+    this._canvasGL.height = CanvasHeight;
 
     container.append(this._canvasGL);
 
@@ -121,11 +130,42 @@ export class Engine {
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
 
     // initialize all systems
+    await this.assetManager.initialize();
     await this.scene.initialize();
+    await this.tileManager.initialize();
+
+    const url = this.getLevelDataUrl();
+    await this.loadScene(url);
+  }
+
+  getLevelDataUrl(): string {
+    return 'assets/levels/tileLevel.json';
+  }
+
+  async loadScene(path: string): Promise<void> {
+    console.debug('Loading level: ' + path + ' ...');
+
+    // get the level data
+    const levelData = (await this.assetManager.requestJson(path)) as ILevelData;
+    if (!levelData) {
+      console.error('Cannot load level from ' + path);
+      return;
+    }
+
+    // close the old level
+    this.scene.closeLevel();
+    this.tileManager.closeLevel();
+    this.assetManager.closeLevel();
+
+    // load the new level
+    await this.assetManager.loadLevel(levelData);
+    await this.scene.loadLevel(levelData);
+    await this.tileManager.loadLevel(levelData);
   }
 
   update(dt: number) {
     this.scene.update(dt);
+    this.tileManager.update(dt);
   }
 
   resize(width: number, height: number) {

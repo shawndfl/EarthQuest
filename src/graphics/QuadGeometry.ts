@@ -13,25 +13,32 @@ export interface Quad {
   uvTransform: mat3;
   mirrorX?: boolean;
   mirrorY?: boolean;
+  /**
+   * default is center. This can be used to
+   * offset the location of the vertices by adding
+   * this value to each of the vertices. The value of
+   * each vertices goes from
+   *     x = [-width/2, width/2]
+   *     y = [-height/2, height/2]
+   *  To center on the bottom right you would use (width/2, height/2)
+   */
+  offset?: vec2;
 }
 
 export class QuadGeometry {
   /**
    * Creates a quad center at the origin with the given width and height on the x,y plane.
+   * This function will sort the quads by bottom y position.
    * @param quads
    * @returns
    */
-  static CreateQuad(quads: Quad[], dest?: Geometry): Geometry {
+  static CreateQuad(quads: Quad[]): Geometry {
     let vertCount = 0;
     let vertIndex = 0;
     let indexIndex = 0;
 
     const verts = new Float32Array(quads.length * 4 * 7);
     const indices = new Uint16Array(quads.length * 6);
-
-    if (dest?.verts) {
-      vertCount = verts.length / 7;
-    }
 
     //               Building a quad
     //
@@ -54,33 +61,55 @@ export class QuadGeometry {
     const t1 = new vec2();
     const t2 = new vec2();
     const t3 = new vec2();
+    const offset = new vec3();
+
+    // sort by height
+    quads.sort((a, b) => {
+      const bottomA = -a.height / 2;
+      const pointA = new vec3(0, bottomA, 0);
+      a.transform?.multiplyVec3(pointA, pointA);
+
+      const bottomB = -b.height / 2;
+      const pointB = new vec3(0, bottomB, 0);
+      b.transform?.multiplyVec3(pointB, pointB);
+
+      return pointB.y - pointA.y;
+    });
+
     for (let quad of quads) {
-      p0.x = -quad.width / 2;
-      p0.y = quad.height / 2;
+      if (quad.offset) {
+        offset.x = quad.offset.x;
+        offset.y = quad.offset.y;
+      } else {
+        offset.x = 0;
+        offset.y = 0;
+      }
+      p0.x = -quad.width / 2 + offset.x;
+      p0.y = quad.height / 2 + offset.y;
       p0.z = 0;
       t0.x = quad.mirrorX ? 1 : 0;
       t0.y = quad.mirrorY ? 0 : 1;
       quad.transform?.multiplyVec3(p0, p0);
       quad.uvTransform?.multiplyVec2(t0, t0);
 
-      p1.x = quad.width / 2;
-      p1.y = quad.height / 2;
+      p1.x = quad.width / 2 + offset.x;
+      p1.y = quad.height / 2 + offset.y;
       p1.z = 0;
       t1.x = quad.mirrorX ? 0 : 1;
       t1.y = quad.mirrorY ? 0 : 1;
       quad.transform?.multiplyVec3(p1, p1);
       quad.uvTransform?.multiplyVec2(t1, t1);
 
-      p2.x = quad.width / 2;
-      p2.y = -quad.height / 2;
+      p2.x = quad.width / 2 + offset.x;
+      p2.y = -quad.height / 2 + offset.y;
       p2.z = 0;
       t2.x = quad.mirrorX ? 0 : 1;
       t2.y = quad.mirrorY ? 1 : 0;
       quad.transform?.multiplyVec3(p2, p2);
       quad.uvTransform?.multiplyVec2(t2, t2);
 
-      p3.x = -quad.width / 2;
-      p3.y = -quad.height / 2;
+      p3.x = -quad.width / 2 + offset.x;
+      p3.y = -quad.height / 2 + offset.y;
       p3.z = 0;
       t3.x = quad.mirrorX ? 1 : 0;
       t3.y = quad.mirrorY ? 1 : 0;
@@ -130,16 +159,9 @@ export class QuadGeometry {
       vertCount += 4;
     }
 
-    if (!dest) {
-      dest = {
-        verts,
-        indices,
-      };
-    } else {
-      dest.verts = Float32Array.of(...dest.verts, ...verts);
-      dest.indices = Uint16Array.of(...dest.indices, ...indices);
-    }
-
-    return dest;
+    return {
+      verts,
+      indices,
+    };
   }
 }

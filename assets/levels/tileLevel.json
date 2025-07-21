@@ -7,77 +7,40 @@
     "main": "assets/tiles/OnettMap.png",
     "sprites": "assets/sprites/characters.png"
   },
-  "tileScale": 4,
-  "sprites": {
-    "player": {
-      "type": "player",
-      "textureId": "sprites",
+
+  "tiles": {
+    "fence_vertical": {
+      "type": "solid",
+      "sourceLocation": "1792,344,8,24",
+      "textureId": "main",
+      "rotate": 0,
       "flipX": false,
       "flipY": false,
-      "rotate": 0,
-      "images": {
-         "down": "0,25,16,24" ,
-         "down_step": "17,25,16,24" ,
-         "up": "34,25,16,24" ,
-         "left": "51,25,16,24" ,
-         "left_step": "68,25,16,24" ,
-         "shock": "119,25,16,24" ,
-         "sit": "153,25,16,24" ,
-         "down_left": "170,25,16,24" ,
-         "down_left_step": "187,25,16,24" ,
-         "up_left": "204,25,16,24" ,
-         "up_left_step": "221,25,16,24" ,
-         "win": "238,25,16,24" ,
-         "dead": "255,25,16,24" 
-      }
+      "options": [],
+      "images": {}
+    },
+    "grass1": {
+      "type": "open",
+      "sourceLocation": "1792,368,8,8"
+    },
+    "fence_horizontal": {
+      "type": "solid",
+      "sourceLocation": "1784,384,8,24"
+    },
+    "fence_end_post": {
+      "type": "solid",
+      "sourceLocation": "1752,384,8,24"
     }
   },
-  "tiles": {
-    "10,7,0": "player",
-    "0,0,-1,20,20": "1880,352,8,8,grass",
 
-    "10,0,0": "1792,344,8,8, top diagonal fence",
-    "10,1,0": "1792,352,8,8, mid diagonal fence",
-    "10,2": "1792,360,8,8, bottom diagonal fence",
-
-    "9,1": "1792,344,8,8, top diagonal fence",
-    "9,2": "1792,352,8,8, mid diagonal fence",
-    "9,3": "1792,360,8,8, bottom diagonal fence",
-
-    "8,2": "1792,344,8,8, top diagonal fence",
-    "8,3": "1792,352,8,8, mid diagonal fence",
-    "8,4": "1792,360,8,8, bottom diagonal fence",
-
-    "7,3": "1792,344,8,8, top diagonal fence",
-    "7,4": "1792,352,8,8, mid diagonal fence",
-    "7,5": "1792,360,8,8, bottom diagonal fence",
-
-    "6,4": "1792,344,8,8, top diagonal fence",
-    "6,5": "1792,352,8,8, mid diagonal fence",
-    "6,6": "1792,360,8,8, bottom diagonal fence",
-
-    "5,5": "1752,384,8,8, lead top small fence",
-    "5,6": "1752,392,8,8, lead bottom small fence",
-    "6,5,1,15,5": "1784,384,8,8, top small fence",
-    "6,6,0,15,6": "1784,392,8,8, bottom small fence",
-
-    "16,4": "1792,344,8,8, top diagonal fence",
-    "16,5": "1792,352,8,8, mid diagonal fence",
-    "16,6": "1792,360,8,8, bottom diagonal fence",
-
-    "17,3": "1792,344,8,8, top diagonal fence",
-    "17,4": "1792,352,8,8, mid diagonal fence",
-    "17,5": "1792,360,8,8, bottom diagonal fence",
-
-    "18,2": "1792,344,8,8, top diagonal fence",
-    "18,3": "1792,352,8,8, mid diagonal fence",
-    "18,4": "1792,360,8,8, bottom diagonal fence",
-
-    "19,1": "1792,344,8,8, top diagonal fence",
-    "19,2": "1792,352,8,8, mid diagonal fence",
-    "19,3": "1792,360,8,8, bottom diagonal fence"
+  "layer0": {
+    "fill,0,0,500,500": "grass1"
   },
-  "collisions": {
-    "9,3": "*"
+  "layer1": {
+    "line,10,54,13,178": "fence_vertical",
+    "line,10,52,150,52": "fence_horizontal",
+    ",10,52": "fence_end_post"
+
+    
   }
 }

@@ -6,16 +6,18 @@ import mat4 from '../math/mat4';
 // Vertex Shader program
 //
 const vsSource = `
+precision mediump float;
+
 attribute vec3 aPos;
 attribute vec2 aTex;
 attribute float aHueAngle;
 attribute float aAlpha;
 
 uniform mat4 uProj;
-varying mediump vec2 vTex;
-varying mediump vec3 depth;
-varying mediump float hueAngle;
-varying mediump float alpha;
+varying vec2 vTex;
+varying vec3 depth;
+varying float hueAngle;
+varying float alpha;
 
 void main() {
     vTex = aTex;
@@ -31,29 +33,63 @@ void main() {
 // Fragment shader program
 //
 const fsSource = `
-varying mediump vec2 vTex;
-varying mediump vec3 depth;
-varying mediump float hueAngle;
-varying mediump float alpha;
+precision mediump float;
+
+varying vec2 vTex;
+varying vec3 depth;
+varying float hueAngle;
+varying float alpha;
 uniform sampler2D uSampler;
 
-mediump vec4 hueShift(mediump vec4 color) {
-  const mediump vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);
-  const mediump vec4  kRGBToI     = vec4 (0.596, -0.275, -0.321, 0.0);
-  const mediump vec4  kRGBToQ     = vec4 (0.212, -0.523, 0.311, 0.0);
+vec3 hue2rgb(vec3 hsv) {
+  float hue = fract(hsv.x); //only use fractional part of hue, making it loop
+  float r = abs(hsv.x * 6. - 3.) - 1.; //red
+  float g = 2. - abs(hsv.x * 6. - 2.); //green
+  float b = 2. - abs(hsv.x * 6. - 4.); //blue
+  vec3 rgb = vec3(r,g,b); //combine components
+  rgb = clamp(rgb, 0., 1.); //clamp between 0 and 1
 
-  const mediump vec4  kYIQToR   = vec4 (1.0, 0.956, 0.621, 0.0);
-  const mediump vec4  kYIQToG   = vec4 (1.0, -0.272, -0.647, 0.0);
-  const mediump vec4  kYIQToB   = vec4 (1.0, -1.107, 1.704, 0.0);
+  rgb = mix( rgb, vec3(1.), hsv.y); //apply saturation
+  rgb = rgb * hsv.z; //apply value
+  
+  return rgb;
+}
+
+vec3 rgb2hsv(vec3 rgb) {
+  float maxComponent = max(rgb.r, max(rgb.g, rgb.b));
+  float minComponent = min(rgb.r, min(rgb.g, rgb.b));
+  float diff = maxComponent - minComponent;
+  float hue = 0.;
+  if(maxComponent == rgb.r) {
+      hue = 0.+(rgb.g-rgb.b)/diff;
+  } else if(maxComponent == rgb.g) {
+      hue = 2.+(rgb.b-rgb.r)/diff;
+  } else if(maxComponent == rgb.b) {
+      hue = 4.+(rgb.r-rgb.g)/diff;
+  }
+  hue = fract(hue / 6.);
+  float saturation = diff / maxComponent;
+  float value = maxComponent;
+  return vec3(hue, saturation, value);
+}
+
+vec4 hueShift(vec4 color) {
+  const vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);
+  const vec4  kRGBToI     = vec4 (0.596, -0.275, -0.321, 0.0);
+  const vec4  kRGBToQ     = vec4 (0.212, -0.523, 0.311, 0.0);
+
+  const vec4  kYIQToR   = vec4 (1.0, 0.956, 0.621, 0.0);
+  const vec4  kYIQToG   = vec4 (1.0, -0.272, -0.647, 0.0);
+  const vec4  kYIQToB   = vec4 (1.0, -1.107, 1.704, 0.0);
 
   // Convert to YIQ
-  mediump float   YPrime  = dot (color, kRGBToYPrime);
-  mediump float   I      = dot (color, kRGBToI);
-  mediump float   Q      = dot (color, kRGBToQ);
+  float   YPrime  = dot (color, kRGBToYPrime);
+  float   I      = dot (color, kRGBToI);
+  float   Q      = dot (color, kRGBToQ);
 
   // Calculate the hue and chroma
-  mediump float   hue     = atan (Q, I);
-  mediump float   chroma  = sqrt (I * I + Q * Q);
+  float   hue     = atan (Q, I);
+  float   chroma  = sqrt (I * I + Q * Q);
 
   // Make the user's adjustments
   hue += hueAngle;
@@ -63,7 +99,7 @@ mediump vec4 hueShift(mediump vec4 color) {
   I = chroma * cos (hue);
 
   // Convert back to RGB
-  mediump vec4    yIQ   = vec4 (YPrime, I, Q, 0.0);
+  vec4    yIQ   = vec4 (YPrime, I, Q, 0.0);
   color.r = dot (yIQ, kYIQToR);
   color.g = dot (yIQ, kYIQToG);
   color.b = dot (yIQ, kYIQToB);
@@ -71,9 +107,9 @@ mediump vec4 hueShift(mediump vec4 color) {
 }
 
 void main() {
-  mediump vec3 axis = vec3(1.0/sqrt(3.0));
-  mediump float angle = 30.0;
-  mediump vec4 color = texture2D(uSampler, vTex);
+  vec3 axis = vec3(1.0/sqrt(3.0));
+  float angle = 30.0;
+  vec4 color = texture2D(uSampler, vTex);
   if(color.a < .0001) {
     discard;
   } 

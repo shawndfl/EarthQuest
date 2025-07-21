@@ -9,14 +9,19 @@ export enum CollisionSide {
   W = 'W',
 }
 
-export interface SpriteData {
+export interface TileData {
+  /** readable name */
   id: string;
+  /** player, enemy, solid, open, door */
   type: string;
-  textureId: string;
+  sourceTextureId?: string; // defaults to the first one
+  /** the pixel x,y, w,h location in the source texture for this image */
+  sourceLocation: '';
   rotate?: number;
   flipX?: boolean;
   flipY?: boolean;
-  options?: string[];
+  options?: string[]; // if it's a door have some options for what level data this connects to
+
   /** The images mapped to a location (x,y,w,h) in the texture */
   images: { [name: string]: string };
 
@@ -43,26 +48,8 @@ export interface ILevelData {
    */
   textures: { [id: string]: string };
 
-  /**
-   * pixel size of a tile is 8 X tileScale
-   */
-  tileScale: number;
-
-  /**
-   * The tiles that make up the scene,
-   * The value is a location (x,y,w,h) or id in the sprites
-   */
-  tiles: { [id: string]: string };
-
-  /**
-   * Collision location throughout the world
-   */
-  collisions: { [id: string]: CollisionSide };
-
-  /**
-   * The tiles can reference an id to customize a tile
-   */
-  sprites: { [id: string]: SpriteData };
+  tiles: { [id: string]: TileData };
+  layer1: { [loc: string]: string };
 }
 
 export function cloneLevel(src: ILevelData): ILevelData {

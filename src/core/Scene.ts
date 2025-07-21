@@ -3,12 +3,13 @@ import { Component } from '../core/Component';
 import { ILevelData } from '../data/ILevelData';
 import { Geometry, GlBuffer } from '../graphics/GlBuffer';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
-import { QuadGeometry } from '../graphics/QuadGeometry';
+import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
 import mat4 from '../math/mat4';
 import mat3 from '../math/mat3';
 import vec3 from '../math/vec3';
 import vec2 from '../math/vec2';
 import { Timer } from '../utilities/Timer';
+import { Curve, CurveType } from '../math/Curve';
 
 /**
  * The main scene for walking around in the world. The player can
@@ -21,6 +22,7 @@ export class Scene extends Component {
   private _shader: SpritePerspectiveShader;
   private hueTimer: Timer;
   private hueValue: number;
+  private curve: Curve;
 
   get spriteSheetTexture(): Texture {
     return this._spriteSheetTexture;
@@ -42,26 +44,29 @@ export class Scene extends Component {
     // get the texture
     await this.spriteSheetTexture.loadImage('./assets/tiles/OnettMap.png');
 
-    let geo: Geometry = this.placeQuad(400, 300, -1, 16, 0, 0, 1.0);
-    geo = this.placeQuad(450, 350, 0, 1824, 368, 90, 0.5, geo);
+    this.curve = new Curve();
+    this.curve.pingPong(true);
+    this.curve.repeat(-1);
+    this.curve.points([
+      { p: 0, t: 0 },
+      { p: 40, t: 1000 },
+    ]);
+    this.curve.curve(CurveType.linear);
+    this.curve.start();
+    this.curve.onUpdate = (value) => {
+      const quad1 = this.placeQuad(40, value, 0, 16, 0, 0, 1.0);
+      const quad2 = this.placeQuad(45, 30, 0, 1824, 368, 90, 1);
 
-    // set the openGL buffers
-    this._buffer.setBuffers(geo);
+      // set the openGL buffers
+      const geo = QuadGeometry.CreateQuad([quad1, quad2]);
+      this._buffer.setBuffers(geo);
+    };
 
     // setup the shader
     this._shader.setSpriteSheet(this.spriteSheetTexture);
   }
 
-  placeQuad(
-    posX: number,
-    posY: number,
-    posZ: number,
-    u: number,
-    v: number,
-    hue: number,
-    alpha: number,
-    dest?: Geometry
-  ): Geometry {
+  placeQuad(posX: number, posY: number, posZ: number, u: number, v: number, hue: number, alpha: number): Quad {
     const transform = new mat4();
     transform.setIdentity();
     transform.translate(new vec3(posX, posY, posZ));
@@ -77,12 +82,7 @@ export class Scene extends Component {
     uvTransform.setTranslation(new vec2(offsetX, 1 - scaleY - offsetY));
 
     // create a quad
-    const geo = QuadGeometry.CreateQuad(
-      [{ width: 800, height: 600, transform, uvTransform, mirrorX: false, mirrorY: false, alpha, hueAngle: hue }],
-      dest
-    );
-
-    return geo;
+    return { width: 16, height: 16, transform, uvTransform, mirrorX: false, mirrorY: false, alpha, hueAngle: hue };
   }
 
   async loadLevel(level: ILevelData): Promise<void> {}
@@ -92,6 +92,7 @@ export class Scene extends Component {
    * @param {float} dt delta time from the last frame
    */
   update(dt: number) {
+    /*
     // Clear the canvas before we start drawing on it.
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
@@ -105,9 +106,13 @@ export class Scene extends Component {
     this._shader.setProj(proj);
     this._buffer.enable();
 
+    // update the curve to test depth sort by height
+    this.curve.update(dt);
+
     if (this.hueTimer.elapsed > 50) {
       this.hueTimer.start();
       this.hueValue += 0.1;
+
       //this._shader.setHue(this.hueValue);
       if (this.hueValue > 360) {
         this.hueValue -= 360;
@@ -117,6 +122,10 @@ export class Scene extends Component {
     const count = this._buffer.indexCount;
     const type = this.gl.UNSIGNED_SHORT;
     const offset = 0;
+
+    this.gl.depthFunc(this.gl.ALWAYS);
     this.gl.drawElements(this.gl.TRIANGLES, count, type, offset);
+    this.gl.depthFunc(this.gl.LEQUAL);
+    */
   }
 }
