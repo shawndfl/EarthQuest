@@ -1,3 +1,5 @@
+import { GlBuffer } from '../graphics/GlBuffer';
+import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
 
@@ -14,23 +16,31 @@ export interface TileData {
   id: string;
   /** player, enemy, solid, open, door */
   type: string;
-  sourceTextureId?: string; // defaults to the first one
-  /** the pixel x,y, w,h location in the source texture for this image */
+  /**Do we need a controller for this */
+  dynamic: boolean;
+
+  sourceTextureIndex?: number; // defaults to the first one
+  /** the pixel x,y,w,h location in the source texture for this image */
   sourceLocation: '';
   rotate?: number;
   flipX?: boolean;
   flipY?: boolean;
+  alpha?: number; // default 1.0
   options?: string[]; // if it's a door have some options for what level data this connects to
 
   /** The images mapped to a location (x,y,w,h) in the texture */
   images: { [name: string]: string };
+}
 
+/**
+ * Used for runtime once the tile data is loaded
+ */
+export interface RuntimeTileData extends TileData {
+  location: vec2;
   texture: Texture;
-
-  width: number;
-  height: number;
-  position: vec2;
-  scale: vec2;
+  /** the quad to manage */
+  quad: Quad;
+  buffer: GlBuffer;
 }
 
 /**
@@ -44,12 +54,15 @@ export interface ILevelData {
   controllerType: string;
 
   /**
-   * url for textures
+   * url for textures these will be loaded into memory and index
    */
-  textures: { [id: string]: string };
+  textures: string[];
 
   tiles: { [id: string]: TileData };
-  layer1: { [loc: string]: string };
+  layers: { [loc: string]: string }[];
+
+  /** map of multi layer 2d tile ids */
+  map: string[][];
 }
 
 export function cloneLevel(src: ILevelData): ILevelData {

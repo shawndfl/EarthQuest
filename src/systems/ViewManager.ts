@@ -84,37 +84,14 @@ export class ViewManager extends Component {
     mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
     this._screenX = 0;
     this._screenY = 0;
-    this._screenW = eng.width;
-    this._screenH = eng.height;
+    this._screenW = 800;
+    this._screenH = 600;
+  }
 
+  initialize(): void {
+    this._screenW = this.eng.width;
+    this._screenH = this.eng.height;
     this.scale = 1.0;
-  }
-
-  /**
-   * Calculates a projection
-   * @returns
-   */
-  calculateProjection(offset: vec2, scale: number = 1.0) {
-    const adjustX = offset.x + (this.eng.width - this.eng.width * scale);
-    const adjustY = offset.y + (this.eng.height - this.eng.height * scale);
-
-    return mat4.orthographic(
-      adjustX,
-      this.eng.width * scale + offset.x,
-      adjustY,
-      this.eng.height * scale + offset.y,
-      1,
-      -1
-    );
-  }
-
-  pushTarget(): void {
-    this._lastTargetX = this._targetX;
-    this._lastTargetY = this._targetY;
-  }
-
-  popTarget(): void {
-    this.setTarget(this._lastTargetX, this._lastTargetY);
   }
 
   /**
@@ -122,14 +99,14 @@ export class ViewManager extends Component {
    * @param x
    * @param y
    */
-  setTarget(x: number, y: number) {
+  setTarget(x: number, y: number): mat4 {
     this._targetX = x;
     this._targetY = y;
 
-    this.updateProjection();
+    return this.updateProjection();
   }
 
-  updateProjection() {
+  updateProjection(): mat4 {
     this._screenX = Math.floor(this._targetX);
     if (this.minX && this.maxX) {
       this._screenX = MathConst.clamp(this._targetX, this.minX, this.maxX);
@@ -146,6 +123,7 @@ export class ViewManager extends Component {
     this._top = this.eng.height * this._scale + this._screenY;
 
     this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
+    return this._projection;
   }
 
   update(dt: number) {}

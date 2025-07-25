@@ -58,6 +58,7 @@ export class Engine {
     this.assetManager = new AssetManager(this);
     //TODO make this configurable, maybe per level
     this.random = new Random(122344);
+    this.viewManager = new ViewManager(this);
   }
 
   /**
@@ -130,6 +131,7 @@ export class Engine {
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
 
     // initialize all systems
+    await this.viewManager.initialize();
     await this.assetManager.initialize();
     await this.scene.initialize();
     await this.tileManager.initialize();

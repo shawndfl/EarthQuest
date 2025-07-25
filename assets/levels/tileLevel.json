@@ -3,44 +3,80 @@
   "comment2": " sprites and tiles map to pixel locations in either the ",
   "name": "TileScene",
   "controllerType": "tile",
-  "textures": {
-    "main": "assets/tiles/OnettMap.png",
-    "sprites": "assets/sprites/characters.png"
-  },
+  "textures": ["assets/tiles/tiles.png"],
 
   "tiles": {
-    "fence_vertical": {
-      "type": "solid",
-      "sourceLocation": "1792,344,8,24",
-      "textureId": "main",
-      "rotate": 0,
-      "flipX": false,
-      "flipY": false,
-      "options": [],
-      "images": {}
+    "01": {
+      "type": "player",
+      "sourceLocation": "0,184,16,24",
+      "dynamic": true,
+      "images": {
+        "down": "0,184,16,24",
+        "downStep": "24,184,16,24",
+        "up": "48,184,16,24",
+        "right": "72,184,16,24",
+        "rightStep": "96,184,16,24",
+        "rope": "128,184,16,24",
+        "ropeUp": "144,184,16,24",
+        "surprise": "168,184,16,24",
+        "climb": "192,184,16,24",
+        "sitLeft": "216,184,16,24",
+        "downLeft": "240,184,16,24",
+        "downLeftStep": "264,184,16,24",
+        "upLeft": "288,184,16,24",
+        "upLeftStep": "312,184,16,24",
+        "win": "336,184,16,24",
+        "dead": "360,184,16,24"
+      }
     },
-    "grass1": {
-      "type": "open",
-      "sourceLocation": "1792,368,8,8"
+    "02": {
+      "type": "npc",
+      "dynamic": true,
+      "options": ["poo"],
+      "sourceLocation": "0,216,16,24"
     },
-    "fence_horizontal": {
+    "03": {
       "type": "solid",
-      "sourceLocation": "1784,384,8,24"
+      "sourceLocation": "24,0,8,24"
     },
-    "fence_end_post": {
-      "type": "solid",
-      "sourceLocation": "1752,384,8,24"
+    "04": {
+      "type": "static",
+      "collide": "tl,bl,tr,br,full",
+      "sourceLocation": "0,8,8,8"
+    },
+    "05": {
+      "type": "static",
+      "options": "collision",
+      "sourceLocation": "32,8,8,16"
+    },
+    "06": {
+      "type": "static",
+      "options": "collision",
+      "sourceLocation": "40,8,8,16"
     }
   },
 
-  "layer0": {
-    "fill,0,0,500,500": "grass1"
-  },
-  "layer1": {
-    "line,10,54,13,178": "fence_vertical",
-    "line,10,52,150,52": "fence_horizontal",
-    ",10,52": "fence_end_post"
+  "layers": [
+    {
+      "fill,0,0,497,450": "04"
+    },
+    {
+      "line,10,54,13,178": "03",
+      "line,10,52,150,52": "05",
+      ",10,52": "06",
+      ",30,50": "01",
+      ",70,60": "02"
+    }
+  ],
+  "map":[
+    [
+      "00010101010101010101010101",
+      "02020202020202020201010101"
+    ],
+    [
+      "09010101010101010101010101",
+      "0A010101010101010101010101"
+    ]
+  ]
 
-    
-  }
 }
