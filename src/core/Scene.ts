@@ -85,8 +85,6 @@ export class Scene extends Component {
     return { width: 16, height: 16, transform, uvTransform, mirrorX: false, mirrorY: false, alpha, hueAngle: hue };
   }
 
-  async loadLevel(level: ILevelData): Promise<void> {}
-
   /**
    * Called for each frame.
    * @param {float} dt delta time from the last frame

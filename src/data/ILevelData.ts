@@ -61,7 +61,10 @@ export interface ILevelData {
   tiles: { [id: string]: TileData };
   layers: { [loc: string]: string }[];
 
-  /** map of multi layer 2d tile ids */
+  /**
+   * map of multi layer 2d tile ids
+   * the layout is layers, then rows, then an array of strings that make up the columns
+   */
   map: string[][];
 }
 

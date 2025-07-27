@@ -34,6 +34,14 @@ export class ViewManager extends Component {
   minY: number;
   maxY: number;
 
+  get targetX(): number {
+    return this._targetX;
+  }
+
+  get targetY(): number {
+    return this._targetY;
+  }
+
   get screenX() {
     return this._screenX;
   }
@@ -66,7 +74,7 @@ export class ViewManager extends Component {
     return this._right;
   }
 
-  get projection(): mat4 {
+  get projection(): Readonly<mat4> {
     return this._projection;
   }
 
@@ -80,6 +88,7 @@ export class ViewManager extends Component {
     this._left = 0;
     this._right = 0;
     this._bottom = 0;
+    this._scale = 1.0;
 
     mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
     this._screenX = 0;
@@ -92,6 +101,7 @@ export class ViewManager extends Component {
     this._screenW = this.eng.width;
     this._screenH = this.eng.height;
     this.scale = 1.0;
+    this.setTarget(0, -this._screenH);
   }
 
   /**
@@ -106,7 +116,7 @@ export class ViewManager extends Component {
     return this.updateProjection();
   }
 
-  updateProjection(): mat4 {
+  private updateProjection(): mat4 {
     this._screenX = Math.floor(this._targetX);
     if (this.minX && this.maxX) {
       this._screenX = MathConst.clamp(this._targetX, this.minX, this.maxX);
@@ -123,6 +133,9 @@ export class ViewManager extends Component {
     this._top = this.eng.height * this._scale + this._screenY;
 
     this._projection = mat4.orthographic(this._left, this._right, this._bottom, this._top, 1, -1, this._projection);
+
+    this.eng.notificationManager.post('view_change');
+
     return this._projection;
   }
 

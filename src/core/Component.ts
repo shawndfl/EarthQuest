@@ -29,7 +29,7 @@ export class Component {
    * Loads a new level
    * @param level
    */
-  async loadLevel(level: ILevelData): Promise<void> {}
+  async loadLevel(): Promise<void> {}
 
   /**
    * When the window is resized

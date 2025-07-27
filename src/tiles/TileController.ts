@@ -5,12 +5,14 @@ import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
+import { DrawingLayer } from '../systems/DrawingLayer';
 
 export interface TileControllerOptions {
   quad: Quad;
   tileData: TileData;
   sourceTexture: Texture;
   buffer: GlBuffer;
+  drawingLayer: DrawingLayer;
 }
 
 /**
@@ -39,6 +41,10 @@ export abstract class TileController extends Component {
 
   constructor(eng: Engine, protected options: TileControllerOptions) {
     super(eng);
+  }
+
+  requestGeometryRefresh(): void {
+    this.options.drawingLayer.requestRefresh();
   }
 
   /**

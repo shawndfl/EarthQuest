@@ -8,6 +8,7 @@ import { PlayerTile } from '../tiles/PlayerTile';
 import { StaticTile } from '../tiles/StaticTile';
 import { TileController } from '../tiles/TileController';
 import { DrawingLayer } from './DrawingLayer';
+import { UserAction } from './InputManager';
 
 /**
  * Create two layers of tiles.
@@ -28,21 +29,47 @@ export class TileManager extends Component {
     this._tileControllers = [];
   }
 
-  async loadLevel(level: ILevelData): Promise<void> {
+  async loadLevel(): Promise<void> {
+    const level: ILevelData = this.eng.gameManager.levelData;
     console.debug('TileManager loading level...');
 
+    // reset the tile controllers
+    for (let controller of this._tileControllers) {
+      controller.closeLevel();
+    }
+    this._tileControllers = [];
+
+    // create the drawing layers
+    this._drawingLayers = [];
     for (let i = 0; i < level.layers.length; i++) {
       const layer = new DrawingLayer(this.eng, i);
       await layer.initialize();
-      await layer.loadLevel(level);
+      await layer.loadLevel();
       this._drawingLayers.push(layer);
+    }
+
+    // initialize the controllers the layers might have made
+    for (let controller of this._tileControllers) {
+      controller.initialize();
+    }
+  }
+
+  panningViewPort(): void {
+    const speed = 1;
+    const direction = this.eng.inputHandler.getInputState().movingDirection(speed);
+    if (direction.length() > 0) {
+      const x = this.eng.viewManager.targetX;
+      const y = this.eng.viewManager.targetY;
+
+      this.eng.viewManager.setTarget(x - direction.x, y + direction.y);
     }
   }
 
   update(dt: number): void {
     for (let controller of this._tileControllers) {
-      //controller.update(dt);
+      controller.update(dt);
     }
+    this.panningViewPort();
 
     //Render
     // baseLayer - includes background, and sprites sorted from top to bottom
@@ -61,8 +88,14 @@ export class TileManager extends Component {
    * @param buffer
    * @returns
    */
-  registerQuad(tileData: TileData, quad: Quad, sourceTexture: Texture, buffer: GlBuffer): TileController {
-    const controller = this.createController(tileData, quad, sourceTexture, buffer);
+  registerQuad(
+    tileData: TileData,
+    quad: Quad,
+    sourceTexture: Texture,
+    buffer: GlBuffer,
+    drawingLayer: DrawingLayer
+  ): TileController {
+    const controller = this.createController(tileData, quad, sourceTexture, buffer, drawingLayer);
     this._tileControllers.push(controller);
     return controller;
   }
@@ -75,14 +108,20 @@ export class TileManager extends Component {
    * @param buffer
    * @returns
    */
-  protected createController(tileData: TileData, quad: Quad, sourceTexture: Texture, buffer: GlBuffer): TileController {
+  protected createController(
+    tileData: TileData,
+    quad: Quad,
+    sourceTexture: Texture,
+    buffer: GlBuffer,
+    drawingLayer: DrawingLayer
+  ): TileController {
     switch (tileData.type) {
       case 'player':
-        return new PlayerTile(this.eng, { buffer, tileData, sourceTexture, quad });
+        return new PlayerTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
       case 'npc':
-        return new NpcTile(this.eng, { buffer, tileData, sourceTexture, quad });
+        return new NpcTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
       case 'static':
-        return new StaticTile(this.eng, { buffer, tileData, sourceTexture, quad });
+        return new StaticTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
     }
   }
 }

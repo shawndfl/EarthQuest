@@ -5,12 +5,18 @@ import { Engine } from './Engine';
  * Manages notifications
  */
 export class NotificationManager extends Component {
-  listeners: Map<string, ((data: any) => void)[]>;
+  private listeners: Map<string, ((data: any) => void)[]>;
+
   constructor(eng: Engine) {
     super(eng);
     this.listeners = new Map<string, ((data: any) => void)[]>();
   }
 
+  /**
+   * subscribe to an event and set a handler for it.
+   * @param event
+   * @param handler
+   */
   subscribe(event: string, handler: (data: any) => void) {
     let list = this.listeners.get(event);
     if (!list) {
@@ -20,7 +26,7 @@ export class NotificationManager extends Component {
     }
   }
 
-  post(event: string, data: any) {
+  post(event: string, data?: any) {
     const list = this.listeners.get(event);
     if (list) {
       list.forEach((handler) => handler(data));

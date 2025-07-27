@@ -9,9 +9,11 @@ import { Scene } from './Scene';
 import '../css/canvas.scss';
 import { TileManager } from '../systems/TileManager';
 import { ILevelData } from '../data/ILevelData';
+import { InputHandler } from '../systems/InputManager';
+import { Editor } from '../systems/Editor';
 
-export const CanvasWidth = 512;
-export const CanvasHeight = 450;
+export const CanvasWidth = 256;
+export const CanvasHeight = 224;
 
 /**
  * This is the game engine class that ties all the sub systems together. Including
@@ -29,6 +31,9 @@ export class Engine {
   readonly notificationManager: NotificationManager;
   readonly scene: Scene;
   readonly tileManager: TileManager;
+  readonly inputHandler: InputHandler;
+  readonly editor: Editor;
+  readonly urlParams: URL;
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -42,6 +47,14 @@ export class Engine {
     return this.canvasGL.width;
   }
 
+  get pixelScale(): number {
+    return 2;
+  }
+
+  get editorActive(): boolean {
+    return !!this.urlParams.searchParams.get('editor');
+  }
+
   /**
    * the render context
    */
@@ -53,12 +66,17 @@ export class Engine {
    * Used to create all instances of systems
    */
   constructor() {
+    this.notificationManager = new NotificationManager(this);
     this.scene = new Scene(this);
     this.tileManager = new TileManager(this);
     this.assetManager = new AssetManager(this);
     //TODO make this configurable, maybe per level
     this.random = new Random(122344);
     this.viewManager = new ViewManager(this);
+    this.inputHandler = new InputHandler(this);
+    this.gameManager = new GameManager(this);
+    this.editor = new Editor(this);
+    this.urlParams = new URL(window.location.href);
   }
 
   /**
@@ -70,9 +88,8 @@ export class Engine {
     container.classList.add('canvas-container');
 
     this._canvasGL = document.createElement('canvas');
-    this._canvasGL.width = CanvasWidth;
-    this._canvasGL.height = CanvasHeight;
-
+    this._canvasGL.width = CanvasWidth * this.pixelScale;
+    this._canvasGL.height = CanvasHeight * this.pixelScale;
     container.append(this._canvasGL);
 
     window.addEventListener('resize', (e) => {
@@ -135,6 +152,9 @@ export class Engine {
     await this.assetManager.initialize();
     await this.scene.initialize();
     await this.tileManager.initialize();
+    if (this.editorActive) {
+      await this.editor.initialize();
+    }
 
     const url = this.getLevelDataUrl();
     await this.loadScene(url);
@@ -159,15 +179,24 @@ export class Engine {
     this.tileManager.closeLevel();
     this.assetManager.closeLevel();
 
+    this.gameManager.setLevel(levelData);
+
     // load the new level
-    await this.assetManager.loadLevel(levelData);
-    await this.scene.loadLevel(levelData);
-    await this.tileManager.loadLevel(levelData);
+    await this.assetManager.loadLevel();
+    await this.scene.loadLevel();
+    await this.tileManager.loadLevel();
   }
 
   update(dt: number) {
+    if (this.editorActive) {
+      return;
+    }
+    this.inputHandler.preUpdate(dt);
+
     this.scene.update(dt);
     this.tileManager.update(dt);
+
+    this.inputHandler.postUpdate(dt);
   }
 
   resize(width: number, height: number) {
