@@ -4,7 +4,9 @@ import { TileData } from '../data/ILevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+import mat3 from '../math/mat3';
 import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 import { DrawingLayer } from '../systems/DrawingLayer';
 
 export interface TileControllerOptions {
@@ -39,6 +41,11 @@ export abstract class TileController extends Component {
     return this.options.tileData;
   }
 
+  /**
+   * The image passed into setImage
+   */
+  protected activeImage: string;
+
   constructor(eng: Engine, protected options: TileControllerOptions) {
     super(eng);
   }
@@ -59,4 +66,54 @@ export abstract class TileController extends Component {
    * @param dt
    */
   abstract update(dt: number): void;
+
+  /**
+   * Get the location from a csv string. Should be in the format of [x,y,width,height]
+   * @param location
+   * @returns
+   */
+  protected getLocationFromString(location: string): vec4 {
+    const point = new vec4();
+    try {
+      const components = location.split(',');
+      let i = 0;
+
+      point.x = parseFloat(components[i++]);
+      point.y = parseFloat(components[i++]);
+      point.z = parseFloat(components[i++]);
+      point.w = parseFloat(components[i++]);
+    } catch (e) {
+      console.error('Cannot parse "' + location + '" expecting [x,y,z,w]');
+    }
+
+    return point;
+  }
+
+  /**
+   * Sets an image for a quad using the tile data images.
+   * @param name
+   */
+  setImage(name: string, flipX?: boolean, flipY?: boolean): void {
+    const imageLoc = this.options.tileData.images?.[name];
+    if (imageLoc) {
+      this.activeImage = name;
+      const texture = this.options.sourceTexture;
+      const [sourcePixelX, sourcePixelY, sourcePixelWidth, sourcePixelHeight] =
+        this.getLocationFromString(imageLoc).xyzw;
+      const uvTransform = new mat3();
+      const scaleX = sourcePixelWidth / texture.width;
+      const scaleY = sourcePixelHeight / texture.height;
+      const offsetU = sourcePixelX / texture.width;
+      const offsetV = sourcePixelY / texture.height;
+      uvTransform.setIdentity();
+      uvTransform.scale(new vec2(scaleX, scaleY));
+      uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));
+      this.quad.uvTransform = uvTransform;
+      this.quad.mirrorX = flipX;
+      this.quad.mirrorY = flipY;
+      this.options.drawingLayer.requestRefresh();
+    } else {
+      console.error('cannot find image ' + name);
+    }
+  }
 }

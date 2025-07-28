@@ -54,16 +54,7 @@ export class TileManager extends Component {
     }
   }
 
-  panningViewPort(): void {
-    const speed = 1;
-    const direction = this.eng.inputHandler.getInputState().movingDirection(speed);
-    if (direction.length() > 0) {
-      const x = this.eng.viewManager.targetX;
-      const y = this.eng.viewManager.targetY;
-
-      this.eng.viewManager.setTarget(x - direction.x, y + direction.y);
-    }
-  }
+  panningViewPort(): void {}
 
   update(dt: number): void {
     for (let controller of this._tileControllers) {

@@ -9,8 +9,8 @@ import { Scene } from './Scene';
 import '../css/canvas.scss';
 import { TileManager } from '../systems/TileManager';
 import { ILevelData } from '../data/ILevelData';
-import { InputHandler } from '../systems/InputManager';
 import { Editor } from '../systems/Editor';
+import { InputManager } from '../systems/InputManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -31,7 +31,7 @@ export class Engine {
   readonly notificationManager: NotificationManager;
   readonly scene: Scene;
   readonly tileManager: TileManager;
-  readonly inputHandler: InputHandler;
+  readonly inputManager: InputManager;
   readonly editor: Editor;
   readonly urlParams: URL;
 
@@ -73,7 +73,7 @@ export class Engine {
     //TODO make this configurable, maybe per level
     this.random = new Random(122344);
     this.viewManager = new ViewManager(this);
-    this.inputHandler = new InputHandler(this);
+    this.inputManager = new InputManager(this);
     this.gameManager = new GameManager(this);
     this.editor = new Editor(this);
     this.urlParams = new URL(window.location.href);
@@ -191,12 +191,12 @@ export class Engine {
     if (this.editorActive) {
       return;
     }
-    this.inputHandler.preUpdate(dt);
+    this.inputManager.preUpdate(dt);
 
     this.scene.update(dt);
     this.tileManager.update(dt);
 
-    this.inputHandler.postUpdate(dt);
+    this.inputManager.postUpdate(dt);
   }
 
   resize(width: number, height: number) {

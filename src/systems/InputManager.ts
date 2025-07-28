@@ -56,42 +56,6 @@ export class InputState {
    * how many touch points are there.
    */
   touchCount: number;
-
-  isReleased(btn: UserAction) {
-    return (this.buttonsReleased & btn) > 0;
-  }
-
-  isDown(btn: UserAction) {
-    return (this.buttonsDown & btn) > 0;
-  }
-
-  movingDirection(scale?: number): vec2 {
-    if (!scale) {
-      scale = 1;
-    }
-    const movingLeft = (this.buttonsDown & UserAction.Left) > 0;
-    const movingRight = (this.buttonsDown & UserAction.Right) > 0;
-    const movingUp = (this.buttonsDown & UserAction.Up) > 0;
-    const movingDown = (this.buttonsDown & UserAction.Down) > 0;
-
-    if (movingLeft) {
-      console.debug('hitting left');
-    }
-    if (movingRight) {
-      console.debug('hitting right');
-    }
-
-    if (movingUp) {
-      console.debug('hitting up');
-    }
-    if (movingDown) {
-      console.debug('hitting down');
-    }
-
-    const movingX = movingLeft ? -scale : movingRight ? scale : 0;
-    const movingY = movingUp ? -scale : movingDown ? scale : 0;
-    return new vec2(movingX, movingY);
-  }
 }
 
 export interface InputMappings {
@@ -109,33 +73,13 @@ export interface InputMappings {
 /**
  * Translates keyboard and gamepad events to game actions
  */
-export class InputHandler extends Component {
+export class InputManager extends Component {
   hasGamePad: boolean;
-
-  /**
-   * Used to map logical buttons to real keyboard or game pad buttons.
-   */
-  readonly mappingIndex;
-
-  /**
-   * Are we calibrating the logical buttons.
-   */
-  isCalibrating: boolean;
-
-  /**
-   * This flag will increase show the next prompt after a button is mapped.
-   */
-  calibrationNextPrompt: boolean;
 
   /**
    * What logical button index are we calibrating.
    */
   activeButtonIndex: number;
-
-  /**
-   * Mapping for input
-   */
-  inputMappings: InputMappings;
 
   /**
    * Name of the game pad
@@ -145,48 +89,35 @@ export class InputHandler extends Component {
   /**
    * logical buttons
    */
-  buttonsDown: UserAction;
+  private buttonsDown: UserAction;
 
   /**
    * The buttons that were just released
    */
-  buttonsReleased: UserAction;
+  private buttonsReleased: UserAction;
 
   /**
    * The first two touch points or mouse left botton and mouse left+shift mouse button
    */
-  inputDown: [boolean, boolean];
+  private inputDown: [boolean, boolean];
 
   /**
    * Only true for one frame when the mouse is released or touch point lifted
    */
-  inputReleased: boolean;
+  private inputReleased: boolean;
 
   /**
    * Capture two touch points if they are there.
    */
-  touchPoint: [vec2, vec2];
+  private touchPoint: [vec2, vec2];
 
   /**
    * how many touch points are there.
    */
-  touchCount: number;
-
-  private _state: InputState = new InputState();
+  private touchCount: number;
 
   constructor(eng: Engine) {
     super(eng);
-
-    this.mappingIndex = {
-      Start: 0,
-      Select: 1,
-      A: 2,
-      B: 3,
-      Up: 4,
-      Down: 5,
-      Right: 6,
-      Left: 7,
-    };
 
     this.buttonsDown = UserAction.None;
     this.buttonsReleased = UserAction.None;
@@ -206,73 +137,101 @@ export class InputHandler extends Component {
     if (!this.isTouchEnabled()) {
       console.debug(' mouse enabled');
       window.addEventListener('mousedown', (e) => {
-        if (!this.isCalibrating) {
-          if (e.shiftKey) {
-            this.inputDown = [false, true];
-          } else {
-            this.inputDown = [true, false];
-          }
-          this.inputReleased = false;
-          this.touchPoint[0].x = e.offsetX;
-          this.touchPoint[0].y = e.offsetY;
-          this.touchCount = 1;
+        if (e.shiftKey) {
+          this.inputDown = [false, true];
+        } else {
+          this.inputDown = [true, false];
         }
+        this.inputReleased = false;
+        this.touchPoint[0].x = e.offsetX;
+        this.touchPoint[0].y = e.offsetY;
+        this.touchCount = 1;
       });
       window.addEventListener('mouseup', (e) => {
-        if (!this.isCalibrating) {
-          this.inputDown = [false, false];
-          this.inputReleased = true;
-          this.touchPoint[0].x = e.offsetX;
-          this.touchPoint[0].y = e.offsetY;
-          this.touchCount = 1;
-        }
+        this.inputDown = [false, false];
+        this.inputReleased = true;
+        this.touchPoint[0].x = e.offsetX;
+        this.touchPoint[0].y = e.offsetY;
+        this.touchCount = 1;
       });
     } else {
       console.debug(' touch enabled');
       window.addEventListener('touchstart', (e) => {
-        if (!this.isCalibrating) {
-          if (e.touches.length > 0 && e.touches[0].target === eng.gl.canvas) {
-            this.inputDown = [e.touches.item(0) ? true : false, e.touches.item(1) ? true : false];
-            this.inputReleased = false;
+        if (e.touches.length > 0 && e.touches[0].target === eng.gl.canvas) {
+          this.inputDown = [e.touches.item(0) ? true : false, e.touches.item(1) ? true : false];
+          this.inputReleased = false;
 
-            const t = e.touches[0].target as HTMLCanvasElement;
-            this.touchPoint[0].x = e.touches[0].pageX - t.clientTop;
-            this.touchPoint[0].y = e.touches[0].screenY;
-            if (e.touches.length > 1) {
-              this.touchPoint[1].x = e.touches[1].pageX - t.clientTop;
-              this.touchPoint[1].y = e.touches[1].screenY;
-            }
-            this.touchCount = e.touches.length;
+          const t = e.touches[0].target as HTMLCanvasElement;
+          this.touchPoint[0].x = e.touches[0].pageX - t.clientTop;
+          this.touchPoint[0].y = e.touches[0].screenY;
+          if (e.touches.length > 1) {
+            this.touchPoint[1].x = e.touches[1].pageX - t.clientTop;
+            this.touchPoint[1].y = e.touches[1].screenY;
           }
+          this.touchCount = e.touches.length;
         }
       });
     }
-
-    this.loadMapping();
   }
 
-  getInputState(): InputState {
-    this._state.buttonsDown = this.buttonsDown;
-    this._state.buttonsReleased = this.buttonsReleased;
-    this._state.inputReleased = this.inputReleased;
-    this._state.inputDown = this.inputDown;
-    this._state.touchPoint = this.touchPoint;
-    return this._state;
+  isReleased(btn: UserAction) {
+    return (this.buttonsReleased & btn) > 0;
   }
 
-  beginCalibration() {
-    console.info('Starting new input calibration...');
-    this.isCalibrating = true;
-    this.activeButtonIndex = 0;
-    this.calibrationNextPrompt = true;
+  isDown(btn: UserAction) {
+    return (this.buttonsDown & btn) > 0;
+  }
+
+  movingDirection(scale?: number): vec2 {
+    if (!scale) {
+      scale = 1;
+    }
+    const movingLeft = (this.buttonsDown & UserAction.Left) > 0;
+    const movingRight = (this.buttonsDown & UserAction.Right) > 0;
+    const movingUp = (this.buttonsDown & UserAction.Up) > 0;
+    const movingDown = (this.buttonsDown & UserAction.Down) > 0;
+
+    const movingX = movingLeft ? -1 : movingRight ? 1 : 0;
+    const movingY = movingUp ? -1 : movingDown ? 1 : 0;
+    return new vec2(movingX, movingY).normalize().scale(scale);
+  }
+
+  /**
+   * Called by the engine to initialize the input state
+   * @param dt
+   */
+  preUpdate(dt: number) {
+    // Always call `navigator.getGamepads()` inside of
+    // the game loop, not outside.
+    const gamepads = navigator.getGamepads();
+    for (const gamepad of gamepads) {
+      // Disregard empty slots.
+      if (!gamepad) {
+        continue;
+      }
+
+      //TODO capture state from game pads
+      gamepad.buttons.forEach((btn) => {
+        btn.pressed;
+      });
+    }
+  }
+
+  /**
+   * Reset release state. Used by the Engine
+   * @param dt
+   */
+  postUpdate(dt: number) {
+    // reset press actions
+    this.buttonsReleased = UserAction.None;
+    this.inputReleased = false;
   }
 
   isTouchEnabled() {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   }
 
-  keydown(e: KeyboardEvent) {
-    //if (!this.isCalibrating) {
+  private keydown(e: KeyboardEvent) {
     if (e.key == 'ArrowRight') {
       this.buttonsDown = this.buttonsDown | UserAction.Right;
     }
@@ -304,12 +263,9 @@ export class InputHandler extends Component {
     if (e.key == 'esc') {
       this.buttonsDown = this.buttonsDown | UserAction.Select;
     }
-    //}
   }
 
-  keyup(e: KeyboardEvent) {
-    console.info('  Mapping: ', e.key);
-
+  private keyup(e: KeyboardEvent) {
     if (e.key == 'ArrowRight') {
       this.buttonsDown = this.buttonsDown & ~UserAction.Right;
       this.buttonsReleased = this.buttonsReleased | UserAction.Right;
@@ -351,67 +307,15 @@ export class InputHandler extends Component {
     }
   }
 
-  preUpdate(dt: number) {
-    //if (this.isCalibrating) {
-    //if (this.calibrationNextPrompt) {
-    //  console.info(
-    //    'Hit the ' + Array.from(Object.keys(this.mappingIndex)).find((key, index) => index == this.activeButtonIndex)
-    //  );
-    //  this.calibrationNextPrompt = false;
-    //}
-    //}
-
-    // Always call `navigator.getGamepads()` inside of
-    // the game loop, not outside.
-    const gamepads = navigator.getGamepads();
-    for (const gamepad of gamepads) {
-      // Disregard empty slots.
-      if (!gamepad) {
-        continue;
-      }
-
-      //TODO capture state from game pads
-      gamepad.buttons.forEach((btn) => {
-        btn.pressed;
-      });
-    }
-  }
-
-  postUpdate(dt: number) {
-    // reset press actions
-    this.buttonsReleased = UserAction.None;
-    this.inputReleased = false;
-  }
-
-  connectGamepad(e: GamepadEvent) {
+  private connectGamepad(e: GamepadEvent) {
     console.log('✅ 🎮 A gamepad was connected:', e.gamepad);
   }
 
-  disconnectGamepad(e: GamepadEvent) {
+  private disconnectGamepad(e: GamepadEvent) {
     console.debug('Gamepad disconnected', e.gamepad);
   }
 
-  loadMapping() {
-    const inputMappingString = window.localStorage.getItem('inputMapping');
-    if (inputMappingString) {
-      this.inputMappings = JSON.parse(inputMappingString);
-    } else {
-      this.inputMappings = {
-        keyboardMapping: [],
-        gamePadMapping: new Map<string, number[]>(),
-      };
-      this.beginCalibration();
-    }
-  }
-
-  doneCalibrating() {
-    window.localStorage.setItem('inputMapping', JSON.stringify(this.inputMappings));
-    this.isCalibrating = false;
-    this.activeButtonIndex = 0;
-    console.debug('done calibrating!!');
-  }
-
-  resetInput() {
+  private resetInput() {
     this.buttonsDown = UserAction.None;
     this.buttonsReleased = UserAction.None;
 

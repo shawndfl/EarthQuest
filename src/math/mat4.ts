@@ -388,6 +388,10 @@ export default class mat4 {
     return this;
   }
 
+  getTranslation(): vec3 {
+    return new vec3(this.values[12], this.values[13], this.values[14]);
+  }
+
   scale(vector: vec3): mat4 {
     const x = vector.x;
     const y = vector.y;
