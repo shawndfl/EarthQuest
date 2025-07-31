@@ -64,6 +64,13 @@ export class Scene extends Component {
 
     // setup the shader
     this._shader.setSpriteSheet(this.spriteSheetTexture);
+
+    this.eng.viewManager.minX = 0;
+    this.eng.viewManager.minY = 0;
+
+    //this.createRandomFlowers();
+    //this.createGrass();
+    //this.createNull();
   }
 
   placeQuad(posX: number, posY: number, posZ: number, u: number, v: number, hue: number, alpha: number): Quad {
@@ -125,5 +132,54 @@ export class Scene extends Component {
     this.gl.drawElements(this.gl.TRIANGLES, count, type, offset);
     this.gl.depthFunc(this.gl.LEQUAL);
     */
+  }
+
+  createRandomFlowers(): void {
+    const replacements = ['00', '09', '0A', '0B', '0C'];
+    const replacementProbability = 0.01; // 1% chance to replace each "00"
+
+    // Function to process each string
+    const map = [];
+    for (let i = 0; i < 288; i++) {
+      let row = '';
+      for (let j = 0; j < 288; j++) {
+        if (Math.random() < replacementProbability) {
+          row += replacements[Math.floor(Math.random() * replacements.length)];
+        } else {
+          row += '00';
+        }
+      }
+      map.push(row);
+    }
+
+    console.log(map);
+  }
+
+  createNull(): void {
+    // Function to process each string
+    const map = [];
+    for (let i = 0; i < 288; i++) {
+      let row = '';
+      for (let j = 0; j < 288; j++) {
+        row += '_0';
+      }
+      map.push(row);
+    }
+
+    console.log(map);
+  }
+
+  createGrass(): void {
+    // Function to process each string
+    const map = [];
+    for (let i = 0; i < 288; i++) {
+      let row = '';
+      for (let j = 0; j < 288; j++) {
+        row += '04';
+      }
+      map.push(row);
+    }
+
+    console.log(map);
   }
 }

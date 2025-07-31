@@ -2,6 +2,7 @@ import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { GameData } from '../data/GameData';
 import { ILevelData } from '../data/ILevelData';
+import { RuntimeLevelData } from '../data/RuntimeLevelData';
 
 /** Key for local storage */
 const localStorageKey = 'EarthQuest';
@@ -12,9 +13,9 @@ const localStorageKey = 'EarthQuest';
 export class GameManager extends Component {
   data: GameData;
   private _timeCounter: number;
-  private _activeLevel: ILevelData;
+  private _activeLevel: RuntimeLevelData;
 
-  public get levelData(): Readonly<ILevelData> {
+  public get levelData(): RuntimeLevelData {
     return this._activeLevel;
   }
 
@@ -39,7 +40,7 @@ export class GameManager extends Component {
    * @param level
    */
   setLevel(level: ILevelData) {
-    this._activeLevel = level;
+    this._activeLevel = new RuntimeLevelData(this.eng, level);
   }
 
   /**

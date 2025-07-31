@@ -1,8 +1,6 @@
 import { SpriteDirection } from '../data/SpriteDirection';
-import mat3 from '../math/mat3';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
-import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 
 export class PlayerTile extends TileController {

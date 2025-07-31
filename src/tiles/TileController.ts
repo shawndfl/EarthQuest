@@ -1,6 +1,6 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
-import { TileData } from '../data/ILevelData';
+import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
@@ -11,7 +11,7 @@ import { DrawingLayer } from '../systems/DrawingLayer';
 
 export interface TileControllerOptions {
   quad: Quad;
-  tileData: TileData;
+  tileData: RuntimeTileData;
   sourceTexture: Texture;
   buffer: GlBuffer;
   drawingLayer: DrawingLayer;
@@ -37,7 +37,7 @@ export abstract class TileController extends Component {
   /**
    * The tile data that describes how this controller should behave
    */
-  public get tileData(): TileData {
+  public get tileData(): RuntimeTileData {
     return this.options.tileData;
   }
 
@@ -94,7 +94,7 @@ export abstract class TileController extends Component {
    * @param name
    */
   setImage(name: string, flipX?: boolean, flipY?: boolean): void {
-    const imageLoc = this.options.tileData.images?.[name];
+    const imageLoc = this.options.tileData.data.images?.[name];
     if (imageLoc) {
       this.activeImage = name;
       const texture = this.options.sourceTexture;

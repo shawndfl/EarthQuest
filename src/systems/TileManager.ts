@@ -1,5 +1,6 @@
 import { Component } from '../core/Component';
 import { ILevelData, TileData } from '../data/ILevelData';
+import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
@@ -30,7 +31,7 @@ export class TileManager extends Component {
   }
 
   async loadLevel(): Promise<void> {
-    const level: ILevelData = this.eng.gameManager.levelData;
+    const level = this.eng.gameManager.levelData.data;
     console.debug('TileManager loading level...');
 
     // reset the tile controllers
@@ -41,7 +42,7 @@ export class TileManager extends Component {
 
     // create the drawing layers
     this._drawingLayers = [];
-    for (let i = 0; i < level.layers.length; i++) {
+    for (let i = 0; i < level.map.length; i++) {
       const layer = new DrawingLayer(this.eng, i);
       await layer.initialize();
       await layer.loadLevel();
@@ -80,7 +81,7 @@ export class TileManager extends Component {
    * @returns
    */
   registerQuad(
-    tileData: TileData,
+    tileData: RuntimeTileData,
     quad: Quad,
     sourceTexture: Texture,
     buffer: GlBuffer,
@@ -100,13 +101,13 @@ export class TileManager extends Component {
    * @returns
    */
   protected createController(
-    tileData: TileData,
+    tileData: RuntimeTileData,
     quad: Quad,
     sourceTexture: Texture,
     buffer: GlBuffer,
     drawingLayer: DrawingLayer
   ): TileController {
-    switch (tileData.type) {
+    switch (tileData.data.type) {
       case 'player':
         return new PlayerTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
       case 'npc':

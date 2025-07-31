@@ -9,8 +9,9 @@ import { Scene } from './Scene';
 import '../css/canvas.scss';
 import { TileManager } from '../systems/TileManager';
 import { ILevelData } from '../data/ILevelData';
-import { Editor } from '../systems/Editor';
 import { InputManager } from '../systems/InputManager';
+import { OptimizeTiles } from '../systems/OptimizeTiles';
+import { RuntimeLevelData } from '../data/RuntimeLevelData';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -32,7 +33,7 @@ export class Engine {
   readonly scene: Scene;
   readonly tileManager: TileManager;
   readonly inputManager: InputManager;
-  readonly editor: Editor;
+  readonly optimizeTiles: OptimizeTiles;
   readonly urlParams: URL;
 
   get canvasGL(): HTMLCanvasElement {
@@ -55,6 +56,10 @@ export class Engine {
     return !!this.urlParams.searchParams.get('editor');
   }
 
+  get levelData(): RuntimeLevelData {
+    return this.gameManager.levelData;
+  }
+
   /**
    * the render context
    */
@@ -75,7 +80,7 @@ export class Engine {
     this.viewManager = new ViewManager(this);
     this.inputManager = new InputManager(this);
     this.gameManager = new GameManager(this);
-    this.editor = new Editor(this);
+    this.optimizeTiles = new OptimizeTiles(this);
     this.urlParams = new URL(window.location.href);
   }
 
@@ -153,7 +158,7 @@ export class Engine {
     await this.scene.initialize();
     await this.tileManager.initialize();
     if (this.editorActive) {
-      await this.editor.initialize();
+      await this.optimizeTiles.initialize();
     }
 
     const url = this.getLevelDataUrl();

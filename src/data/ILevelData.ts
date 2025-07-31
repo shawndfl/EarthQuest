@@ -1,7 +1,10 @@
+import { Component } from '../core/Component';
+import { Engine } from '../core/Engine';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 
 export enum CollisionSide {
   All = '*',
@@ -25,22 +28,15 @@ export interface TileData {
   rotate?: number;
   flipX?: boolean;
   flipY?: boolean;
+  tileXOffset?: number;
+  tileYOffset?: number;
+  tileWidth?: number; // default is 8
+  tileHeight?: number; // default is 8
   alpha?: number; // default 1.0
   options?: string[]; // if it's a door have some options for what level data this connects to
 
   /** The images mapped to a location (x,y,w,h) in the texture */
   images: { [name: string]: string };
-}
-
-/**
- * Used for runtime once the tile data is loaded
- */
-export interface RuntimeTileData extends TileData {
-  location: vec2;
-  texture: Texture;
-  /** the quad to manage */
-  quad: Quad;
-  buffer: GlBuffer;
 }
 
 /**
@@ -59,7 +55,6 @@ export interface ILevelData {
   textures: string[];
 
   tiles: { [id: string]: TileData };
-  layers: { [loc: string]: string }[];
 
   /**
    * map of multi layer 2d tile ids
