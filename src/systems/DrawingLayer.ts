@@ -116,10 +116,10 @@ export class DrawingLayer extends Component {
       alpha: 1,
       hue: 0,
       texture,
-      sourcePixelX: tileData.position.x,
-      sourcePixelY: tileData.position.y,
-      sourcePixelWidth: tileData.size.x,
-      sourcePixelHeight: tileData.size.y,
+      sourcePixelX: tileData.sourcePosition.x,
+      sourcePixelY: tileData.sourcePosition.y,
+      sourcePixelWidth: tileData.sourceSize.x,
+      sourcePixelHeight: tileData.sourceSize.y,
     });
   }
 
@@ -169,8 +169,8 @@ export class DrawingLayer extends Component {
 
     const transform = new mat4();
     transform.setIdentity();
-    transform.translate(new vec3(posX + (tileData.position.x ?? 0), posY + (tileData.position.y ?? 0), posZ));
-    transform.scale(new vec3(tileData.size.x ?? sourcePixelWidth, tileData.size.y ?? sourcePixelHeight, 1));
+    transform.translate(new vec3(posX + (tileData.tilePosition.x ?? 0), posY + (tileData.tilePosition.y ?? 0), posZ));
+    transform.scale(new vec3(tileData.tileSize.x ?? sourcePixelWidth, tileData.tileSize.y ?? sourcePixelHeight, 1));
 
     const uvTransform = new mat3();
     const scaleX = sourcePixelWidth / texture.width;

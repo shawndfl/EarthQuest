@@ -9,11 +9,14 @@ export class RuntimeTileData {
   /**
    * Position in pixels of the source image
    */
-  position: vec2;
+  sourcePosition: vec2;
   /**
    * Size in pixels of the source image. Mostly 8x8
    */
-  size: vec2;
+  sourceSize: vec2;
+
+  tileSize: vec2;
+  tilePosition: vec2;
 
   get data(): Readonly<TileData> {
     return this._tileData;
@@ -27,8 +30,10 @@ export class RuntimeTileData {
   constructor(private _tileData: TileData) {
     this._images = new Map();
     const point = this.getLocationFromString(_tileData.sourceLocation);
-    this.position = new vec2(point.x, point.y);
-    this.size = new vec2(point.z, point.w);
+    this.sourcePosition = new vec2(point.x, point.y);
+    this.sourceSize = new vec2(point.z, point.w);
+    this.tileSize = new vec2(_tileData.tileWidth ?? this.sourceSize.x, _tileData.tileHeight ?? this.sourceSize.y);
+    this.tilePosition = new vec2(_tileData.tileXOffset ?? 0, _tileData.tileYOffset ?? 0);
 
     // add in all the images
     if (this._tileData.images) {
