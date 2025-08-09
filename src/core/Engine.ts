@@ -13,6 +13,7 @@ import { InputManager } from '../systems/InputManager';
 import { OptimizeTiles } from '../systems/OptimizeTiles';
 import { RuntimeLevelData } from '../data/RuntimeLevelData';
 import { DebugHelpers } from '../systems/DebugHelpers';
+import { TextManager } from '../systems/TextManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -37,6 +38,7 @@ export class Engine {
   readonly optimizeTiles: OptimizeTiles;
   readonly urlParams: URL;
   readonly debugHelpers: DebugHelpers;
+  readonly textManager: TextManager;
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -75,6 +77,7 @@ export class Engine {
   constructor() {
     this.notificationManager = new NotificationManager(this);
     this.debugHelpers = new DebugHelpers(this);
+    this.textManager = new TextManager(this);
     this.scene = new Scene(this);
     this.tileManager = new TileManager(this);
     this.assetManager = new AssetManager(this);
@@ -157,6 +160,7 @@ export class Engine {
 
     // initialize all systems
     await this.debugHelpers.initialize();
+    await this.textManager.initialize();
     await this.viewManager.initialize();
     await this.assetManager.initialize();
     await this.scene.initialize();
@@ -207,6 +211,7 @@ export class Engine {
     this.tileManager.update(dt);
 
     this.debugHelpers.update(dt);
+    this.textManager.update(dt);
 
     this.inputManager.postUpdate(dt);
   }

@@ -19,6 +19,15 @@ export class PlayerTile extends TileController {
     this._translation = new vec3();
     this.speed = 0.2;
     this._facing = SpriteDirection.South;
+
+    this.eng.textManager.setTextBlock({
+      id: 'player',
+      text: 'It works!',
+      color: new vec4([0, 1, 1, 1]),
+      position: new vec2(0, 0),
+      scale: 2,
+      depth: 0,
+    });
   }
 
   update(dt: number): void {
