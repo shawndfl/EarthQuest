@@ -24,8 +24,19 @@ export interface TileControllerOptions {
  * This is a base class for managing a tile.
  */
 export abstract class TileController extends Component {
+  /**
+   * The collision rect of the tile.
+   */
   protected _collision: rect = new rect();
+  /**
+   * This is the bottom left corner of the tile.
+   */
   protected _quadPosition: vec3 = new vec3();
+
+  get collision(): Readonly<rect> {
+    return this._collision;
+  }
+
   /**
    * The texture applied to this quad
    */
@@ -99,6 +110,27 @@ export abstract class TileController extends Component {
     }
 
     return point;
+  }
+
+  /**
+   * Updates the transform matrix, updates collision, request refresh
+   * @param offset - vector 3 translation relative to the current translation. if null will just update the collision box.
+   */
+  setTranslation(offset?: vec3): void {
+    if (offset) {
+      this.quad.transform.translate(offset);
+    }
+    this.quad.transform.getTranslation(this._quadPosition);
+    this.updateCollision();
+
+    this.options.drawingLayer.requestRefresh();
+  }
+
+  updateCollision(): void {
+    this._collision.left = this._quadPosition.x;
+    this._collision.width = this.tileData.tileSize.x * this.eng.pixelScale;
+    this._collision.height = this.tileData.tileSize.y * this.eng.pixelScale;
+    this._collision.top = this._quadPosition.y + this._collision.height;
   }
 
   /**

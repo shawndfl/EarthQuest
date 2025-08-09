@@ -124,10 +124,31 @@ export class TileManager extends Component {
     }
   }
 
-  checkCollision(source: TileController, filterMask: CollisionTypes, collision: rect): CollisionResults {
-    for (let i = 0; i < this._tileControllers.length; i++) {
-      //const other = this._tileControllers[i].get
+  /**
+   * Check for a collision between this and other tiles.
+   * @param source
+   * @param filterMask
+   * @param collision
+   * @returns
+   */
+  checkCollision(source: TileController, filterMask?: CollisionTypes, collision?: Readonly<rect>): CollisionResults {
+    if (!collision) {
+      collision = source.collision;
     }
-    return null;
+    const results = new CollisionResults();
+    for (let i = 0; i < this._tileControllers.length; i++) {
+      const other = this._tileControllers[i];
+
+      // don't collide with yourself
+      if (other == source) {
+        continue;
+      }
+
+      // collect the colliding tiles
+      if (collision.intersects(other.collision)) {
+        results.pushCollision(other);
+      }
+    }
+    return results;
   }
 }

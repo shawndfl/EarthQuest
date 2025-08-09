@@ -29,10 +29,10 @@ export class DebugHelpers extends Component {
   }
 
   setRect(id: string, rect: rect, color: vec4): void {
-    const p0 = new vec3(rect.left, rect.top + rect.height, 0);
-    const p1 = new vec3(rect.right, rect.top + rect.height, 0);
-    const p2 = new vec3(rect.right, rect.top, 0);
-    const p3 = new vec3(rect.left, rect.top, 0);
+    const p0 = new vec3(rect.left, rect.top, 0);
+    const p1 = new vec3(rect.right, rect.top, 0);
+    const p2 = new vec3(rect.right, rect.top - rect.height, 0);
+    const p3 = new vec3(rect.left, rect.top - rect.height, 0);
 
     this._lines.set(id + ':top', { start: p0, end: p1, color });
     this._lines.set(id + ':right', { start: p1, end: p2, color });
@@ -71,7 +71,7 @@ export class DebugHelpers extends Component {
       const offset = 0;
 
       this.gl.depthFunc(this.gl.ALWAYS);
-      this.gl.drawArrays(this.gl.LINE_LOOP, offset, count);
+      this.gl.drawArrays(this.gl.LINES, offset, count);
       this.gl.depthFunc(this.gl.LEQUAL);
     }
   }

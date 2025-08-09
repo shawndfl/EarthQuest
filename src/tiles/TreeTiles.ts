@@ -1,5 +1,6 @@
 import { Curve, CurveType } from '../math/Curve';
 import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 
 export class TreeTile extends TileController {
@@ -25,10 +26,17 @@ export class TreeTile extends TileController {
       this.setImage(imageNames[v]);
 
       const transform = this.options.quad.transform;
-      const currentPosition = transform.getTranslation();
+      transform.getTranslation(this._quadPosition);
       transform.setIdentity();
-      transform.translate(currentPosition);
+      this.setTranslation(this._quadPosition);
+
       transform.scale(new vec3(tileData.sourceSize.x, tileData.sourceSize.y, 1));
+      transform.getTranslation(this._quadPosition);
+      this.tileData.tileSize.x = this.tileData.sourceSize.x;
+      this.tileData.tileSize.y = this.tileData.sourceSize.y;
+      this.updateCollision();
+
+      this.eng.debugHelpers.setRect('tree', this._collision, new vec4([0, 0.5, 1, 1]));
     });
   }
 

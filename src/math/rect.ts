@@ -22,7 +22,7 @@ export default class rect {
   }
 
   get bottom(): number {
-    return this.top + this.height;
+    return this.top - this.height;
   }
 
   set left(value: number) {
@@ -94,7 +94,7 @@ export default class rect {
     return true;
   }
 
-  intersects(other: rect): boolean {
+  intersects(other: Readonly<rect>): boolean {
     if (this.right < other.left) {
       return false;
     }
@@ -105,7 +105,7 @@ export default class rect {
       return false;
     }
 
-    if (this.bottom < other.top) {
+    if (this.bottom > other.top) {
       return false;
     }
 

@@ -41,7 +41,6 @@ export class PlayerTile extends TileController {
 
       this.quad.transform.getTranslation(this._quadPosition);
 
-      /*
       console.debug(
         'player collision ',
         this._collision.left.toFixed(0) +
@@ -53,16 +52,8 @@ export class PlayerTile extends TileController {
           this._collision.height.toFixed(0) +
           ', '
       );
-      */
 
-      this.quad.transform.translate(this._translation);
-      this.quad.transform.getTranslation(this._quadPosition);
-      this._collision.left = this._quadPosition.x;
-      this._collision.width = (this.tileData.tileSize?.x ?? this.tileData.sourceSize.x) * this.eng.pixelScale;
-      this._collision.height = (this.tileData.tileSize?.y ?? this.tileData.sourceSize.y) * this.eng.pixelScale;
-      this._collision.top = this._quadPosition.y;
-
-      this.eng.debugHelpers.setRect('player', this._collision, new vec4([1, 0, 0, 1]));
+      this.setTranslation(this._translation);
 
       this.eng.viewManager.setTarget(
         this._quadPosition.x - this.eng.width / 2,
@@ -73,6 +64,14 @@ export class PlayerTile extends TileController {
       this._walkingTimer -= dt;
     } else {
       this.adjustSpriteDirection(dir);
+    }
+
+    const results = this.eng.tileManager.checkCollision(this);
+
+    if (results.hasCollision()) {
+      this.eng.debugHelpers.setRect('player', this._collision, new vec4([1, 0, 0, 1]));
+    } else {
+      this.eng.debugHelpers.setRect('player', this._collision, new vec4([0, 0.5, 1, 1]));
     }
   }
 
