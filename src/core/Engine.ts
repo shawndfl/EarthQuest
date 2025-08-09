@@ -146,7 +146,7 @@ export class Engine {
 
     // some gl setup
     this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.FRONT);
+    this.gl.cullFace(this.gl.BACK);
 
     this.gl.enable(this.gl.BLEND);
 
@@ -207,11 +207,13 @@ export class Engine {
     }
     this.inputManager.preUpdate(dt);
 
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
     this.scene.update(dt);
     this.tileManager.update(dt);
+    this.textManager.update(dt);
 
     this.debugHelpers.update(dt);
-    this.textManager.update(dt);
 
     this.inputManager.postUpdate(dt);
   }

@@ -10,6 +10,7 @@ import vec3 from '../math/vec3';
 import vec2 from '../math/vec2';
 import { Timer } from '../utilities/Timer';
 import { Curve, CurveType } from '../math/Curve';
+import vec4 from '../math/vec4';
 
 /**
  * The main scene for walking around in the world. The player can

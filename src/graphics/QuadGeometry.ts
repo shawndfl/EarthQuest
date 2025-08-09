@@ -221,12 +221,12 @@ export class QuadGeometry {
       verts[vertIndex++] = quad.alpha;
 
       indices[indexIndex++] = vertCount + 0;
-      indices[indexIndex++] = vertCount + 1;
       indices[indexIndex++] = vertCount + 3;
+      indices[indexIndex++] = vertCount + 1;
 
       indices[indexIndex++] = vertCount + 1;
-      indices[indexIndex++] = vertCount + 2;
       indices[indexIndex++] = vertCount + 3;
+      indices[indexIndex++] = vertCount + 2;
 
       vertCount += 4;
     }

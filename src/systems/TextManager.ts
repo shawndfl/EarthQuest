@@ -4,7 +4,7 @@ import { Texture } from '../graphics/Texture';
 import { Engine } from '../core/Engine';
 import { Component } from '../core/Component';
 import { TextController } from '../core/TextController';
-import { TextShader } from '../shaders/textShader';
+import { TextShader } from '../shaders/TextShader';
 import FontImage from '../assets/font.png';
 import FontData from '../assets/font.json';
 

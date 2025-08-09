@@ -96,7 +96,7 @@ export class TextController extends Component {
       quads.push(quad);
     }
     const geo = TextGeometry.createQuad(quads);
-    this.buffer.setBuffers(geo, false);
+    this.buffer.setTextBuffers(geo, false);
   }
 
   /**

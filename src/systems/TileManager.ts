@@ -70,7 +70,6 @@ export class TileManager extends Component {
     //Render
     // baseLayer - includes background, and sprites sorted from top to bottom
     // Clear the canvas before we start drawing on it.
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     for (let layer of this._drawingLayers) {
       layer.update(dt);
     }
