@@ -76,6 +76,42 @@ export default class rect {
     return dest;
   }
 
+  contains(other: rect): boolean {
+    if (other.left < this.left) {
+      return false;
+    }
+    if (other.right > this.right) {
+      return false;
+    }
+    if (other.top > this.top) {
+      return false;
+    }
+
+    if (other.bottom < this.bottom) {
+      return false;
+    }
+
+    return true;
+  }
+
+  intersects(other: rect): boolean {
+    if (this.right < other.left) {
+      return false;
+    }
+    if (this.left > other.right) {
+      return false;
+    }
+    if (this.top < other.bottom) {
+      return false;
+    }
+
+    if (this.bottom < other.top) {
+      return false;
+    }
+
+    return true;
+  }
+
   equals(vector: rect, threshold = epsilon): boolean {
     if (Math.abs(this.left - vector.left) > threshold) {
       return false;

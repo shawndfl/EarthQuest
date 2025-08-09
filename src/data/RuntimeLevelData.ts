@@ -27,6 +27,10 @@ export class RuntimeTileData {
     return this._images;
   }
 
+  getImageNames(): string[] {
+    return Array.from(this._images.keys());
+  }
+
   constructor(private _tileData: TileData) {
     this._images = new Map();
     const point = this.getLocationFromString(_tileData.sourceLocation);

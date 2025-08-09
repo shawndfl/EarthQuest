@@ -1,13 +1,17 @@
 import { Component } from '../core/Component';
+import { CollisionResults } from '../data/CollisionResults';
+import { CollisionTypes } from '../data/CollisionTypes';
 import { ILevelData, TileData } from '../data/ILevelData';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+import rect from '../math/rect';
 import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
 import { StaticTile } from '../tiles/StaticTile';
 import { TileController } from '../tiles/TileController';
+import { TreeTile } from '../tiles/TreeTiles';
 import { DrawingLayer } from './DrawingLayer';
 import { UserAction } from './InputManager';
 
@@ -107,13 +111,23 @@ export class TileManager extends Component {
     buffer: GlBuffer,
     drawingLayer: DrawingLayer
   ): TileController {
+    const options = { buffer, tileData, sourceTexture, quad, drawingLayer };
     switch (tileData.data.type) {
       case 'player':
-        return new PlayerTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
+        return new PlayerTile(this.eng, options);
       case 'npc':
-        return new NpcTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
+        return new NpcTile(this.eng, options);
       case 'static':
-        return new StaticTile(this.eng, { buffer, tileData, sourceTexture, quad, drawingLayer });
+        return new StaticTile(this.eng, options);
+      case 'tree':
+        return new TreeTile(this.eng, options);
     }
+  }
+
+  checkCollision(source: TileController, filterMask: CollisionTypes, collision: rect): CollisionResults {
+    for (let i = 0; i < this._tileControllers.length; i++) {
+      //const other = this._tileControllers[i].get
+    }
+    return null;
   }
 }

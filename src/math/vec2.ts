@@ -81,6 +81,9 @@ export default class vec2 {
   }
 
   equals(vector: vec2, threshold = epsilon): boolean {
+    if (!vector) {
+      return false;
+    }
     if (Math.abs(this.x - vector.x) > threshold) {
       return false;
     }

@@ -1,0 +1,38 @@
+import { Curve, CurveType } from '../math/Curve';
+import vec3 from '../math/vec3';
+import { TileController } from './TileController';
+
+export class TreeTile extends TileController {
+  private curve: Curve;
+  async initialize(): Promise<void> {
+    this.curve = new Curve();
+    this.curve.curve(CurveType.discreet);
+    this.curve.repeat(-1);
+    this.curve.points([
+      { p: 0, t: 0 },
+      { p: 1, t: 1000 },
+      { p: 2, t: 2000 },
+      { p: 3, t: 3000 },
+      { p: 4, t: 4000 },
+      { p: 0, t: 5000 },
+    ]);
+    this.curve.start(false, undefined, (v) => {
+      //console.debug('tree ' + v);
+      const tileData = this.options.tileData;
+      const imageNames = this.options.tileData.getImageNames();
+
+      // requests refresh
+      this.setImage(imageNames[v]);
+
+      const transform = this.options.quad.transform;
+      const currentPosition = transform.getTranslation();
+      transform.setIdentity();
+      transform.translate(currentPosition);
+      transform.scale(new vec3(tileData.sourceSize.x, tileData.sourceSize.y, 1));
+    });
+  }
+
+  update(dt: number): void {
+    this.curve.update(dt);
+  }
+}

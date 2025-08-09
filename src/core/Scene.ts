@@ -58,7 +58,7 @@ export class Scene extends Component {
       const quad2 = this.placeQuad(45, 30, 0, 1824, 368, 90, 1);
 
       // set the openGL buffers
-      const geo = QuadGeometry.CreateQuad([quad1, quad2]);
+      const geo = QuadGeometry.createQuad([quad1, quad2]);
       this._buffer.setBuffers(geo);
     };
 

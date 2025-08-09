@@ -1,6 +1,8 @@
 import { SpriteDirection } from '../data/SpriteDirection';
+import rect from '../math/rect';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 
 export class PlayerTile extends TileController {
@@ -36,9 +38,36 @@ export class PlayerTile extends TileController {
     if (this._walking) {
       this._walking = true;
       this.adjustSpriteDirection(dir);
+
+      this.quad.transform.getTranslation(this._quadPosition);
+
+      /*
+      console.debug(
+        'player collision ',
+        this._collision.left.toFixed(0) +
+          ', ' +
+          this._collision.top.toFixed(0) +
+          ', ' +
+          this._collision.width.toFixed(0) +
+          ', ' +
+          this._collision.height.toFixed(0) +
+          ', '
+      );
+      */
+
       this.quad.transform.translate(this._translation);
-      const target = this.quad.transform.getTranslation();
-      this.eng.viewManager.setTarget(target.x - this.eng.width / 2, target.y - this.eng.height / 2);
+      this.quad.transform.getTranslation(this._quadPosition);
+      this._collision.left = this._quadPosition.x;
+      this._collision.width = (this.tileData.tileSize?.x ?? this.tileData.sourceSize.x) * this.eng.pixelScale;
+      this._collision.height = (this.tileData.tileSize?.y ?? this.tileData.sourceSize.y) * this.eng.pixelScale;
+      this._collision.top = this._quadPosition.y;
+
+      this.eng.debugHelpers.setRect('player', this._collision, new vec4([1, 0, 0, 1]));
+
+      this.eng.viewManager.setTarget(
+        this._quadPosition.x - this.eng.width / 2,
+        this._quadPosition.y - this.eng.height / 2
+      );
       this.options.drawingLayer.requestRefresh();
 
       this._walkingTimer -= dt;

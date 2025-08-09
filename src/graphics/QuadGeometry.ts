@@ -2,6 +2,7 @@ import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
 import { Geometry } from './GlBuffer';
 
 export interface Quad {
@@ -25,14 +26,85 @@ export interface Quad {
   offset?: vec2;
 }
 
+export interface Line {
+  start: vec3;
+  end: vec3;
+  color: vec4;
+}
+
 export class QuadGeometry {
+  /**
+   * Creates an array of colored lines
+   * @param lines
+   * @returns
+   */
+  static createLineArray(lines: Line[]): Geometry {
+    let vertCount = 0;
+    let vertIndex = 0;
+    let indexIndex = 0;
+
+    const verts = new Float32Array(lines.length * 2 * 7); // x,y,z r,g,b,a X 2
+    const indices = new Uint16Array(lines.length * 2);
+
+    const p0 = new vec3();
+    const p1 = new vec3();
+    const c0 = new vec4();
+    const c1 = new vec4();
+
+    for (let line of lines) {
+      p0.x = line.start.x;
+      p0.y = line.start.y;
+      p0.z = line.start.z;
+
+      c0.x = line.color.x;
+      c0.y = line.color.y;
+      c0.z = line.color.z;
+      c0.w = line.color.w;
+
+      p1.x = line.end.x;
+      p1.y = line.end.y;
+      p1.z = line.end.z;
+
+      c1.x = line.color.x;
+      c1.y = line.color.y;
+      c1.z = line.color.z;
+      c1.w = line.color.w;
+
+      verts[vertIndex++] = p0.x;
+      verts[vertIndex++] = p0.y;
+      verts[vertIndex++] = p0.z;
+      verts[vertIndex++] = c0.x;
+      verts[vertIndex++] = c0.y;
+      verts[vertIndex++] = c0.z;
+      verts[vertIndex++] = c0.w;
+
+      verts[vertIndex++] = p1.x;
+      verts[vertIndex++] = p1.y;
+      verts[vertIndex++] = p1.z;
+      verts[vertIndex++] = c1.x;
+      verts[vertIndex++] = c1.y;
+      verts[vertIndex++] = c1.z;
+      verts[vertIndex++] = c1.w;
+
+      indices[indexIndex++] = vertCount + 0;
+      indices[indexIndex++] = vertCount + 1;
+
+      vertCount += 2;
+    }
+
+    return {
+      verts,
+      indices,
+    };
+  }
+
   /**
    * Creates a quad center at the origin with the given width and height on the x,y plane.
    * This function will sort the quads by bottom y position.
    * @param quads
    * @returns
    */
-  static CreateQuad(quads: Quad[]): Geometry {
+  static createQuad(quads: Quad[]): Geometry {
     let vertCount = 0;
     let vertIndex = 0;
     let indexIndex = 0;

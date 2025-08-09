@@ -95,7 +95,7 @@ export class DrawingLayer extends Component {
 
   protected refreshGeometry(): void {
     // set the openGL buffers
-    const geo = QuadGeometry.CreateQuad(this._quads);
+    const geo = QuadGeometry.createQuad(this._quads);
     this._buffer.setBuffers(geo);
     this._refreshGeometry = false;
   }
@@ -187,7 +187,7 @@ export class DrawingLayer extends Component {
     const quad = {
       width,
       height,
-      // offset quad so that the bottom right is the anchor point instead of the center
+      // offset quad so that the bottom left is the anchor point instead of the center
       offset: new vec2(width / 2, height / 2),
       transform,
       uvTransform,

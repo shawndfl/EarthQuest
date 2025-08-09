@@ -16,11 +16,9 @@ export class Block8X8 {
     const destData = [];
     for (let y = top; y < top + 8; y++) {
       for (let x = left; x < left + 8; x++) {
-        const destX = x - left;
-        const destY = y - top;
-
         // watch the bounds
         if (x >= data.width || y >= data.height) {
+          destData.push(...[0, 0, 0, 0]);
           continue;
         }
 
@@ -38,6 +36,10 @@ export class Block8X8 {
     // Normalize and stringify hash
     hash = hash % 0xffffffff; // keep it 32-bit
     this.hash = hash.toString(16).padStart(8, '0');
+    const count = 8 * 8 * 4;
+    if (count != destData.length) {
+      console.error('');
+    }
 
     this.data = new ImageData(new Uint8ClampedArray(destData), 8, 8, { colorSpace: 'srgb' });
   }
@@ -95,7 +97,10 @@ export class OptimizeTiles extends Component {
           // Loop through pixels
           for (let y = 0; y < this.canvas.height; y += blockSize) {
             for (let x = 0; x < this.canvas.width; x += blockSize) {
-              const blockIndex = ((y / blockSize) * this.canvas.width) / blockSize + x / blockSize;
+              const blockIndex = Math.ceil(((y / blockSize) * this.canvas.width) / blockSize + x / blockSize);
+              if (!blocks[blockIndex]) {
+                console.error('null');
+              }
               blocks[blockIndex].setPixels(x, y, data);
 
               //console.debug('block index ' + blockIndex + ' hash ' + blocks[blockIndex].hash);
@@ -130,9 +135,13 @@ export class OptimizeTiles extends Component {
           );
 
           this._2dContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          const width = 256; // clamp to 256
+          const height = (unique.length / (width / blockSize)) * blockSize;
+          //this.canvas.width = width;
+          //this.canvas.height = height;
           let index = 0;
-          for (let y = 0; y < 256; y += blockSize) {
-            for (let x = 0; x < 256; x += blockSize) {
+          for (let y = 0; y < height; y += blockSize) {
+            for (let x = 0; x < width; x += blockSize) {
               this._2dContext.putImageData(unique[index++].data, x, y);
             }
           }

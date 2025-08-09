@@ -1,11 +1,14 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
+import { CollisionTypes } from '../data/CollisionTypes';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import mat3 from '../math/mat3';
+import rect from '../math/rect';
 import vec2 from '../math/vec2';
+import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 import { DrawingLayer } from '../systems/DrawingLayer';
 
@@ -21,12 +24,21 @@ export interface TileControllerOptions {
  * This is a base class for managing a tile.
  */
 export abstract class TileController extends Component {
+  protected _collision: rect = new rect();
+  protected _quadPosition: vec3 = new vec3();
   /**
    * The texture applied to this quad
    */
   public get texture(): Texture {
     return this.options.sourceTexture;
   }
+
+  public canMove(newLocation: vec2): boolean {
+    const collision = new rect([newLocation.x, newLocation.y + this.quad.height, this.quad.width, this.quad.height]);
+    const results = this.eng.tileManager.checkCollision(this, CollisionTypes.Any, collision);
+    return false;
+  }
+
   /**
    * The quad that will be managed by this tile controller.
    */
@@ -105,6 +117,13 @@ export abstract class TileController extends Component {
       const scaleY = sourcePixelHeight / texture.height;
       const offsetU = sourcePixelX / texture.width;
       const offsetV = sourcePixelY / texture.height;
+
+      // save the new source data
+      this.options.tileData.sourcePosition.x = sourcePixelX;
+      this.options.tileData.sourcePosition.y = sourcePixelY;
+      this.options.tileData.sourceSize.x = sourcePixelWidth;
+      this.options.tileData.sourceSize.y = sourcePixelHeight;
+
       uvTransform.setIdentity();
       uvTransform.scale(new vec2(scaleX, scaleY));
       uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));

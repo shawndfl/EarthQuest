@@ -6,14 +6,10 @@ import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
 
-export enum CollisionSide {
-  All = '*',
-  N = 'N',
-  E = 'E',
-  S = 'S',
-  W = 'W',
-}
-
+/**
+ * Which corners can you collide with?
+ *
+ */
 export interface TileData {
   /** readable name */
   id: string;
@@ -24,7 +20,7 @@ export interface TileData {
 
   sourceTextureIndex?: number; // defaults to the first one
   /** the pixel x,y,w,h location in the source texture for this image */
-  sourceLocation: '';
+  sourceLocation: string;
   rotate?: number;
   flipX?: boolean;
   flipY?: boolean;
@@ -33,6 +29,15 @@ export interface TileData {
   tileWidth?: number; // default is 8
   tileHeight?: number; // default is 8
   alpha?: number; // default 1.0
+
+  /**
+   * Set flags for each tile that is the user can collide with.
+   * For example, a 16x24 character would be
+   *   x,x
+   *   x,x
+   *   x,x
+   */
+  collisionTiles: string[][];
   options?: string[]; // if it's a door have some options for what level data this connects to
 
   /** The images mapped to a location (x,y,w,h) in the texture */

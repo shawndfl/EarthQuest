@@ -44,6 +44,73 @@ export class GlBuffer {
   }
 
   /**
+   * Create the buffer for lines. No index buffer.
+   * @param quads A array of quads that will be added to this buffer
+   * @param isStatic Is this buffer static
+   * @returns
+   */
+  setColorBuffers(geo: Geometry, isStatic: boolean = true) {
+    const { verts } = geo;
+
+    this.indexCount = geo.verts.length / 7;
+    // check if we have buffer
+    if (!this.vertBuffer) {
+      this.dispose();
+      // create vert array buffer
+      this.vertArrayBuffer = this.gl.createVertexArray();
+      // position buffer
+      this.vertBuffer = this.gl.createBuffer();
+    }
+
+    // bind the array buffer
+    this.gl.bindVertexArray(this.vertArrayBuffer);
+
+    // Create a buffer for positions.
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      verts,
+      isStatic ? this.gl.STATIC_DRAW : this.gl.DYNAMIC_DRAW,
+      0,
+      verts.length
+    );
+
+    // in order for this to work the vertex shader will
+    // need to have position
+    //  vec3 aPos;
+    //  vec4 aColor;
+    //
+    const positionAttribute = 0;
+    const colorAttribute = 1;
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute
+    {
+      const numComponents = 3; // position x, y, z
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + color(r,g,b,a) * 4 byte float
+      const offset = 0;
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(positionAttribute, numComponents, type, normalize, stride, offset);
+      this.gl.enableVertexAttribArray(positionAttribute);
+    }
+
+    // Tell WebGL how to pull out the texture coordinates from
+    // the texture coordinate buffer into the textureCoord attribute.
+    {
+      const numComponents = 4;
+      const type = this.gl.FLOAT;
+      const normalize = false;
+      const stride = 7 * 4; // pos(x,y,x) + color(r,g,b,a) * 4 byte float
+      const offset = 3 * 4; // start after the position
+      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertBuffer);
+      this.gl.vertexAttribPointer(colorAttribute, numComponents, type, normalize, stride, offset);
+      this.gl.enableVertexAttribArray(colorAttribute);
+    }
+  }
+
+  /**
    * Create the buffer
    * @param quads A array of quads that will be added to this buffer
    * @param isStatic Is this buffer static
