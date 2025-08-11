@@ -3,7 +3,8 @@ import { Engine } from '../core/Engine';
 import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
 import vec4 from '../math/vec4';
-import { ILevelData, TileData } from './ILevelData';
+import { ILevelData } from './ILevelData';
+import { TileData } from './ITileAtlas';
 
 export class RuntimeTileData {
   /**
@@ -81,24 +82,24 @@ export class RuntimeLevelData extends Component {
     return this._tiles;
   }
 
-  protected _textures: Texture[];
-  get textures(): Texture[] {
-    return this._textures;
+  protected _texture: Texture;
+  get texture(): Texture {
+    return this._texture;
   }
 
-  private _textureLoadPromise: Promise<Texture>[];
+  private _textureLoadPromise: Promise<Texture>;
 
   constructor(eng: Engine, protected _levelData: ILevelData) {
     super(eng);
-    this._textureLoadPromise = _levelData.textures.map((t) => eng.assetManager.getTexture(t));
+    this._textureLoadPromise = eng.assetManager.getTexture(_levelData.atlas.texture);
     this._tiles = new Map();
-    this._textures = [];
-    Object.keys(_levelData.tiles).forEach((k) => this._tiles.set(k, new RuntimeTileData(_levelData.tiles[k])));
+    Object.keys(_levelData.atlas.tiles).forEach((k) =>
+      this._tiles.set(k, new RuntimeTileData(_levelData.atlas.tiles[k]))
+    );
   }
 
-  async waitForTextures(): Promise<void> {
-    await Promise.all(this._textureLoadPromise).then((values) => {
-      this._textures.push(...values);
-    });
+  async waitForTextures(): Promise<Texture> {
+    this._texture = await this._textureLoadPromise;
+    return this._texture;
   }
 }

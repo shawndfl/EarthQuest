@@ -1,6 +1,5 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
-import { ILevelData, TileData } from '../data/ILevelData';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
@@ -13,13 +12,10 @@ import vec3 from '../math/vec3';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
 export class DrawingLayer extends Component {
-  private _textures: Texture[];
+  private _texture: Texture;
   private _buffer: GlBuffer;
   private _shader: SpritePerspectiveShader;
   private _quads: Quad[]; // should be 32 X 29 For a screen of 128/225
-  private _backgroundTileMin: vec2;
-  private _backgroundTileMax: vec2;
-  private _backgroundTileReset: boolean;
 
   private _refreshGeometry: boolean;
 
@@ -37,28 +33,20 @@ export class DrawingLayer extends Component {
    * Create the tiles
    */
   async initialize(): Promise<void> {
-    this._textures = [];
     this._quads = [];
     this._buffer = new GlBuffer(this.gl);
     this._shader = new SpritePerspectiveShader(this.gl, 'scene');
-    this._backgroundTileMin = new vec2(-this.eng.width / 2, -this.eng.height / 2);
-    this._backgroundTileMax = new vec2(this.eng.width * 1.5, this.eng.height * 1.5);
   }
 
   async loadLevel(): Promise<void> {
     const tileSize = 8;
-    const level = this.eng.gameManager.levelData;
-    const promise = [];
-    console.debug('TileManager loading level...');
+    const level = this.eng.levelData;
 
     // load all the textures
-    await level.waitForTextures();
-    this._textures = level.textures.splice(0);
+    this._texture = await level.waitForTextures();
 
     // setup the shader
-    this._shader.setSpriteSheet(this._textures[0]);
-
-    //this.updateTiles();
+    this._shader.setSpriteSheet(this._texture);
 
     const map = level.data.map;
     const loc = new vec2(); // location of the tile in world space
@@ -94,10 +82,13 @@ export class DrawingLayer extends Component {
   }
 
   protected refreshGeometry(): void {
-    // set the openGL buffers
-    const geo = QuadGeometry.createQuad(this._quads);
-    this._buffer.setBuffers(geo);
-    this._refreshGeometry = false;
+    if (this._refreshGeometry) {
+      // set the openGL buffers
+      const geo = QuadGeometry.createQuad(this._quads);
+      this._buffer.setBuffers(geo);
+
+      this._refreshGeometry = false;
+    }
   }
 
   /**
@@ -107,7 +98,7 @@ export class DrawingLayer extends Component {
   private placeSingleQuad(loc: vec2, tileData: RuntimeTileData): void {
     const x = loc.x;
     const y = loc.y;
-    const texture = this.getTextureFromId(tileData.data.sourceTextureIndex);
+    const texture = this._texture;
     this.placeQuad({
       tileData,
       posX: x,
@@ -121,18 +112,6 @@ export class DrawingLayer extends Component {
       sourcePixelWidth: tileData.sourceSize.x,
       sourcePixelHeight: tileData.sourceSize.y,
     });
-  }
-
-  /**
-   * Get the texture from an index
-   * @param index
-   * @returns
-   */
-  private getTextureFromId(index: number): Texture {
-    if (!index) {
-      return this._textures[0];
-    }
-    return this._textures[index];
   }
 
   /**
@@ -208,16 +187,9 @@ export class DrawingLayer extends Component {
   }
 
   update(dt: number): void {
-    if (this.requestRefresh) {
-      this.refreshGeometry();
-    }
+    this.refreshGeometry();
 
     this._shader.enable();
-    const scale = 1;
-    const adjustX = this.eng.width - this.eng.width * scale;
-    const adjustY = this.eng.height - this.eng.height * scale;
-
-    //this._curve.update(dt);
 
     const proj = this.eng.viewManager.projection;
 

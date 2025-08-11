@@ -3,6 +3,7 @@ import { Engine } from '../core/Engine';
 import { GameData } from '../data/GameData';
 import { ILevelData } from '../data/ILevelData';
 import { RuntimeLevelData } from '../data/RuntimeLevelData';
+import DefaultTileAtlas from '../assets/data/tileAtlas.json';
 
 /** Key for local storage */
 const localStorageKey = 'EarthQuest';
@@ -40,6 +41,11 @@ export class GameManager extends Component {
    * @param level
    */
   setLevel(level: ILevelData) {
+    // use the default atlas
+    if (!level.atlas) {
+      level.atlas = JSON.parse(JSON.stringify(DefaultTileAtlas));
+    }
+
     this._activeLevel = new RuntimeLevelData(this.eng, level);
   }
 

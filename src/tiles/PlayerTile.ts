@@ -27,6 +27,13 @@ export class PlayerTile extends TileController {
       scale: 1.0,
       depth: -1,
     });
+
+    this.quad.transform.getTranslation(this._quadPosition);
+
+    this.eng.viewManager.setTarget(
+      this._quadPosition.x - this.eng.width / 2,
+      this._quadPosition.y - this.eng.height / 2
+    );
   }
 
   update(dt: number): void {

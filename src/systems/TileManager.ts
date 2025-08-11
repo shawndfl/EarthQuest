@@ -1,12 +1,12 @@
 import { Component } from '../core/Component';
 import { CollisionResults } from '../data/CollisionResults';
 import { CollisionTypes } from '../data/CollisionTypes';
-import { ILevelData, TileData } from '../data/ILevelData';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import rect from '../math/rect';
+import { MenuTile } from '../tiles/MenuTile';
 import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
 import { StaticTile } from '../tiles/StaticTile';
@@ -120,6 +120,8 @@ export class TileManager extends Component {
         return new StaticTile(this.eng, options);
       case 'tree':
         return new TreeTile(this.eng, options);
+      case 'menu':
+        return new MenuTile(this.eng, options);
     }
   }
 

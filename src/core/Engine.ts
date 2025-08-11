@@ -14,6 +14,7 @@ import { OptimizeTiles } from '../systems/OptimizeTiles';
 import { RuntimeLevelData } from '../data/RuntimeLevelData';
 import { DebugHelpers } from '../systems/DebugHelpers';
 import { TextManager } from '../systems/TextManager';
+import { DialogManager } from '../systems/DialogManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -39,6 +40,7 @@ export class Engine {
   readonly urlParams: URL;
   readonly debugHelpers: DebugHelpers;
   readonly textManager: TextManager;
+  readonly dialogManager: DialogManager;
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -78,6 +80,7 @@ export class Engine {
     this.notificationManager = new NotificationManager(this);
     this.debugHelpers = new DebugHelpers(this);
     this.textManager = new TextManager(this);
+    this.dialogManager = new DialogManager(this);
     this.scene = new Scene(this);
     this.tileManager = new TileManager(this);
     this.assetManager = new AssetManager(this);
@@ -161,6 +164,7 @@ export class Engine {
     // initialize all systems
     await this.debugHelpers.initialize();
     await this.textManager.initialize();
+    await this.dialogManager.initialize();
     await this.viewManager.initialize();
     await this.assetManager.initialize();
     await this.scene.initialize();
@@ -192,10 +196,12 @@ export class Engine {
     this.scene.closeLevel();
     this.tileManager.closeLevel();
     this.assetManager.closeLevel();
+    this.dialogManager.closeLevel();
 
     this.gameManager.setLevel(levelData);
 
     // load the new level
+    await this.dialogManager.loadLevel();
     await this.assetManager.loadLevel();
     await this.scene.loadLevel();
     await this.tileManager.loadLevel();
@@ -211,6 +217,7 @@ export class Engine {
 
     this.scene.update(dt);
     this.tileManager.update(dt);
+    this.dialogManager.update(dt);
     this.textManager.update(dt);
 
     this.debugHelpers.update(dt);
