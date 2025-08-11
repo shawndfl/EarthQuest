@@ -5,10 +5,8 @@ import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
-import rect from '../math/rect';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
-import vec4 from '../math/vec4';
 
 /**
  * Creates the quads that make up the dialog box.
@@ -26,141 +24,176 @@ export class DialogComponent extends Component {
     super(eng);
     this.tileData = tileData;
     this.texture = texture;
+    this._quads = [];
+    for (let i = 0; i < 9; i++) {
+      this._quads.push(this.defaultQuad());
+    }
   }
 
-  createQuad(pos: vec2, width: number, height: number, alpha: number = 1.0): Quad[] {
-    this._quads = [];
+  protected defaultQuad(): Quad {
+    return {
+      width: 0,
+      height: 0,
+      // offset quad to the  center
+      offset: new vec2(),
+      transform: mat4.identity,
+      uvTransform: mat3.identity,
+      mirrorX: false,
+      mirrorY: false,
+      alpha: 1.0,
+      hueAngle: 0,
+    };
+  }
+
+  createQuad(pos: vec2, width: number, height: number, alpha: number = 1.0): Readonly<Quad[]> {
     this.position = pos;
     this.width = width;
     this.height = height;
     this.alpha = alpha;
-    this._quads.push(this.createCenterQuad());
-    this._quads.push(this.createTopRightQuad());
-    this._quads.push(this.createTopLeftQuad());
-    this._quads.push(this.createLeftQuad());
-    this._quads.push(this.createRightQuad());
-    this._quads.push(this.createTopQuad());
-    this._quads.push(this.createBottomQuad());
-    this._quads.push(this.createBottomLeftQuad());
-    this._quads.push(this.createBottomRightQuad());
+
+    this.createTopRightQuad(this._quads[0]);
+    this.createTopQuad(this._quads[1]);
+    this.createTopLeftQuad(this._quads[2]);
+
+    this.createLeftQuad(this._quads[3]);
+    this.createCenterQuad(this._quads[4]);
+    this.createRightQuad(this._quads[5]);
+
+    this.createBottomQuad(this._quads[6]);
+    this.createBottomLeftQuad(this._quads[7]);
+    this.createBottomRightQuad(this._quads[8]);
 
     return this._quads;
   }
 
-  protected createCenterQuad(): Quad {
+  protected createCenterQuad(dest: Quad): Quad {
     const width = this.width - 16;
     const height = this.height - 16;
     const imageName = 'center';
     const offset = new vec2(this.width / 2, this.height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset, 0.8);
+    return this.createQuadImp(width, height, imageName, offset, dest, 0.8);
   }
 
-  protected createTopLeftQuad(): Quad {
+  protected createTopLeftQuad(dest: Quad): Quad {
     const width = 8;
     const height = 8;
     const imageName = 'top:left';
     const offset = new vec2(width / 2, this.height - height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createTopRightQuad(): Quad {
+  protected createTopRightQuad(dest: Quad): Quad {
     const width = 8;
     const height = 8;
     const imageName = 'top:right';
     const offset = new vec2(this.width - width / 2, this.height - height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
-  protected createBottomRightQuad(): Quad {
+  protected createBottomRightQuad(dest: Quad): Quad {
     const width = 8;
     const height = 8;
     const imageName = 'bottom:right';
     const offset = new vec2(this.width - width / 2, height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createBottomLeftQuad(): Quad {
+  protected createBottomLeftQuad(dest: Quad): Quad {
     const width = 8;
     const height = 8;
     const imageName = 'bottom:left';
     const offset = new vec2(width / 2, height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createLeftQuad(): Quad {
+  protected createLeftQuad(dest: Quad): Quad {
     const width = 8;
     const height = this.height - 16;
     const imageName = 'center:left';
     const offset = new vec2(width / 2, height / 2 + width);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createTopQuad(): Quad {
+  protected createTopQuad(dest: Quad): Quad {
     const width = this.width - 16;
     const height = 8;
     const imageName = 'top:center';
     const offset = new vec2(width / 2 + 8, this.height - 8 / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createBottomQuad(): Quad {
+  protected createBottomQuad(dest: Quad): Quad {
     const width = this.width - 16;
     const height = 8;
     const imageName = 'bottom:center';
     const offset = new vec2(width / 2 + 8, height / 2);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createRightQuad(): Quad {
+  protected createRightQuad(dest: Quad): Quad {
     const width = 8;
     const height = this.height - 16;
     const imageName = 'center:right';
     const offset = new vec2(this.width - width / 2, height / 2 + 8);
 
-    return this.createQuadImp(width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset, dest);
   }
 
-  protected createQuadImp(width: number, height: number, imageName: string, offset: vec2, alpha: number = 1.0): Quad {
+  /**
+   * Creates a quad with the given inputs.
+   * @param width
+   * @param height
+   * @param imageName
+   * @param offset
+   * @param dest - target quad if null one will be created
+   * @param alpha - transparency of the quad
+   * @returns
+   */
+  protected createQuadImp(
+    width: number,
+    height: number,
+    imageName: string,
+    offset: vec2,
+    dest?: Quad,
+    alpha: number = 1.0
+  ): Quad {
+    if (!dest) {
+      dest = this.defaultQuad();
+    }
+
+    dest.width = width;
+    dest.height = height;
+    dest.offset.set(offset);
+    dest.mirrorX = false;
+    dest.mirrorY = false;
+    dest.alpha = alpha;
+    dest.hueAngle = 0;
+
     const pos = this.position;
 
-    const transform = new mat4();
-    transform.setIdentity();
-    transform.translate(new vec3(pos.x, pos.y, 0));
-    transform.scale(vec3.one);
+    dest.transform.setIdentity();
+    dest.transform.translate(new vec3(pos.x, pos.y, 0));
+    dest.transform.scale(vec3.one);
 
     const sourceSize = this.tileData.images.get(imageName).size;
     const sourcePos = this.tileData.images.get(imageName).pos;
 
-    const uvTransform = new mat3();
     const scaleX = sourceSize.x / this.texture.width;
     const scaleY = sourceSize.y / this.texture.height;
     const offsetU = sourcePos.x / this.texture.width;
     const offsetV = sourcePos.y / this.texture.height;
 
-    uvTransform.setIdentity();
-    uvTransform.scale(new vec2(scaleX, scaleY));
-    uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));
+    dest.uvTransform.setIdentity();
+    dest.uvTransform.scale(new vec2(scaleX, scaleY));
+    dest.uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));
 
-    // create a quad
-    const quad = {
-      width,
-      height,
-      // offset quad to the  center
-      offset,
-      transform,
-      uvTransform,
-      mirrorX: false,
-      mirrorY: false,
-      alpha: alpha,
-      hueAngle: 0,
-    };
-    return quad;
+    return dest;
   }
 }

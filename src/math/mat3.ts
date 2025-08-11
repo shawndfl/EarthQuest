@@ -14,7 +14,9 @@ export default class mat3 {
 
   private values = new Float32Array(9);
 
-  static readonly identity = new mat3().setIdentity();
+  static get identity(): mat3 {
+    return new mat3().setIdentity();
+  }
 
   at(index: number): number {
     return this.values[index];

@@ -4,6 +4,8 @@ import { DialogComponent } from '../dialogs/DialogComponent';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+import { clamp } from '../math/constants';
+import { Curve, CurveType } from '../math/Curve';
 import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
@@ -25,10 +27,13 @@ export class DialogManager extends Component {
   private _quads: Quad[] = []; // should be 32 X 29 For a screen of 128/225
   protected _projection: mat4;
 
+  protected openCurve: Curve;
+
   async initialize(): Promise<void> {
     this._buffer = new GlBuffer(this.gl);
     this._shader = new SpritePerspectiveShader(this.gl, 'dialogShader');
     this._projection = mat4.orthographic(0, this.eng.width, 0, this.eng.height, 1, -1, this._projection);
+    this.openCurve = new Curve();
   }
 
   async loadLevel(): Promise<void> {
@@ -53,6 +58,23 @@ export class DialogManager extends Component {
     const component = new DialogComponent(this.eng, this._menuTitle, this._texture);
     const quads = component.createQuad(pos, 200, 100, 1.0);
 
+    this.openCurve.points([
+      { p: 0, t: 0 },
+      { p: 1, t: 150 },
+      { p: 2, t: 300 },
+      { p: 3, t: 1200 },
+    ]);
+    this.openCurve.curve(CurveType.linear);
+    this.openCurve.repeat(-1);
+    this.openCurve.pingPong(true);
+    this.openCurve.start(true, undefined, (value) => {
+      const w = clamp(value * 200, 16, 200);
+      const h = clamp((value - 1) * 100, 16, 100);
+      component.createQuad(pos, w, h, 1.0);
+      const geo = QuadGeometry.createQuad(this._quads);
+      this._buffer.setBuffers(geo);
+    });
+
     this._quads.push(...quads);
     const geo = QuadGeometry.createQuad(this._quads);
     this._buffer.setBuffers(geo);
@@ -65,6 +87,8 @@ export class DialogManager extends Component {
 
     this._shader.setProj(proj);
     this._buffer.enable();
+
+    this.openCurve.update(dt);
 
     const count = this._buffer.indexCount;
     const type = this.gl.UNSIGNED_SHORT;

@@ -17,7 +17,9 @@ export default class mat4 {
     return this.values;
   }
 
-  static readonly identity = new mat4().setIdentity();
+  static get identity(): mat4 {
+    return new mat4().setIdentity();
+  }
 
   at(index: number): number {
     return this.values[index];

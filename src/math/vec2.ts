@@ -134,6 +134,12 @@ export default class vec2 {
     return this;
   }
 
+  set(other: vec2): vec2 {
+    this.x = other.x;
+    this.y = other.y;
+    return this;
+  }
+
   scale(value: number, dest?: vec2): vec2 {
     if (!dest) {
       dest = this;
