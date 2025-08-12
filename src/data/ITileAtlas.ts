@@ -7,8 +7,6 @@ export interface TileData {
   id: string;
   /** player, enemy, solid, open, door */
   type: string;
-  /**Do we need a controller for this */
-  dynamic: boolean;
 
   /** the pixel x,y,w,h location in the source texture for this image */
   sourceLocation: string;

@@ -7,11 +7,13 @@
       "_0": {
         "id": "nothing",
         "type": "null",
+        "staticTile": true,
         "sourceLocation": "0,16,8,8"
       },
       "00": {
         "id": "nothing",
         "type": "null",
+        "staticTile": true,
         "sourceLocation": "0,16,8,8"
       },
       "01": {
@@ -41,7 +43,6 @@
       "02": {
         "id": "poo",
         "type": "npc",
-        "dynamic": true,
         "options": ["poo"],
         "sourceLocation": "0,216,16,24"
       },
@@ -95,6 +96,7 @@
         "id": "ness house",
         "type": "static",
         "sourceLocation": "88,0,96,88"
+
       },
       "0E": {
         "id": "tree",

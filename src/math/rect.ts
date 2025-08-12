@@ -41,6 +41,14 @@ export default class rect {
     this.values[3] = value;
   }
 
+  get centerX(): number {
+    return this.left + this.width / 2;
+  }
+
+  get centerY(): number {
+    return this.top + this.height / 2;
+  }
+
   constructor(values?: [number, number, number, number]) {
     if (values !== undefined) {
       this.values[0] = values[0];

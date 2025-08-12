@@ -10,11 +10,22 @@ import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
+import vec4 from '../math/vec4';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
 export const defaultDialogDepth = -0.5;
 
 export const MaxDialogCount = 5;
+
+//TODO
+// Support multiple dialog
+// support options
+// Print character at a time
+// input to continue
+// menu for status
+// menu for equip
+// menu for items
+// menu for help
 
 /**
  * Manages dialog boxes
@@ -37,6 +48,15 @@ export class DialogManager extends Component {
   }
 
   async loadLevel(): Promise<void> {
+    this.eng.textManager.setTextBlock({
+      id: 'player',
+      text: 'It works!',
+      color: new vec4([0.4, 0.4, 0.7, 1]),
+      position: new vec2([this.eng.width / 2, 50]),
+      scale: 1.0,
+      depth: -1,
+    });
+
     const level = this.eng.levelData;
     this._menuTitle = this.eng.levelData.tiles.get('0F');
     if (!this._menuTitle) {
@@ -49,10 +69,6 @@ export class DialogManager extends Component {
 
     // setup the shader
     this._shader.setSpriteSheet(this._texture);
-
-    //TODO get the correct texture for the tile.
-    // Create a tile atlas
-    // then create a level data that references the atlas
 
     const pos = new vec2(100, 300);
     const component = new DialogComponent(this.eng, this._menuTitle, this._texture);
@@ -81,6 +97,8 @@ export class DialogManager extends Component {
   }
 
   update(dt: number): void {
+    // just disabling for now
+    return;
     this._shader.enable();
 
     const proj = this._projection;

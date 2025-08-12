@@ -9,11 +9,10 @@ import rect from '../math/rect';
 import { MenuTile } from '../tiles/MenuTile';
 import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
-import { StaticTile } from '../tiles/StaticTile';
+import { SolidTile } from '../tiles/SolidTile';
 import { TileController } from '../tiles/TileController';
 import { TreeTile } from '../tiles/TreeTiles';
 import { DrawingLayer } from './DrawingLayer';
-import { UserAction } from './InputManager';
 
 /**
  * Create two layers of tiles.
@@ -53,6 +52,8 @@ export class TileManager extends Component {
       this._drawingLayers.push(layer);
     }
 
+    console.debug('initializing ' + this._tileControllers.length + ' tiles...');
+
     // initialize the controllers the layers might have made
     for (let controller of this._tileControllers) {
       controller.initialize();
@@ -91,7 +92,9 @@ export class TileManager extends Component {
     drawingLayer: DrawingLayer
   ): TileController {
     const controller = this.createController(tileData, quad, sourceTexture, buffer, drawingLayer);
-    this._tileControllers.push(controller);
+    if (controller) {
+      this._tileControllers.push(controller);
+    }
     return controller;
   }
 
@@ -117,11 +120,13 @@ export class TileManager extends Component {
       case 'npc':
         return new NpcTile(this.eng, options);
       case 'static':
-        return new StaticTile(this.eng, options);
+        return null;
       case 'tree':
         return new TreeTile(this.eng, options);
       case 'menu':
         return new MenuTile(this.eng, options);
+      case 'solid':
+        return new SolidTile(this.eng, options);
     }
   }
 
@@ -137,6 +142,7 @@ export class TileManager extends Component {
       collision = source.collision;
     }
     const results = new CollisionResults();
+    results.source = source;
     for (let i = 0; i < this._tileControllers.length; i++) {
       const other = this._tileControllers[i];
 

@@ -17,23 +17,10 @@ export class PlayerTile extends TileController {
 
   async initialize(): Promise<void> {
     this._translation = new vec3();
-    this.speed = 0.2;
+    this.speed = 2;
     this._facing = SpriteDirection.South;
-    this.eng.textManager.setTextBlock({
-      id: 'player',
-      text: 'It works!',
-      color: new vec4([0.4, 0.4, 0.7, 1]),
-      position: new vec2([this.eng.width / 2, 50]),
-      scale: 1.0,
-      depth: -1,
-    });
 
-    this.quad.transform.getTranslation(this._quadPosition);
-
-    this.eng.viewManager.setTarget(
-      this._quadPosition.x - this.eng.width / 2,
-      this._quadPosition.y - this.eng.height / 2
-    );
+    this.eng.viewManager.setTarget(this.bottomLeft.x - this.eng.width / 2, this.bottomLeft.y - this.eng.height / 2);
   }
 
   update(dt: number): void {
@@ -54,26 +41,11 @@ export class PlayerTile extends TileController {
       this._walking = true;
       this.adjustSpriteDirection(dir);
 
-      this.quad.transform.getTranslation(this._quadPosition);
-
-      console.debug(
-        'player collision ',
-        this._collision.left.toFixed(0) +
-          ', ' +
-          this._collision.top.toFixed(0) +
-          ', ' +
-          this._collision.width.toFixed(0) +
-          ', ' +
-          this._collision.height.toFixed(0) +
-          ', '
-      );
+      console.debug('player position ', this._collision.left.toFixed(0) + ', ' + this._collision.top.toFixed(0));
 
       this.setTranslation(this._translation);
 
-      this.eng.viewManager.setTarget(
-        this._quadPosition.x - this.eng.width / 2,
-        this._quadPosition.y - this.eng.height / 2
-      );
+      this.eng.viewManager.setTarget(this.bottomLeft.x - this.eng.width / 2, this.bottomLeft.y - this.eng.height / 2);
       this.options.drawingLayer.requestRefresh();
 
       this._walkingTimer -= dt;
@@ -81,7 +53,11 @@ export class PlayerTile extends TileController {
       this.adjustSpriteDirection(dir);
     }
 
+    // is there a collision
     const results = this.eng.tileManager.checkCollision(this);
+
+    // respond to the collision
+    this.collisionResponse(results);
 
     if (results.hasCollision()) {
       this.eng.debugHelpers.setRect('player', this._collision, new vec4([1, 0, 0, 1]));

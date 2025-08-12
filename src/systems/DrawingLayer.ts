@@ -177,9 +177,7 @@ export class DrawingLayer extends Component {
     };
 
     // register the controller so that we can do stuff with this quad
-    if (options.tileData.data.dynamic) {
-      this.eng.tileManager.registerQuad(options.tileData, quad, texture, this._buffer, this);
-    }
+    this.eng.tileManager.registerQuad(options.tileData, quad, texture, this._buffer, this);
 
     // this class will render the quads so add it to the list
     this._quads.push(quad);

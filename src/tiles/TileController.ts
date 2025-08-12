@@ -1,10 +1,12 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
+import { CollisionResults } from '../data/CollisionResults';
 import { CollisionTypes } from '../data/CollisionTypes';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+import { clamp } from '../math/constants';
 import mat3 from '../math/mat3';
 import rect from '../math/rect';
 import vec2 from '../math/vec2';
@@ -31,12 +33,16 @@ export abstract class TileController extends Component {
   /**
    * This is the bottom left corner of the tile.
    */
-  protected _quadPosition: vec3 = new vec3();
+  protected _quadBottomLeft: vec3 = new vec3();
 
   get collision(): Readonly<rect> {
     return this._collision;
   }
 
+  get bottomLeft(): vec3 {
+    this.quad.transform.getTranslation(this._quadBottomLeft);
+    return this._quadBottomLeft;
+  }
   /**
    * The texture applied to this quad
    */
@@ -44,17 +50,25 @@ export abstract class TileController extends Component {
     return this.options.sourceTexture;
   }
 
-  public canMove(newLocation: vec2): boolean {
-    const collision = new rect([newLocation.x, newLocation.y + this.quad.height, this.quad.width, this.quad.height]);
-    const results = this.eng.tileManager.checkCollision(this, CollisionTypes.Any, collision);
-    return false;
-  }
-
   /**
    * The quad that will be managed by this tile controller.
    */
   public get quad(): Quad {
     return this.options.quad;
+  }
+
+  /**
+   * type of tile this is
+   */
+  public get type(): string {
+    return this.options.tileData.data.type;
+  }
+
+  /**
+   * tile name
+   */
+  public get id(): string {
+    return this.options.tileData.data.id;
   }
 
   /**
@@ -120,17 +134,65 @@ export abstract class TileController extends Component {
     if (offset) {
       this.quad.transform.translate(offset);
     }
-    this.quad.transform.getTranslation(this._quadPosition);
     this.updateCollision();
 
     this.options.drawingLayer.requestRefresh();
   }
 
+  /**
+   * Alow others to respond to this collision
+   * @param results
+   */
+  collisionResponse(results: CollisionResults): void {
+    for (let tileController of results.intersectingTiles) {
+      tileController.onCollision(results.source);
+    }
+  }
+
+  /**
+   * Each controller can handle how to respond to the collision.
+   * Default is push it out.
+   * @param source
+   */
+  onCollision(source: TileController): void {
+    // by default just push out the source tile
+    this.pushOut(source);
+  }
+
+  pushOut(source: TileController, speed: number = 0.01): void {
+    let distToLeft = source._collision.right - this._collision.left;
+    let distToRight = this._collision.right - source._collision.left;
+    let distToTop = this._collision.top - source._collision.bottom;
+    let distToBottom = source._collision.top - this._collision.bottom;
+
+    distToLeft = distToLeft < 0 ? 0 : distToLeft;
+    distToRight = distToRight < 0 ? 0 : distToRight;
+    distToTop = distToTop < 0 ? 0 : distToTop;
+    distToBottom = distToBottom < 0 ? 0 : distToBottom;
+
+    let deltaX = distToLeft < distToRight ? -distToLeft : distToRight;
+    let deltaY = distToTop < distToBottom ? distToTop : -distToBottom;
+
+    if (Math.abs(deltaX) < Math.abs(deltaY)) {
+      deltaY = 0;
+    } else {
+      deltaX = 0;
+    }
+    const dir = new vec3(deltaX, deltaY, 0);
+    const newPos = dir.scale(0.5);
+    console.debug('pushing out ' + source.type + ' ' + newPos.x.toFixed(5) + ', ' + newPos.y.toFixed(5));
+    source.setTranslation(newPos);
+  }
+
+  /**
+   * gets the latest bottom left and creates a collision box around the tileSize
+   */
   updateCollision(): void {
-    this._collision.left = this._quadPosition.x;
+    this.quad.transform.getTranslation(this.bottomLeft);
+    this._collision.left = this.bottomLeft.x;
     this._collision.width = this.tileData.tileSize.x * this.eng.pixelScale;
     this._collision.height = this.tileData.tileSize.y * this.eng.pixelScale;
-    this._collision.top = this._quadPosition.y + this._collision.height;
+    this._collision.top = this.bottomLeft.y + this._collision.height;
   }
 
   /**
