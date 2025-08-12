@@ -10,6 +10,8 @@ export interface TileData {
 
   /** the pixel x,y,w,h location in the source texture for this image */
   sourceLocation: string;
+  /** in pixels x,y,width, height offset for the collision */
+  collisionOffset: string;
   rotate?: number;
   flipX?: boolean;
   flipY?: boolean;

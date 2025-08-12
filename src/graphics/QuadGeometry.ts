@@ -137,11 +137,11 @@ export class QuadGeometry {
 
     // sort by height
     quads.sort((a, b) => {
-      const bottomA = -a.height / 2;
+      const bottomA = -a.height / 2 + a.offset.y;
       const pointA = new vec3(0, bottomA, 0);
       a.transform?.multiplyVec3(pointA, pointA);
 
-      const bottomB = -b.height / 2;
+      const bottomB = -b.height / 2 + a.offset.y;
       const pointB = new vec3(0, bottomB, 0);
       b.transform?.multiplyVec3(pointB, pointB);
 

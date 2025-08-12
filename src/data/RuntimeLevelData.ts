@@ -19,6 +19,8 @@ export class RuntimeTileData {
   tileSize: vec2;
   tilePosition: vec2;
 
+  collisionOffset: vec4;
+
   get data(): Readonly<TileData> {
     return this._tileData;
   }
@@ -35,6 +37,7 @@ export class RuntimeTileData {
   constructor(private _tileData: TileData) {
     this._images = new Map();
     const point = this.getLocationFromString(_tileData.sourceLocation);
+    this.collisionOffset = this.getLocationFromString(_tileData.collisionOffset);
     this.sourcePosition = new vec2(point.x, point.y);
     this.sourceSize = new vec2(point.z, point.w);
     this.tileSize = new vec2(_tileData.tileWidth ?? this.sourceSize.x, _tileData.tileHeight ?? this.sourceSize.y);
@@ -56,8 +59,11 @@ export class RuntimeTileData {
    * @returns
    */
   getLocationFromString(location: string): vec4 {
-    const components = location.split(',');
-    const point = new vec4();
+    if (!location) {
+      return new vec4();
+    }
+    const components = location?.split(',');
+    const point = new vec4([0, 0, 0, 0]);
     let i = 0;
     try {
       point.x = parseFloat(components[i++]);

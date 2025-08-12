@@ -20,7 +20,7 @@
         "id": "ness",
         "type": "player",
         "sourceLocation": "0,184,16,24",
-        "dynamic": true,
+        "collisionOffset": "0,0,0,-16",
         "images": {
           "down": "0,184,16,24",
           "downStep": "24,184,16,24",
@@ -43,6 +43,7 @@
       "02": {
         "id": "poo",
         "type": "npc",
+        "collisionOffset": "0,0,0,-8",
         "options": ["poo"],
         "sourceLocation": "0,216,16,24"
       },
@@ -83,18 +84,18 @@
       },
       "05": {
         "id": "horizontal wood fence post",
-        "type": "static",
+        "collisionOffset": "0,0,0,-8",
+        "type": "solid",
         "sourceLocation": "32,8,8,16"
       },
       "06": {
         "id": "horizontal wood end post",
-        "type": "static",
-        "options": "collision",
+        "type": "solid",
         "sourceLocation": "40,8,8,16"
       },
       "0D": {
         "id": "ness house",
-        "type": "static",
+        "type": "solid",
         "sourceLocation": "88,0,96,88"
 
       },
@@ -102,7 +103,6 @@
         "id": "tree",
         "type": "tree",
         "sourceLocation": "336,80,32,32",
-        "dynamic": true,
         "images": {
           "tree": "336,80,32,32",
           "tallTree": "56,0,32,48",

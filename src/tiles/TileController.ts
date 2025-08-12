@@ -189,10 +189,10 @@ export abstract class TileController extends Component {
    */
   updateCollision(): void {
     this.quad.transform.getTranslation(this.bottomLeft);
-    this._collision.left = this.bottomLeft.x;
-    this._collision.width = this.tileData.tileSize.x * this.eng.pixelScale;
-    this._collision.height = this.tileData.tileSize.y * this.eng.pixelScale;
-    this._collision.top = this.bottomLeft.y + this._collision.height;
+    this._collision.left = this.bottomLeft.x + this.tileData.collisionOffset.x;
+    this._collision.width = (this.tileData.tileSize.x + this.tileData.collisionOffset.z) * this.eng.pixelScale;
+    this._collision.height = (this.tileData.tileSize.y + +this.tileData.collisionOffset.w) * this.eng.pixelScale;
+    this._collision.top = this.bottomLeft.y + this._collision.height + this.tileData.collisionOffset.y;
   }
 
   /**
