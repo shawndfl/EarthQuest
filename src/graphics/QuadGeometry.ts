@@ -6,6 +6,7 @@ import vec4 from '../math/vec4';
 import { Geometry } from './GlBuffer';
 
 export interface Quad {
+  uuid: string;
   width: number;
   height: number;
   hueAngle: number;

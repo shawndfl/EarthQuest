@@ -32,6 +32,7 @@ export class DialogComponent extends Component {
 
   protected defaultQuad(): Quad {
     return {
+      uuid: this.eng.random.getUuid(),
       width: 0,
       height: 0,
       // offset quad to the  center
@@ -182,13 +183,12 @@ export class DialogComponent extends Component {
     dest.transform.translate(new vec3(pos.x, pos.y, 0));
     dest.transform.scale(vec3.one);
 
-    const sourceSize = this.tileData.images.get(imageName).size;
-    const sourcePos = this.tileData.images.get(imageName).pos;
+    const sourceLocation = this.tileData.images.get(imageName);
 
-    const scaleX = sourceSize.x / this.texture.width;
-    const scaleY = sourceSize.y / this.texture.height;
-    const offsetU = sourcePos.x / this.texture.width;
-    const offsetV = sourcePos.y / this.texture.height;
+    const scaleX = sourceLocation.z / this.texture.width;
+    const scaleY = sourceLocation.w / this.texture.height;
+    const offsetU = sourceLocation.x / this.texture.width;
+    const offsetV = sourceLocation.y / this.texture.height;
 
     dest.uvTransform.setIdentity();
     dest.uvTransform.scale(new vec2(scaleX, scaleY));

@@ -87,7 +87,7 @@ export class Editor extends Component {
    * @param level
    */
   async loadLevel(): Promise<void> {
-    const level = this.eng.levelData.data;
+    const level: any = null; //this.eng.levelData.data;
     this.levelData = level;
 
     this.tileBrowser.refreshLevel(level);

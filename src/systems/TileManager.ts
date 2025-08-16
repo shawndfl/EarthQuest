@@ -2,6 +2,7 @@ import { Component } from '../core/Component';
 import { CollisionResults } from '../data/CollisionResults';
 import { CollisionTypes } from '../data/CollisionTypes';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
+import { DrawingLayer } from '../drawingLayers/DrawingLayer';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
@@ -12,28 +13,34 @@ import { PlayerTile } from '../tiles/PlayerTile';
 import { SolidTile } from '../tiles/SolidTile';
 import { TileController } from '../tiles/TileController';
 import { TreeTile } from '../tiles/TreeTiles';
-import { DrawingLayer } from './DrawingLayer';
 
 /**
  * Create two layers of tiles.
  * 800x600 visible tiles. Allow for overflow on all sides
  */
 export class TileManager extends Component {
-  private _drawingLayers: DrawingLayer[];
-  private _tileControllers: TileController[] = [];
+  private _tileControllers: Map<string, TileController>;
 
-  public get tileControllers(): TileController[] {
+  public get tileControllers(): Map<string, TileController> {
     return this._tileControllers;
   }
   /**
    * Create the tiles
    */
   async initialize(): Promise<void> {
-    this._drawingLayers = [];
-    this._tileControllers = [];
+    this._tileControllers = new Map();
+  }
+
+  closeLevel(): void {
+    // reset the tile controllers
+    for (let [, controller] of this._tileControllers) {
+      controller.closeLevel();
+    }
+    this._tileControllers.clear();
   }
 
   async loadLevel(): Promise<void> {
+    /*
     const level = this.eng.gameManager.levelData.data;
     console.debug('TileManager loading level...');
 
@@ -58,76 +65,32 @@ export class TileManager extends Component {
     for (let controller of this._tileControllers) {
       controller.initialize();
     }
+    */
   }
 
   panningViewPort(): void {}
 
   update(dt: number): void {
-    for (let controller of this._tileControllers) {
+    for (let [, controller] of this._tileControllers) {
       controller.update(dt);
     }
     this.panningViewPort();
-
-    //Render
-    // baseLayer - includes background, and sprites sorted from top to bottom
-    // Clear the canvas before we start drawing on it.
-    for (let layer of this._drawingLayers) {
-      layer.update(dt);
-    }
   }
 
   /**
-   * Registers a quad by wrapping it in a controller and saving it in the list
-   * @param tileData
-   * @param quad
-   * @param sourceTexture
-   * @param buffer
-   * @returns
+   * Register a tile controller
+   * @param tileController
    */
-  registerQuad(
-    tileData: RuntimeTileData,
-    quad: Quad,
-    sourceTexture: Texture,
-    buffer: GlBuffer,
-    drawingLayer: DrawingLayer
-  ): TileController {
-    const controller = this.createController(tileData, quad, sourceTexture, buffer, drawingLayer);
-    if (controller) {
-      this._tileControllers.push(controller);
-    }
-    return controller;
+  registerTileForUpdate(tileController: TileController): void {
+    this._tileControllers.set(tileController.uuid, tileController);
   }
 
   /**
-   * create a controller
-   * @param tileData
-   * @param quad
-   * @param sourceTexture
-   * @param buffer
-   * @returns
+   * Remove the controller from update
+   * @param uuid
    */
-  protected createController(
-    tileData: RuntimeTileData,
-    quad: Quad,
-    sourceTexture: Texture,
-    buffer: GlBuffer,
-    drawingLayer: DrawingLayer
-  ): TileController {
-    const options = { buffer, tileData, sourceTexture, quad, drawingLayer };
-    switch (tileData.data.type) {
-      case 'player':
-        return new PlayerTile(this.eng, options);
-      case 'npc':
-        return new NpcTile(this.eng, options);
-      case 'static':
-        return null;
-      case 'tree':
-        return new TreeTile(this.eng, options);
-      case 'menu':
-        return new MenuTile(this.eng, options);
-      case 'solid':
-        return new SolidTile(this.eng, options);
-    }
+  removeTileFromUpdate(uuid: string): void {
+    this._tileControllers.delete(uuid);
   }
 
   /**
@@ -143,11 +106,9 @@ export class TileManager extends Component {
     }
     const results = new CollisionResults();
     results.source = source;
-    for (let i = 0; i < this._tileControllers.length; i++) {
-      const other = this._tileControllers[i];
-
+    for (let [, other] of this._tileControllers) {
       // don't collide with yourself
-      if (other == source) {
+      if (other.uuid == source.uuid) {
         continue;
       }
 

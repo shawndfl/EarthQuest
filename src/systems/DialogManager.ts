@@ -57,15 +57,16 @@ export class DialogManager extends Component {
       depth: -1,
     });
 
-    const level = this.eng.levelData;
-    this._menuTitle = this.eng.levelData.tiles.get('0F');
+    const name = 'Dialog Menu';
+    const tileAtlas = this.eng.assetManager.atlasData['default'];
+    const tileData = tileAtlas.tiles[name];
+    this._texture = await this.eng.assetManager.getTexture(tileAtlas.texture);
+    this._menuTitle = new RuntimeTileData(this.eng, name, tileData, this._texture);
+
     if (!this._menuTitle) {
       console.error('Cannot find menu title');
       return;
     }
-
-    // load all the textures
-    this._texture = await level.waitForTextures();
 
     // setup the shader
     this._shader.setSpriteSheet(this._texture);

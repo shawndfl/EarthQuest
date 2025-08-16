@@ -20,7 +20,7 @@ import vec4 from '../math/vec4';
 export class Scene extends Component {
   private _spriteSheetTexture: Texture;
   private _buffer: GlBuffer;
-  private _shader: SpritePerspectiveShader;
+  protected _shader: SpritePerspectiveShader;
   private hueTimer: Timer;
   private hueValue: number;
   private curve: Curve;
@@ -34,63 +34,9 @@ export class Scene extends Component {
   }
 
   async initialize(): Promise<void> {
-    this.hueTimer = new Timer();
-    this.hueTimer.start();
-    this.hueValue = 0;
-
-    this._spriteSheetTexture = new Texture(this.gl);
-    this._buffer = new GlBuffer(this.gl);
-    this._shader = new SpritePerspectiveShader(this.gl, 'scene');
-
-    // get the texture
-    await this.spriteSheetTexture.loadImage('./assets/tiles/OnettMap.png');
-
-    this.curve = new Curve();
-    this.curve.pingPong(true);
-    this.curve.repeat(-1);
-    this.curve.points([
-      { p: 0, t: 0 },
-      { p: 40, t: 1000 },
-    ]);
-    this.curve.curve(CurveType.linear);
-    this.curve.start();
-    this.curve.onUpdate = (value) => {
-      const quad1 = this.placeQuad(40, value, 0, 16, 0, 0, 1.0);
-      const quad2 = this.placeQuad(45, 30, 0, 1824, 368, 90, 1);
-
-      // set the openGL buffers
-      const geo = QuadGeometry.createQuad([quad1, quad2]);
-      this._buffer.setBuffers(geo);
-    };
-
-    // setup the shader
-    this._shader.setSpriteSheet(this.spriteSheetTexture);
-
-    this.eng.viewManager.minX = 0;
-    this.eng.viewManager.minY = 0;
-
     //this.createRandomFlowers();
     //this.createGrass();
     //this.createNull();
-  }
-
-  placeQuad(posX: number, posY: number, posZ: number, u: number, v: number, hue: number, alpha: number): Quad {
-    const transform = new mat4();
-    transform.setIdentity();
-    transform.translate(new vec3(posX, posY, posZ));
-    transform.scale(new vec3(1, 1, 1));
-
-    const uvTransform = new mat3();
-    const scaleX = 8 / this.spriteSheetTexture.width;
-    const scaleY = 8 / this.spriteSheetTexture.height;
-    const offsetX = u / this.spriteSheetTexture.width;
-    const offsetY = v / this.spriteSheetTexture.height;
-    uvTransform.setIdentity();
-    uvTransform.scale(new vec2(scaleX, scaleY));
-    uvTransform.setTranslation(new vec2(offsetX, 1 - scaleY - offsetY));
-
-    // create a quad
-    return { width: 16, height: 16, transform, uvTransform, mirrorX: false, mirrorY: false, alpha, hueAngle: hue };
   }
 
   /**

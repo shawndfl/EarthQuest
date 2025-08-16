@@ -2,24 +2,26 @@ import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { CollisionResults } from '../data/CollisionResults';
 import { CollisionTypes } from '../data/CollisionTypes';
-import { RuntimeTileData } from '../data/RuntimeLevelData';
+import { CollisionShape } from '../data/ITileAtlas';
+import { RuntimeTileData, SourceImageOptions } from '../data/RuntimeLevelData';
+import { DrawingLayer } from '../drawingLayers/DrawingLayer';
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import { clamp } from '../math/constants';
 import mat3 from '../math/mat3';
+import mat4 from '../math/mat4';
 import rect from '../math/rect';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
-import { DrawingLayer } from '../systems/DrawingLayer';
 
+/**
+ * Everything you need to know about a tile and how it's drawn
+ */
 export interface TileControllerOptions {
-  quad: Quad;
   tileData: RuntimeTileData;
-  sourceTexture: Texture;
-  buffer: GlBuffer;
-  drawingLayer: DrawingLayer;
+  requestBufferRefresh: (tileController: TileController) => void;
 }
 
 /**
@@ -33,42 +35,47 @@ export abstract class TileController extends Component {
   /**
    * This is the bottom left corner of the tile.
    */
-  protected _quadBottomLeft: vec3 = new vec3();
+  public get bottomLeft(): Readonly<vec3> {
+    return this.tileData.tilePosition;
+  }
 
   get collision(): Readonly<rect> {
     return this._collision;
   }
 
-  get bottomLeft(): vec3 {
-    this.quad.transform.getTranslation(this._quadBottomLeft);
-    return this._quadBottomLeft;
-  }
   /**
    * The texture applied to this quad
    */
   public get texture(): Texture {
-    return this.options.sourceTexture;
+    return this.tileData.texture;
+  }
+
+  /**
+   * The id of the controller
+   */
+  public get uuid(): string {
+    return this.tileData.uuid;
   }
 
   /**
    * The quad that will be managed by this tile controller.
    */
   public get quad(): Quad {
-    return this.options.quad;
+    return this.tileData.quad;
   }
 
   /**
-   * type of tile this is
+   * type of this tile
    */
   public get type(): string {
-    return this.options.tileData.data.type;
+    return this.tileData.data.type;
   }
 
   /**
    * tile name
    */
-  public get id(): string {
-    return this.options.tileData.data.id;
+  public get name(): string {
+    return this.tileData.name;
   }
 
   /**
@@ -87,8 +94,50 @@ export abstract class TileController extends Component {
     super(eng);
   }
 
-  requestGeometryRefresh(): void {
-    this.options.drawingLayer.requestRefresh();
+  /**
+   * Sets the uv location for the quad.
+   * This will change the source image location on the texture.
+   * @param location - x,y,w,h in pixels of the texture.
+   */
+  setSourceLocation(
+    location: vec4,
+    options: {
+      flipX: boolean;
+      flipY: boolean;
+      alpha: number;
+      hueRotation: number;
+    }
+  ): void {
+    this.tileData.setSourceLocation(location, options);
+    this.requestGeometryRefresh();
+  }
+
+  /**
+   * Translates the tile ( adding to its current position ).
+   * @param translation
+   */
+  setTranslation(translation: vec3): void {
+    this.setPosition(translation.add(this.bottomLeft));
+  }
+
+  /**
+   * Sets the tile transform
+   * @param position
+   */
+  setPosition(position: vec3): void {
+    this.setTileTransform({ position });
+    this.updateCollision();
+  }
+
+  /**
+   * Sets the position of scale and offset of a quad. Only the values provided are set
+   * @param position - position in pixels
+   * @param tileSize - tile size - default is the tileSize of this object
+   * @param offset - Offset - default is bottom left corner. See QuadGeometry
+   */
+  setTileTransform(options: { position?: vec3; tileSize?: vec2; offset?: vec2 }): void {
+    this.tileData.setTileTransform(options);
+    this.requestGeometryRefresh();
   }
 
   /**
@@ -105,38 +154,17 @@ export abstract class TileController extends Component {
   abstract update(dt: number): void;
 
   /**
-   * Get the location from a csv string. Should be in the format of [x,y,width,height]
-   * @param location
-   * @returns
+   * Draw the collision shape
    */
-  protected getLocationFromString(location: string): vec4 {
-    const point = new vec4();
-    try {
-      const components = location.split(',');
-      let i = 0;
-
-      point.x = parseFloat(components[i++]);
-      point.y = parseFloat(components[i++]);
-      point.z = parseFloat(components[i++]);
-      point.w = parseFloat(components[i++]);
-    } catch (e) {
-      console.error('Cannot parse "' + location + '" expecting [x,y,z,w]');
+  drawCollision(color?: vec4): void {
+    if (!color) {
+      this.eng.debugHelpers.removeRect(this.uuid);
+      return;
     }
 
-    return point;
-  }
-
-  /**
-   * Updates the transform matrix, updates collision, request refresh
-   * @param offset - vector 3 translation relative to the current translation. if null will just update the collision box.
-   */
-  setTranslation(offset?: vec3): void {
-    if (offset) {
-      this.quad.transform.translate(offset);
+    if (this.tileData.collisionShape == CollisionShape.Full) {
+      this.eng.debugHelpers.setRect(this.uuid, this._collision, color);
     }
-    this.updateCollision();
-
-    this.options.drawingLayer.requestRefresh();
   }
 
   /**
@@ -181,7 +209,7 @@ export abstract class TileController extends Component {
     const dir = new vec3(deltaX, deltaY, 0);
     const newPos = dir.scale(0.5);
     console.debug('pushing out ' + source.type + ' ' + newPos.x.toFixed(5) + ', ' + newPos.y.toFixed(5));
-    source.setTranslation(newPos);
+    source.setTileTransform({ position: newPos });
   }
 
   /**
@@ -199,34 +227,18 @@ export abstract class TileController extends Component {
    * Sets an image for a quad using the tile data images.
    * @param name
    */
-  setImage(name: string, flipX?: boolean, flipY?: boolean): void {
-    const imageLoc = this.options.tileData.data.images?.[name];
-    if (imageLoc) {
-      this.activeImage = name;
-      const texture = this.options.sourceTexture;
-      const [sourcePixelX, sourcePixelY, sourcePixelWidth, sourcePixelHeight] =
-        this.getLocationFromString(imageLoc).xyzw;
-      const uvTransform = new mat3();
-      const scaleX = sourcePixelWidth / texture.width;
-      const scaleY = sourcePixelHeight / texture.height;
-      const offsetU = sourcePixelX / texture.width;
-      const offsetV = sourcePixelY / texture.height;
+  setImage(name: string, options?: SourceImageOptions): void {
+    this.activeImage = name;
+    this.tileData.setImage(name, options);
+    this.requestGeometryRefresh();
+  }
 
-      // save the new source data
-      this.options.tileData.sourcePosition.x = sourcePixelX;
-      this.options.tileData.sourcePosition.y = sourcePixelY;
-      this.options.tileData.sourceSize.x = sourcePixelWidth;
-      this.options.tileData.sourceSize.y = sourcePixelHeight;
-
-      uvTransform.setIdentity();
-      uvTransform.scale(new vec2(scaleX, scaleY));
-      uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));
-      this.quad.uvTransform = uvTransform;
-      this.quad.mirrorX = flipX;
-      this.quad.mirrorY = flipY;
-      this.options.drawingLayer.requestRefresh();
-    } else {
-      console.error('cannot find image ' + name);
+  /**
+   * tells the drawing layer we need to update something
+   */
+  protected requestGeometryRefresh(): void {
+    if (this.options.requestBufferRefresh) {
+      this.options.requestBufferRefresh(this);
     }
   }
 }

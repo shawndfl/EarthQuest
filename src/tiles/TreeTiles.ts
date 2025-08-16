@@ -25,15 +25,6 @@ export class TreeTile extends TileController {
       // requests refresh
       this.setImage(imageNames[v]);
 
-      const transform = this.options.quad.transform;
-      transform.getTranslation(this._quadBottomLeft);
-      transform.setIdentity();
-      this.setTranslation(this._quadBottomLeft);
-
-      transform.scale(new vec3(tileData.sourceSize.x, tileData.sourceSize.y, 1));
-      transform.getTranslation(this._quadBottomLeft);
-      this.tileData.tileSize.x = this.tileData.sourceSize.x;
-      this.tileData.tileSize.y = this.tileData.sourceSize.y;
       this.updateCollision();
 
       this.eng.debugHelpers.setRect('tree', this._collision, new vec4([0, 0.5, 1, 1]));

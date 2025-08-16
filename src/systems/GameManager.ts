@@ -2,7 +2,6 @@ import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { GameData } from '../data/GameData';
 import { ILevelData } from '../data/ILevelData';
-import { RuntimeLevelData } from '../data/RuntimeLevelData';
 import DefaultTileAtlas from '../assets/data/tileAtlas.json';
 
 /** Key for local storage */
@@ -14,11 +13,6 @@ const localStorageKey = 'EarthQuest';
 export class GameManager extends Component {
   data: GameData;
   private _timeCounter: number;
-  private _activeLevel: RuntimeLevelData;
-
-  public get levelData(): RuntimeLevelData {
-    return this._activeLevel;
-  }
 
   constructor(eng: Engine) {
     super(eng);
@@ -45,8 +39,6 @@ export class GameManager extends Component {
     if (!level.atlas) {
       level.atlas = JSON.parse(JSON.stringify(DefaultTileAtlas));
     }
-
-    this._activeLevel = new RuntimeLevelData(this.eng, level);
   }
 
   /**

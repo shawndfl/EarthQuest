@@ -1,14 +1,34 @@
-import { Engine } from '../core/Engine';
 import { Component } from '../core/Component';
 import { Texture } from '../graphics/Texture';
+import DefaultTileAtlas from '../assets/data/tileAtlas.json';
+import { ITileAtlasCollection } from '../data/ITileAtlas';
+import { Engine } from '../core/Engine';
 
 /**
  * Manages texture assets
  */
 export class AssetManager extends Component {
   private _textureCache: Map<string, Texture> = new Map();
+  private _atlasData: ITileAtlasCollection = DefaultTileAtlas;
 
-  async initialize(): Promise<void> {}
+  /**
+   * Get the atlas collection for this game, each tile texture should be in this file.
+   */
+  get atlasData(): ITileAtlasCollection {
+    return this._atlasData;
+  }
+
+  constructor(eng: Engine) {
+    super(eng);
+    // assign all the names
+    for (let atlasName of Object.keys(this._atlasData)) {
+      this._atlasData[atlasName].name = atlasName;
+    }
+  }
+
+  async initialize(): Promise<void> {
+    //nop
+  }
 
   /**
    * Get a texture

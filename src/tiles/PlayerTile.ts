@@ -1,3 +1,4 @@
+import { CollisionResults } from '../data/CollisionResults';
 import { SpriteDirection } from '../data/SpriteDirection';
 import rect from '../math/rect';
 import vec2 from '../math/vec2';
@@ -12,6 +13,7 @@ export class PlayerTile extends TileController {
   private _walkingTimer: number;
   private _walkingTime = 200;
   private _walkingToggle: boolean;
+  private _lastCollisionResults: CollisionResults;
 
   speed: number;
 
@@ -46,7 +48,6 @@ export class PlayerTile extends TileController {
       this.setTranslation(this._translation);
 
       this.eng.viewManager.setTarget(this.bottomLeft.x - this.eng.width / 2, this.bottomLeft.y - this.eng.height / 2);
-      this.options.drawingLayer.requestRefresh();
 
       this._walkingTimer -= dt;
     } else {
@@ -59,11 +60,19 @@ export class PlayerTile extends TileController {
     // respond to the collision
     this.collisionResponse(results);
 
+    const tilesToDisable = this._lastCollisionResults?.intersectingTiles.filter(
+      (t) => !results.intersectingTiles.some((o) => o.uuid == t.uuid)
+    );
+    tilesToDisable?.forEach((tile) => tile.drawCollision(null));
+
     if (results.hasCollision()) {
-      this.eng.debugHelpers.setRect('player', this._collision, new vec4([1, 0, 0, 1]));
+      this.drawCollision(new vec4([1, 0, 0, 1]));
+      results.intersectingTiles.forEach((t) => t.drawCollision(new vec4([0, 0, 1, 1])));
     } else {
-      this.eng.debugHelpers.setRect('player', this._collision, new vec4([0, 0.5, 1, 1]));
+      this.drawCollision(null);
     }
+
+    this._lastCollisionResults = results;
   }
 
   adjustSpriteDirection(dir: vec2): void {
@@ -133,9 +142,9 @@ export class PlayerTile extends TileController {
     }
 
     if (imageName != 'up') {
-      this.setImage(imageName + (this._walkingToggle ? 'Step' : ''), flip);
+      this.setImage(imageName + (this._walkingToggle ? 'Step' : ''), { flipX: flip });
     } else {
-      this.setImage(imageName, this._walkingToggle);
+      this.setImage(imageName, { flipX: this._walkingToggle });
     }
   }
 }

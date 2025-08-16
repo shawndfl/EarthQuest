@@ -3,6 +3,7 @@ import vec3 from './vec3';
 import vec4 from './vec4';
 
 import { epsilon } from './constants';
+import vec2 from './vec2';
 
 export default class mat4 {
   constructor(values?: number[]) {
@@ -399,10 +400,10 @@ export default class mat4 {
     return dest;
   }
 
-  scale(vector: vec3): mat4 {
+  scale(vector: vec3 | vec2): mat4 {
     const x = vector.x;
     const y = vector.y;
-    const z = vector.z;
+    const z = (vector as vec3).z ?? 1;
 
     this.values[0] *= x;
     this.values[1] *= x;

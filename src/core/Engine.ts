@@ -1,20 +1,18 @@
-import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { AssetManager } from '../systems/AssetManager';
 import { GameManager } from '../systems/GameManager';
 import { SoundManager } from '../systems/SoundManager';
 import { ViewManager } from '../systems/ViewManager';
 import { Random } from '../utilities/Random';
 import { NotificationManager } from './NotificationManager';
-import { Scene } from './Scene';
 import '../css/canvas.scss';
 import { TileManager } from '../systems/TileManager';
 import { ILevelData } from '../data/ILevelData';
 import { InputManager } from '../systems/InputManager';
 import { OptimizeTiles } from '../systems/OptimizeTiles';
-import { RuntimeLevelData } from '../data/RuntimeLevelData';
 import { DebugHelpers } from '../systems/DebugHelpers';
 import { TextManager } from '../systems/TextManager';
 import { DialogManager } from '../systems/DialogManager';
+import { SceneManager } from '../systems/SceneManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -33,7 +31,7 @@ export class Engine {
   readonly assetManager: AssetManager;
   readonly rootElement: HTMLElement;
   readonly notificationManager: NotificationManager;
-  readonly scene: Scene;
+  readonly sceneManager: SceneManager;
   readonly tileManager: TileManager;
   readonly inputManager: InputManager;
   readonly optimizeTiles: OptimizeTiles;
@@ -62,10 +60,6 @@ export class Engine {
     return !!this.urlParams.searchParams.get('editor');
   }
 
-  get levelData(): RuntimeLevelData {
-    return this.gameManager.levelData;
-  }
-
   /**
    * the render context
    */
@@ -81,7 +75,7 @@ export class Engine {
     this.debugHelpers = new DebugHelpers(this);
     this.textManager = new TextManager(this);
     this.dialogManager = new DialogManager(this);
-    this.scene = new Scene(this);
+    this.sceneManager = new SceneManager(this);
     this.tileManager = new TileManager(this);
     this.assetManager = new AssetManager(this);
     //TODO make this configurable, maybe per level
@@ -167,8 +161,8 @@ export class Engine {
     await this.dialogManager.initialize();
     await this.viewManager.initialize();
     await this.assetManager.initialize();
-    await this.scene.initialize();
     await this.tileManager.initialize();
+    await this.sceneManager.initialize();
     if (this.editorActive) {
       await this.optimizeTiles.initialize();
     }
@@ -193,7 +187,7 @@ export class Engine {
 
     // close the old level
     this.debugHelpers.closeLevel();
-    this.scene.closeLevel();
+    this.sceneManager.closeLevel();
     this.tileManager.closeLevel();
     this.assetManager.closeLevel();
     this.dialogManager.closeLevel();
@@ -203,8 +197,8 @@ export class Engine {
     // load the new level
     await this.dialogManager.loadLevel();
     await this.assetManager.loadLevel();
-    await this.scene.loadLevel();
     await this.tileManager.loadLevel();
+    await this.sceneManager.loadLevel();
   }
 
   update(dt: number) {
@@ -215,7 +209,7 @@ export class Engine {
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    this.scene.update(dt);
+    this.sceneManager.update(dt);
     this.tileManager.update(dt);
     this.dialogManager.update(dt);
     this.textManager.update(dt);
@@ -226,11 +220,11 @@ export class Engine {
   }
 
   resize(width: number, height: number) {
-    this.scene.resize(width, height);
+    this.sceneManager.resize(width, height);
   }
 
   dispose() {
-    this.scene.dispose();
+    this.sceneManager.dispose();
   }
 
   logGlError(error: string, functionName: string, args: any) {

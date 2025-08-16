@@ -28,6 +28,32 @@ export class DebugHelpers extends Component {
     this._refreshRequired = true;
   }
 
+  /**
+   * Remove all lines that have and id that starts with the given id.
+   * @param id
+   */
+  removeRect(id: string): void {
+    const keys = Array.from(this._lines.keys());
+    for (let key of keys) {
+      if (key.startsWith(id)) {
+        this._lines.delete(key);
+      }
+    }
+  }
+
+  /**
+   * Remove all lines that are equal to the id
+   * @param id
+   */
+  removeLine(id: string): void {
+    const keys = Array.from(this._lines.keys());
+    for (let key of keys) {
+      if (key == id) {
+        this._lines.delete(key);
+      }
+    }
+  }
+
   setRect(id: string, rect: rect, color: vec4): void {
     const p0 = new vec3(rect.left, rect.top, 0);
     const p1 = new vec3(rect.right, rect.top, 0);
