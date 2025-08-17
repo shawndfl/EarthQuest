@@ -132,13 +132,16 @@ export class RuntimeTileData extends Component {
       this._tileData.tileWidth ?? this.sourceSize.x ?? 8,
       this._tileData.tileHeight ?? this.sourceSize.y ?? 8
     );
+
     this._tilePosition = new vec3(0, 0, 0);
 
     // set the origin of the tile.
     this._tileOffset = new vec2(0, 0);
     switch (this._tileData.origin) {
       case TileOrigin.Center:
-
+        this._tileOffset.x = 0;
+        this._tileOffset.y = 0;
+        break;
       case TileOrigin.BottomLeft:
       default:
         this._tileOffset.x = this.eng.pixelScale / 2;
@@ -165,6 +168,8 @@ export class RuntimeTileData extends Component {
       alpha: this.data.alpha ?? 1,
       hueAngle: 0,
     };
+
+    this.updateQuad();
   }
 
   /**

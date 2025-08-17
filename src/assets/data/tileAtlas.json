@@ -5,7 +5,6 @@
     "tiles": {
     "null": {
       "type": "null",
-      "staticTile": true,
       "sourceLocation": "0,16,8,8"
     },
     "ness": {
@@ -53,6 +52,7 @@
       "tileYOffset": -4608,
       "tileWidth": 2304,
       "tileHeight": 2304,
+      "origin": "Center",
       "sourceLocation": "0,8,8,8"
     },
     "long gree grass": {
@@ -72,6 +72,16 @@
       "type": "static",
       "flipX": true,
       "sourceLocation": "8,0,8,8"
+    },
+    "stone path":{
+      "type": "static",
+      "tileWidth": 32,
+      "sourceLocation": "40,0,16,8"
+    },
+    "Red flower flipped": {
+      "type": "static",
+      "flipX": true,
+      "sourceLocation": "16,0,8,8"
     },
     "horizontal wood fence post": {
       "type": "solid",

@@ -16,8 +16,8 @@ export interface ITileCollision {
  * The origin of the tile.
  */
 export enum TileOrigin {
-  Center,
-  BottomLeft,
+  Center = 'Center',
+  BottomLeft = 'BottomLeft',
 }
 
 /**
