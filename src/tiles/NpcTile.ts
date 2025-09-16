@@ -1,9 +1,11 @@
 import { Curve } from '../math/Curve';
-import { TileController } from './TileController';
+import { RigidBodyTile } from './RigidBodyTile';
 
-export class NpcTile extends TileController {
+export class NpcTile extends RigidBodyTile {
   private curve: Curve;
+
   async initialize(): Promise<void> {
+    await super.initialize();
     this.curve = new Curve();
     this.curve.points([
       { p: 0, t: 0 },
@@ -18,6 +20,7 @@ export class NpcTile extends TileController {
       this.requestGeometryRefresh();
     });
   }
+
   update(dt: number): void {
     this.curve.update(dt);
   }

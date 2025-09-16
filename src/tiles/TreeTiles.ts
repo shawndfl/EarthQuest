@@ -1,9 +1,9 @@
 import { Curve, CurveType } from '../math/Curve';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
-import { TileController } from './TileController';
+import { CollisionTile } from './CollisionTile';
 
-export class TreeTile extends TileController {
+export class TreeTile extends CollisionTile {
   private curve: Curve;
   async initialize(): Promise<void> {
     this.curve = new Curve();

@@ -37,6 +37,7 @@ export class DebugHelpers extends Component {
     for (let key of keys) {
       if (key.startsWith(id)) {
         this._lines.delete(key);
+        this._refreshRequired = true;
       }
     }
   }
@@ -50,6 +51,7 @@ export class DebugHelpers extends Component {
     for (let key of keys) {
       if (key == id) {
         this._lines.delete(key);
+        this._refreshRequired = true;
       }
     }
   }
@@ -64,6 +66,7 @@ export class DebugHelpers extends Component {
     this._lines.set(id + ':right', { start: p1, end: p2, color });
     this._lines.set(id + ':bottom', { start: p2, end: p3, color });
     this._lines.set(id + ':left', { start: p3, end: p0, color });
+    console.debug('set line count ' + this._lines.size);
     this._refreshRequired = true;
   }
 

@@ -1,9 +1,6 @@
-import { Component } from '../core/Component';
-import { Curve, CurveType } from '../math/Curve';
-import vec3 from '../math/vec3';
-import { TileController } from './TileController';
+import { CollisionTile } from './CollisionTile';
 
-export class SolidTile extends TileController {
+export class SolidTile extends CollisionTile {
   async initialize(): Promise<void> {
     console.debug('creating a solid tile');
     this.updateCollision();

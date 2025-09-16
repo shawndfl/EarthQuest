@@ -92,31 +92,4 @@ export class TileManager extends Component {
   removeTileFromUpdate(uuid: string): void {
     this._tileControllers.delete(uuid);
   }
-
-  /**
-   * Check for a collision between this and other tiles.
-   * @param source
-   * @param filterMask
-   * @param collision
-   * @returns
-   */
-  checkCollision(source: TileController, filterMask?: CollisionTypes, collision?: Readonly<rect>): CollisionResults {
-    if (!collision) {
-      collision = source.collision;
-    }
-    const results = new CollisionResults();
-    results.source = source;
-    for (let [, other] of this._tileControllers) {
-      // don't collide with yourself
-      if (other.uuid == source.uuid) {
-        continue;
-      }
-
-      // collect the colliding tiles
-      if (collision.intersects(other.collision)) {
-        results.pushCollision(other);
-      }
-    }
-    return results;
-  }
 }

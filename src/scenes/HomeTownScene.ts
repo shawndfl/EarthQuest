@@ -6,6 +6,7 @@ import { Texture } from '../graphics/Texture';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
+import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
 import { StaticTile } from '../tiles/StaticTile';
 import { TileController } from '../tiles/TileController';
@@ -37,6 +38,29 @@ export class HomeTownScene extends Scene {
     await this.addGroundDetail();
     await this.createPlayer();
     await this.createStonePath();
+    await this.createPoo();
+  }
+
+  async createPoo(): Promise<void> {
+    const tileData = this._backgroundLayer.tileAtlas.tiles['poo'];
+
+    const poo = new NpcTile(this.eng, {
+      // tell the character layer to handle the buffer refresh request
+      requestBufferRefresh: (t) => {
+        this._characterLayer.requestRefresh();
+      },
+      tileData: new RuntimeTileData(this.eng, 'poo', tileData, this._characterLayer.texture),
+    });
+
+    // this will handle the update function
+    this.eng.tileManager.registerTileForUpdate(poo);
+
+    this.eng.collisionManager.registerTileForCollision(poo);
+
+    // this will handle the quad drawing
+    this._characterLayer.registerQuad(poo.quad);
+
+    await poo.initialize();
   }
 
   async createStonePath(): Promise<void> {
@@ -109,6 +133,7 @@ export class HomeTownScene extends Scene {
     const tileData = this._characterLayer.tileAtlas.tiles['ness'];
 
     const playerTile = new PlayerTile(this.eng, {
+      initializePosition: new vec3(140, 0, 0),
       // tell the character layer to handle the buffer refresh request
       requestBufferRefresh: (t) => {
         this._characterLayer.requestRefresh();
@@ -118,6 +143,8 @@ export class HomeTownScene extends Scene {
 
     // this will handle the update function
     this.eng.tileManager.registerTileForUpdate(playerTile);
+
+    this.eng.collisionManager.registerTileForCollision(playerTile);
 
     // this will handle the quad drawing
     this._characterLayer.registerQuad(playerTile.quad);

@@ -13,6 +13,7 @@ import { DebugHelpers } from '../systems/DebugHelpers';
 import { TextManager } from '../systems/TextManager';
 import { DialogManager } from '../systems/DialogManager';
 import { SceneManager } from '../systems/SceneManager';
+import { CollisionManager } from '../systems/CollisionManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -33,6 +34,7 @@ export class Engine {
   readonly notificationManager: NotificationManager;
   readonly sceneManager: SceneManager;
   readonly tileManager: TileManager;
+  readonly collisionManager: CollisionManager;
   readonly inputManager: InputManager;
   readonly optimizeTiles: OptimizeTiles;
   readonly urlParams: URL;
@@ -77,6 +79,7 @@ export class Engine {
     this.dialogManager = new DialogManager(this);
     this.sceneManager = new SceneManager(this);
     this.tileManager = new TileManager(this);
+    this.collisionManager = new CollisionManager(this);
     this.assetManager = new AssetManager(this);
     //TODO make this configurable, maybe per level
     this.random = new Random(122344);
@@ -191,11 +194,13 @@ export class Engine {
     this.tileManager.closeLevel();
     this.assetManager.closeLevel();
     this.dialogManager.closeLevel();
+    this.collisionManager.closeLevel();
 
     this.gameManager.setLevel(levelData);
 
     // load the new level
     await this.dialogManager.loadLevel();
+    await this.collisionManager.loadLevel();
     await this.assetManager.loadLevel();
     await this.tileManager.loadLevel();
     await this.sceneManager.loadLevel();
@@ -211,6 +216,7 @@ export class Engine {
 
     this.sceneManager.update(dt);
     this.tileManager.update(dt);
+    this.collisionManager.update(dt);
     this.dialogManager.update(dt);
     this.textManager.update(dt);
 
