@@ -4,6 +4,10 @@ import quat from './quat';
 import { epsilon } from './constants';
 
 export default class vec3 {
+  get type(): string {
+    return 'vec3';
+  }
+
   get x(): number {
     return this.values[0];
   }

@@ -3,6 +3,10 @@ import vec2 from './vec2';
 import vec3 from './vec3';
 
 export default class rect {
+  get type(): string {
+    return 'rect';
+  }
+
   get left(): number {
     return this.values[0];
   }
