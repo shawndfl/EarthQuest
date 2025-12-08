@@ -2,6 +2,7 @@ import { Component } from '../core/Component';
 import { CollisionResults } from '../data/CollisionResults';
 import { CollisionTypes } from '../data/CollisionTypes';
 import rect from '../math/rect';
+import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import { CollisionTile } from '../tiles/CollisionTile';
 import { TileController } from '../tiles/TileController';
@@ -40,9 +41,10 @@ export class CollisionManager extends Component {
    * @param collision
    * @returns
    */
-  checkCollisionPoint(source: CollisionTile, point: vec3): CollisionResults {
+  checkCollisionPoint(source: CollisionTile, point: vec2): CollisionResults {
     const results = new CollisionResults();
     results.source = source;
+    results.point = point;
     for (let [, other] of this._collisionTiles) {
       // don't collide with yourself
       if (other.uuid == source.uuid) {
@@ -50,7 +52,7 @@ export class CollisionManager extends Component {
       }
 
       // collect the colliding tiles
-      if (other.collision.containsPoint(point)) {
+      if (other.bounds.containsPoint(point)) {
         results.pushCollision(other);
       }
     }
@@ -65,6 +67,7 @@ export class CollisionManager extends Component {
    */
   checkCollisionRect(source: CollisionTile, rect: rect): CollisionResults {
     const results = new CollisionResults();
+    results.rect = rect;
     results.source = source;
     for (let [, other] of this._collisionTiles) {
       // don't collide with yourself
@@ -72,7 +75,7 @@ export class CollisionManager extends Component {
         continue;
       }
 
-      if (other.collision.intersects(rect)) {
+      if (other.bounds.intersects(rect)) {
         results.pushCollision(other);
       }
     }

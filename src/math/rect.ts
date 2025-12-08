@@ -1,4 +1,5 @@
 import { epsilon } from './constants';
+import edge2 from './edge2';
 import vec2 from './vec2';
 import vec3 from './vec3';
 
@@ -35,16 +36,22 @@ export default class rect {
     this.values[0] = value;
   }
 
+  /**
+   * The width of the rect. Cannot be negative
+   */
   set width(value: number) {
-    this.values[1] = value;
+    this.values[1] = value < 0 ? 0 : value;
   }
 
   set top(value: number) {
     this.values[2] = value;
   }
 
+  /**
+   * The height of the rect. Cannot be negative
+   */
   set height(value: number) {
-    this.values[3] = value;
+    this.values[3] = value < 0 ? 0 : value;
   }
 
   get centerX(): number {
@@ -52,7 +59,7 @@ export default class rect {
   }
 
   get centerY(): number {
-    return this.top + this.height / 2;
+    return this.bottom + this.height / 2;
   }
 
   /**
@@ -62,9 +69,9 @@ export default class rect {
   constructor(values?: [number, number, number, number]) {
     if (values !== undefined) {
       this.values[0] = values[0];
-      this.values[1] = values[1];
+      this.width = values[1];
       this.values[2] = values[2];
-      this.values[3] = values[3];
+      this.height = values[3];
     }
   }
 
@@ -79,6 +86,21 @@ export default class rect {
     this.values[1] = 0;
     this.values[2] = 0;
     this.values[3] = 0;
+  }
+
+  /**
+   * Get edges that make up this rect.
+   * The edges will be in a clockwise orientation with
+   * their normals facing out.
+   * @returns
+   */
+  getEdges(): edge2[] {
+    return [
+      new edge2(this.left, this.top, this.right, this.top),
+      new edge2(this.right, this.top, this.right, this.bottom),
+      new edge2(this.right, this.bottom, this.left, this.bottom),
+      new edge2(this.left, this.bottom, this.left, this.top),
+    ];
   }
 
   copy(dest?: rect): rect {
@@ -175,7 +197,7 @@ export default class rect {
    * @param end2
    * @returns
    */
-  lineIntersection(start1: vec2, end1: vec2, start2: vec2, end2: vec2): vec2 {
+  lineIntersection(start1: vec2, end1: vec2, start2: vec2, end2: vec2, infinite?: boolean): vec2 {
     const denom = (start1.x - end1.x) * (start2.y - end2.y) - (start1.y - end1.y) * (start2.x - end2.x);
 
     if (denom === 0) {
@@ -199,11 +221,11 @@ export default class rect {
     const t = toPoint.length();
 
     // past the end point
-    if (t > limit) {
+    if (!infinite && t > limit) {
       return null;
     }
     // intersecting behind
-    if (vec2.dot(toEnd, toPoint) < 0) {
+    if (!infinite && vec2.dot(toEnd, toPoint) < 0) {
       return null;
     }
     return new vec2([px, py]);

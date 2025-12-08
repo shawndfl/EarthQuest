@@ -46,6 +46,28 @@ describe('lineIntersection', () => {
     expect(result).toEqual(new vec2([5, 5]));
   });
 
+  it('No intersection when finite', () => {
+    const r = new rect();
+    const a = new vec2([0, 0]);
+    const b = new vec2([0, 5]);
+    const c = new vec2([1, 10]);
+    const d = new vec2([-1, 10]);
+
+    const result = r.lineIntersection(a, b, c, d);
+    expect(result).toBeNull();
+  });
+
+  it('Find intersection when infinite', () => {
+    const r = new rect();
+    const a = new vec2([0, 0]);
+    const b = new vec2([0, 5]);
+    const c = new vec2([1, 10]);
+    const d = new vec2([-1, 10]);
+
+    const result = r.lineIntersection(a, b, c, d, true);
+    expect(result).toEqual(new vec2([0, 10]));
+  });
+
   it('works with negative coordinates', () => {
     const r = new rect();
     const a = new vec2([-10, -10]);

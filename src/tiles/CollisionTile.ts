@@ -9,10 +9,10 @@ export abstract class CollisionTile extends TileController {
   /**
    * The collision rect of the tile.
    */
-  protected _collision: rect = new rect();
+  protected _bounds: rect = new rect();
 
-  get collision(): Readonly<rect> {
-    return this._collision;
+  get bounds(): Readonly<rect> {
+    return this._bounds;
   }
 
   async initialize(): Promise<void> {
@@ -21,10 +21,10 @@ export abstract class CollisionTile extends TileController {
   }
 
   pushOut(source: CollisionTile, speed: number = 0.01): void {
-    let distToLeft = source._collision.right - this._collision.left;
-    let distToRight = this._collision.right - source._collision.left;
-    let distToTop = this._collision.top - source._collision.bottom;
-    let distToBottom = source._collision.top - this._collision.bottom;
+    let distToLeft = source._bounds.right - this._bounds.left;
+    let distToRight = this._bounds.right - source._bounds.left;
+    let distToTop = this._bounds.top - source._bounds.bottom;
+    let distToBottom = source._bounds.top - this._bounds.bottom;
 
     distToLeft = distToLeft < 0 ? 0 : distToLeft;
     distToRight = distToRight < 0 ? 0 : distToRight;
@@ -55,7 +55,7 @@ export abstract class CollisionTile extends TileController {
     }
 
     if (this.tileData.collisionShape == CollisionShape.Full) {
-      this.eng.debugHelpers.setRect(this.uuid, this._collision, color);
+      this.eng.debugHelpers.setRect(this.uuid, this._bounds, color);
     }
   }
 
@@ -74,10 +74,10 @@ export abstract class CollisionTile extends TileController {
    */
   protected updateCollision(): void {
     this.quad.transform.getTranslation(this.bottomLeft);
-    this._collision.left = this.bottomLeft.x + this.tileData.collisionOffset.x;
-    this._collision.width = (this.tileData.tileSize.x + this.tileData.collisionOffset.z) * this.eng.pixelScale;
-    this._collision.height = (this.tileData.tileSize.y + this.tileData.collisionOffset.w) * this.eng.pixelScale;
-    this._collision.top = this.bottomLeft.y + this._collision.height + this.tileData.collisionOffset.y;
+    this._bounds.left = this.bottomLeft.x + this.tileData.collisionOffset.x;
+    this._bounds.width = (this.tileData.tileSize.x + this.tileData.collisionOffset.z) * this.eng.pixelScale;
+    this._bounds.height = (this.tileData.tileSize.y + this.tileData.collisionOffset.w) * this.eng.pixelScale;
+    this._bounds.top = this.bottomLeft.y + this._bounds.height + this.tileData.collisionOffset.y;
   }
 
   /**

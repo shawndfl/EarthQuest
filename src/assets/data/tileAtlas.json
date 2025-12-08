@@ -11,7 +11,7 @@
       "type": "player",
       "sourceLocation": "0,184,16,24",
       "collisionOffset": "0,0,0,-16",
-      "collisionShape": "full",
+      "collisionShape": "Full",
       "images": {
         "down": "0,184,16,24",
         "downStep": "24,184,16,24",
@@ -33,7 +33,7 @@
     },
     "poo": {
       "type": "npc",
-      "collisionOffset": "0,0,0,-8",
+      "collisionOffset": "0,0,0,16",
       "options": ["poo"],
       "sourceLocation": "0,216,16,24"
     },

@@ -5,52 +5,39 @@ import vec3 from './vec3';
 import { epsilon } from './constants';
 
 export default class vec2 {
-  get x(): number {
-    return this.values[0];
-  }
-
-  get y(): number {
-    return this.values[1];
-  }
+  x: number;
+  y: number;
 
   get xy(): [number, number] {
-    return [this.values[0], this.values[1]];
-  }
-
-  set x(value: number) {
-    this.values[0] = value;
-  }
-
-  set y(value: number) {
-    this.values[1] = value;
+    return [this.x, this.y];
   }
 
   set xy(values: [number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
+    this.x = values[0];
+    this.y = values[1];
   }
 
   constructor(values?: [number, number] | number, y?: number) {
     if (values !== undefined) {
       if (typeof values === 'number') {
-        this.values[0] = values;
+        this.x = values;
       } else if (Array.isArray(values)) {
         this.xy = values;
       }
 
       if (y !== undefined) {
-        this.values[1] = y;
+        this.y = y;
       }
     }
   }
 
-  values = new Float32Array(2);
-
   static readonly zero = new vec2([0, 0]);
   static readonly one = new vec2([1, 1]);
+  static readonly right = new vec2([1, 0]);
+  static readonly up = new vec2([0, 1]);
 
   at(index: number): number {
-    return this.values[index];
+    return index == 0 ? this.x : this.y;
   }
 
   reset(): void {

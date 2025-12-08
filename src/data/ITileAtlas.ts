@@ -1,10 +1,10 @@
 export enum CollisionShape {
-  Full,
-  None,
-  TopRight,
-  TopLeft,
-  BottomRight,
-  bottomLeft,
+  Full = 'Full',
+  None = 'None',
+  TopRight = 'TopRight',
+  TopLeft = 'TopLeft',
+  BottomRight = 'BottomRight',
+  BottomLeft = 'BottomLeft',
 }
 
 export interface ITileCollision {
