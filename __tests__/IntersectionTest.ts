@@ -75,14 +75,14 @@ describe('lineIntersection', () => {
     const c = new vec2([-10, 0]);
     const d = new vec2([0, -10]);
 
-    const result = r.lineIntersection(a, b, c, d);
+    const result = r.lineIntersection(a, b, c, d, true);
     expect(result).toEqual(new vec2([-5, -5]));
   });
 });
 
 describe('rectIntersection', () => {
   it('finds intersection of rect and line', () => {
-    const r = new rect([0, 10, 0, 10]);
+    const r = new rect(0, 10, 0, 10);
     const start = new vec2([-1, 1]);
     const end = new vec2([1, 1]);
 
@@ -90,7 +90,7 @@ describe('rectIntersection', () => {
     expect(result).toEqual(new vec2([0, 1]));
   });
   it('finds intersection of rect and line backwards', () => {
-    const r = new rect([0, 10, 0, 10]);
+    const r = new rect(0, 10, 0, 10);
     const start = new vec2([-1, 1]);
     const end = new vec2([-10, 1]);
 
@@ -99,7 +99,7 @@ describe('rectIntersection', () => {
   });
 
   it('finds intersection of rect and line backwards', () => {
-    const r = new rect([0, 10, 0, 10]);
+    const r = new rect(0, 10, 0, 10);
     const start = new vec2([-1, 1]);
     const end = new vec2([-10, 1]);
 

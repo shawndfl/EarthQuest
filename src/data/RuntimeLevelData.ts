@@ -7,13 +7,18 @@ import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
-import { CollisionShape, ITileData, TileOrigin } from './ITileAtlas';
+import { ITileData, TileOrigin } from './ITileAtlas';
 
 export interface SourceImageOptions {
   flipX?: boolean;
   flipY?: boolean;
   alpha?: number;
   hueRotation?: number;
+}
+
+export interface TriggerCollision {
+  triggerName: string;
+  collisionPolygon: vec2[];
 }
 
 export class RuntimeTileData extends Component {
@@ -31,6 +36,8 @@ export class RuntimeTileData extends Component {
   private _tileSize: vec2;
   private _tilePosition: vec3;
   private _collisionOffset: vec4;
+  private _collisionPolygon: vec2[];
+  private _triggerCollision: TriggerCollision[];
   private _tileOffset: vec2;
   private _worldTransform = new mat4();
 
@@ -87,8 +94,8 @@ export class RuntimeTileData extends Component {
     return this._collisionOffset;
   }
 
-  get collisionShape(): CollisionShape {
-    return this._tileData.collisionShape ?? CollisionShape.Full;
+  get collisionPolygon(): vec2[] {
+    return this._collisionPolygon;
   }
 
   get data(): Readonly<ITileData> {
@@ -116,6 +123,13 @@ export class RuntimeTileData extends Component {
     this._images = new Map();
     const point = this.getLocationFromString(this._tileData.sourceLocation);
     this._collisionOffset = this.getLocationFromString(this._tileData.collisionOffset);
+    this._collisionPolygon = this._tileData.collisionPolygon?.map((p) => this.getVec2FromString(p));
+    this._triggerCollision = this._tileData.collisionTrigger?.map((p) => {
+      return {
+        triggerName: p.triggerName,
+        collisionPolygon: p.collisionPolygon.map((p2) => this.getVec2FromString(p2)),
+      };
+    });
 
     // setup source location
     this._sourcePosition = new vec2(point.x, point.y);
@@ -279,6 +293,28 @@ export class RuntimeTileData extends Component {
       point.w = parseFloat(components[i++]);
     } catch (e) {
       console.error('Cannot parse ' + location + ' expecting [x,y] or [x,y,z,w]');
+    }
+
+    return point;
+  }
+
+  /**
+   * Parses the location from a string
+   * @param location
+   * @returns
+   */
+  getVec2FromString(location: string): vec2 {
+    if (!location) {
+      return new vec2();
+    }
+    const components = location?.split(',');
+    const point = new vec2([0, 0]);
+    let i = 0;
+    try {
+      point.x = parseFloat(components[i++]);
+      point.y = parseFloat(components[i++]);
+    } catch (e) {
+      console.error('Cannot parse ' + location + ' expecting [x,y] or [x,y');
     }
 
     return point;

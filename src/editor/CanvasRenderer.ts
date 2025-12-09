@@ -49,7 +49,7 @@ export class CanvasRenderer extends EditorComponent {
   constructor(editor: IEditor, private ctx: CanvasRenderingContext2D) {
     super(editor);
     this.ctx.imageSmoothingEnabled = false;
-    this.offsetBounds = new rect([-200, 4000, -2000, 4000]);
+    this.offsetBounds = new rect(-200, 4000, -2000, 4000);
     this._scale = 1.0;
     this.minScale = 0.5;
     this.maxScale = 1.5;

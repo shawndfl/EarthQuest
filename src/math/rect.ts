@@ -8,21 +8,10 @@ export default class rect {
     return 'rect';
   }
 
-  get left(): number {
-    return this.values[0];
-  }
-
-  get width(): number {
-    return this.values[1];
-  }
-
-  get top(): number {
-    return this.values[2];
-  }
-
-  get height(): number {
-    return this.values[3];
-  }
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 
   get right(): number {
     return this.left + this.width;
@@ -30,28 +19,6 @@ export default class rect {
 
   get bottom(): number {
     return this.top - this.height;
-  }
-
-  set left(value: number) {
-    this.values[0] = value;
-  }
-
-  /**
-   * The width of the rect. Cannot be negative
-   */
-  set width(value: number) {
-    this.values[1] = value < 0 ? 0 : value;
-  }
-
-  set top(value: number) {
-    this.values[2] = value;
-  }
-
-  /**
-   * The height of the rect. Cannot be negative
-   */
-  set height(value: number) {
-    this.values[3] = value < 0 ? 0 : value;
   }
 
   get centerX(): number {
@@ -66,26 +33,18 @@ export default class rect {
    *
    * @param values left, width, top, height
    */
-  constructor(values?: [number, number, number, number]) {
-    if (values !== undefined) {
-      this.values[0] = values[0];
-      this.width = values[1];
-      this.values[2] = values[2];
-      this.height = values[3];
-    }
-  }
-
-  private values = new Float32Array(4);
-
-  at(index: number): number {
-    return this.values[index];
+  constructor(left?: number, width?: number, top?: number, height?: number) {
+    this.left = left || 0;
+    this.width = width || 0;
+    this.top = top || 0;
+    this.height = height || 0;
   }
 
   reset(): void {
-    this.values[0] = 0;
-    this.values[1] = 0;
-    this.values[2] = 0;
-    this.values[3] = 0;
+    this.left = 0;
+    this.width = 0;
+    this.top = 0;
+    this.height = 0;
   }
 
   /**
@@ -116,7 +75,7 @@ export default class rect {
     return dest;
   }
 
-  contains(other: rect): boolean {
+  contains(other: Readonly<rect>): boolean {
     if (other.left < this.left) {
       return false;
     }
@@ -137,22 +96,46 @@ export default class rect {
   /**
    * Check if a point is inside this rectangle (inclusive).
    */
-  containsPoint(point: vec2 | vec3): boolean {
-    return point.x >= this.left && point.x <= this.right && point.y <= this.top && point.y >= this.bottom;
+  containsPoint(x: number, y: number): boolean {
+    return x >= this.left && x <= this.right && y <= this.top && y >= this.bottom;
+  }
+
+  verticalSplitIntersection(other: Readonly<rect>): boolean {
+    if (this.intersects(other)) {
+      if (this.right > other.right) {
+        return true;
+      }
+      if (this.left < other.left) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  splitHorizontalIntersection(other: Readonly<rect>): boolean {
+    if (this.intersects(other)) {
+      if (this.top > other.top) {
+        return true;
+      }
+      if (this.bottom < other.bottom) {
+        return true;
+      }
+    }
+    return false;
   }
 
   intersects(other: Readonly<rect>): boolean {
-    if (this.right < other.left) {
+    if (this.right <= other.left) {
       return false;
     }
-    if (this.left > other.right) {
+    if (this.left >= other.right) {
       return false;
     }
-    if (this.top < other.bottom) {
+    if (this.top <= other.bottom) {
       return false;
     }
-
-    if (this.bottom > other.top) {
+    if (this.bottom >= other.top) {
       return false;
     }
 
@@ -198,37 +181,9 @@ export default class rect {
    * @returns
    */
   lineIntersection(start1: vec2, end1: vec2, start2: vec2, end2: vec2, infinite?: boolean): vec2 {
-    const denom = (start1.x - end1.x) * (start2.y - end2.y) - (start1.y - end1.y) * (start2.x - end2.x);
-
-    if (denom === 0) {
-      // Lines are parallel (or coincident)
-      return null;
-    }
-
-    const px =
-      ((start1.x * end1.y - start1.y * end1.x) * (start2.x - end2.x) -
-        (start1.x - end1.x) * (start2.x * end2.y - start2.y * end2.x)) /
-      denom;
-    const py =
-      ((start1.x * end1.y - start1.y * end1.x) * (start2.y - end2.y) -
-        (start1.y - end1.y) * (start2.x * end2.y - start2.y * end2.x)) /
-      denom;
-
-    const p = new vec2([px, py]);
-    const toEnd = start1.copy().subtract(end1);
-    const toPoint = start1.copy().subtract(p);
-    const limit = toEnd.length();
-    const t = toPoint.length();
-
-    // past the end point
-    if (!infinite && t > limit) {
-      return null;
-    }
-    // intersecting behind
-    if (!infinite && vec2.dot(toEnd, toPoint) < 0) {
-      return null;
-    }
-    return new vec2([px, py]);
+    const e1 = new edge2(start1.x, start1.y, end1.x, end1.y);
+    const e2 = new edge2(start2.x, start2.y, end2.x, end2.y);
+    return e1.lineIntersection(e2, infinite);
   }
 
   equals(vector: rect, threshold = epsilon): boolean {

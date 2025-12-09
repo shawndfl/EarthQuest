@@ -40,7 +40,7 @@ describe('edge2', () => {
     // Line 2: (0,10) -> (10,0)
     const e2 = new edge2(0, 10, 10, 0);
 
-    const result = e1.Intersects(e2);
+    const result = e1.lineIntersection(e2, true);
 
     expect(result).not.toBeNull();
     expect(result.x).toBeCloseTo(5);
@@ -52,7 +52,7 @@ describe('edge2', () => {
     const e1 = new edge2(0, 0, 10, 0);
     const e2 = new edge2(0, 5, 10, 5);
 
-    const result = e1.Intersects(e2);
+    const result = e1.lineIntersection(e2, true);
 
     expect(result).toBeNull();
   });
@@ -61,7 +61,7 @@ describe('edge2', () => {
     const e1 = new edge2(0, 0, 10, 10);
     const e2 = new edge2(0, 10, 10, 0);
 
-    const result = e1.Intersects(e2);
+    const result = e1.lineIntersection(e2, true);
 
     expect(result).toBeInstanceOf(vec2);
   });
@@ -88,7 +88,7 @@ describe('edge2', () => {
       const e2 = new edge2(c[0], c[1], d[0], d[1]);
 
       const ref = intersectRef(a, b, c, d);
-      const out = e1.Intersects(e2);
+      const out = e1.lineIntersection(e2, true);
 
       if (ref === null) {
         expect(out).toBeNull();

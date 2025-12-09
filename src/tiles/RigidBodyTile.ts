@@ -85,57 +85,90 @@ export abstract class RigidBodyTile extends CollisionTile {
     if (!collisionResults.hasCollision) {
       return;
     }
-    const velocity2d = new vec2(this.velocity.xy);
-    const velocity2dNormal = velocity2d.copy().normalize();
-    const myEdges = this.bounds.getEdges().filter((e) => vec2.dot(e.normal, velocity2dNormal) > 0);
 
-    let xLimit = Number.MAX_VALUE;
-    let yLimit = Number.MAX_VALUE;
-    let posX: number;
-    let posY: number;
+    const smallCorrectionStep = 0.5;
+    const maxCycles = 5;
+    let clearVelocityX = false;
+    let clearVelocityY = false;
+    const isMovingRight = velocityStep.x > 0;
+    const isMovingLeft = velocityStep.x < 0;
+    const isMovingUp = velocityStep.y > 0;
+    const isMovingDown = velocityStep.y < 0;
 
-    // find the right and up limit
-    for (let result of collisionResults.intersectingTiles) {
-      // get all edges that are facing away
-      const theirEdges = result.bounds.getEdges().filter((e) => vec2.dot(e.normal, velocity2dNormal) < 0);
-      for (let myEdge of myEdges) {
-        const isRightAxis = Math.abs(vec2.dot(myEdge.normal, vec2.right)) > 0.999;
-        const isUpAxis = Math.abs(vec2.dot(myEdge.normal, vec2.up)) > 0.999;
+    // loop over this correct for multiple cycle to
+    // avoid oscillating corrections with the position
+    for (let cycles = 0; cycles < maxCycles; cycles++) {
+      if (velocityStep.x != 0) {
+        // offset the rect
+        const myUpdatedRect = this.bounds.copy();
+        myUpdatedRect.left += velocityStep.x;
+        for (let result of collisionResults.intersectingTiles) {
+          // is this an intersection worth adjusting
+          const intersects = myUpdatedRect.intersects(result.bounds);
+          const splitLeftEdge = myUpdatedRect.left < result.bounds.left;
+          const splitRightEdge = myUpdatedRect.right > result.bounds.right;
+          const splitCorrectEdge = isMovingRight ? splitLeftEdge : splitRightEdge;
+          if (intersects && splitCorrectEdge) {
+            clearVelocityX = true;
 
-        for (let theirEdge of theirEdges) {
-          // no slopes
-          const match = vec2.dot(myEdge.normal, theirEdge.normal) < -0.99;
-          if (match) {
-            const distance = myEdge.DistanceToSegment(theirEdge);
-            if (isRightAxis) {
-              if (distance < Math.abs(velocityStep.x)) {
-                xLimit = Math.min(myEdge.DistanceToSegment(theirEdge), xLimit);
-                posX = theirEdge.start.x;
-              }
-            } else if (isUpAxis) {
-              if (distance < Math.abs(velocityStep.y)) {
-                yLimit = Math.min(myEdge.DistanceToSegment(theirEdge), yLimit);
-                posY = theirEdge.start.y;
-              }
+            // position to the edge of the other bounds
+            if (velocityStep.x > 0) {
+              // moving right
+              const target = result.bounds.left - this._bounds.width;
+              const dir = target - this.position.x;
+              this.position.x += dir * smallCorrectionStep;
+            } else {
+              // moving left
+              const target = result.bounds.right;
+              const dir = target - this.position.x;
+              this.position.x += dir * smallCorrectionStep;
             }
+            this.updateCollision();
+          }
+        }
+      }
+
+      if (velocityStep.y != 0) {
+        const myUpdatedRect = this.bounds.copy();
+        myUpdatedRect.top += velocityStep.y;
+        for (let result of collisionResults.intersectingTiles) {
+          // limit the position here
+          // is this an intersection worth adjusting
+          const intersects = myUpdatedRect.intersects(result.bounds);
+          const splitTopEdge = myUpdatedRect.top > result.bounds.top;
+          const splitBottomEdge = myUpdatedRect.bottom < result.bounds.bottom;
+          const splitCorrectEdge = isMovingUp ? splitBottomEdge : splitTopEdge;
+          if (intersects && splitCorrectEdge) {
+            clearVelocityY = true;
+            // position to the edge of the other bounds
+            if (velocityStep.y > 0) {
+              // moving up
+              const target = result.bounds.bottom - this._bounds.height;
+              const dir = target - this.position.y;
+              this.position.y += dir * smallCorrectionStep;
+            } else {
+              // moving down
+              const target = result.bounds.top;
+              const dir = target - this.position.y;
+              this.position.y += dir * smallCorrectionStep;
+            }
+            this.updateCollision();
           }
         }
       }
     }
-    // update position with the step
-    this.position.add(velocityStep);
 
-    // limit the position here
-    if (xLimit < Number.MAX_VALUE) {
-      // no velocity on this axis
+    if (clearVelocityX) {
       this.velocity.x = 0;
-      this.position.x = posX - (velocityStep.x > 0 ? this._bounds.width : 0);
+      velocityStep.x = 0;
     }
-    if (yLimit < Number.MAX_VALUE) {
-      // no velocity on this axis
+
+    if (clearVelocityY) {
       this.velocity.y = 0;
-      this.position.y = posY - (velocityStep.y > 0 ? this._bounds.height : 0);
+      velocityStep.y = 0;
     }
+
+    this.position.add(velocityStep);
 
     // update collision
     this.updateCollision();
@@ -151,7 +184,7 @@ export abstract class RigidBodyTile extends CollisionTile {
    * @returns
    */
   protected slideEdge(edge: edge2, staticEdge: edge2): edge2 {
-    const intersection = edge.Intersects(staticEdge);
+    const intersection = edge.lineIntersection(staticEdge, true);
     if (intersection) {
       const toEnd = new edge2(intersection.x, intersection.y, edge.end.x, edge.end.y);
       let scale = vec2.dot(toEnd.directionFull(), staticEdge.direction());
@@ -194,34 +227,36 @@ export abstract class RigidBodyTile extends CollisionTile {
    * @param results
    */
   private drawCollisionFromResults(results: CollisionResults): void {
-    // draw results
-    const start = this.bestStartPointForVelocity(this._bounds, this.velocity);
-    const pixelLengthOfDebugLine = 10;
-    const step = this.velocity.copy().normalize().scale(pixelLengthOfDebugLine);
-    const nextPosition = start.copy().add(step);
+    if (true) {
+      // draw results
+      const start = this.bestStartPointForVelocity(this._bounds, this.velocity);
+      const pixelLengthOfDebugLine = 10;
+      const step = this.velocity.copy().normalize().scale(pixelLengthOfDebugLine);
+      const nextPosition = start.copy().add(step);
 
-    this.eng.debugHelpers.setLine(
-      this.uuid,
-      new vec3(...start.xy, 0),
-      new vec3(...nextPosition.xy, 0),
-      new vec4([1, 0, 0, 1])
-    );
+      this.eng.debugHelpers.setLine(
+        this.uuid,
+        new vec3(...start.xy, 0),
+        new vec3(...nextPosition.xy, 0),
+        new vec4([1, 0, 0, 1])
+      );
 
-    if (this.lastCollisionResults) {
-      for (let res of this.lastCollisionResults.intersectingTiles) {
-        res.drawCollision(null);
+      if (this.lastCollisionResults) {
+        for (let res of this.lastCollisionResults.intersectingTiles) {
+          res.drawCollision(null);
+        }
+        this.drawCollision(null);
       }
-      this.drawCollision(null);
-    }
-    this.lastCollisionResults = null;
-    if (results.hasCollision()) {
-      const theirColor = new vec4([0, 1, 0, 1]);
-      const ourColor = new vec4([0, 0.5, 0.8, 1]);
-      for (let res of results.intersectingTiles) {
-        res.drawCollision(theirColor);
+      this.lastCollisionResults = null;
+      if (results.hasCollision()) {
+        const theirColor = new vec4([0, 1, 0, 1]);
+        const ourColor = new vec4([0, 0.5, 0.8, 1]);
+        for (let res of results.intersectingTiles) {
+          res.drawCollision(theirColor);
+        }
+        this.drawCollision(ourColor);
+        this.lastCollisionResults = results;
       }
-      this.drawCollision(ourColor);
-      this.lastCollisionResults = results;
     }
   }
 }

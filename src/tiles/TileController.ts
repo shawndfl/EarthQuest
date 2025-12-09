@@ -1,17 +1,8 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
-import { CollisionResults } from '../data/CollisionResults';
-import { CollisionTypes } from '../data/CollisionTypes';
-import { CollisionShape } from '../data/ITileAtlas';
 import { RuntimeTileData, SourceImageOptions } from '../data/RuntimeLevelData';
-import { DrawingLayer } from '../drawingLayers/DrawingLayer';
-import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
-import { clamp } from '../math/constants';
-import mat3 from '../math/mat3';
-import mat4 from '../math/mat4';
-import rect from '../math/rect';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';

@@ -1,5 +1,4 @@
 import { CollisionResults } from '../data/CollisionResults';
-import { CollisionShape } from '../data/ITileAtlas';
 import rect from '../math/rect';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
@@ -20,31 +19,6 @@ export abstract class CollisionTile extends TileController {
     this.updateCollision();
   }
 
-  pushOut(source: CollisionTile, speed: number = 0.01): void {
-    let distToLeft = source._bounds.right - this._bounds.left;
-    let distToRight = this._bounds.right - source._bounds.left;
-    let distToTop = this._bounds.top - source._bounds.bottom;
-    let distToBottom = source._bounds.top - this._bounds.bottom;
-
-    distToLeft = distToLeft < 0 ? 0 : distToLeft;
-    distToRight = distToRight < 0 ? 0 : distToRight;
-    distToTop = distToTop < 0 ? 0 : distToTop;
-    distToBottom = distToBottom < 0 ? 0 : distToBottom;
-
-    let deltaX = distToLeft < distToRight ? -distToLeft : distToRight;
-    let deltaY = distToTop < distToBottom ? distToTop : -distToBottom;
-
-    if (Math.abs(deltaX) < Math.abs(deltaY)) {
-      deltaY = 0;
-    } else {
-      deltaX = 0;
-    }
-    const dir = new vec3(deltaX, deltaY, 0);
-    const newPos = dir.scale(0.5);
-    console.debug('pushing out ' + source.type + ' ' + newPos.x.toFixed(5) + ', ' + newPos.y.toFixed(5));
-    source.setTileTransform({ position: newPos });
-  }
-
   /**
    * Draw the collision shape
    */
@@ -54,9 +28,7 @@ export abstract class CollisionTile extends TileController {
       return;
     }
 
-    if (this.tileData.collisionShape == CollisionShape.Full) {
-      this.eng.debugHelpers.setRect(this.uuid, this._bounds, color);
-    }
+    this.eng.debugHelpers.setRect(this.uuid, this._bounds, color);
   }
 
   /**
@@ -64,10 +36,7 @@ export abstract class CollisionTile extends TileController {
    * Default is push it out.
    * @param source
    */
-  onCollision(source: CollisionTile): void {
-    // by default just push out the source tile
-    this.pushOut(source);
-  }
+  onCollision(source: CollisionTile): void {}
 
   /**
    * gets the latest bottom left and creates a collision box around the tileSize

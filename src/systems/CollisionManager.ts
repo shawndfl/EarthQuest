@@ -52,7 +52,7 @@ export class CollisionManager extends Component {
       }
 
       // collect the colliding tiles
-      if (other.bounds.containsPoint(point)) {
+      if (other.bounds.containsPoint(point.x, point.y)) {
         results.pushCollision(other);
       }
     }

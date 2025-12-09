@@ -1,17 +1,3 @@
-export enum CollisionShape {
-  Full = 'Full',
-  None = 'None',
-  TopRight = 'TopRight',
-  TopLeft = 'TopLeft',
-  BottomRight = 'BottomRight',
-  BottomLeft = 'BottomLeft',
-}
-
-export interface ITileCollision {
-  collisionOffset: string;
-  collisionShape: CollisionShape;
-}
-
 /**
  * The origin of the tile.
  */
@@ -30,10 +16,19 @@ export interface ITileData {
 
   /** the pixel x,y,w,h location in the source texture for this image */
   sourceLocation: string;
-  collisions?: ITileCollision[];
+
+  collisionTrigger: {
+    triggerName: string;
+    collisionPolygon: string[];
+  }[];
+
   /** in pixels x,y,width, height offset for the collision */
   collisionOffset: string;
-  collisionShape: CollisionShape;
+  /**
+   * x, y points that make up a polygon. The points should be in clockwise order.
+   * Each string is a x,y component
+   */
+  collisionPolygon: string[];
   /** default is bottom left */
   origin?: TileOrigin;
   rotate?: number;

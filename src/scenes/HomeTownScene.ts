@@ -8,6 +8,7 @@ import vec3 from '../math/vec3';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
+import { SolidTile } from '../tiles/SolidTile';
 import { StaticTile } from '../tiles/StaticTile';
 import { TileController } from '../tiles/TileController';
 import { Scene } from './Scene';
@@ -39,6 +40,40 @@ export class HomeTownScene extends Scene {
     await this.createPlayer();
     await this.createStonePath();
     await this.createPoo();
+    //await this.createHouse();
+    await this.createLineOfHouses();
+  }
+  async createLineOfHouses(): Promise<void> {
+    const promises = [];
+    const step = 220;
+    const row = 50;
+    for (let i = 0; i < 10; i++) {
+      const position = new vec2(step * i, 50);
+      await this.createHouse(position);
+    }
+  }
+
+  async createHouse(position: vec2): Promise<void> {
+    const tileData = this._backgroundLayer.tileAtlas.tiles['ness house'];
+
+    const house = new SolidTile(this.eng, {
+      // tell the character layer to handle the buffer refresh request
+      requestBufferRefresh: (t) => {
+        this._characterLayer.requestRefresh();
+      },
+      tileData: new RuntimeTileData(this.eng, 'ness house', tileData, this._characterLayer.texture),
+    });
+
+    house.setPosition(new vec3(...position.xy, 0));
+    // this will handle the update function
+    //this.eng.tileManager.registerTileForUpdate(house);
+
+    this.eng.collisionManager.registerTileForCollision(house);
+
+    // this will handle the quad drawing
+    this._characterLayer.registerQuad(house.quad);
+
+    await house.initialize();
   }
 
   async createPoo(): Promise<void> {

@@ -52,32 +52,75 @@ export default class edge2 {
     this.updateNormal();
   }
 
+  doesOverLapAlongMyNormal(other: edge2, includeStartAndEnd?: boolean): boolean {
+    let toTheirStart = other.start.copy().subtract(this.start).normalize();
+    let toTheirEnd = other.end.copy().subtract(this.start).normalize();
+    const dir1 = this.direction();
+    const d1 = vec2.dot(dir1, toTheirStart);
+    const d2 = vec2.dot(dir1, toTheirEnd);
+
+    if (includeStartAndEnd ? d1 < 0 && d2 < 0 : d1 <= 0 && d2 <= 0) {
+      return false;
+    }
+
+    toTheirStart = other.start.copy().subtract(this.end).normalize();
+    toTheirEnd = other.end.copy().subtract(this.end).normalize();
+    const dir2 = this.direction().copy().negate();
+
+    const d3 = vec2.dot(dir2, toTheirStart);
+    const d4 = vec2.dot(dir2, toTheirEnd);
+
+    if (includeStartAndEnd ? d3 < 0 && d4 > 0 : d3 <= 0 || d4 <= 0) {
+      return true;
+    }
+
+    return true;
+  }
+
   /**
-   * See if two edges intersect
-   * @param other
+   * Find the point a line intersects a line
+   * @param start1
+   * @param end1
+   * @param start2
+   * @param end2
    * @returns
    */
-  Intersects(other: edge2): vec2 {
-    const x1 = this.start.x;
-    const y1 = this.start.y;
-    const x2 = this.end.x;
-    const y2 = this.end.y;
-    const x3 = other.start.x;
-    const y3 = other.start.y;
-    const x4 = other.end.x;
-    const y4 = other.end.y;
+  lineIntersection(other: edge2, infinite?: boolean): vec2 {
+    const start1 = this.start;
+    const start2 = other.start;
+    const end1 = this.end;
+    const end2 = other.end;
 
-    const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    const denom = (start1.x - end1.x) * (start2.y - end2.y) - (start1.y - end1.y) * (start2.x - end2.x);
 
-    // Lines are parallel or coincident
     if (denom === 0) {
+      // Lines are parallel (or coincident)
       return null;
     }
 
-    const px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denom;
+    const px =
+      ((start1.x * end1.y - start1.y * end1.x) * (start2.x - end2.x) -
+        (start1.x - end1.x) * (start2.x * end2.y - start2.y * end2.x)) /
+      denom;
+    const py =
+      ((start1.x * end1.y - start1.y * end1.x) * (start2.y - end2.y) -
+        (start1.y - end1.y) * (start2.x * end2.y - start2.y * end2.x)) /
+      denom;
 
-    const py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denom;
+    const p = new vec2([px, py]);
+    const toEnd = start1.copy().subtract(end1);
+    const toPoint = start1.copy().subtract(p);
+    const limit = toEnd.length();
+    const t = toPoint.length();
 
+    // past the end point
+    if (!infinite && t > limit) {
+      return null;
+    }
+    // intersecting behind
+    if (!infinite && vec2.dot(toEnd, toPoint) < 0) {
+      return null;
+    }
     return new vec2([px, py]);
   }
 
@@ -125,7 +168,7 @@ export default class edge2 {
    */
   DistanceToSegment(other: edge2): number {
     // If they intersect (infinite line intersection), distance is 0.
-    if (this.Intersects(other)) {
+    if (this.lineIntersection(other, true)) {
       return 0;
     }
 
