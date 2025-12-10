@@ -62,6 +62,29 @@ export default class rect {
     ];
   }
 
+  distance(other: rect) {
+    // ----- Horizontal distance -----
+    let dx = 0;
+
+    if (this.right < other.left) {
+      dx = other.left - this.right; // A is left of B
+    } else if (other.right < this.left) {
+      dx = this.left - other.right; // B is left of A
+    }
+
+    // ----- Vertical distance (Y-up) -----
+    let dy = 0;
+
+    if (this.top < other.bottom) {
+      dy = other.bottom - this.top; // A is below B
+    } else if (other.top < this.bottom) {
+      dy = this.bottom - other.top; // B is below A
+    }
+
+    // Euclidean distance between the closest points
+    return Math.hypot(dx, dy);
+  }
+
   copy(dest?: rect): rect {
     if (!dest) {
       dest = new rect();

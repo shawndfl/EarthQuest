@@ -97,9 +97,9 @@ export class DialogManager extends Component {
     this._buffer.setBuffers(geo);
   }
 
+  show(): void {}
+
   update(dt: number): void {
-    // just disabling for now
-    return;
     this._shader.enable();
 
     const proj = this._projection;

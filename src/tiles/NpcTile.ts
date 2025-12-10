@@ -1,4 +1,8 @@
+import { SpriteDirection } from '../data/SpriteDirection';
 import { Curve } from '../math/Curve';
+import vec2 from '../math/vec2';
+import { UserAction } from '../systems/InputManager';
+import { PlayerTile } from './PlayerTile';
 import { RigidBodyTile } from './RigidBodyTile';
 
 export class NpcTile extends RigidBodyTile {
@@ -23,5 +27,44 @@ export class NpcTile extends RigidBodyTile {
 
   update(dt: number): void {
     this.curve.update(dt);
+
+    if (this.eng.inputManager.isReleased(UserAction.A)) {
+      if (this.withInRangeOfPlayer()) {
+        console.log('talking to ' + this.name);
+      }
+    }
+  }
+
+  protected withInRangeOfPlayer(): boolean {
+    const player = this.eng.tileManager.playerTile;
+
+    const minInteractionDistance = 50;
+
+    if (this.bounds.distance(player.bounds) < minInteractionDistance && this.isFacingMe(player)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected isFacingMe(player: PlayerTile): boolean {
+    // N
+    if (player.bounds.top < this.bounds.bottom) {
+      return player.facing == SpriteDirection.North;
+    }
+    //E
+    if (player.bounds.right < this.bounds.left) {
+      return player.facing == SpriteDirection.East;
+    }
+    //S
+    if (player.bounds.bottom > this.bounds.top) {
+      return player.facing == SpriteDirection.South;
+    }
+    //w
+    if (player.bounds.left > this.bounds.right) {
+      return player.facing == SpriteDirection.West;
+    }
+
+    return true;
   }
 }

@@ -1,4 +1,3 @@
-import { CollisionResults } from '../data/CollisionResults';
 import { SpriteDirection } from '../data/SpriteDirection';
 
 import vec2 from '../math/vec2';
@@ -13,6 +12,10 @@ export class PlayerTile extends RigidBodyTile {
   private _walkingToggle: boolean;
 
   speed: number;
+
+  get facing(): SpriteDirection {
+    return this._facing;
+  }
 
   async initialize(): Promise<void> {
     await super.initialize();

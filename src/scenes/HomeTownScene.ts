@@ -176,9 +176,13 @@ export class HomeTownScene extends Scene {
       tileData: new RuntimeTileData(this.eng, 'ness', tileData, this._characterLayer.texture),
     });
 
+    // this will make sure all other systems can access this tile
+    this.eng.tileManager.registerPlayerTile(playerTile);
+
     // this will handle the update function
     this.eng.tileManager.registerTileForUpdate(playerTile);
 
+    // make sure this can collide with other things
     this.eng.collisionManager.registerTileForCollision(playerTile);
 
     // this will handle the quad drawing

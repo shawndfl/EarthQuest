@@ -20,6 +20,11 @@ import { TreeTile } from '../tiles/TreeTiles';
  */
 export class TileManager extends Component {
   private _tileControllers: Map<string, TileController>;
+  private _playerTile: PlayerTile;
+
+  public get playerTile(): PlayerTile {
+    return this._playerTile;
+  }
 
   public get tileControllers(): Map<string, TileController> {
     return this._tileControllers;
@@ -75,6 +80,14 @@ export class TileManager extends Component {
       controller.update(dt);
     }
     this.panningViewPort();
+  }
+
+  /**
+   * register player tile
+   * @param player
+   */
+  registerPlayerTile(player: PlayerTile): void {
+    this._playerTile = player;
   }
 
   /**

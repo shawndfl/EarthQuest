@@ -21,6 +21,8 @@ export enum UserAction {
   Select = 0x0020,
   A = 0x0040,
   B = 0x0080,
+  X = 0x0100,
+  Y = 0x0200,
 }
 
 /**
@@ -248,11 +250,19 @@ export class InputManager extends Component {
       this.buttonsDown = this.buttonsDown | UserAction.Down;
     }
 
-    if (e.key == ' ') {
+    if (e.key == 'a') {
+      this.buttonsDown = this.buttonsDown | UserAction.Y;
+    }
+
+    if (e.key == 'd') {
       this.buttonsDown = this.buttonsDown | UserAction.A;
     }
 
-    if (e.key == 'b') {
+    if (e.key == 'w') {
+      this.buttonsDown = this.buttonsDown | UserAction.X;
+    }
+
+    if (e.key == 's') {
       this.buttonsDown = this.buttonsDown | UserAction.B;
     }
 
@@ -286,12 +296,22 @@ export class InputManager extends Component {
       this.buttonsReleased = this.buttonsReleased | UserAction.Down;
     }
 
-    if (e.key == ' ') {
+    if (e.key == 'a') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.Y;
+      this.buttonsReleased = this.buttonsReleased | UserAction.Y;
+    }
+
+    if (e.key == 'd') {
       this.buttonsDown = this.buttonsDown & ~UserAction.A;
       this.buttonsReleased = this.buttonsReleased | UserAction.A;
     }
 
-    if (e.key == 'b') {
+    if (e.key == 'w') {
+      this.buttonsDown = this.buttonsDown & ~UserAction.X;
+      this.buttonsReleased = this.buttonsReleased | UserAction.X;
+    }
+
+    if (e.key == 's') {
       this.buttonsDown = this.buttonsDown & ~UserAction.B;
       this.buttonsReleased = this.buttonsReleased | UserAction.B;
     }
