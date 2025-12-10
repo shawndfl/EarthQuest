@@ -222,7 +222,7 @@ export class Engine {
 
     this.debugHelpers.update(dt);
 
-    this.inputManager.postUpdate(dt);
+    this.inputManager.clearRelease();
   }
 
   resize(width: number, height: number) {

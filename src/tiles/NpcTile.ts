@@ -28,9 +28,15 @@ export class NpcTile extends RigidBodyTile {
   update(dt: number): void {
     this.curve.update(dt);
 
+    if (this.eng.dialogManager.dialogHasFocus()) {
+      return;
+    }
+
     if (this.eng.inputManager.isReleased(UserAction.A)) {
-      if (this.withInRangeOfPlayer()) {
+      if (this.withInRangeOfPlayer() && this.playerIsFacingMe()) {
         console.log('talking to ' + this.name);
+        this.eng.dialogManager.showDialog();
+        this.eng.inputManager.clearRelease();
       }
     }
   }
@@ -40,14 +46,15 @@ export class NpcTile extends RigidBodyTile {
 
     const minInteractionDistance = 50;
 
-    if (this.bounds.distance(player.bounds) < minInteractionDistance && this.isFacingMe(player)) {
+    if (this.bounds.distance(player.bounds) < minInteractionDistance) {
       return true;
     } else {
       return false;
     }
   }
 
-  protected isFacingMe(player: PlayerTile): boolean {
+  protected playerIsFacingMe(): boolean {
+    const player = this.eng.tileManager.playerTile;
     // N
     if (player.bounds.top < this.bounds.bottom) {
       return player.facing == SpriteDirection.North;

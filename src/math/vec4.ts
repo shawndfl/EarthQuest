@@ -3,144 +3,32 @@ import mat4 from './mat4';
 import { epsilon } from './constants';
 
 export default class vec4 {
-  get x(): number {
-    return this.values[0];
-  }
-
-  get y(): number {
-    return this.values[1];
-  }
-
-  get z(): number {
-    return this.values[2];
-  }
-
-  get w(): number {
-    return this.values[3];
-  }
+  x: number;
+  y: number;
+  z: number;
+  w: number;
 
   get xy(): [number, number] {
-    return [this.values[0], this.values[1]];
+    return [this.x, this.y];
   }
 
   get xyz(): [number, number, number] {
-    return [this.values[0], this.values[1], this.values[2]];
+    return [this.x, this.y, this.z];
   }
 
   get xyzw(): [number, number, number, number] {
-    return [this.values[0], this.values[1], this.values[2], this.values[3]];
+    return [this.x, this.y, this.z, this.w];
   }
 
-  set x(value: number) {
-    this.values[0] = value;
+  constructor(x?: number, y?: number, z?: number, w?: number) {
+    this.x = x ?? 0;
+    this.y = y ?? 0;
+    this.z = z ?? 0;
+    this.w = w ?? 0;
   }
 
-  set y(value: number) {
-    this.values[1] = value;
-  }
-
-  set z(value: number) {
-    this.values[2] = value;
-  }
-
-  set w(value: number) {
-    this.values[3] = value;
-  }
-
-  set xy(values: [number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-  }
-
-  set xyz(values: [number, number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
-  }
-
-  set xyzw(values: [number, number, number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
-    this.values[3] = values[3];
-  }
-
-  get r(): number {
-    return this.values[0];
-  }
-
-  get g(): number {
-    return this.values[1];
-  }
-
-  get b(): number {
-    return this.values[2];
-  }
-
-  get a(): number {
-    return this.values[3];
-  }
-
-  get rg(): [number, number] {
-    return [this.values[0], this.values[1]];
-  }
-
-  get rgb(): [number, number, number] {
-    return [this.values[0], this.values[1], this.values[2]];
-  }
-
-  get rgba(): [number, number, number, number] {
-    return [this.values[0], this.values[1], this.values[2], this.values[3]];
-  }
-
-  set r(value: number) {
-    this.values[0] = value;
-  }
-
-  set g(value: number) {
-    this.values[1] = value;
-  }
-
-  set b(value: number) {
-    this.values[2] = value;
-  }
-
-  set a(value: number) {
-    this.values[3] = value;
-  }
-
-  set rg(values: [number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-  }
-
-  set rgb(values: [number, number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
-  }
-
-  set rgba(values: [number, number, number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
-    this.values[3] = values[3];
-  }
-
-  constructor(values?: [number, number, number, number]) {
-    if (values !== undefined) {
-      this.xyzw = values;
-    }
-  }
-
-  private values = new Float32Array(4);
-
-  static readonly zero = new vec4([0, 0, 0, 1]);
-  static readonly one = new vec4([1, 1, 1, 1]);
-
-  at(index: number): number {
-    return this.values[index];
-  }
+  static readonly zero = new vec4(0, 0, 0, 1);
+  static readonly one = new vec4(1, 1, 1, 1);
 
   reset(): void {
     this.x = 0;
@@ -360,14 +248,6 @@ export default class vec4 {
     return dest;
   }
   toString() {
-    return (
-      this.x.toFixed(5) +
-      ', ' +
-      this.y.toFixed(5) +
-      ', ' +
-      this.z.toFixed(5) +
-      ', ' +
-      this.a.toFixed(5)
-    );
+    return this.x.toFixed(5) + ', ' + this.y.toFixed(5) + ', ' + this.z.toFixed(5) + ', ' + this.w.toFixed(5);
   }
 }

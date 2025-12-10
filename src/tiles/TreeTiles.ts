@@ -27,7 +27,7 @@ export class TreeTile extends CollisionTile {
 
       this.updateCollision();
 
-      this.eng.debugHelpers.setRect('tree', this._bounds, new vec4([0, 0.5, 1, 1]));
+      this.eng.debugHelpers.setRect('tree', this._bounds, new vec4(0, 0.5, 1, 1));
     });
   }
 

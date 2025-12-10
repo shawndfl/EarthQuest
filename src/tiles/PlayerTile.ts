@@ -27,6 +27,9 @@ export class PlayerTile extends RigidBodyTile {
 
   update(dt: number): void {
     const dir = this.eng.inputManager.movingDirection(this.speed);
+    if (this.eng.dialogManager.dialogHasFocus()) {
+      dir.reset();
+    }
     this.velocity.x = dir.x;
     this.velocity.y = -dir.y;
     const walking = this.velocity.length() > 0;

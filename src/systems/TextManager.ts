@@ -62,7 +62,6 @@ export class TextManager extends Component {
       return { width: 0, height: 0 };
     }
 
-    let width = 0;
     let offsetX = 0;
     let height = this.maxHeightOfCharacters;
     for (let i = 0; i < text.length; i++) {

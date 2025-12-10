@@ -220,10 +220,9 @@ export class InputManager extends Component {
   }
 
   /**
-   * Reset release state. Used by the Engine
-   * @param dt
+   * Reset release state.
    */
-  postUpdate(dt: number) {
+  clearRelease() {
     // reset press actions
     this.buttonsReleased = UserAction.None;
     this.inputReleased = false;

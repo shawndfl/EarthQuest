@@ -238,7 +238,7 @@ export abstract class RigidBodyTile extends CollisionTile {
         this.uuid,
         new vec3(...start.xy, 0),
         new vec3(...nextPosition.xy, 0),
-        new vec4([1, 0, 0, 1])
+        new vec4(1, 0, 0, 1)
       );
 
       if (this.lastCollisionResults) {
@@ -249,8 +249,8 @@ export abstract class RigidBodyTile extends CollisionTile {
       }
       this.lastCollisionResults = null;
       if (results.hasCollision()) {
-        const theirColor = new vec4([0, 1, 0, 1]);
-        const ourColor = new vec4([0, 0.5, 0.8, 1]);
+        const theirColor = new vec4(0, 1, 0, 1);
+        const ourColor = new vec4(0, 0.5, 0.8, 1);
         for (let res of results.intersectingTiles) {
           res.drawCollision(theirColor);
         }

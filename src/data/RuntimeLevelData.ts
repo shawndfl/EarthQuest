@@ -284,7 +284,7 @@ export class RuntimeTileData extends Component {
       return new vec4();
     }
     const components = location?.split(',');
-    const point = new vec4([0, 0, 0, 0]);
+    const point = new vec4(0, 0, 0, 0);
     let i = 0;
     try {
       point.x = parseFloat(components[i++]);
