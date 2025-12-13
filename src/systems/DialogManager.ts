@@ -2,7 +2,6 @@ import { Component } from '../core/Component';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 import { DialogComponent } from '../dialogs/DialogComponent';
 
-import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';

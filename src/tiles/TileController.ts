@@ -113,6 +113,14 @@ export abstract class TileController extends Component {
   }
 
   /**
+   * Offsets the position so that it appears higher
+   * @param offset
+   */
+  setPositionOffset(offset: vec2): void {
+    this.setTileTransform({ offset });
+  }
+
+  /**
    * Sets the position of scale and offset of a quad. Only the values provided are set
    * @param position - position in pixels
    * @param tileSize - tile size - default is the tileSize of this object
@@ -129,7 +137,9 @@ export abstract class TileController extends Component {
    * @param tileData
    */
   async initialize(): Promise<void> {
-    this.setPosition(this.options.initializePosition ?? new vec3());
+    if (this.options.initializePosition) {
+      this.setPosition(this.options.initializePosition);
+    }
   }
 
   /**

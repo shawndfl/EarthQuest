@@ -1,18 +1,12 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { ITileAtlas } from '../data/ITileAtlas';
-import { RuntimeTileData } from '../data/RuntimeLevelData';
+
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
-import { Curve } from '../math/Curve';
-import mat3 from '../math/mat3';
-import mat4 from '../math/mat4';
-import quat from '../math/quat';
-import vec2 from '../math/vec2';
-import vec3 from '../math/vec3';
+
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
-import { TileController } from '../tiles/TileController';
 
 export class DrawingLayer extends Component {
   private _texture: Texture;

@@ -117,9 +117,10 @@ void main() {
   // uncomment to show depth
   //gl_FragColor = vec4(depth.xyz, 1.0);
   color = hueShift(color);
-  color.a *= alpha;
+  //color.a *= alpha;
+  //gl_FragColor = vec4(depth.xyz, 1.0) + color *.00001;
+  //gl_FragColor = vec4(color.xyz, 0.5);
   gl_FragColor = color;
-
 }
 `;
 

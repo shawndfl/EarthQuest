@@ -47,6 +47,18 @@
         }
       ]
     },
+    "particle white":{
+      "type": "static" ,
+      "collisionOffset": "0,0,0,0",
+      "origin": "Center",
+      "sourceLocation": "8,312,8,8"
+    },
+    "big tree":{
+      "type": "static",
+      "collisionOffset": "24,0,-24,-32",
+      "origin": "BottomLeft",
+      "sourceLocation": "0,24,56,56"
+    },
     "simple gree grass": {
       "type": "static",
       "tileYOffset": -4608,

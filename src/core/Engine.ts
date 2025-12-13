@@ -14,6 +14,7 @@ import { TextManager } from '../systems/TextManager';
 import { DialogManager } from '../systems/DialogManager';
 import { SceneManager } from '../systems/SceneManager';
 import { CollisionManager } from '../systems/CollisionManager';
+import { ParticleManage } from '../systems/ParticleManager';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -41,6 +42,7 @@ export class Engine {
   readonly debugHelpers: DebugHelpers;
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
+  readonly particleManager: ParticleManage;
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -81,6 +83,7 @@ export class Engine {
     this.tileManager = new TileManager(this);
     this.collisionManager = new CollisionManager(this);
     this.assetManager = new AssetManager(this);
+    this.particleManager = new ParticleManage(this);
     //TODO make this configurable, maybe per level
     this.random = new Random(122344);
     this.viewManager = new ViewManager(this);
@@ -116,7 +119,7 @@ export class Engine {
         this.logGLCall.bind(this)
       );
     } else {
-      this._glContext = this._canvasGL.getContext('webgl2');
+      this._glContext = this._canvasGL.getContext('webgl2', { premultipliedAlpha: false });
     }
     // Only continue if WebGL is available and working
     if (this.gl === null) {
@@ -152,14 +155,17 @@ export class Engine {
 
     this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ONE, this.gl.ZERO);
+    //this.gl.blendFuncSeparate(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA, this.gl.ONE, this.gl.ZERO);
     this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
+    this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true); // needed for alpha blend to work correctly
 
     // initialize all systems
     await this.debugHelpers.initialize();
+    await this.particleManager.initialize();
     await this.textManager.initialize();
     await this.dialogManager.initialize();
     await this.viewManager.initialize();
@@ -190,6 +196,7 @@ export class Engine {
 
     // close the old level
     this.debugHelpers.closeLevel();
+    this.particleManager.closeLevel();
     this.sceneManager.closeLevel();
     this.tileManager.closeLevel();
     this.assetManager.closeLevel();
@@ -200,6 +207,7 @@ export class Engine {
 
     // load the new level
     await this.dialogManager.loadLevel();
+    await this.particleManager.loadLevel();
     await this.collisionManager.loadLevel();
     await this.assetManager.loadLevel();
     await this.tileManager.loadLevel();
@@ -219,6 +227,7 @@ export class Engine {
     this.collisionManager.update(dt);
     this.dialogManager.update(dt);
     this.textManager.update(dt);
+    this.particleManager.update(dt);
 
     this.debugHelpers.update(dt);
 

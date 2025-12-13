@@ -1,6 +1,5 @@
 import { CollisionResults } from '../data/CollisionResults';
 import rect from '../math/rect';
-import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 

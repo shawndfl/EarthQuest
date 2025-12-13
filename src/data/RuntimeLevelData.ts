@@ -247,6 +247,15 @@ export class RuntimeTileData extends Component {
     this.updateQuad();
   }
 
+  get alpha(): number {
+    return this._alpha;
+  }
+
+  set alpha(alpha: number) {
+    this._alpha = alpha;
+    this.updateQuad();
+  }
+
   /**
    * Updates the quad with the uv and transform data.
    */

@@ -191,7 +191,10 @@ export class Curve {
       if (this._type == CurveType.linear) {
         const t0 = this._points[indices[0]].t;
         const t1 = this._points[indices[1]].t;
-        const t = MathConst.clamp((this._time - t0) / (t1 - t0), 0, 1.0);
+        let t = 0;
+        if (t0 != t1) {
+          t = MathConst.clamp((this._time - t0) / (t1 - t0), 0, 1.0);
+        }
 
         this._position = p0 + t * (p1 - p0);
       } else if (this._type == CurveType.discreet) {
