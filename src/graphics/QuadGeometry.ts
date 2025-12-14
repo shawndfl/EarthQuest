@@ -12,6 +12,7 @@ export interface Quad {
   hueAngle: number;
   alpha: number;
   transform: mat4;
+  depthBias: number;
   uvTransform: mat3;
   mirrorX?: boolean;
   mirrorY?: boolean;
@@ -136,15 +137,24 @@ export class QuadGeometry {
     const t3 = new vec2();
     const offset = new vec3();
 
+    // used to sort bottom point of a quad
+    const pointA = new vec3(0, 0, 0);
+    const pointB = new vec3(0, 0, 0);
     // sort by height
     quads.sort((a, b) => {
       const bottomA = -a.height / 2 + a.offset.y;
-      const pointA = new vec3(0, bottomA, 0);
+      pointA.x = 0;
+      pointA.y = bottomA;
+      pointA.z = 0;
       a.transform?.multiplyVec3(pointA, pointA);
+      pointA.y += a.depthBias;
 
-      const bottomB = -b.height / 2 + a.offset.y;
-      const pointB = new vec3(0, bottomB, 0);
+      const bottomB = -b.height / 2 + b.offset.y;
+      pointB.x = 0;
+      pointB.y = bottomB;
+      pointB.z = 0;
       b.transform?.multiplyVec3(pointB, pointB);
+      pointB.y += b.depthBias;
 
       return pointB.y - pointA.y;
     });
@@ -195,7 +205,7 @@ export class QuadGeometry {
       verts[vertIndex++] = t0.x;
       verts[vertIndex++] = t0.y;
       verts[vertIndex++] = quad.hueAngle;
-      verts[vertIndex++] = quad.alpha;
+      verts[vertIndex++] = quad.alpha ?? 1;
 
       verts[vertIndex++] = p1.x;
       verts[vertIndex++] = p1.y;
@@ -203,7 +213,7 @@ export class QuadGeometry {
       verts[vertIndex++] = t1.x;
       verts[vertIndex++] = t1.y;
       verts[vertIndex++] = quad.hueAngle;
-      verts[vertIndex++] = quad.alpha;
+      verts[vertIndex++] = quad.alpha ?? 1;
 
       verts[vertIndex++] = p2.x;
       verts[vertIndex++] = p2.y;
@@ -211,7 +221,7 @@ export class QuadGeometry {
       verts[vertIndex++] = t2.x;
       verts[vertIndex++] = t2.y;
       verts[vertIndex++] = quad.hueAngle;
-      verts[vertIndex++] = quad.alpha;
+      verts[vertIndex++] = quad.alpha ?? 1;
 
       verts[vertIndex++] = p3.x;
       verts[vertIndex++] = p3.y;
@@ -219,7 +229,7 @@ export class QuadGeometry {
       verts[vertIndex++] = t3.x;
       verts[vertIndex++] = t3.y;
       verts[vertIndex++] = quad.hueAngle;
-      verts[vertIndex++] = quad.alpha;
+      verts[vertIndex++] = quad.alpha ?? 1;
 
       indices[indexIndex++] = vertCount + 0;
       indices[indexIndex++] = vertCount + 3;

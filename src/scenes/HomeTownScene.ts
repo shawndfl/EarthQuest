@@ -52,15 +52,13 @@ export class HomeTownScene extends Scene {
     const tileData = this._backgroundLayer.tileAtlas.tiles['particle white'];
 
     const fireFly = new FireFlyTile(this.eng, {
-      initializePosition: new vec3(200, -250, 0.5),
+      initializePosition: new vec3(150, -200, 0.5),
       // tell the character layer to handle the buffer refresh request
       requestBufferRefresh: (t) => {
         this._characterLayer.requestRefresh();
       },
       tileData: new RuntimeTileData(this.eng, 'firefly', tileData, this._characterLayer.texture),
     });
-
-    fireFly.setPositionOffset(new vec2(0, 5));
 
     // this will handle the update function
     this.eng.tileManager.registerTileForUpdate(fireFly);

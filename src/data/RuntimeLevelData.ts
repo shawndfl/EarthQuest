@@ -2,6 +2,7 @@ import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { Quad } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+import { toRadian } from '../math/constants';
 import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
@@ -54,10 +55,13 @@ export class RuntimeTileData extends Component {
   private _images: Map<string, vec4>;
   private _uvOffset: vec2;
   private _uvScale: vec2;
+  /** rotation in degrees */
+  private _rotation: number = 0;
   private _uvTransform = new mat3();
   private _flipX: boolean;
   private _flipY: boolean;
   private _alpha: number;
+  private _depthBias: number;
   private _hueRotation: number;
 
   private _quad: Quad;
@@ -180,6 +184,7 @@ export class RuntimeTileData extends Component {
       mirrorX: this.data.flipX,
       mirrorY: this.data.flipY,
       alpha: this.data.alpha ?? 1,
+      depthBias: 0,
       hueAngle: 0,
     };
 
@@ -225,13 +230,23 @@ export class RuntimeTileData extends Component {
    * @param tileSize - tile size - default is the tileSize of this object
    * @param offset - Offset - default is bottom left corner. See QuadGeometry
    */
-  setTileTransform(options: { position?: vec3; tileSize?: vec2; offset?: vec2 }): void {
-    const { position, tileSize, offset } = options;
+  setTileTransform(options: {
+    position?: vec3;
+    tileSize?: vec2;
+    offset?: vec2;
+    rotation?: number;
+    depthBias?: number;
+  }): void {
+    const { position, tileSize, offset, rotation, depthBias } = options;
 
     if (position) {
       this._tilePosition.x = position.x;
       this._tilePosition.y = position.y;
       this._tilePosition.z = position.z;
+    }
+
+    if (depthBias !== undefined) {
+      this._depthBias = depthBias;
     }
 
     if (tileSize) {
@@ -243,6 +258,10 @@ export class RuntimeTileData extends Component {
     if (offset) {
       this._tileOffset.x = offset.x;
       this._tileOffset.y = offset.y;
+    }
+
+    if (rotation !== undefined) {
+      this._rotation = rotation;
     }
     this.updateQuad();
   }
@@ -261,8 +280,13 @@ export class RuntimeTileData extends Component {
    */
   private updateQuad(): void {
     this._worldTransform.setIdentity();
-    this._worldTransform.translate(this.tilePosition);
     this._worldTransform.scale(this.tileSize);
+    this._worldTransform.rotate(toRadian(this._rotation), vec3.forward);
+    this._worldTransform.translate(this.tilePosition);
+
+    //const rotation = new mat4();
+    // rotation.setIdentity();
+    //this._worldTransform.rotate(toRadian(this._rotation), vec3.forward);
 
     this._uvTransform.setIdentity();
     this._uvTransform.scale(this._uvScale);
@@ -279,8 +303,9 @@ export class RuntimeTileData extends Component {
     this._quad.uvTransform = this._uvTransform;
     this._quad.mirrorX = this._flipX;
     this._quad.mirrorY = this._flipY;
-    this._quad.alpha = this._alpha ?? 1;
+    this._quad.alpha = this._alpha;
     this._quad.hueAngle = this._hueRotation;
+    this._quad.depthBias = this._depthBias ?? 0;
   }
 
   /**

@@ -110,6 +110,8 @@ void main() {
   vec3 axis = vec3(1.0/sqrt(3.0));
   float angle = 30.0;
   vec4 color = texture2D(uSampler, vTex);
+  color.a *= alpha;
+
   if(color.a < .0001) {
     discard;
   } 
@@ -117,10 +119,11 @@ void main() {
   // uncomment to show depth
   //gl_FragColor = vec4(depth.xyz, 1.0);
   color = hueShift(color);
-  //color.a *= alpha;
+  
   //gl_FragColor = vec4(depth.xyz, 1.0) + color *.00001;
   //gl_FragColor = vec4(color.xyz, 0.5);
   gl_FragColor = color;
+  gl_FragColor.rgb *= gl_FragColor.a;
 }
 `;
 

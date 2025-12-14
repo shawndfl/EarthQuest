@@ -22,7 +22,7 @@ export class Curve {
   public id: string;
 
   onDone: (curve: Curve) => void;
-  onUpdate: (value: number, curve: Curve) => void;
+  onUpdate: (value: number, time: number) => void;
 
   isRunning() {
     return this._running;
@@ -49,7 +49,7 @@ export class Curve {
     this._isDone = false;
   }
 
-  start(restart?: boolean, onDone?: (curve: Curve) => void, onUpdate?: (value: number, curve: Curve) => void): Curve {
+  start(restart?: boolean, onDone?: (curve: Curve) => void, onUpdate?: (value: number, time: number) => void): Curve {
     if (restart) {
       this._time = 0;
       this._position = 0;
@@ -149,7 +149,7 @@ export class Curve {
 
         // handle update
         if (this.onUpdate) {
-          this.onUpdate(this._position, this);
+          this.onUpdate(this._position, this._time);
         }
 
         // handle the repeat and ping pong
@@ -202,7 +202,7 @@ export class Curve {
       }
 
       if (this.onUpdate && lastPos != this._position) {
-        this.onUpdate(this._position, this);
+        this.onUpdate(this._position, this._time);
       }
     }
   }

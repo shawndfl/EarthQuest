@@ -118,6 +118,7 @@ export class DialogComponent extends Component {
       mirrorY: false,
       alpha: 1.0,
       hueAngle: 0,
+      depthBias: 0,
     };
   }
 
