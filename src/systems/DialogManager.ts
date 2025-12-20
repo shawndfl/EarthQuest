@@ -7,6 +7,7 @@ import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 
 import vec4 from '../math/vec4';
+import { SceneType } from '../scenes/SceneType';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
 export const defaultDialogDepth = -0.5;

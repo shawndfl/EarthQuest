@@ -15,6 +15,7 @@ import { DialogManager } from '../systems/DialogManager';
 import { SceneManager } from '../systems/SceneManager';
 import { CollisionManager } from '../systems/CollisionManager';
 import { ParticleManage } from '../systems/ParticleManager';
+import { SceneType } from '../scenes/SceneType';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -174,25 +175,24 @@ export class Engine {
       await this.optimizeTiles.initialize();
     }
 
-    const url = this.getLevelDataUrl();
-    await this.loadScene(url);
+    await this.loadScene(this.getInitialSceneType());
   }
 
-  getLevelDataUrl(): string {
-    return 'assets/levels/tileLevel.json';
+  /**
+   * Get the initial scene type using url parameters
+   * @returns
+   */
+  getInitialSceneType(): SceneType {
+    const scene = this.urlParams.searchParams.get('scene');
+
+    return (scene as SceneType) ?? SceneType.HomeTown;
   }
 
-  async loadScene(path: string): Promise<void> {
-    console.debug('Loading level: ' + path + ' ...');
-
-    // get the level data
-    const levelData = (await this.assetManager.requestJson(path)) as ILevelData;
-    if (!levelData) {
-      console.error('Cannot load level from ' + path);
-      return;
-    }
+  async loadScene(sceneType: SceneType): Promise<void> {
+    console.debug('Loading level: ' + sceneType + ' ...');
 
     // close the old level
+    this.sceneManager.closeLevel();
     this.debugHelpers.closeLevel();
     this.particleManager.closeLevel();
     this.sceneManager.closeLevel();
@@ -201,7 +201,7 @@ export class Engine {
     this.dialogManager.closeLevel();
     this.collisionManager.closeLevel();
 
-    this.gameManager.setLevel(levelData);
+    this.gameManager.setScene(sceneType);
 
     // load the new level
     await this.dialogManager.loadLevel();

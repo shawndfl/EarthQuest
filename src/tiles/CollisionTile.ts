@@ -3,7 +3,7 @@ import rect from '../math/rect';
 import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 
-export abstract class CollisionTile extends TileController {
+export class CollisionTile extends TileController {
   /**
    * The collision rect of the tile.
    */
@@ -16,6 +16,10 @@ export abstract class CollisionTile extends TileController {
   async initialize(): Promise<void> {
     await super.initialize();
     this.updateCollision();
+  }
+
+  setBounds(rect: rect): void {
+    this._bounds = rect;
   }
 
   /**
@@ -58,12 +62,5 @@ export abstract class CollisionTile extends TileController {
     }
   }
 
-  update(dt: number): void {
-    //if (results.hasCollision()) {
-    //this.drawCollision(new vec4([1, 0, 0, 1]));
-    //results.intersectingTiles.forEach((t) => t.drawCollision(new vec4([0, 0, 1, 1])));
-    //} else {
-    //  this.drawCollision(null);
-    // }
-  }
+  update(dt: number): void {}
 }

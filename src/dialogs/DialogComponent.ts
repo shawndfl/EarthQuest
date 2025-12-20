@@ -11,6 +11,7 @@ import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
+import { SceneType } from '../scenes/SceneType';
 import { UserAction } from '../systems/InputManager';
 
 /**
@@ -168,6 +169,7 @@ export class DialogComponent extends Component {
     if (this.eng.inputManager.isReleased(UserAction.A)) {
       this.hide();
       this.eng.inputManager.clearRelease();
+      this.eng.loadScene(SceneType.HomeBattle1);
     }
   }
 

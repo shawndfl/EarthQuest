@@ -36,14 +36,6 @@ export abstract class RigidBodyTile extends CollisionTile {
       nextRect.left = nextPosition.x + this.tileData.collisionOffset.x;
       nextRect.top = nextPosition.y + this._bounds.height + this.tileData.collisionOffset.y;
 
-      //TODO create a velocity vector from this.bestStartPointForVelocity
-      // see if it intersect an edge or a collision box using finite intersection test.
-      //
-      // If it does not really intersect then try two other points from the other edge. This way
-      // we will know if there really is something in front of it. If they intersect the collision edge
-      //
-      //
-
       const results = this.eng.collisionManager.checkCollisionRect(this, nextRect);
 
       // for debug
@@ -51,6 +43,11 @@ export abstract class RigidBodyTile extends CollisionTile {
 
       // if there is a collision adjust the step
       if (results?.hasCollision()) {
+        // let the other tiles know we hit them
+        for (let otherTile of results.intersectingTiles) {
+          otherTile.onCollision(this);
+        }
+
         // this will change the velocity vector
         this.adjustVelocityStep(step, results, dt);
       } else {

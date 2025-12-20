@@ -71,7 +71,11 @@ export class DebugHelpers extends Component {
   }
 
   closeLevel(): void {
-    //TODO
+    this._rects = [];
+    this._lines.clear();
+    this._arrows = [];
+    this._refreshRequired = true;
+    this._buffer.dispose();
   }
 
   updateBuffers(): void {

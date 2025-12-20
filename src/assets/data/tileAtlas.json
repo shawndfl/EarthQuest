@@ -108,6 +108,11 @@
       "type": "solid",
       "sourceLocation": "40,8,8,16"
     },
+    "iso_cube":{
+      "type": "solid",
+      "collisionOffset": "0,8,0,-32",
+      "sourceLocation": "352,464,32,32"
+    },
     "ness house": {
       "type": "solid",
       "collisionOffset": "0,8,0,-32",

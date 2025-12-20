@@ -3,6 +3,7 @@ import { Engine } from '../core/Engine';
 import { GameData } from '../data/GameData';
 import { ILevelData } from '../data/ILevelData';
 import DefaultTileAtlas from '../assets/data/tileAtlas.json';
+import { SceneType } from '../scenes/SceneType';
 
 /** Key for local storage */
 const localStorageKey = 'EarthQuest';
@@ -13,6 +14,11 @@ const localStorageKey = 'EarthQuest';
 export class GameManager extends Component {
   data: GameData;
   private _timeCounter: number;
+  private _sceneType: SceneType;
+
+  public get sceneType(): SceneType {
+    return this._sceneType;
+  }
 
   constructor(eng: Engine) {
     super(eng);
@@ -31,14 +37,11 @@ export class GameManager extends Component {
   }
 
   /**
-   * Set the active level
-   * @param level
+   * Keep track of the scene type
+   * @param sceneType
    */
-  setLevel(level: ILevelData) {
-    // use the default atlas
-    if (!level.atlas) {
-      level.atlas = JSON.parse(JSON.stringify(DefaultTileAtlas));
-    }
+  setScene(sceneType: SceneType): void {
+    this._sceneType = sceneType;
   }
 
   /**

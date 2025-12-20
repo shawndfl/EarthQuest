@@ -31,7 +31,7 @@ export class DrawingLayer extends Component {
 
   constructor(eng: Engine, private _atlasId: string) {
     super(eng);
-    this._tileAtlas = this.eng.assetManager.atlasData[_atlasId];
+    this._tileAtlas = this.eng.assetManager.atlasData[this._atlasId];
   }
 
   registerQuad(quad: Quad): void {

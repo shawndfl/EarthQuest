@@ -11,14 +11,19 @@ import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
 import { SolidTile } from '../tiles/SolidTile';
 import { StaticTile } from '../tiles/StaticTile';
-import { TileController } from '../tiles/TileController';
 import { Scene } from './Scene';
+import { SceneType } from './SceneType';
 
 export class HomeTownScene extends Scene {
+  protected _shader: SpritePerspectiveShader;
   private _backgroundLayer: DrawingLayer;
   private _backgroundDetail: DrawingLayer;
   private _characterLayer: DrawingLayer;
   private _overlayLayer: DrawingLayer;
+
+  get type(): SceneType {
+    return SceneType.HomeTown;
+  }
 
   constructor(eng: Engine) {
     super(eng);
@@ -123,6 +128,21 @@ export class HomeTownScene extends Scene {
     this._characterLayer.registerQuad(house.quad);
 
     await house.initialize();
+    //TODO add portal
+    /*
+    const portalX = position.x;
+    const portalY = position.y;
+    const door = new PortalTile(this.eng, {
+      initializePosition: new vec3(portalX, portalY, 0.5),
+      requestBufferRefresh: (t) => {
+        // NO drawing for this
+      },
+      tileData: null,
+    });
+    door.setBounds(new rect(portalX, 64, portalY, 64));
+
+    this.eng.collisionManager.registerTileForCollision(door);
+    */
   }
 
   async createPoo(): Promise<void> {
