@@ -27,6 +27,7 @@ export const CanvasHeight = 224;
 export class Engine {
   private _glContext: WebGL2RenderingContext;
   private _canvasGL: HTMLCanvasElement;
+  private _canvas2D: HTMLCanvasElement;
   readonly soundManager: SoundManager;
   readonly viewManager: ViewManager;
   readonly gameManager: GameManager;
@@ -47,6 +48,10 @@ export class Engine {
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
+  }
+
+  get canvas2D(): HTMLCanvasElement {
+    return this._canvas2D;
   }
 
   get height(): number {
@@ -107,6 +112,15 @@ export class Engine {
     this._canvasGL.height = CanvasHeight * this.pixelScale;
     container.append(this._canvasGL);
 
+    this._canvas2D = document.createElement('canvas');
+    this._canvas2D.style.display = 'none';
+    this._canvas2D.style.width = '800px';
+    this._canvas2D.style.height = '600px';
+    this._canvas2D.width = 800;
+    this._canvas2D.height = 600;
+    this._canvas2D.classList.add('this._canvas');
+    container.append(this._canvas2D);
+
     window.addEventListener('resize', (e) => {
       this.resize(this._canvasGL.width, this._canvasGL.height);
     });
@@ -154,7 +168,7 @@ export class Engine {
 
     this.gl.enable(this.gl.BLEND);
 
-    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to black, fully opaque
+    this.gl.clearColor(0.3, 0.3, 0.3, 1.0); // Clear to dark gray, fully opaque
     this.gl.clearDepth(1.0); // Clear everything
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 

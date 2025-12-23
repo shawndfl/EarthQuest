@@ -233,6 +233,7 @@ export class InputManager extends Component {
   }
 
   private keydown(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
     if (e.key == 'ArrowRight') {
       this.buttonsDown = this.buttonsDown | UserAction.Right;
     }
@@ -249,19 +250,19 @@ export class InputManager extends Component {
       this.buttonsDown = this.buttonsDown | UserAction.Down;
     }
 
-    if (e.key == 'a') {
+    if (key == 'a') {
       this.buttonsDown = this.buttonsDown | UserAction.Y;
     }
 
-    if (e.key == 'd') {
+    if (key == 'd') {
       this.buttonsDown = this.buttonsDown | UserAction.A;
     }
 
-    if (e.key == 'w') {
+    if (key == 'w') {
       this.buttonsDown = this.buttonsDown | UserAction.X;
     }
 
-    if (e.key == 's') {
+    if (key == 's') {
       this.buttonsDown = this.buttonsDown | UserAction.B;
     }
 
@@ -275,6 +276,7 @@ export class InputManager extends Component {
   }
 
   private keyup(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
     if (e.key == 'ArrowRight') {
       this.buttonsDown = this.buttonsDown & ~UserAction.Right;
       this.buttonsReleased = this.buttonsReleased | UserAction.Right;
@@ -295,22 +297,22 @@ export class InputManager extends Component {
       this.buttonsReleased = this.buttonsReleased | UserAction.Down;
     }
 
-    if (e.key == 'a') {
+    if (key == 'a') {
       this.buttonsDown = this.buttonsDown & ~UserAction.Y;
       this.buttonsReleased = this.buttonsReleased | UserAction.Y;
     }
 
-    if (e.key == 'd') {
+    if (key == 'd') {
       this.buttonsDown = this.buttonsDown & ~UserAction.A;
       this.buttonsReleased = this.buttonsReleased | UserAction.A;
     }
 
-    if (e.key == 'w') {
+    if (key == 'w') {
       this.buttonsDown = this.buttonsDown & ~UserAction.X;
       this.buttonsReleased = this.buttonsReleased | UserAction.X;
     }
 
-    if (e.key == 's') {
+    if (key == 's') {
       this.buttonsDown = this.buttonsDown & ~UserAction.B;
       this.buttonsReleased = this.buttonsReleased | UserAction.B;
     }

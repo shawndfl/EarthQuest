@@ -20,9 +20,9 @@ export class PlaneMesh extends Component {
   initialize(): void {
     const geometry = PlaneGeometry.createPlanes([
       {
-        width: 1,
-        height: 1,
-        color: new vec4(1, 0, 0, 1),
+        width: 2,
+        height: 2,
+        color: new vec4(1, 1, 1, 1),
         transform: mat4.identity,
         uuid: this.eng.random.getUuid(),
         uvTransform: mat3.identity,

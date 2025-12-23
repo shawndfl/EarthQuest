@@ -1,14 +1,14 @@
 import { Component } from '../core/Component';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
-import { DialogComponent } from '../dialogs/DialogComponent';
 
 import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
 
 import vec4 from '../math/vec4';
-import { SceneType } from '../scenes/SceneType';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
+import { DialogComponent } from '../ui/dialogs/DialogComponent';
+import { DialogOptions } from '../ui/dialogs/DialogOptions';
 
 export const defaultDialogDepth = -0.5;
 
@@ -30,16 +30,22 @@ export const MaxDialogCount = 5;
 export class DialogManager extends Component {
   private _texture: Texture;
   private _menuTitle: RuntimeTileData;
-  private _dialogBox: DialogComponent;
   private _shader: SpritePerspectiveShader;
   protected _projection: mat4;
 
+  private _dialogBox: DialogComponent;
+
+  /**
+   * Create the shader and projection matrix used for all menus
+   */
   async initialize(): Promise<void> {
     this._shader = new SpritePerspectiveShader(this.gl, 'dialogShader');
     this._projection = mat4.orthographic(0, this.eng.width, 0, this.eng.height, 1, -1, this._projection);
+
+    this._dialogBox = await this.createMainDialogComponent();
   }
 
-  async loadLevel(): Promise<void> {
+  async createMainDialogComponent(): Promise<DialogComponent> {
     const name = 'Dialog Menu';
     const tileAtlas = this.eng.assetManager.atlasData['default'];
     const tileData = tileAtlas.tiles[name];
@@ -53,18 +59,16 @@ export class DialogManager extends Component {
 
     // setup the shader
     this._shader.setSpriteSheet(this._texture);
-    this._dialogBox = new DialogComponent(this.eng, this._menuTitle, this._texture);
+    return new DialogComponent(this.eng, this._menuTitle, this._texture);
   }
 
-  showDialog(): void {
-    const pos = new vec2(0, 100);
-    this._dialogBox.setText('dialog1', ' Hello', 0, 0, new vec4(0, 0.2, 6, 1));
-    this._dialogBox.show(pos, 200, 100, 1.0);
+  async loadLevel(): Promise<void> {}
+
+  showDialog(dialogOptions: DialogOptions): void {
+    this._dialogBox.show(dialogOptions);
   }
 
-  hideDialog(): void {
-    this.hideDialog();
-  }
+  hideDialog(): void {}
 
   dialogHasFocus(): boolean {
     return this._dialogBox.isVisible;

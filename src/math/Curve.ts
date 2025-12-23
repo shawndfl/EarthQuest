@@ -11,6 +11,7 @@ export enum CurveType {
 export class Curve {
   private _points: { p: number; t: number }[];
   private _position: number;
+  private _lastPosition: number;
   private _time: number;
   private _running: boolean;
   private _type: CurveType;
@@ -186,7 +187,6 @@ export class Curve {
       let p0 = this._points[indices[0]].p;
       let p1 = this._points[indices[1]].p;
 
-      const lastPos = this._position;
       // calculate the position
       if (this._type == CurveType.linear) {
         const t0 = this._points[indices[0]].t;
@@ -201,9 +201,10 @@ export class Curve {
         this._position = p0;
       }
 
-      if (this.onUpdate && lastPos != this._position) {
+      if (this.onUpdate && this._lastPosition != this._position) {
         this.onUpdate(this._position, this._time);
       }
+      this._lastPosition = this._position;
     }
   }
 

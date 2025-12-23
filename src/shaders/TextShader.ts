@@ -1,6 +1,7 @@
 import { ShaderController } from '../graphics/ShaderController';
 import { Texture } from '../graphics/Texture';
 import vec4 from '../math/vec4';
+import { BaseShader } from './BaseShader';
 
 /**
  * Vertex shader for Font
@@ -37,10 +38,9 @@ const fsSource = `
 `;
 
 /**
- * Font manager keeps track of all FontController objects
+ * This shader is used to draw font
  */
-export class TextShader {
-  private _shader: ShaderController;
+export class TextShader extends BaseShader {
   private _fontTexture: Texture;
   private _aPos: number;
   private _aTex: number;
@@ -48,8 +48,8 @@ export class TextShader {
   private _uFont: number;
   private _uColor: number;
 
-  constructor(private gl: WebGL2RenderingContext, shaderId: string) {
-    this._shader = new ShaderController(this.gl, 'fontShader');
+  constructor(gl: WebGL2RenderingContext, shaderId: string) {
+    super(gl, shaderId ?? 'fontShader');
     this._shader.initShaderProgram(vsSource, fsSource);
 
     // set the info
@@ -68,7 +68,7 @@ export class TextShader {
   }
 
   enable(): void {
-    this._shader.enable();
+    super.enable();
     if (!this._fontTexture) {
       console.warn('texture is null. Call setSpriteSheet()');
     } else {

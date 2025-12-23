@@ -1,6 +1,6 @@
-import { ShaderController } from '../graphics/ShaderController';
 import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
+import { BaseShader } from './BaseShader';
 
 //
 // Vertex Shader program
@@ -129,10 +129,16 @@ void main() {
 
 /**
  * Shader for sprites
+ * Required buffer attributes
+ *    pos3
+ *    tex2
+ *    hue angle
+ *    alpha
+ * Require uniforms are
+ *    texture
+ *    projection
  */
-export class SpritePerspectiveShader {
-  private _shader: ShaderController;
-
+export class SpritePerspectiveShader extends BaseShader {
   private _aPos: number;
   private _aTex: number;
   private _aHueAngle: number;
@@ -141,8 +147,9 @@ export class SpritePerspectiveShader {
   private _texture: Texture;
   private _uProj: number;
 
-  constructor(private gl: WebGL2RenderingContext, shaderId: string) {
-    this._shader = new ShaderController(this.gl, shaderId);
+  constructor(gl: WebGL2RenderingContext, shaderId: string) {
+    super(gl, shaderId);
+
     this._shader.initShaderProgram(vsSource, fsSource);
 
     // set the info
@@ -164,7 +171,7 @@ export class SpritePerspectiveShader {
   }
 
   enable(): void {
-    this._shader.enable();
+    super.enable();
     if (!this._texture) {
       console.warn('texture is null. Call setSpriteSheet()');
     } else {

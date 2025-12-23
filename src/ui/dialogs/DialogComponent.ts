@@ -1,18 +1,25 @@
-import { Component } from '../core/Component';
-import { Engine } from '../core/Engine';
-import { RuntimeTileData } from '../data/RuntimeLevelData';
-import { GlBuffer } from '../graphics/GlBuffer';
-import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
-import { Texture } from '../graphics/Texture';
-import { clamp } from '../math/constants';
-import { Curve, CurveType } from '../math/Curve';
-import mat3 from '../math/mat3';
-import mat4 from '../math/mat4';
-import vec2 from '../math/vec2';
-import vec3 from '../math/vec3';
-import vec4 from '../math/vec4';
-import { SceneType } from '../scenes/SceneType';
-import { UserAction } from '../systems/InputManager';
+import { Component } from '../../core/Component';
+import { Engine } from '../../core/Engine';
+import { RuntimeTileData } from '../../data/RuntimeLevelData';
+import { GlBuffer } from '../../graphics/GlBuffer';
+import { Quad, QuadGeometry } from '../../graphics/QuadGeometry';
+import { Texture } from '../../graphics/Texture';
+import { clamp } from '../../math/constants';
+import { Curve, CurveType } from '../../math/Curve';
+import mat3 from '../../math/mat3';
+import mat4 from '../../math/mat4';
+import vec2 from '../../math/vec2';
+import vec3 from '../../math/vec3';
+import vec4 from '../../math/vec4';
+
+import { UserAction } from '../../systems/InputManager';
+import { DialogOptions } from './DialogOptions';
+import { TextIterator } from './TextIterator';
+
+/** used to wait for user acknowledge */
+export const TextReturn = '\x0a';
+/** list user option */
+export const TextTab = '\x09';
 
 /**
  * Creates the quads that make up the dialog box.
@@ -26,16 +33,24 @@ export class DialogComponent extends Component {
   protected height: number;
   protected originalWidth: number;
   protected originalHeight: number;
-
+  protected pixelBorderThickness: number = 10;
   protected alpha: number;
   protected position: vec2;
+  protected fullText: string;
   protected text: string;
+  protected textPadding: number;
+  protected fontScale: number;
   protected id: string;
   protected _visible: boolean;
   protected isHiding: boolean;
   protected fontColor: vec4;
+  protected textIterator: TextIterator;
+
+  protected dialogOptions: DialogOptions;
 
   protected openCurve: Curve;
+  protected textCurve: Curve;
+  protected cursorCurve: Curve;
 
   get isVisible(): boolean {
     return this._visible;
@@ -47,10 +62,59 @@ export class DialogComponent extends Component {
     this.texture = texture;
     this._buffer = new GlBuffer(this.gl);
 
+    this.textIterator = new TextIterator();
+
     this._quads = [];
     for (let i = 0; i < 9; i++) {
       this._quads.push(this.defaultQuad());
     }
+
+    this.setupTextAnimation();
+    this.setupOpenAnimation();
+  }
+
+  protected setupTextAnimation(): void {
+    this.textCurve = new Curve();
+    this.textCurve.points([
+      { p: 0, t: 0 },
+      { p: 1, t: 100 },
+    ]);
+    this.textCurve.repeat(-1);
+
+    this.textCurve.curve(CurveType.discreet);
+
+    this.textCurve.onUpdate = (value) => {
+      const result = this.textIterator.next();
+
+      if (!result) {
+        return;
+      }
+
+      // if we are just waiting for the user
+      if (result.pauseForUser) {
+        return;
+      }
+      const yPosition =
+        this.eng.height - this.position.y - this.height + this.pixelBorderThickness * 2 + (this.textPadding ?? 0);
+      const xPosition = this.position.x + this.pixelBorderThickness + (this.textPadding ?? 0);
+
+      this.text += result.character;
+      for (let option of result.Options) {
+        this.text += '   ' + option + '\n';
+      }
+
+      this.eng.textManager.setTextBlock({
+        id: this.id,
+        text: this.text,
+        color: this.fontColor,
+        position: new vec2(xPosition, yPosition),
+        scale: this.fontScale,
+        depth: -1,
+      });
+    };
+  }
+
+  protected setupOpenAnimation(): void {
     this.openCurve = new Curve();
     this.openCurve.points([
       { p: 0, t: 0 },
@@ -58,6 +122,7 @@ export class DialogComponent extends Component {
       { p: 2, t: 200 },
       { p: 3, t: 300 },
     ]);
+
     this.openCurve.curve(CurveType.linear);
     this.openCurve.onUpdate = (value) => {
       this.width = clamp(value * this.originalWidth, 16, this.originalWidth);
@@ -68,35 +133,33 @@ export class DialogComponent extends Component {
       if (this.isHiding) {
         this._visible = false;
       } else {
-        const size = this.eng.textManager.getTextSize(this.text);
-        const yPosition = this.eng.height - this.position.y - this.height + size.height;
-        this.eng.textManager.setTextBlock({
-          id: this.id,
-          text: this.text,
-          color: this.fontColor,
-          position: new vec2(this.position.x, yPosition),
-          scale: 1.0,
-          depth: -1,
-        });
+        this.textIterator.initialize(this.fullText);
+        this.textCurve.start(true);
       }
     };
   }
 
-  setText(id: string, text: string, x: number, y: number, color: vec4): void {
-    this.id = id;
-    this.text = text;
-    this.fontColor = color.copy();
-  }
+  /**
+   *
+   * @param dialogOptions show the dialog
+   */
+  show(dialogOptions: DialogOptions): void {
+    this.dialogOptions = dialogOptions;
+    this.id = dialogOptions.id;
+    this.fullText = dialogOptions.text;
+    this.text = '';
+    this.textPadding = dialogOptions.textPadding;
+    this.fontColor = dialogOptions.color.copy();
+    this.fontScale = dialogOptions.fontScale;
 
-  show(pos: vec2, width: number, height: number, alpha: number = 1.0): void {
-    this.position = pos;
-    this.originalWidth = width;
-    this.originalHeight = height;
-    this.alpha = alpha;
+    this.position = dialogOptions.position.copy();
+    this.originalWidth = dialogOptions.width;
+    this.originalHeight = dialogOptions.height;
     this._visible = true;
     this.isHiding = false;
     this.openCurve.reverse(false);
     this.openCurve.start(true);
+    this.textIterator.initialize(this.text);
   }
 
   hide(): void {
@@ -104,6 +167,11 @@ export class DialogComponent extends Component {
     this.eng.textManager.hideText(this.id);
     this.openCurve.reverse(true);
     this.openCurve.start(true);
+    this.textCurve.pause(0);
+
+    if (this.dialogOptions.onClose) {
+      this.dialogOptions.onClose('');
+    }
   }
 
   protected defaultQuad(): Quad {
@@ -122,6 +190,8 @@ export class DialogComponent extends Component {
       depthBias: 0,
     };
   }
+
+  protected updateText(): void {}
 
   updateDialogQuad(): void {
     this.createTopRightQuad(this._quads[0]);
@@ -144,7 +214,10 @@ export class DialogComponent extends Component {
     if (!this.isVisible) {
       return;
     }
+    this.updateText();
+
     this.openCurve.update(dt);
+    this.textCurve.update(dt);
 
     this._buffer.enable();
 
@@ -165,11 +238,14 @@ export class DialogComponent extends Component {
   /**
    * Processes user input
    */
-  handleInput(): void {
+  protected handleInput(): void {
     if (this.eng.inputManager.isReleased(UserAction.A)) {
-      this.hide();
+      if (this.textIterator.isDone()) {
+        this.hide();
+      }
+      this.textIterator.acknowledge();
+
       this.eng.inputManager.clearRelease();
-      this.eng.loadScene(SceneType.HomeBattle1);
     }
   }
 

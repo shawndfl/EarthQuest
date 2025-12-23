@@ -21,7 +21,6 @@ export abstract class RigidBodyTile extends CollisionTile {
     this._position.y = position.y;
     this._position.z = position.z;
     super.setPosition(position);
-    this.eng.viewManager.setTarget(this.bottomLeft.x - this.eng.width / 2, this.bottomLeft.y - this.eng.height / 2);
   }
 
   /**

@@ -1,7 +1,9 @@
 import { SpriteDirection } from '../data/SpriteDirection';
 import { Curve } from '../math/Curve';
 import vec2 from '../math/vec2';
+import vec4 from '../math/vec4';
 import { UserAction } from '../systems/InputManager';
+import { TextReturn, TextTab } from '../ui/dialogs/DialogComponent';
 import { PlayerTile } from './PlayerTile';
 import { RigidBodyTile } from './RigidBodyTile';
 
@@ -34,8 +36,25 @@ export class NpcTile extends RigidBodyTile {
 
     if (this.eng.inputManager.isReleased(UserAction.A)) {
       if (this.withInRangeOfPlayer() && this.playerIsFacingMe()) {
-        console.log('talking to ' + this.name);
-        this.eng.dialogManager.showDialog();
+        this.eng.dialogManager.showDialog({
+          text:
+            "I know you. You're that\ntough kid! " +
+            TextReturn +
+            'Do you want to fight!?!\n' +
+            TextTab +
+            "I'll kick your butt\n" +
+            TextTab +
+            'No thanks',
+          fontScale: 1,
+          textPadding: 5,
+          color: new vec4(1, 1, 1, 1),
+          height: 100,
+          width: 300,
+          id: 'Poo.1',
+          onAccept: (options) => {},
+          onClose: (options) => {},
+          position: new vec2(50, this.eng.height - 100 - 50),
+        });
         this.eng.inputManager.clearRelease();
       }
     }

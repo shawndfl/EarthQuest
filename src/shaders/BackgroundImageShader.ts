@@ -1,6 +1,7 @@
 import { ShaderController } from '../graphics/ShaderController';
 import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
+import { BaseShader } from './BaseShader';
 
 //
 // Vertex Shader program
@@ -31,25 +32,30 @@ uniform sampler2D uSampler;
 void main() {
   mediump vec4 color = texture2D(uSampler, vTex) * vColor;
   //mediump vec4 color =  vColor;
-  gl_FragColor = color;
+  gl_FragColor = vec4(color.rgb, vColor.a + color.a);
   
 }
 `;
-
 /**
- * Shader for sprites
+ * Shader for drawing backgrounds with scaled colors.
+ * Required buffer attributes
+ *    pos3
+ *    tex2
+ *    color4
+ * Require uniforms are
+ *    texture
+ *    projection
  */
-export class BackgroundImageShader {
-  private _shader: ShaderController;
-
+export class BackgroundImageShader extends BaseShader {
   private _aPos: number;
   private _aTex: number;
   private _aColor: number;
   private _uSampler: number;
   private _texture: Texture;
 
-  constructor(private gl: WebGL2RenderingContext, shaderId: string) {
-    this._shader = new ShaderController(this.gl, shaderId);
+  constructor(gl: WebGL2RenderingContext, shaderId: string) {
+    super(gl, shaderId);
+
     this._shader.initShaderProgram(vsSource, fsSource);
 
     // set the info
@@ -64,7 +70,7 @@ export class BackgroundImageShader {
   }
 
   enable() {
-    this._shader.enable();
+    super.enable();
     if (!this._texture) {
       console.warn('texture is null. Call setSpriteSheet()');
     } else {

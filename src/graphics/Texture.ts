@@ -41,8 +41,10 @@ export class Texture {
   /**
    * Set the image to a single pixel until the correct image can be loaded
    */
-  private initializePixel(): void {
-    this.glTexture = this.gl.createTexture();
+  private initializePixel(useLinear?: boolean): void {
+    if (!this.glTexture) {
+      this.glTexture = this.gl.createTexture();
+    }
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.glTexture);
 
     // Because images have to be download over the internet
@@ -76,8 +78,16 @@ export class Texture {
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
     //this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
     //this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MIN_FILTER,
+      useLinear ? this.gl.LINEAR_MIPMAP_LINEAR : this.gl.NEAREST
+    );
+    this.gl.texParameteri(
+      this.gl.TEXTURE_2D,
+      this.gl.TEXTURE_MAG_FILTER,
+      useLinear ? this.gl.LINEAR_MIPMAP_LINEAR : this.gl.NEAREST
+    );
   }
 
   /**
@@ -99,9 +109,9 @@ export class Texture {
    * @param imagePath
    * @returns
    */
-  async loadImage(imagePath: string): Promise<HTMLImageElement> {
+  async loadImage(imagePath: string, useLinear?: boolean): Promise<HTMLImageElement> {
     if (this.glTexture == 0) {
-      this.initializePixel();
+      this.initializePixel(useLinear);
     }
     return new Promise((resolve, reject) => {
       const image = new Image();
@@ -121,7 +131,7 @@ export class Texture {
 
   dispose(): void {
     this.gl.deleteTexture(this.glTexture);
-    this.glTexture = null;
+    this.glTexture = 0;
   }
 
   private isPowerOf2(value: number): boolean {

@@ -45,6 +45,7 @@ export class ParticleManage extends Component {
   }
 
   update(dt: number): void {
+    /*
     this._shader.enable();
 
     const proj = this.eng.viewManager.projection;
@@ -57,5 +58,6 @@ export class ParticleManage extends Component {
     const offset = 0;
 
     this.gl.drawElements(this.gl.TRIANGLES, count, type, offset);
+    */
   }
 }

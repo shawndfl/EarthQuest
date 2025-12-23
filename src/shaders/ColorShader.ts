@@ -1,5 +1,6 @@
 import { ShaderController } from '../graphics/ShaderController';
 import mat4 from '../math/mat4';
+import { BaseShader } from './BaseShader';
 
 //
 // Vertex Shader program
@@ -34,17 +35,20 @@ void main() {
 `;
 
 /**
- * Shader for sprites
+ * Shader for drawing colored lines. See @class DebugHelpers
+ * Required buffer attributes
+ *    pos3
+ *    color4
+ * Require uniforms are
+ *    projection
  */
-export class ColorShader {
-  private _shader: ShaderController;
-
+export class ColorShader extends BaseShader {
   private _aPos: number;
   private _aColor: number;
   private _uProj: number;
 
-  constructor(private gl: WebGL2RenderingContext, shaderId: string) {
-    this._shader = new ShaderController(this.gl, shaderId);
+  constructor(gl: WebGL2RenderingContext, shaderId: string) {
+    super(gl, shaderId);
     this._shader.initShaderProgram(vsSource, fsSource);
 
     // set the info
@@ -58,6 +62,6 @@ export class ColorShader {
   }
 
   enable(): void {
-    this._shader.enable();
+    super.enable();
   }
 }

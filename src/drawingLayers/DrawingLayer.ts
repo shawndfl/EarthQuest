@@ -8,19 +8,30 @@ import { Texture } from '../graphics/Texture';
 
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
+/**
+ * This will manage a collection of quads and draw them in one draw call
+ */
 export class DrawingLayer extends Component {
-  private _texture: Texture;
-  private _buffer: GlBuffer;
-  private _shader: SpritePerspectiveShader;
+  protected _texture: Texture;
+  protected _buffer: GlBuffer;
+  protected _shader: SpritePerspectiveShader;
   /** This is what we are drawing */
-  private _quads: Quad[];
-  private _tileAtlas: ITileAtlas;
-  private _refreshGeometry: boolean;
+  protected _quads: Quad[];
 
+  protected _tileAtlas: ITileAtlas;
+  /** Should the buffer be updated by the the _quads */
+  protected _refreshGeometry: boolean;
+
+  /**
+   * Get the texture assigned to this layer
+   */
   public get texture(): Texture {
     return this._texture;
   }
 
+  /**
+   * Atlas used to look up sprites with in this texture
+   */
   public get tileAtlas(): ITileAtlas {
     return this._tileAtlas;
   }
@@ -34,14 +45,24 @@ export class DrawingLayer extends Component {
     this._tileAtlas = this.eng.assetManager.atlasData[this._atlasId];
   }
 
+  /**
+   * Register a quad to draw
+   * @param quad
+   */
   registerQuad(quad: Quad): void {
     this._quads.push(quad);
+    this._refreshGeometry = true;
   }
 
+  /**
+   * Remove a quad from the drawing queue
+   * @param uuid
+   */
   unregister(uuid: string): void {
     const i = this._quads.findIndex((q) => q.uuid == uuid);
     if (i > -1) {
       this._quads.splice(i);
+      this._refreshGeometry = true;
     }
   }
 
@@ -58,10 +79,16 @@ export class DrawingLayer extends Component {
     this._refreshGeometry = true;
   }
 
+  /**
+   * If the client updates a quad call this to queue a buffer refresh
+   */
   requestRefresh(): void {
     this._refreshGeometry = true;
   }
 
+  /**
+   * Refresh the geometry if required
+   */
   protected refreshGeometry(): void {
     if (this._refreshGeometry) {
       // set the openGL buffers
@@ -72,6 +99,10 @@ export class DrawingLayer extends Component {
     }
   }
 
+  /**
+   * Draw the quads
+   * @param dt
+   */
   update(dt: number): void {
     this.refreshGeometry();
 
