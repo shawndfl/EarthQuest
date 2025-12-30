@@ -1,6 +1,7 @@
 import { SpriteDirection } from '../data/SpriteDirection';
 import { Curve } from '../math/Curve';
 import vec2 from '../math/vec2';
+import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 import { UserAction } from '../systems/InputManager';
 import { TextReturn, TextTab } from '../ui/dialogs/DialogComponent';
@@ -22,8 +23,7 @@ export class NpcTile extends RigidBodyTile {
 
     this.curve.start(true, undefined, (value) => {
       //TODO toggle the image over time
-      this.quad.mirrorX = !!value;
-      this.requestGeometryRefresh();
+      this.mirrorX = !!value;
     });
   }
 
@@ -53,7 +53,7 @@ export class NpcTile extends RigidBodyTile {
           id: 'Poo.1',
           onAccept: (options) => {},
           onClose: (options) => {},
-          position: new vec2(50, this.eng.height - 100 - 50),
+          position: new vec3(50, this.eng.height - 100 - 50, 0),
         });
         this.eng.inputManager.clearRelease();
       }

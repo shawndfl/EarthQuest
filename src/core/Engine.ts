@@ -16,6 +16,7 @@ import { SceneManager } from '../systems/SceneManager';
 import { CollisionManager } from '../systems/CollisionManager';
 import { ParticleManage } from '../systems/ParticleManager';
 import { SceneType } from '../scenes/SceneType';
+import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
 export const CanvasWidth = 256;
 export const CanvasHeight = 224;
@@ -45,6 +46,12 @@ export class Engine {
   readonly textManager: TextManager;
   readonly dialogManager: DialogManager;
   readonly particleManager: ParticleManage;
+
+  protected _spritePerspectiveShader: SpritePerspectiveShader;
+
+  get spritePerspectiveShader(): SpritePerspectiveShader {
+    return this._spritePerspectiveShader;
+  }
 
   get canvasGL(): HTMLCanvasElement {
     return this._canvasGL;
@@ -176,13 +183,17 @@ export class Engine {
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
     this.gl.depthFunc(this.gl.LEQUAL); // Near things obscure far things
 
+    // initialize shaders since we have access to the gl object now
+    this._spritePerspectiveShader = new SpritePerspectiveShader(this.gl, 'global-spritePerspectiveShader');
+
     // initialize all systems
     await this.debugHelpers.initialize();
-    await this.particleManager.initialize();
+    await this.assetManager.initialize();
     await this.textManager.initialize();
+
     await this.dialogManager.initialize();
     await this.viewManager.initialize();
-    await this.assetManager.initialize();
+
     await this.tileManager.initialize();
     await this.sceneManager.initialize();
     if (this.editorActive) {

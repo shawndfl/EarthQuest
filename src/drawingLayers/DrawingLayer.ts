@@ -1,10 +1,14 @@
 import { Component } from '../core/Component';
 import { Engine } from '../core/Engine';
 import { ITileAtlas } from '../data/ITileAtlas';
+import { RuntimeTileData } from '../data/RuntimeLevelData';
 
 import { GlBuffer } from '../graphics/GlBuffer';
 import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
+
+import mat4 from '../math/mat4';
+import { BaseShader } from '../shaders/BaseShader';
 
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 
@@ -12,12 +16,15 @@ import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
  * This will manage a collection of quads and draw them in one draw call
  */
 export class DrawingLayer extends Component {
+  /** texture for all the quads */
   protected _texture: Texture;
+  /** buffer used to draw the quads */
   protected _buffer: GlBuffer;
+  /** shader used in drawing this */
   protected _shader: SpritePerspectiveShader;
   /** This is what we are drawing */
-  protected _quads: Quad[];
-
+  protected _tileControllers: Map<string, RuntimeTileData> = new Map();
+  /** atlas used to look up the textures */
   protected _tileAtlas: ITileAtlas;
   /** Should the buffer be updated by the the _quads */
   protected _refreshGeometry: boolean;
@@ -45,13 +52,25 @@ export class DrawingLayer extends Component {
     this._tileAtlas = this.eng.assetManager.atlasData[this._atlasId];
   }
 
+  protected createShader(): BaseShader {
+    return this.eng.spritePerspectiveShader;
+  }
+
   /**
    * Register a quad to draw
    * @param quad
    */
-  registerQuad(quad: Quad): void {
-    this._quads.push(quad);
+  registerQuad(tile: RuntimeTileData): void {
+    this._tileControllers.set(tile.uuid, tile);
     this._refreshGeometry = true;
+  }
+
+  /**
+   * The projection matrix for this view
+   * @returns
+   */
+  protected getProjection(): Readonly<mat4> {
+    return this.eng.viewManager.projection;
   }
 
   /**
@@ -59,9 +78,8 @@ export class DrawingLayer extends Component {
    * @param uuid
    */
   unregister(uuid: string): void {
-    const i = this._quads.findIndex((q) => q.uuid == uuid);
-    if (i > -1) {
-      this._quads.splice(i);
+    if (this._tileControllers.has(uuid)) {
+      this._tileControllers.delete(uuid);
       this._refreshGeometry = true;
     }
   }
@@ -70,7 +88,7 @@ export class DrawingLayer extends Component {
    * Create the tiles
    */
   async loadLevel(): Promise<void> {
-    this._quads = [];
+    this._tileControllers.clear();
     this._buffer = new GlBuffer(this.gl);
     this._shader = new SpritePerspectiveShader(this.gl, 'scene');
     this._texture = await this.eng.assetManager.getTexture(this._tileAtlas.texture);
@@ -92,7 +110,8 @@ export class DrawingLayer extends Component {
   protected refreshGeometry(): void {
     if (this._refreshGeometry) {
       // set the openGL buffers
-      const geo = QuadGeometry.createQuad(this._quads);
+      const quads = Array.from(this._tileControllers.values()).filter((tile) => !tile.quad.hidden);
+      const geo = QuadGeometry.createQuad(quads.map((tile) => tile.quad));
       this._buffer.setBuffers(geo);
 
       this._refreshGeometry = false;

@@ -1,18 +1,6 @@
 import { Component } from '../core/Component';
-import { CollisionResults } from '../data/CollisionResults';
-import { CollisionTypes } from '../data/CollisionTypes';
-import { RuntimeTileData } from '../data/RuntimeLevelData';
-import { DrawingLayer } from '../drawingLayers/DrawingLayer';
-import { GlBuffer } from '../graphics/GlBuffer';
-import { Quad } from '../graphics/QuadGeometry';
-import { Texture } from '../graphics/Texture';
-import rect from '../math/rect';
-import { MenuTile } from '../tiles/MenuTile';
-import { NpcTile } from '../tiles/NpcTile';
 import { PlayerTile } from '../tiles/PlayerTile';
-import { SolidTile } from '../tiles/SolidTile';
 import { TileController } from '../tiles/TileController';
-import { TreeTile } from '../tiles/TreeTiles';
 
 /**
  * Create two layers of tiles.

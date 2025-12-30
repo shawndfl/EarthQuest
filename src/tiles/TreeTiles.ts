@@ -19,8 +19,7 @@ export class TreeTile extends CollisionTile {
     ]);
     this.curve.start(false, undefined, (v) => {
       //console.debug('tree ' + v);
-      const tileData = this.options.tileData;
-      const imageNames = this.options.tileData.getImageNames();
+      const imageNames = this.getImageNames();
 
       // requests refresh
       this.setImage(imageNames[v]);

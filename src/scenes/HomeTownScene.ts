@@ -54,46 +54,28 @@ export class HomeTownScene extends Scene {
   }
 
   async createFireFly(): Promise<void> {
-    const tileData = this._backgroundLayer.tileAtlas.tiles['particle white'];
-
-    const fireFly = new FireFlyTile(this.eng, {
+    const fireFly = new FireFlyTile(this.eng, 'firefly', {
       initializePosition: new vec3(150, -200, 0.5),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._characterLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'firefly', tileData, this._characterLayer.texture),
+      drawingLayer: this._characterLayer,
+      tileDataId: 'particle white',
     });
 
     // this will handle the update function
     this.eng.tileManager.registerTileForUpdate(fireFly);
-
-    // this will handle the quad drawing
-    this._characterLayer.registerQuad(fireFly.quad);
-
     await fireFly.initialize();
   }
 
   async addTrees(): Promise<void> {
-    const tileData = this._backgroundLayer.tileAtlas.tiles['big tree'];
-
-    const tree = new SolidTile(this.eng, {
+    const tree = new SolidTile(this.eng, 'tree', {
       initializePosition: new vec3(80, -200, 0.5),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._characterLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'ness house', tileData, this._characterLayer.texture),
+      drawingLayer: this._characterLayer,
+      tileDataId: 'big tree',
     });
 
     // this will handle the update function
     //this.eng.tileManager.registerTileForUpdate(house);
 
     this.eng.collisionManager.registerTileForCollision(tree);
-
-    // this will handle the quad drawing
-    this._characterLayer.registerQuad(tree.quad);
-
     await tree.initialize();
   }
 
@@ -110,23 +92,16 @@ export class HomeTownScene extends Scene {
   async createHouse(position: vec2): Promise<void> {
     const tileData = this._backgroundLayer.tileAtlas.tiles['ness house'];
 
-    const house = new SolidTile(this.eng, {
+    const house = new SolidTile(this.eng, 'ness house', {
       initializePosition: new vec3(...position.xy, 0.5),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._characterLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'ness house', tileData, this._characterLayer.texture),
+      drawingLayer: this._characterLayer,
+      tileDataId: 'ness house',
     });
 
     // this will handle the update function
     //this.eng.tileManager.registerTileForUpdate(house);
 
     this.eng.collisionManager.registerTileForCollision(house);
-
-    // this will handle the quad drawing
-    this._characterLayer.registerQuad(house.quad);
-
     await house.initialize();
     //TODO add portal
     /*
@@ -148,23 +123,16 @@ export class HomeTownScene extends Scene {
   async createPoo(): Promise<void> {
     const tileData = this._backgroundLayer.tileAtlas.tiles['poo'];
 
-    const poo = new NpcTile(this.eng, {
+    const poo = new NpcTile(this.eng, 'poo', {
       initializePosition: new vec3(50, -50, 0.5),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._characterLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'poo', tileData, this._characterLayer.texture),
+      drawingLayer: this._characterLayer,
+      tileDataId: 'poo',
     });
 
     // this will handle the update function
     this.eng.tileManager.registerTileForUpdate(poo);
 
     this.eng.collisionManager.registerTileForCollision(poo);
-
-    // this will handle the quad drawing
-    this._characterLayer.registerQuad(poo.quad);
-
     await poo.initialize();
   }
 
@@ -184,20 +152,11 @@ export class HomeTownScene extends Scene {
   }
 
   async createBackground(): Promise<void> {
-    const tileData = this._backgroundLayer.tileAtlas.tiles['simple gree grass'];
-
-    const grassBackground = new StaticTile(this.eng, {
+    const grassBackground = new StaticTile(this.eng, 'grass', {
       initializePosition: new vec3(0, 0, 1),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._backgroundLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'grass', tileData, this._backgroundLayer.texture),
+      drawingLayer: this._backgroundLayer,
+      tileDataId: 'simple gree grass',
     });
-
-    // this will handle the quad drawing
-    this._backgroundLayer.registerQuad(grassBackground.quad);
-
     grassBackground.initialize();
   }
 
@@ -223,32 +182,21 @@ export class HomeTownScene extends Scene {
   }
 
   protected PlaceBackgroundTile(tileName: string, x: number, y: number): void {
-    const tileData = this._backgroundDetail.tileAtlas.tiles[tileName];
-    const backgroundDetail = new StaticTile(this.eng, {
+    const backgroundDetail = new StaticTile(this.eng, 'flower_' + tileName, {
       initializePosition: new vec3(x, y, 0.6),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._backgroundDetail.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'detail', tileData, this._backgroundDetail.texture),
+      drawingLayer: this._backgroundDetail,
+      tileDataId: tileName,
     });
-
-    // this will handle the quad drawing
-    this._backgroundDetail.registerQuad(backgroundDetail.quad);
-
     backgroundDetail.initialize();
   }
 
   async createPlayer(): Promise<void> {
     const tileData = this._characterLayer.tileAtlas.tiles['ness'];
 
-    const playerTile = new PlayerTile(this.eng, {
+    const playerTile = new PlayerTile(this.eng, 'player', {
       initializePosition: new vec3(140, 0, 0.5),
-      // tell the character layer to handle the buffer refresh request
-      requestBufferRefresh: (t) => {
-        this._characterLayer.requestRefresh();
-      },
-      tileData: new RuntimeTileData(this.eng, 'ness', tileData, this._characterLayer.texture),
+      drawingLayer: this._characterLayer,
+      tileDataId: 'ness',
     });
 
     // this will make sure all other systems can access this tile
@@ -259,10 +207,6 @@ export class HomeTownScene extends Scene {
 
     // make sure this can collide with other things
     this.eng.collisionManager.registerTileForCollision(playerTile);
-
-    // this will handle the quad drawing
-    this._characterLayer.registerQuad(playerTile.quad);
-
     await playerTile.initialize();
   }
 

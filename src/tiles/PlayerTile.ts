@@ -52,7 +52,7 @@ export class PlayerTile extends RigidBodyTile {
 
       //console.debug('player position ', this._collision.left.toFixed(0) + ', ' + this._collision.top.toFixed(0));
 
-      this.setPosition(this.position);
+      //this.setPosition(this.position);
 
       this._walkingTimer -= dt;
     } else {

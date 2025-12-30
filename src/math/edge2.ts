@@ -107,7 +107,7 @@ export default class edge2 {
         (start1.y - end1.y) * (start2.x * end2.y - start2.y * end2.x)) /
       denom;
 
-    const p = new vec2([px, py]);
+    const p = new vec2(px, py);
     const toEnd = start1.copy().subtract(end1);
     const toPoint = start1.copy().subtract(p);
     const limit = toEnd.length();
@@ -121,7 +121,7 @@ export default class edge2 {
     if (!infinite && vec2.dot(toEnd, toPoint) < 0) {
       return null;
     }
-    return new vec2([px, py]);
+    return new vec2(px, py);
   }
 
   /**

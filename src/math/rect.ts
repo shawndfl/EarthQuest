@@ -172,10 +172,10 @@ export default class rect {
    * @returns
    */
   intersectionPoint(start: vec2, end: vec2): vec2 {
-    const topLeft = new vec2([this.left, this.top]);
-    const topRight = new vec2([this.right, this.top]);
-    const bottomLeft = new vec2([this.left, this.bottom]);
-    const bottomRight = new vec2([this.right, this.bottom]);
+    const topLeft = new vec2(this.left, this.top);
+    const topRight = new vec2(this.right, this.top);
+    const bottomLeft = new vec2(this.left, this.bottom);
+    const bottomRight = new vec2(this.right, this.bottom);
 
     const edges: [vec2, vec2][] = [
       [topLeft, topRight], // Top

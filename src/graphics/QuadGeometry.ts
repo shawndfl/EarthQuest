@@ -26,6 +26,8 @@ export interface Quad {
    *  To center on the bottom right you would use (width/2, height/2)
    */
   offset?: vec2;
+  /** is this quad visible */
+  hidden?: boolean;
 }
 
 export interface Line {
@@ -107,6 +109,7 @@ export class QuadGeometry {
    * @returns
    */
   static createQuad(quads: Quad[]): Geometry {
+    //TODO add a quad sorter
     let vertCount = 0;
     let vertIndex = 0;
     let indexIndex = 0;

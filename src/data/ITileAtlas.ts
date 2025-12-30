@@ -7,8 +7,7 @@ export enum TileOrigin {
 }
 
 /**
- * Which corners can you collide with?
- *
+ * Tile Data
  */
 export interface ITileData {
   /** player, enemy, solid, open, door */

@@ -1,11 +1,9 @@
 import { Component } from '../core/Component';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
+import { DrawingLayer } from '../drawingLayers/DrawingLayer';
+import { UiDrawingLayer } from '../drawingLayers/UIDrawingLayer';
 
-import { Texture } from '../graphics/Texture';
 import mat4 from '../math/mat4';
-import vec2 from '../math/vec2';
-
-import vec4 from '../math/vec4';
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
 import { DialogComponent } from '../ui/dialogs/DialogComponent';
 import { DialogOptions } from '../ui/dialogs/DialogOptions';
@@ -28,10 +26,11 @@ export const MaxDialogCount = 5;
  * Manages dialog boxes
  */
 export class DialogManager extends Component {
-  private _texture: Texture;
-  private _menuTitle: RuntimeTileData;
-  private _shader: SpritePerspectiveShader;
-  protected _projection: mat4;
+  private _drawingLayer: UiDrawingLayer;
+
+  get drawingLayer(): DrawingLayer {
+    return this._drawingLayer;
+  }
 
   private _dialogBox: DialogComponent;
 
@@ -39,30 +38,22 @@ export class DialogManager extends Component {
    * Create the shader and projection matrix used for all menus
    */
   async initialize(): Promise<void> {
-    this._shader = new SpritePerspectiveShader(this.gl, 'dialogShader');
-    this._projection = mat4.orthographic(0, this.eng.width, 0, this.eng.height, 1, -1, this._projection);
+    this._drawingLayer = new UiDrawingLayer(this.eng, 'default');
 
     this._dialogBox = await this.createMainDialogComponent();
   }
 
   async createMainDialogComponent(): Promise<DialogComponent> {
-    const name = 'Dialog Menu';
-    const tileAtlas = this.eng.assetManager.atlasData['default'];
-    const tileData = tileAtlas.tiles[name];
-    this._texture = await this.eng.assetManager.getTexture(tileAtlas.texture);
-    this._menuTitle = new RuntimeTileData(this.eng, name, tileData, this._texture);
-
-    if (!this._menuTitle) {
-      console.error('Cannot find menu title');
-      return;
-    }
-
-    // setup the shader
-    this._shader.setSpriteSheet(this._texture);
-    return new DialogComponent(this.eng, this._menuTitle, this._texture);
+    return new DialogComponent(this.eng);
   }
 
-  async loadLevel(): Promise<void> {}
+  async loadLevel(): Promise<void> {
+    await this.drawingLayer.loadLevel();
+  }
+
+  closeLevel(): void {
+    this.drawingLayer.closeLevel();
+  }
 
   showDialog(dialogOptions: DialogOptions): void {
     this._dialogBox.show(dialogOptions);
@@ -75,11 +66,7 @@ export class DialogManager extends Component {
   }
 
   update(dt: number): void {
-    this._shader.enable();
-
-    const proj = this._projection;
-
-    this._shader.setProj(proj);
+    this.drawingLayer.update(dt);
 
     this._dialogBox.update(dt);
   }

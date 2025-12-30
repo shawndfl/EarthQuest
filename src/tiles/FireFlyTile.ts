@@ -10,7 +10,6 @@ export class FireFlyTile extends TileController {
   private curve: Curve;
 
   async initialize(): Promise<void> {
-    await super.initialize();
     this.curve = new Curve();
     this.curve.points([
       { p: 0, t: 0 },
@@ -20,8 +19,8 @@ export class FireFlyTile extends TileController {
     this.curve.pingPong(true);
     this.curve.repeat(-1);
     this.curve.curve(CurveType.linear);
-    const startPosition = this.tileData.tilePosition.copy();
-    const position = this.tileData.tilePosition.copy();
+    const startPosition = this.tilePosition.copy();
+    const position = this.tilePosition.copy();
     const xOffset = 0;
     const yOffset = 100;
     //this.tileData.alpha = 0.05;
@@ -31,19 +30,17 @@ export class FireFlyTile extends TileController {
       position.x = startPosition.x; // + xOffset * value;
       position.y = startPosition.y + yOffset * value;
       const alpha = value;
-      this.tileData.alpha = alpha * 0.5 + 0.5;
+      this.alpha = alpha * 0.5 + 0.5;
       const scale = 10 * value + 10;
       const rotate = 360 * value;
-      console.debug('value ' + value.toFixed(4) + ' time ' + time);
 
-      this.tileData.setTileTransform({
+      this.setTileTransform({
         position: position,
         tileSize: new vec2(scale, scale),
         rotation: rotate,
         offset: new vec2(0, 0),
         depthBias: -70,
       });
-      this.requestGeometryRefresh();
     });
   }
 

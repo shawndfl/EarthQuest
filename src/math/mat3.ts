@@ -206,10 +206,10 @@ export default class mat3 {
 
       return result;
     } else {
-      return new vec2([
+      return new vec2(
         x * this.values[0] + y * this.values[3] + this.values[6],
-        x * this.values[1] + y * this.values[4] + this.values[7],
-      ]);
+        x * this.values[1] + y * this.values[4] + this.values[7]
+      );
     }
   }
 

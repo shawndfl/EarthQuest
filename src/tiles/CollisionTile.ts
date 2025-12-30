@@ -13,8 +13,10 @@ export class CollisionTile extends TileController {
     return this._bounds;
   }
 
+  /**
+   * initialize type
+   */
   async initialize(): Promise<void> {
-    await super.initialize();
     this.updateCollision();
   }
 
@@ -45,11 +47,10 @@ export class CollisionTile extends TileController {
    * gets the latest bottom left and creates a collision box around the tileSize
    */
   protected updateCollision(): void {
-    this.quad.transform.getTranslation(this.bottomLeft);
-    this._bounds.left = this.bottomLeft.x + this.tileData.collisionOffset.x;
-    this._bounds.width = (this.tileData.tileSize.x + this.tileData.collisionOffset.z) * this.eng.pixelScale;
-    this._bounds.height = (this.tileData.tileSize.y + this.tileData.collisionOffset.w) * this.eng.pixelScale;
-    this._bounds.top = this.bottomLeft.y + this._bounds.height + this.tileData.collisionOffset.y;
+    this._bounds.left = this.bottomLeft.x + this.collisionOffset.x;
+    this._bounds.width = (this.tileSize.x + this.collisionOffset.z) * this.eng.pixelScale;
+    this._bounds.height = (this.tileSize.y + this.collisionOffset.w) * this.eng.pixelScale;
+    this._bounds.top = this.bottomLeft.y + this._bounds.height + this.collisionOffset.y;
   }
 
   /**

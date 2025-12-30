@@ -17,24 +17,15 @@ export default class vec2 {
     this.y = values[1];
   }
 
-  constructor(values?: [number, number] | number, y?: number) {
-    if (values !== undefined) {
-      if (typeof values === 'number') {
-        this.x = values;
-      } else if (Array.isArray(values)) {
-        this.xy = values;
-      }
-
-      if (y !== undefined) {
-        this.y = y;
-      }
-    }
+  constructor(x?: number, y?: number) {
+    this.x = x ?? 0;
+    this.y = y ?? 0;
   }
 
-  static readonly zero = new vec2([0, 0]);
-  static readonly one = new vec2([1, 1]);
-  static readonly right = new vec2([1, 0]);
-  static readonly up = new vec2([0, 1]);
+  static readonly zero = new vec2(0, 0);
+  static readonly one = new vec2(1, 1);
+  static readonly right = new vec2(1, 0);
+  static readonly up = new vec2(0, 1);
 
   at(index: number): number {
     return index == 0 ? this.x : this.y;

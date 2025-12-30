@@ -1,4 +1,6 @@
+import { IRequestBufferRefresh } from '../../drawingLayers/IRequestBufferRefersh';
 import vec2 from '../../math/vec2';
+import vec3 from '../../math/vec3';
 import vec4 from '../../math/vec4';
 
 export interface DialogUserOptions {
@@ -19,7 +21,7 @@ export interface DialogOptions {
   textPadding: number;
   fontScale: number;
   /** position in screen space 0,0 is bottom left */
-  position: vec2;
+  position: vec3;
   width: number;
   height: number;
   color: vec4;
@@ -28,3 +30,5 @@ export interface DialogOptions {
   /** When the dialog closes */
   onClose: (optionSelected: string) => void;
 }
+
+export interface InternalDialogOptions extends DialogOptions, IRequestBufferRefresh {}
