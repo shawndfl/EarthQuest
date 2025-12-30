@@ -1,5 +1,6 @@
 import { CollisionResults } from '../data/CollisionResults';
 import rect from '../math/rect';
+import vec3 from '../math/vec3';
 import vec4 from '../math/vec4';
 import { TileController } from './TileController';
 
@@ -46,11 +47,13 @@ export class CollisionTile extends TileController {
   /**
    * gets the latest bottom left and creates a collision box around the tileSize
    */
-  protected updateCollision(): void {
-    this._bounds.left = this.bottomLeft.x + this.collisionOffset.x;
+  protected updateCollision(position?: vec3): void {
+    position ??= this.tilePosition;
+    //this.quad.transform.getTranslation(this.bottomLeft);
+    this._bounds.left = position.x + this.collisionOffset.x;
     this._bounds.width = (this.tileSize.x + this.collisionOffset.z) * this.eng.pixelScale;
     this._bounds.height = (this.tileSize.y + this.collisionOffset.w) * this.eng.pixelScale;
-    this._bounds.top = this.bottomLeft.y + this._bounds.height + this.collisionOffset.y;
+    this._bounds.top = position.y + this._bounds.height + this.collisionOffset.y;
   }
 
   /**

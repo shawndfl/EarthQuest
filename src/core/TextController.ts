@@ -85,8 +85,8 @@ export class TextController extends Component {
       const tv2 = 1 - font.v1;
 
       const quad: FontQuad = {
-        min: new vec3([(xpos1 / screenWidth) * 2 - 1.0, (ypos1 / screenHeight) * 2 - 1.0, zpos]),
-        max: new vec3([(xpos2 / screenWidth) * 2 - 1.0, (ypos2 / screenHeight) * 2 - 1.0, zpos]),
+        min: new vec3((xpos1 / screenWidth) * 2 - 1.0, (ypos1 / screenHeight) * 2 - 1.0, zpos),
+        max: new vec3((xpos2 / screenWidth) * 2 - 1.0, (ypos2 / screenHeight) * 2 - 1.0, zpos),
         minTex: new vec2(tu1, tv2),
         maxTex: new vec2(tu2, tv1),
       };

@@ -2,85 +2,38 @@ import mat3 from './mat3';
 import quat from './quat';
 
 import { epsilon } from './constants';
+import vec2 from './vec2';
 
 export default class vec3 {
   get type(): string {
     return 'vec3';
   }
 
-  get x(): number {
-    return this.values[0];
+  x: number;
+  y: number;
+  z: number;
+
+  get xy(): vec2 {
+    return new vec2(this.x, this.y);
   }
 
-  get y(): number {
-    return this.values[1];
+  constructor(x?: number, y?: number, z?: number) {
+    this.x = x ?? 0;
+    this.y = y ?? 0;
+    this.z = z ?? 0;
   }
 
-  get z(): number {
-    return this.values[2];
-  }
+  static readonly zero = new vec3(0, 0, 0);
+  static readonly one = new vec3(1, 1, 1);
 
-  get xy(): [number, number] {
-    return [this.values[0], this.values[1]];
-  }
+  static readonly up = new vec3(0, 1, 0);
+  static readonly right = new vec3(1, 0, 0);
+  static readonly forward = new vec3(0, 0, 1);
 
-  get xyz(): [number, number, number] {
-    return [this.values[0], this.values[1], this.values[2]];
-  }
-
-  set x(value: number) {
-    this.values[0] = value;
-  }
-
-  set y(value: number) {
-    this.values[1] = value;
-  }
-
-  set z(value: number) {
-    this.values[2] = value;
-  }
-
-  set xy(values: [number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-  }
-
-  set xyz(values: [number, number, number]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
-  }
-
-  constructor(values?: [number, number, number] | number, y?: number, z?: number) {
-    if (values !== undefined) {
-      if (typeof values === 'number') {
-        this.values[0] = values;
-      } else if (Array.isArray(values)) {
-        this.xyz = values;
-      }
-
-      if (y !== undefined) {
-        this.values[1] = y;
-      }
-      if (z !== undefined) {
-        this.values[2] = z;
-      }
-    } else {
-      this.xyz = [0, 0, 0];
-    }
-  }
-
-  values = new Float32Array(3);
-
-  static readonly zero = new vec3([0, 0, 0]);
-  static readonly one = new vec3([1, 1, 1]);
-
-  static readonly up = new vec3([0, 1, 0]);
-  static readonly right = new vec3([1, 0, 0]);
-  static readonly forward = new vec3([0, 0, 1]);
-
-  at(index: number): number {
-    return this.values[index];
+  set(x?: number, y?: number, z?: number): void {
+    this.x = x ?? 0;
+    this.y = y ?? 0;
+    this.z = z ?? 0;
   }
 
   reset(): void {

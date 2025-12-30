@@ -219,19 +219,19 @@ export default class mat3 {
     const z = vector.z;
 
     if (result) {
-      result.xyz = [
+      result.set(
         x * this.values[0] + y * this.values[3] + z * this.values[6],
         x * this.values[1] + y * this.values[4] + z * this.values[7],
-        x * this.values[2] + y * this.values[5] + z * this.values[8],
-      ];
+        x * this.values[2] + y * this.values[5] + z * this.values[8]
+      );
 
       return result;
     } else {
-      return new vec3([
+      return new vec3(
         x * this.values[0] + y * this.values[3] + z * this.values[6],
         x * this.values[1] + y * this.values[4] + z * this.values[7],
-        x * this.values[2] + y * this.values[5] + z * this.values[8],
-      ]);
+        x * this.values[2] + y * this.values[5] + z * this.values[8]
+      );
     }
   }
 

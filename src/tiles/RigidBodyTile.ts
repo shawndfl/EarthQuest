@@ -7,7 +7,6 @@ import vec4 from '../math/vec4';
 import { CollisionTile } from './CollisionTile';
 
 export abstract class RigidBodyTile extends CollisionTile {
-  private tempPosition: vec3 = new vec3();
   velocity: vec3 = new vec3();
 
   private lastCollisionResults: CollisionResults;
@@ -28,8 +27,7 @@ export abstract class RigidBodyTile extends CollisionTile {
     if (this.velocity && this.velocity.length() > 0) {
       let step = this.velocity.copy().scale(dt * 0.001);
       // copy the position
-      this.tilePosition.copy(this.tempPosition);
-      const nextPosition = this.tempPosition.add(step);
+      const nextPosition = this.tilePosition.copy().add(step);
 
       const nextRect = this._bounds.copy();
       nextRect.left = nextPosition.x + this.collisionOffset.x;
@@ -51,8 +49,7 @@ export abstract class RigidBodyTile extends CollisionTile {
         this.adjustVelocityStep(step, results, dt);
       } else {
         // move the tile
-        this.tempPosition.add(step);
-        this.setPosition(this.tempPosition);
+        this.setPosition(this.tilePosition.add(step));
         this.updateCollision();
       }
     }
@@ -91,6 +88,7 @@ export abstract class RigidBodyTile extends CollisionTile {
     const isMovingLeft = velocityStep.x < 0;
     const isMovingUp = velocityStep.y > 0;
     const isMovingDown = velocityStep.y < 0;
+    const adjustedPosition = this.tilePosition.copy();
 
     // loop over this correct for multiple cycle to
     // avoid oscillating corrections with the position
@@ -112,16 +110,15 @@ export abstract class RigidBodyTile extends CollisionTile {
             if (velocityStep.x > 0) {
               // moving right
               const target = result.bounds.left - this._bounds.width;
-              const dir = target - this.tempPosition.x;
-              this.tempPosition.x += dir * smallCorrectionStep;
+              const dir = target - adjustedPosition.x;
+              adjustedPosition.x += dir * smallCorrectionStep;
             } else {
               // moving left
               const target = result.bounds.right;
-              const dir = target - this.tempPosition.x;
-              this.tempPosition.x += dir * smallCorrectionStep;
+              const dir = target - adjustedPosition.x;
+              adjustedPosition.x += dir * smallCorrectionStep;
             }
-            this.setPosition(this.tempPosition);
-            this.updateCollision();
+            this.updateCollision(adjustedPosition);
           }
         }
       }
@@ -142,15 +139,15 @@ export abstract class RigidBodyTile extends CollisionTile {
             if (velocityStep.y > 0) {
               // moving up
               const target = result.bounds.bottom - this._bounds.height;
-              const dir = target - this.tempPosition.y;
-              this.tempPosition.y += dir * smallCorrectionStep;
+              const dir = target - adjustedPosition.y;
+              adjustedPosition.y += dir * smallCorrectionStep;
             } else {
               // moving down
               const target = result.bounds.top;
-              const dir = target - this.tempPosition.y;
-              this.tempPosition.y += dir * smallCorrectionStep;
+              const dir = target - adjustedPosition.y;
+              adjustedPosition.y += dir * smallCorrectionStep;
             }
-            this.updateCollision();
+            this.updateCollision(adjustedPosition);
           }
         }
       }
@@ -166,8 +163,8 @@ export abstract class RigidBodyTile extends CollisionTile {
       velocityStep.y = 0;
     }
 
-    this.tempPosition.add(velocityStep);
-    this.setPosition(this.tempPosition);
+    // set the new corrected position
+    this.setPosition(this.tilePosition.add(velocityStep));
 
     // update collision
     this.updateCollision();
