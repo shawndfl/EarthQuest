@@ -20,7 +20,7 @@ import { ListBox } from './ListBox';
 import { TextIterator } from './TextIterator';
 
 /** used to wait for user acknowledge */
-export const TextReturn = '\x0a';
+export const TextReturn = '\x0C';
 /** list user option */
 export const TextTab = '\x09';
 
@@ -28,11 +28,15 @@ export const TextTab = '\x09';
  * Creates the quads that make up the dialog box.
  */
 export class DialogComponent extends Component {
-  protected _quads: Quad[] = [];
-  protected _cursor: DialogIcon;
+  protected _cursor: RuntimeTileData;
   protected listbox: ListBox;
+  protected _id: string;
 
-  protected tileData: RuntimeTileData;
+  protected _textSpeedPerCharacterInMs = 60;
+
+  protected readonly TileId = 'Dialog Menu';
+
+  protected tileData: Map<string, RuntimeTileData> = new Map();
   protected texture: Texture;
   protected width: number;
   protected height: number;
@@ -67,37 +71,32 @@ export class DialogComponent extends Component {
 
   constructor(eng: Engine) {
     super(eng);
-    /*
-    this.tileData = UiRuntimeTileFactory.get().runtimeData;
-    this.texture = this.tileData.texture;
-
-    this.textIterator = new TextIterator();
-
-    this._quads = [];
-    const quadCount = 10;
-    for (let i = 0; i < quadCount; i++) {
-      this._quads.push(this.defaultQuad());
-    }
+    this._id = this.eng.random.getUuid();
 
     this.setupTextAnimation();
     this.setupOpenAnimation();
-    this.createIcons();
-    */
   }
 
   protected createIcons(): void {
-    this._cursor = new DialogIcon(this.eng, this.drawingLayer);
-    this.listbox = new ListBox(this.eng, this.drawingLayer);
+    if (!this._cursor) {
+      const id = this.id + '_' + 'cursor';
+      this._cursor = new RuntimeTileData(this.eng, id, this.TileId, this.drawingLayer);
+      this._cursor.setImage('icon1');
+      // start out hidden
+      this._cursor.visible = false;
+      this.tileData.set(id, this._cursor);
+    }
   }
 
   /**
    * This will print one character at a time
    */
   protected setupTextAnimation(): void {
+    this.textIterator = new TextIterator();
     this.textCurve = new Curve();
     this.textCurve.points([
       { p: 0, t: 0 },
-      { p: 1, t: 100 },
+      { p: 1, t: this._textSpeedPerCharacterInMs },
     ]);
     this.textCurve.repeat(-1);
 
@@ -119,22 +118,22 @@ export class DialogComponent extends Component {
       const xPosition = this.position.x + this.pixelBorderThickness + (this.textPadding ?? 0);
 
       this.text += result.character;
-      //for (let option of result.Options) {
-      //  this.text += '   ' + option + '\n';
-      //}
+      result.Options.forEach((option, i, a) => {
+        this.text += '    ' + option + (i < a.length - 1 ? '\n' : '');
+      });
 
-      for (let i = 0; i < result.Options.length; i++) {
-        const option = result.Options[i];
-        this.listbox.initialize([
-          [
-            {
-              index: i,
-              location: new vec2(0, 0),
-              text: option,
-            },
-          ],
-        ]);
+      if (result.Options.length > 0) {
+        this._cursor.visible = true;
+        const pos = this.position.copy();
+        pos.x += 10;
+        pos.y += 10;
+        pos.z = -0.5;
+        this._cursor.setTileTransform({
+          position: pos,
+        });
       }
+
+      this.text = this.shiftTextLines(this.text);
 
       this.eng.textManager.setTextBlock({
         id: this.id,
@@ -145,6 +144,38 @@ export class DialogComponent extends Component {
         depth: -1,
       });
     };
+  }
+
+  get maxLinesInDialog(): number {
+    const innerHeight = this.height - this.pixelBorderThickness * 2;
+    return innerHeight / this.eng.textManager.lineHeight;
+  }
+
+  private shiftTextLines(text: string): string {
+    let lineCount = (text.match(/\n/g) || []).length + 1;
+    if (text.endsWith('\n')) {
+      lineCount--;
+    }
+    if (lineCount > this.maxLinesInDialog) {
+      let startIndex = text.length - 1;
+      lineCount = 0;
+
+      // go backwards until we get the max lines
+      for (let i = text.length - 1; i >= 0; i--) {
+        if (text.at(i) == '\n') {
+          lineCount++;
+          if (lineCount >= this.maxLinesInDialog) {
+            // add one to remove the new line we just came across
+            startIndex = i + 1;
+            break;
+          }
+        }
+      }
+      const corrected = text.substring(startIndex);
+      return corrected;
+    }
+
+    return text;
   }
 
   /**
@@ -167,17 +198,22 @@ export class DialogComponent extends Component {
     };
     this.openCurve.onDone = () => {
       if (this.isHiding) {
-        this._visible = false;
+        this.hideDialog();
       } else {
-        this._cursor.initialize({
-          imageName: 'icon1',
-          position: new vec3(this.position.x - 10, this.position.y - 10, 0),
-        });
-        this._cursor.visible = true;
         this.textIterator.initialize(this.fullText);
         this.textCurve.start(true);
       }
     };
+  }
+
+  /**
+   * Hide the 9 dialog tiles and icons
+   */
+  private hideDialog(): void {
+    this._visible = false;
+    this.tileData.forEach((v, _) => {
+      v.visible = false;
+    });
   }
 
   /**
@@ -206,6 +242,7 @@ export class DialogComponent extends Component {
   hide(): void {
     this.isHiding = true;
     this.eng.textManager.hideText(this.id);
+    this._cursor.visible = false;
     this.openCurve.reverse(true);
     this.openCurve.start(true);
     this.textCurve.pause(0);
@@ -235,17 +272,19 @@ export class DialogComponent extends Component {
   updateDialogQuad(): void {
     const drawingLayer = this.eng.dialogManager.drawingLayer;
 
-    drawingLayer.registerQuad(this.createTopRightQuad(this._quads[0]));
-    drawingLayer.registerQuad(this.createTopQuad(this._quads[1]));
-    drawingLayer.registerQuad(this.createTopLeftQuad(this._quads[2]));
+    this.createIcons();
 
-    drawingLayer.registerQuad(this.createLeftQuad(this._quads[3]));
-    drawingLayer.registerQuad(this.createCenterQuad(this._quads[4]));
-    drawingLayer.registerQuad(this.createRightQuad(this._quads[5]));
+    drawingLayer.registerQuad(this.createTopRightQuad());
+    drawingLayer.registerQuad(this.createTopQuad());
+    drawingLayer.registerQuad(this.createTopLeftQuad());
 
-    drawingLayer.registerQuad(this.createBottomQuad(this._quads[6]));
-    drawingLayer.registerQuad(this.createBottomLeftQuad(this._quads[7]));
-    drawingLayer.registerQuad(this.createBottomRightQuad(this._quads[8]));
+    drawingLayer.registerQuad(this.createLeftQuad());
+    drawingLayer.registerQuad(this.createCenterQuad());
+    drawingLayer.registerQuad(this.createRightQuad());
+
+    drawingLayer.registerQuad(this.createBottomQuad());
+    drawingLayer.registerQuad(this.createBottomLeftQuad());
+    drawingLayer.registerQuad(this.createBottomRightQuad());
 
     // icons
   }
@@ -275,84 +314,75 @@ export class DialogComponent extends Component {
     }
   }
 
-  protected createCenterQuad(dest: Quad): RuntimeTileData {
+  protected createCenterQuad(): RuntimeTileData {
     const width = this.width - 16;
     const height = this.height - 16;
     const imageName = 'center';
     const offset = new vec2(this.width / 2, this.height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset, 0.8);
+    return this.createQuadImp(width, height, imageName, offset, 0.8);
   }
 
-  protected createTopLeftQuad(dest: Quad): RuntimeTileData {
+  protected createTopLeftQuad(): RuntimeTileData {
     const width = 8;
     const height = 8;
     const imageName = 'top:left';
     const offset = new vec2(width / 2, this.height - height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createTopRightQuad(dest: Quad): RuntimeTileData {
+  protected createTopRightQuad(): RuntimeTileData {
     const width = 8;
     const height = 8;
     const imageName = 'top:right';
     const offset = new vec2(this.width - width / 2, this.height - height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
-  protected createBottomRightQuad(dest: Quad): RuntimeTileData {
+  protected createBottomRightQuad(): RuntimeTileData {
     const width = 8;
     const height = 8;
     const imageName = 'bottom:right';
     const offset = new vec2(this.width - width / 2, height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createBottomLeftQuad(dest: Quad): RuntimeTileData {
+  protected createBottomLeftQuad(): RuntimeTileData {
     const width = 8;
     const height = 8;
     const imageName = 'bottom:left';
     const offset = new vec2(width / 2, height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createLeftQuad(dest: Quad): RuntimeTileData {
+  protected createLeftQuad(): RuntimeTileData {
     const width = 8;
     const height = this.height - 16;
     const imageName = 'center:left';
     const offset = new vec2(width / 2, height / 2 + width);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createTopQuad(dest: Quad): RuntimeTileData {
+  protected createTopQuad(): RuntimeTileData {
     const width = this.width - 16;
     const height = 8;
     const imageName = 'top:center';
     const offset = new vec2(width / 2 + 8, this.height - 8 / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createBottomQuad(dest: Quad): RuntimeTileData {
+  protected createBottomQuad(): RuntimeTileData {
     const width = this.width - 16;
     const height = 8;
     const imageName = 'bottom:center';
     const offset = new vec2(width / 2 + 8, height / 2);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
-  protected createRightQuad(dest: Quad): RuntimeTileData {
+  protected createRightQuad(): RuntimeTileData {
     const width = 8;
     const height = this.height - 16;
     const imageName = 'center:right';
     const offset = new vec2(this.width - width / 2, height / 2 + 8);
-    const id = imageName + '_' + this.eng.random.getUuid();
-    return this.createQuadImp(id, width, height, imageName, offset);
+    return this.createQuadImp(width, height, imageName, offset);
   }
 
   /**
@@ -366,48 +396,18 @@ export class DialogComponent extends Component {
    * @returns
    */
   protected createQuadImp(
-    id: string,
     width: number,
     height: number,
     imageName: string,
     offset: vec2,
     alpha: number = 1.0
   ): RuntimeTileData {
-    /*
-    if (!dest) {
-      dest = this.defaultQuad();
-    }
-
-    dest.uuid = id;
-    dest.width = width;
-    dest.height = height;
-    dest.offset.set(offset);
-    dest.mirrorX = false;
-    dest.mirrorY = false;
-    dest.alpha = alpha;
-    dest.hueAngle = 0;
-
-    const pos = this.position;
-
-    dest.transform.setIdentity();
-    dest.transform.translate(new vec3(pos.x, pos.y, 0));
-    dest.transform.scale(vec3.one);
-
-    const sourceLocation = this.tileData.images.get(imageName);
-
-    const scaleX = sourceLocation.z / this.texture.width;
-    const scaleY = sourceLocation.w / this.texture.height;
-    const offsetU = sourceLocation.x / this.texture.width;
-    const offsetV = sourceLocation.y / this.texture.height;
-
-    dest.uvTransform.setIdentity();
-    dest.uvTransform.scale(new vec2(scaleX, scaleY));
-    dest.uvTransform.setTranslation(new vec2(offsetU, 1 - scaleY - offsetV));
-    */
-    const tile = new RuntimeTileData(this.eng, id, imageName, this.drawingLayer);
+    const tileId = 'Dialog Menu';
+    const tile = new RuntimeTileData(this.eng, this.id + '_' + imageName, tileId, this.drawingLayer);
     tile.setTileTransform({
       position: this.position,
       offset: offset,
+      tileSize: new vec2(1, 1),
     });
     tile.setImage(imageName);
 
@@ -418,6 +418,9 @@ export class DialogComponent extends Component {
     tile.mirrorY = false;
     tile.alpha = alpha;
     tile.hueAngle = 0;
+
+    // save for later
+    this.tileData.set(imageName, tile);
 
     return tile;
   }

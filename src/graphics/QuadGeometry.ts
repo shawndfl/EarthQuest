@@ -1,3 +1,4 @@
+import { IQuadSorter } from '../drawingLayers/IQuadSorter';
 import mat3 from '../math/mat3';
 import mat4 from '../math/mat4';
 import vec2 from '../math/vec2';
@@ -108,7 +109,7 @@ export class QuadGeometry {
    * @param quads
    * @returns
    */
-  static createQuad(quads: Quad[]): Geometry {
+  static createQuad(quads: Quad[], sorter: IQuadSorter): Geometry {
     //TODO add a quad sorter
     let vertCount = 0;
     let vertIndex = 0;
@@ -140,27 +141,8 @@ export class QuadGeometry {
     const t3 = new vec2();
     const offset = new vec3();
 
-    // used to sort bottom point of a quad
-    const pointA = new vec3(0, 0, 0);
-    const pointB = new vec3(0, 0, 0);
-    // sort by height
-    quads.sort((a, b) => {
-      const bottomA = -a.height / 2 + a.offset.y;
-      pointA.x = 0;
-      pointA.y = bottomA;
-      pointA.z = 0;
-      a.transform?.multiplyVec3(pointA, pointA);
-      pointA.y += a.depthBias;
-
-      const bottomB = -b.height / 2 + b.offset.y;
-      pointB.x = 0;
-      pointB.y = bottomB;
-      pointB.z = 0;
-      b.transform?.multiplyVec3(pointB, pointB);
-      pointB.y += b.depthBias;
-
-      return pointB.y - pointA.y;
-    });
+    // sort them
+    sorter.sort(quads);
 
     for (let quad of quads) {
       if (quad.offset) {

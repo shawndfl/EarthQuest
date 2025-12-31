@@ -4,13 +4,15 @@ import { ITileAtlas } from '../data/ITileAtlas';
 import { RuntimeTileData } from '../data/RuntimeLevelData';
 
 import { GlBuffer } from '../graphics/GlBuffer';
-import { Quad, QuadGeometry } from '../graphics/QuadGeometry';
+import { QuadGeometry } from '../graphics/QuadGeometry';
 import { Texture } from '../graphics/Texture';
 
 import mat4 from '../math/mat4';
 import { BaseShader } from '../shaders/BaseShader';
 
 import { SpritePerspectiveShader } from '../shaders/SpritePerspectiveShader';
+import { IQuadSorter } from './IQuadSorter';
+import { QuadHeightSorter } from './QuadHeightSorter';
 
 /**
  * This will manage a collection of quads and draw them in one draw call
@@ -28,6 +30,8 @@ export class DrawingLayer extends Component {
   protected _tileAtlas: ITileAtlas;
   /** Should the buffer be updated by the the _quads */
   protected _refreshGeometry: boolean;
+
+  protected sorter: IQuadSorter;
 
   /**
    * Get the texture assigned to this layer
@@ -50,6 +54,7 @@ export class DrawingLayer extends Component {
   constructor(eng: Engine, private _atlasId: string) {
     super(eng);
     this._tileAtlas = this.eng.assetManager.atlasData[this._atlasId];
+    this.sorter = this.createQuadSorter();
   }
 
   protected createShader(): BaseShader {
@@ -63,6 +68,10 @@ export class DrawingLayer extends Component {
   registerQuad(tile: RuntimeTileData): void {
     this._tileControllers.set(tile.uuid, tile);
     this._refreshGeometry = true;
+  }
+
+  createQuadSorter(): IQuadSorter {
+    return new QuadHeightSorter();
   }
 
   /**
@@ -111,7 +120,10 @@ export class DrawingLayer extends Component {
     if (this._refreshGeometry) {
       // set the openGL buffers
       const quads = Array.from(this._tileControllers.values()).filter((tile) => !tile.quad.hidden);
-      const geo = QuadGeometry.createQuad(quads.map((tile) => tile.quad));
+      const geo = QuadGeometry.createQuad(
+        quads.map((tile) => tile.quad),
+        this.sorter
+      );
       this._buffer.setBuffers(geo);
 
       this._refreshGeometry = false;
@@ -127,7 +139,7 @@ export class DrawingLayer extends Component {
 
     this._shader.enable();
 
-    const proj = this.eng.viewManager.projection;
+    const proj = this.getProjection();
 
     this._shader.setProj(proj);
     this._buffer.enable();

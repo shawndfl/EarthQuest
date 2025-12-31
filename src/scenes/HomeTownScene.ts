@@ -92,7 +92,7 @@ export class HomeTownScene extends Scene {
   async createHouse(position: vec2): Promise<void> {
     const tileData = this._backgroundLayer.tileAtlas.tiles['ness house'];
 
-    const house = new SolidTile(this.eng, 'ness house', {
+    const house = new SolidTile(this.eng, 'nessHouse_' + this.eng.random.getUuid(), {
       initializePosition: new vec3(...position.xy, 0.5),
       drawingLayer: this._characterLayer,
       tileDataId: 'ness house',
@@ -182,7 +182,7 @@ export class HomeTownScene extends Scene {
   }
 
   protected PlaceBackgroundTile(tileName: string, x: number, y: number): void {
-    const backgroundDetail = new StaticTile(this.eng, 'flower_' + tileName, {
+    const backgroundDetail = new StaticTile(this.eng, 'flower_' + tileName + '_' + this.eng.random.getUuid(), {
       initializePosition: new vec3(x, y, 0.6),
       drawingLayer: this._backgroundDetail,
       tileDataId: tileName,

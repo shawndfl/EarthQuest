@@ -180,10 +180,8 @@ export class RuntimeTileData extends Component {
   }
 
   public set visible(value: boolean) {
-    if (this._quad.hidden == value) {
-      this._quad.hidden = !value;
-      this.drawingLayer.requestRefresh();
-    }
+    this._quad.hidden = !value;
+    this.drawingLayer.requestRefresh();
   }
 
   public get name(): string {
@@ -253,7 +251,7 @@ export class RuntimeTileData extends Component {
 
     // initialize the quad that is used in rendering
     this._quad = {
-      uuid: this._name + '_' + this.eng.random.getUuid(),
+      uuid: this._name,
       width: eng.pixelScale, // this will match the size of the canvas pixel scale
       height: eng.pixelScale, // this will match the size of the canvas pixel scale
       offset: new vec2(),
@@ -268,8 +266,6 @@ export class RuntimeTileData extends Component {
 
     // make sure the drawing layer knows about this quad
     this.drawingLayer.registerQuad(this);
-
-    this._drawingLayer.tileAtlas;
 
     this._images = new Map();
     const point = this.getLocationFromString(this._tileData.sourceLocation);

@@ -38,9 +38,9 @@ export class NpcTile extends RigidBodyTile {
       if (this.withInRangeOfPlayer() && this.playerIsFacingMe()) {
         this.eng.dialogManager.showDialog({
           text:
-            "I know you. You're that\ntough kid! " +
-            TextReturn +
-            'Do you want to fight!?!\n' +
+            "I know you. You're Ness.\nI heard so much about you.\nYou are a great warrior!\n" +
+            'Can you show me some of your moves?\n' +
+            'Do you want to fight?!?\n' +
             TextTab +
             "I'll kick your butt\n" +
             TextTab +
@@ -49,7 +49,7 @@ export class NpcTile extends RigidBodyTile {
           textPadding: 5,
           color: new vec4(1, 1, 1, 1),
           height: 100,
-          width: 300,
+          width: 320,
           id: 'Poo.1',
           onAccept: (options) => {},
           onClose: (options) => {},

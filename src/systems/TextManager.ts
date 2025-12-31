@@ -42,11 +42,13 @@ export class TextManager extends Component {
 
     // find the tallest character. This will be used when calculating new lines
     this.maxHeightOfCharacters = 0;
+    let minY = 0;
     this.fontData.forEach((value) => {
-      if (value.sizeY > this.maxHeightOfCharacters) {
-        this.maxHeightOfCharacters = value.sizeY;
-      }
+      this.maxHeightOfCharacters = Math.max(value.sizeY, this.maxHeightOfCharacters);
+      minY = Math.min(value.bearingY - value.sizeY, minY);
     });
+
+    this.maxHeightOfCharacters += -minY;
 
     // reset the text controllers
     this.texts.clear();

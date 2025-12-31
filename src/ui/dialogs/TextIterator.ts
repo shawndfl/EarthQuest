@@ -53,14 +53,14 @@ export class TextIterator {
       };
     }
 
-    // we the user is just hitting the acknowledge button
+    // The user is just hitting the acknowledge button
     // and there is nothing to acknowledge then just skip to the end of the text
     if (this.acknowledged && !this.waitForAcknowledge) {
       const endIndex = this.text.indexOf('\n', this.index);
       if (endIndex != -1) {
         const text = this.text.substring(this.index, endIndex + 1);
         this.index += text.length;
-        this.waitForAcknowledge = true;
+        this.waitForAcknowledge = false;
         this.acknowledged = false;
         return {
           character: text,
