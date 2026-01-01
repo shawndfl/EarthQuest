@@ -44,14 +44,18 @@ export class NpcTile extends RigidBodyTile {
             TextTab +
             "I'll kick your butt\n" +
             TextTab +
-            'No thanks',
+            'No thanks\n' +
+            TextTab +
+            '...Maybe',
           fontScale: 1,
           textPadding: 5,
           color: new vec4(1, 1, 1, 1),
           height: 100,
           width: 320,
           id: 'Poo.1',
-          onAccept: (options) => {},
+          onAccept: (option) => {
+            console.log('accept ' + option);
+          },
           onClose: (options) => {},
           position: new vec3(50, this.eng.height - 100 - 50, 0),
         });

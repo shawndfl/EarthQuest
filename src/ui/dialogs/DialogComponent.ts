@@ -28,13 +28,19 @@ export const TextTab = '\x09';
  * Creates the quads that make up the dialog box.
  */
 export class DialogComponent extends Component {
-  protected _cursor: RuntimeTileData;
-  protected listbox: ListBox;
   protected _id: string;
+
+  protected _cursor: RuntimeTileData;
+  protected _cursorBlinkSpeed = 250;
+  protected _cursorLocation: vec3;
 
   protected _textSpeedPerCharacterInMs = 60;
 
   protected readonly TileId = 'Dialog Menu';
+  /** The selectable options for this dialog */
+  protected _selectableOptions: string[];
+  protected _selectedIndex: number = 0;
+  protected _firstOptionLocation: vec3;
 
   protected tileData: Map<string, RuntimeTileData> = new Map();
   protected texture: Texture;
@@ -43,6 +49,7 @@ export class DialogComponent extends Component {
   protected originalWidth: number;
   protected originalHeight: number;
   protected pixelBorderThickness: number = 10;
+  protected borderDepthOffset: number = -0.5;
   protected alpha: number;
   protected position: vec3;
   protected fullText: string;
@@ -61,6 +68,29 @@ export class DialogComponent extends Component {
   protected textCurve: Curve;
   protected cursorCurve: Curve;
 
+  set selectedIndex(index: number) {
+    if (this._selectableOptions) {
+      console.debug('raw index       ' + index);
+      if (index < 0) {
+        index = this._selectableOptions.length - 1;
+      }
+      this._selectedIndex = index % this._selectableOptions.length;
+      console.debug('corrected index ' + this._selectedIndex);
+      this._cursorLocation = this._firstOptionLocation.copy();
+      const yOffset = this.eng.textManager.lineHeight * this._selectedIndex;
+      // subtract because the next options will be lower on the screen
+      this._cursorLocation.y -= yOffset;
+    }
+  }
+  get selectedIndex(): number {
+    return this._selectedIndex;
+  }
+
+  get selectedOption(): string {
+    if (this._selectableOptions?.length) {
+      return this._selectableOptions[this._selectedIndex];
+    }
+  }
   get drawingLayer(): DrawingLayer {
     return this.eng.dialogManager.drawingLayer;
   }
@@ -75,6 +105,7 @@ export class DialogComponent extends Component {
 
     this.setupTextAnimation();
     this.setupOpenAnimation();
+    this.setupCursorAnimation();
   }
 
   protected createIcons(): void {
@@ -86,6 +117,25 @@ export class DialogComponent extends Component {
       this._cursor.visible = false;
       this.tileData.set(id, this._cursor);
     }
+  }
+
+  protected setupCursorAnimation(): void {
+    this.cursorCurve = new Curve();
+    this.cursorCurve.points([
+      { p: 0, t: 0 },
+      { p: 5, t: this._cursorBlinkSpeed },
+    ]);
+    this.cursorCurve.repeat(-1);
+    this.cursorCurve.pingPong(true);
+    this.cursorCurve.curve(CurveType.linear);
+
+    this.cursorCurve.onUpdate = (value) => {
+      if (this._cursor.visible) {
+        const pos = this._cursorLocation.copy();
+        pos.x += value;
+        this._cursor.setTileTransform({ position: pos });
+      }
+    };
   }
 
   /**
@@ -113,6 +163,10 @@ export class DialogComponent extends Component {
       if (result.pauseForUser) {
         return;
       }
+
+      // save the options for later
+      this._selectableOptions = result.Options;
+
       const yPosition =
         this.eng.height - this.position.y - this.height + this.pixelBorderThickness * 2 + (this.textPadding ?? 0);
       const xPosition = this.position.x + this.pixelBorderThickness + (this.textPadding ?? 0);
@@ -124,12 +178,24 @@ export class DialogComponent extends Component {
 
       if (result.Options.length > 0) {
         this._cursor.visible = true;
-        const pos = this.position.copy();
-        pos.x += 10;
-        pos.y += 10;
-        pos.z = -0.5;
+        // start at the bottom left of the dialog
+        this._firstOptionLocation = this.position.copy();
+        // figure out the position of the first option
+        const firstOptionYOffset = this.eng.textManager.lineHeight * (result.Options.length - 1);
+        this._firstOptionLocation.x += this.pixelBorderThickness + (this.textPadding ?? 0);
+        this._firstOptionLocation.y += this.pixelBorderThickness + (this.textPadding ?? 0) + firstOptionYOffset;
+        this._firstOptionLocation.z = this.borderDepthOffset;
+
+        // set the cursor to the first option
+        this._cursorLocation = this._firstOptionLocation.copy();
+
+        this._selectedIndex = 0;
+
+        this.cursorCurve.start();
+
+        // set the initial position
         this._cursor.setTileTransform({
-          position: pos,
+          position: this._cursorLocation,
         });
       }
 
@@ -151,6 +217,11 @@ export class DialogComponent extends Component {
     return innerHeight / this.eng.textManager.lineHeight;
   }
 
+  /**
+   * Shift over flow text off the top
+   * @param text
+   * @returns
+   */
   private shiftTextLines(text: string): string {
     let lineCount = (text.match(/\n/g) || []).length + 1;
     if (text.endsWith('\n')) {
@@ -296,6 +367,7 @@ export class DialogComponent extends Component {
 
     this.openCurve.update(dt);
     this.textCurve.update(dt);
+    this.cursorCurve.update(dt);
 
     this.handleInput();
   }
@@ -309,8 +381,20 @@ export class DialogComponent extends Component {
         this.hide();
       }
       this.textIterator.acknowledge();
-
       this.eng.inputManager.clearRelease();
+
+      // let the caller know what happen
+      this.dialogOptions.onAccept(this.selectedOption);
+    }
+    if (this._selectableOptions?.length > 0) {
+      // hitting up will move the cursor up on the screen, but the down on the list because the
+      // first option is highest on the screen
+      if (this.eng.inputManager.isReleased(UserAction.Up)) {
+        this.selectedIndex--;
+      }
+      if (this.eng.inputManager.isReleased(UserAction.Down)) {
+        this.selectedIndex++;
+      }
     }
   }
 
