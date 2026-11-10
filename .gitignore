@@ -1,2 +1,23 @@
-node_modules
-coverage
+# Dependencies and package-manager caches
+node_modules/
+.npm-cache/
+
+# Build output and tooling caches
+dist/
+.vite/
+*.tsbuildinfo
+coverage/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
