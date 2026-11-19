@@ -2,7 +2,6 @@ import {
   AmbientLight,
   Color,
   DirectionalLight,
-  DoubleSide,
   GridHelper,
   Mesh,
   MeshStandardMaterial,
@@ -15,11 +14,13 @@ import {
 import { MovementInput } from '../components/MovementInput';
 import { Player } from '../components/Player';
 import { Renderable } from '../components/Renderable';
+import { SpriteComponent } from '../components/SpriteComponent';
 import { Transform } from '../components/Transform';
 import { World } from '../ecs/World';
 import { KeyboardInputSystem } from '../systems/KeyboardInputSystem';
 import { PlayerMovementSystem } from '../systems/PlayerMovementSystem';
 import { RenderSyncSystem } from '../systems/RenderSyncSystem';
+import { SpriteAnimationSystem } from '../systems/SpriteAnimationSystem';
 import { ThreeRenderSystem } from '../systems/ThreeRenderSystem';
 import type { GameScene } from './GameScene';
 
@@ -47,20 +48,22 @@ export class MainWorldScene implements GameScene {
     this.scene.add(ground);
     this.scene.add(new GridHelper(30, 30, 0x365270, 0x243a51));
 
-    const playerMesh = new Mesh(
-      new PlaneGeometry(1, 1),
-      new MeshStandardMaterial({ color: 0xffc857, side: DoubleSide }),
-    );
-    playerMesh.rotation.x = -Math.PI / 2;
-    this.scene.add(playerMesh);
-
     const player = this.world.createEntity();
+    const playerSprite = this.world.addComponent(
+      player,
+      new SpriteComponent('sprites/Sprite.json', {
+        animation: 'Forward',
+        pixelsPerUnit: 16,
+      }),
+    );
+    this.scene.add(playerSprite.object);
     this.world.addComponent(player, new Transform(new Vector3(0, 0.03, 0)));
     this.world.addComponent(player, new Player(5));
     this.world.addComponent(player, new MovementInput());
-    this.world.addComponent(player, new Renderable(playerMesh));
+    this.world.addComponent(player, new Renderable(playerSprite.object));
     this.world.addSystem(new KeyboardInputSystem());
     this.world.addSystem(new PlayerMovementSystem(this.camera));
+    this.world.addSystem(new SpriteAnimationSystem());
     this.world.addSystem(new RenderSyncSystem());
     this.world.addSystem(new ThreeRenderSystem(renderer, this.scene, this.camera));
   }
