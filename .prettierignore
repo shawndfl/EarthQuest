@@ -1,0 +1,7 @@
+dist/
+node_modules/
+coverage/
+.vite/
+assets/
+public/assets/sprites/*.json
+package-lock.json

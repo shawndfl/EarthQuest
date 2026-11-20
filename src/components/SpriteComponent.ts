@@ -41,6 +41,10 @@ export class SpriteComponent {
     this.sprite?.pause();
   }
 
+  setFrame(frame: number): void {
+    this.sprite?.setFrame(frame);
+  }
+
   dispose(): void {
     if (!this.sprite) return;
     this.object.remove(this.sprite);

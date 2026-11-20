@@ -48,24 +48,21 @@ export class World {
   query<T extends readonly ComponentType<unknown>[]>(
     ...types: T
   ): Array<[Entity, ...{ [K in keyof T]: T[K] extends ComponentType<infer C> ? C : never }]> {
-    if (types.length === 0) 
-      return [];
+    if (types.length === 0) return [];
 
     const first = this.components.get(types[0]);
-    if (!first) 
-      return [];
+    if (!first) return [];
 
     const matches: Array<[Entity, ...unknown[]]> = [];
 
     for (const entity of first.keys()) {
-      const values = types.map(type => this.components.get(type)?.get(entity));
-      if (values.every(value => value !== undefined)) matches.push([entity, ...values]);
+      const values = types.map((type) => this.components.get(type)?.get(entity));
+      if (values.every((value) => value !== undefined)) matches.push([entity, ...values]);
     }
 
-    return matches as unknown as Array<[
-      Entity,
-      ...{ [K in keyof T]: T[K] extends ComponentType<infer C> ? C : never },
-    ]>;
+    return matches as unknown as Array<
+      [Entity, ...{ [K in keyof T]: T[K] extends ComponentType<infer C> ? C : never }]
+    >;
   }
 
   addSystem(system: System): void {
@@ -73,8 +70,8 @@ export class World {
   }
 
   update(deltaSeconds: number): void {
-    for (const system of this.systems){
-       system.update(this, deltaSeconds);
+    for (const system of this.systems) {
+      system.update(this, deltaSeconds);
     }
   }
 }

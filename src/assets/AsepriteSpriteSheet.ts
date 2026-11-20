@@ -201,6 +201,11 @@ export class AsepriteSprite extends Sprite {
     this.frameTexture.dispose();
   }
 
+  setFrame(frame: number): void {
+    this.animationFrame = frame % this.animation.length;
+    this.applyFrame();
+  }
+
   private currentFrame(): AsepriteFrameData {
     return this.sheet.frames[this.animation[this.animationFrame]];
   }

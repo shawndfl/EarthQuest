@@ -2,6 +2,7 @@ import { Camera, Vector3 } from 'three';
 import type { System, World } from '../ecs/World';
 import { MovementInput } from '../components/MovementInput';
 import { Player } from '../components/Player';
+import { SpriteComponent } from '../components/SpriteComponent';
 import { Transform } from '../components/Transform';
 
 export class PlayerMovementSystem implements System {
@@ -17,7 +18,14 @@ export class PlayerMovementSystem implements System {
     this.cameraForward.normalize();
     this.cameraRight.crossVectors(this.cameraForward, this.camera.up).normalize();
 
-    for (const [, transform, player, input] of world.query(Transform, Player, MovementInput)) {
+    for (const [entity, transform, player, input] of world.query(
+      Transform,
+      Player,
+      MovementInput,
+    )) {
+      const sprite = world.getComponent(entity, SpriteComponent);
+      if (sprite) this.updateAnimation(sprite, input);
+
       this.movement
         .copy(this.cameraRight)
         .multiplyScalar(input.horizontal)
@@ -26,6 +34,26 @@ export class PlayerMovementSystem implements System {
         this.movement.normalize();
         transform.position.addScaledVector(this.movement, player.speed * deltaSeconds);
       }
+    }
+  }
+
+  private updateAnimation(sprite: SpriteComponent, input: MovementInput): void {
+    if (input.horizontal === 0 && input.vertical === 0) {
+      sprite.pause();
+      sprite.setFrame(2);
+      return;
+    }
+
+    // The sheet contains the left-facing half of the eight movement directions.
+    // Mirror those animations for movement to the right.
+    sprite.object.scale.x = input.horizontal > 0 ? -1 : 1;
+
+    if (input.vertical > 0) {
+      sprite.play(input.horizontal === 0 ? 'Back' : 'BackLeft');
+    } else if (input.vertical < 0) {
+      sprite.play(input.horizontal === 0 ? 'Forward' : 'ForwardLeft');
+    } else {
+      sprite.play('Left');
     }
   }
 }
