@@ -37,12 +37,24 @@ export class SpriteComponent {
     this.sprite?.play(animation, restart);
   }
 
+  isPlaying(): boolean {
+    return !!this.sprite?.isPlaying();
+  }
+
   pause(): void {
     this.sprite?.pause();
   }
 
   setFrame(frame: number): void {
     this.sprite?.setFrame(frame);
+  }
+
+  setFlipHorizontal(flipped: boolean): void {
+    if (this.sprite) this.sprite.flipHorizontal = flipped;
+  }
+
+  setFlipVertical(flipped: boolean): void {
+    if (this.sprite) this.sprite.flipVertical = flipped;
   }
 
   dispose(): void {

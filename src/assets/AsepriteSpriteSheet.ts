@@ -45,6 +45,8 @@ export interface AsepriteSpriteOptions {
   animation?: string;
   pixelsPerUnit?: number;
   autoplay?: boolean;
+  flipHorizontal?: boolean;
+  flipVertical?: boolean;
 }
 
 interface Animation {
@@ -145,7 +147,8 @@ export class AsepriteSprite extends Sprite {
   private animationFrame = 0;
   private elapsedMilliseconds = 0;
   private playing: boolean;
-
+  private horizontalFlipped: boolean;
+  private verticalFlipped: boolean;
   constructor(
     private readonly sheet: AsepriteSpriteSheet,
     options: AsepriteSpriteOptions = {},
@@ -158,11 +161,35 @@ export class AsepriteSprite extends Sprite {
     this.pixelsPerUnit = options.pixelsPerUnit ?? 16;
     if (this.pixelsPerUnit <= 0) throw new Error('pixelsPerUnit must be greater than zero');
     this.playing = options.autoplay ?? true;
+    this.horizontalFlipped = options.flipHorizontal ?? false;
+    this.verticalFlipped = options.flipVertical ?? false;
     this.play(options.animation ?? 'all', true);
   }
 
   get currentAnimation(): string {
     return this.animationName;
+  }
+
+  isPlaying(): boolean {
+    return this.playing;
+  }
+
+  get flipHorizontal(): boolean {
+    return this.horizontalFlipped;
+  }
+
+  set flipHorizontal(flipped: boolean) {
+    this.horizontalFlipped = flipped;
+    this.applyTextureCoordinates();
+  }
+
+  get flipVertical(): boolean {
+    return this.verticalFlipped;
+  }
+
+  set flipVertical(flipped: boolean) {
+    this.verticalFlipped = flipped;
+    this.applyTextureCoordinates();
   }
 
   play(name: string, restart = false): void {
@@ -184,6 +211,7 @@ export class AsepriteSprite extends Sprite {
   }
 
   update(deltaSeconds: number): void {
+
     if (!this.playing || this.animation.length < 2 || deltaSeconds <= 0) return;
 
     this.elapsedMilliseconds += deltaSeconds * 1000;
@@ -202,8 +230,10 @@ export class AsepriteSprite extends Sprite {
   }
 
   setFrame(frame: number): void {
-    this.animationFrame = frame % this.animation.length;
-    this.applyFrame();
+    if (this.animationFrame != frame) {
+      this.animationFrame = frame;
+      this.applyFrame();
+    }
   }
 
   private currentFrame(): AsepriteFrameData {
@@ -212,14 +242,7 @@ export class AsepriteSprite extends Sprite {
 
   private applyFrame(): void {
     const frame = this.currentFrame();
-    const sheetSize = this.sheet.data.meta.size;
-
-    this.frameTexture.repeat.set(frame.frame.w / sheetSize.w, frame.frame.h / sheetSize.h);
-    this.frameTexture.offset.set(
-      frame.frame.x / sheetSize.w,
-      1 - (frame.frame.y + frame.frame.h) / sheetSize.h,
-    );
-
+    this.applyTextureCoordinates();
     this.scale.set(
       frame.sourceSize.w / this.pixelsPerUnit,
       frame.sourceSize.h / this.pixelsPerUnit,
@@ -228,5 +251,23 @@ export class AsepriteSprite extends Sprite {
 
     // Keep the character's feet anchored when frames have different heights.
     this.center.set(0.5, 0);
+  }
+
+  private applyTextureCoordinates(): void {
+    const frame = this.currentFrame();
+    const sheetSize = this.sheet.data.meta.size;
+    const width = frame.frame.w / sheetSize.w;
+    const height = frame.frame.h / sheetSize.h;
+    const left = frame.frame.x / sheetSize.w;
+    const bottom = 1 - (frame.frame.y + frame.frame.h) / sheetSize.h;
+
+    this.frameTexture.repeat.set(
+      this.horizontalFlipped ? -width : width,
+      this.verticalFlipped ? -height : height,
+    );
+    this.frameTexture.offset.set(
+      this.horizontalFlipped ? left + width : left,
+      this.verticalFlipped ? bottom + height : bottom,
+    );
   }
 }

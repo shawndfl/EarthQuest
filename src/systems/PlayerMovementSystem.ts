@@ -10,7 +10,7 @@ export class PlayerMovementSystem implements System {
   private readonly cameraForward = new Vector3();
   private readonly movement = new Vector3();
 
-  constructor(private readonly camera: Camera) {}
+  constructor(private readonly camera: Camera) { }
 
   update(world: World, deltaSeconds: number): void {
     this.camera.getWorldDirection(this.cameraForward);
@@ -40,18 +40,19 @@ export class PlayerMovementSystem implements System {
   private updateAnimation(sprite: SpriteComponent, input: MovementInput): void {
     if (input.horizontal === 0 && input.vertical === 0) {
       sprite.pause();
-      sprite.setFrame(2);
+      sprite.setFrame(1);
       return;
     }
 
     // The sheet contains the left-facing half of the eight movement directions.
     // Mirror those animations for movement to the right.
-    sprite.object.scale.x = input.horizontal > 0 ? -1 : 1;
+    sprite.setFlipHorizontal(input.horizontal > 0);
 
     if (input.vertical > 0) {
-      sprite.play(input.horizontal === 0 ? 'Back' : 'BackLeft');
+      //sprite.setFlipVertical(input.horizontal < 0)      
+      sprite.play(input.horizontal === 0 ? 'Back' : 'BackLeft', !sprite.isPlaying());
     } else if (input.vertical < 0) {
-      sprite.play(input.horizontal === 0 ? 'Forward' : 'ForwardLeft');
+      sprite.play(input.horizontal === 0 ? 'Forward' : 'ForwardLeft', !sprite.isPlaying());
     } else {
       sprite.play('Left');
     }
