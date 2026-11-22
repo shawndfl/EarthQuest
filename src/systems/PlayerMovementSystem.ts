@@ -1,3 +1,4 @@
+import { Collision } from '../components/Collision';
 import { Camera, Vector3 } from 'three';
 import type { System, World } from '../ecs/World';
 import { MovementInput } from '../components/MovementInput';
@@ -32,7 +33,9 @@ export class PlayerMovementSystem implements System {
         .addScaledVector(this.cameraForward, input.vertical);
       if (this.movement.lengthSq() > 0) {
         this.movement.normalize();
-        transform.position.addScaledVector(this.movement, player.speed * deltaSeconds);
+        const body = world.getComponent(entity, Collision);
+        if (body) body.displacement.copy(this.movement).multiplyScalar(player.speed * deltaSeconds);
+        else transform.position.addScaledVector(this.movement, player.speed * deltaSeconds);
       }
     }
   }

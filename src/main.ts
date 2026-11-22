@@ -6,7 +6,8 @@ const canvasElement = document.querySelector<HTMLCanvasElement>('#canvas');
 if (!canvasElement) throw new Error('Game canvas was not found');
 const canvas: HTMLCanvasElement = canvasElement;
 
-const renderer = new WebGLRenderer({ canvas, antialias: true });
+// Pixel-art tiles use nearest sampling. Multisampling their overlapping quad edges creates seams.
+const renderer = new WebGLRenderer({ canvas, antialias: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const activeScene = new MainWorldScene(renderer);

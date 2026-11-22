@@ -1,12 +1,9 @@
+import { Collision } from '../components/Collision';
+import { CollisionSystem } from '../systems/CollisionSystem';
+import { TileLayoutSystem, tileSize, isometricOrder } from '../systems/TileLayoutSystem';
 import {
-  AmbientLight,
   Color,
-  DirectionalLight,
-  GridHelper,
-  Mesh,
-  MeshStandardMaterial,
   OrthographicCamera,
-  PlaneGeometry,
   Scene,
   Vector3,
   WebGLRenderer,
@@ -32,23 +29,36 @@ export class MainWorldScene implements GameScene {
 
   constructor(renderer: WebGLRenderer) {
     this.scene.background = new Color(0x101826);
-    this.camera.position.set(8, 10, 8);
+    this.camera.position.set(8, 8 * Math.sqrt(2 / 3), 8);
     this.camera.lookAt(0, 0, 0);
     this.camera.updateMatrixWorld();
 
-    this.scene.add(new AmbientLight(0xffffff, 1.6));
-    const sun = new DirectionalLight(0xffffff, 2.5);
-    sun.position.set(4, 10, 2);
-    this.scene.add(sun);
 
-    const ground = new Mesh(
-      new PlaneGeometry(30, 30),
-      new MeshStandardMaterial({ color: 0x16263a, roughness: 0.9 }),
-    );
-    ground.rotation.x = -Math.PI / 2;
-    this.scene.add(ground);
-    this.scene.add(new GridHelper(30, 30, 0x365270, 0x243a51));
+    const layout = new TileLayoutSystem([
+      '333333333333333333',
+      '311131111111111113',
+      '312234122111111113',
+      '311111111111111113333333333333333',
+      '311211111111111111111111111111113',
+      '311111131111111111111111111111113',
+      '311111131111111111111111111111113',
+      '31122111111111111111111111111111333333333',
+      '31112111111111111111111111111111111111113',
+      '333333313333333313333333333333333333333113',
+      '333332111333333311111111111111111111111313',
+      '333333313333333313333333333333333333333313',
+      '311111111111111111111111111111111111111113',
+      '333333313333333313333333333333333333333313',
+      '311111111111111111111111111111111111111113',
+      '333333313333333313333333333333333333333313',
+      '311111111111111111111111111111111111111113',
+      '333333313333333313333333333333333333333313',
+      '311111111111111111111111111111111111111113',
+      '333333333311111111111333333333333333333333',
+      '0000000003333333333333',
+    ]);
 
+    void layout.load(this.scene).catch(console.error);
     const player = this.world.createEntity();
     const playerSprite = this.world.addComponent(
       player,
@@ -58,15 +68,27 @@ export class MainWorldScene implements GameScene {
       }),
     );
     this.scene.add(playerSprite.object);
-    this.world.addComponent(player, new Transform(new Vector3(0, 0.03, 0)));
+    this.world.addComponent(player, new Transform(new Vector3(5 * tileSize, 0.03, 4 * tileSize)));
+    this.world.addComponent(player, new Collision(0.22));
     this.world.addComponent(player, new Player(5));
     this.world.addComponent(player, new MovementInput());
     this.world.addComponent(player, new Renderable(playerSprite.object));
     this.world.addSystem(new KeyboardInputSystem());
     this.world.addSystem(new PlayerMovementSystem(this.camera));
+    this.world.addSystem(new CollisionSystem(layout));
     this.world.addSystem(new CameraFollowSystem(this.camera, player));
     this.world.addSystem(new SpriteAnimationSystem());
     this.world.addSystem(new RenderSyncSystem());
+    this.world.addSystem({
+      update() {
+        const sprite = playerSprite.sprite;
+        if (!sprite) return;
+        const { x, z } = playerSprite.object.position;
+        sprite.renderOrder = isometricOrder(x, z);
+        sprite.material.depthTest = false;
+        sprite.material.depthWrite = false;
+      },
+    });
     this.world.addSystem(new ThreeRenderSystem(renderer, this.scene, this.camera));
   }
 
