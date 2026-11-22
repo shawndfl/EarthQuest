@@ -18,6 +18,7 @@ import { SpriteComponent } from '../components/SpriteComponent';
 import { Transform } from '../components/Transform';
 import { World } from '../ecs/World';
 import { KeyboardInputSystem } from '../systems/KeyboardInputSystem';
+import { CameraFollowSystem } from '../systems/CameraFollowSystem';
 import { PlayerMovementSystem } from '../systems/PlayerMovementSystem';
 import { RenderSyncSystem } from '../systems/RenderSyncSystem';
 import { SpriteAnimationSystem } from '../systems/SpriteAnimationSystem';
@@ -63,6 +64,7 @@ export class MainWorldScene implements GameScene {
     this.world.addComponent(player, new Renderable(playerSprite.object));
     this.world.addSystem(new KeyboardInputSystem());
     this.world.addSystem(new PlayerMovementSystem(this.camera));
+    this.world.addSystem(new CameraFollowSystem(this.camera, player));
     this.world.addSystem(new SpriteAnimationSystem());
     this.world.addSystem(new RenderSyncSystem());
     this.world.addSystem(new ThreeRenderSystem(renderer, this.scene, this.camera));
